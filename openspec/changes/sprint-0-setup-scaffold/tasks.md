@@ -20,16 +20,16 @@ Chain strategy: pending
 
 ## Phase 1: Foundation & Toolchain
 
-- [ ] 1.1 Scaffold: `pnpm create next-app@15.5.22 . --ts --tailwind --eslint --app --src-dir --import-alias "@/*"`; pin next `15.5.22` exact in `package.json`
-- [ ] 1.2 Edit `package.json`: add scripts `typecheck` (`tsc --noEmit`), `test` (`vitest run`), `format`; add `onlyBuiltDependencies`
-- [ ] 1.3 Edit `tsconfig.json`: `strict: true`, `@/*` alias, include `src/test/`
-- [ ] 1.4 `pnpm install` + `pnpm approve-builds`; `pnpm dev` boots on :3000 (project-setup R5)
-- [ ] 1.5 Git: `git init`, initial commit on `main`, create `develop` from `main` (project-setup R4)
+- [x] 1.1 Scaffold: `pnpm create next-app@15.5.22 . --ts --tailwind --eslint --app --src-dir --import-alias "@/*"`; pin next `15.5.22` exact in `package.json`
+- [x] 1.2 Edit `package.json`: add scripts `typecheck` (`tsc --noEmit`), `test` (`vitest run`), `format`; add `onlyBuiltDependencies`
+- [x] 1.3 Edit `tsconfig.json`: `strict: true`, `@/*` alias, include `src/test/`
+- [x] 1.4 `pnpm install` + `pnpm approve-builds`; `pnpm dev` boots on :3000 (project-setup R5)
+- [x] 1.5 Git: `git init`, initial commit on `main`, create `develop` from `main` (project-setup R4)
 
 ## Phase 2: Test Infrastructure
 
-- [ ] 2.1 Create `vitest.config.ts`: jsdom, globals, setup file, coverage-v8
-- [ ] 2.2 Create `src/test/setup.ts`: import `@testing-library/jest-dom/vitest`
+- [x] 2.1 Create `vitest.config.ts`: jsdom, globals, setup file, coverage-v8
+- [x] 2.2 Create `src/test/setup.ts`: import `@testing-library/jest-dom/vitest`
 
 ## Phase 3: Prisma & Contracts (strict TDD)
 
