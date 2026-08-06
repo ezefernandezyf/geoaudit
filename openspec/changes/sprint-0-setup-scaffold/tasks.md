@@ -43,10 +43,10 @@ Chain strategy: pending
 
 ## Phase 4: Auth Skeleton (TDD)
 
-- [ ] 4.1 Create `.env.example`: AUTH_SECRET, AUTH_GITHUB_ID/SECRET, DATABASE_URL, STRIPE keys (auth-github R4)
-- [ ] 4.2 RED: `src/lib/__tests__/auth-middleware.test.ts` — unauthenticated `/dashboard` → 307 redirect to sign-in (auth-github R3)
-- [ ] 4.3 GREEN: create `src/lib/auth.ts` (GitHub provider, no DB adapter), `app/api/auth/[...nextauth]/route.ts` (GET+POST), `middleware.ts` (matcher `/dashboard`), `app/dashboard/page.tsx`
-- [ ] 4.4 Verify: `GET /api/auth/signin` renders GitHub button; callback POST handled (auth-github R2/R5, manual OAuth)
+- [x] 4.1 Create `.env.example`: AUTH_SECRET, AUTH_GITHUB_ID/SECRET, DATABASE_URL, STRIPE keys (auth-github R4)
+- [x] 4.2 RED: `src/lib/__tests__/auth-middleware.test.ts` — unauthenticated `/dashboard` → 307 redirect to sign-in (auth-github R3)
+- [x] 4.3 GREEN: create `src/lib/auth.ts` (GitHub provider, no DB adapter), `app/api/auth/[...nextauth]/route.ts` (GET+POST), `middleware.ts` (matcher `/dashboard`), `app/dashboard/page.tsx`
+- [x] 4.4 Verify: `GET /api/auth/signin` renders GitHub button; callback POST handled (auth-github R2/R5, manual OAuth)
 
 ## Phase 5: CI, Hooks & Config Flip
 
