@@ -9,12 +9,19 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.9.1",
+    "@prisma/client": "7.9.1",
     "next": "15.5.22",
+    "pg": "^8.22.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -23,6 +30,7 @@
     "@testing-library/jest-dom": "7.0.0",
     "@testing-library/react": "16.3.2",
     "@types/node": "^20",
+    "@types/pg": "^8.20.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "6.0.5",
@@ -31,6 +39,7 @@
     "eslint-config-next": "15.5.22",
     "jsdom": "30.0.1",
     "prettier": "^3.6.2",
+    "prisma": "7.9.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "4.1.10"

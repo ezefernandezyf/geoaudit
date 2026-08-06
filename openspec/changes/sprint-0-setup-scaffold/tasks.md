@@ -33,13 +33,13 @@ Chain strategy: pending
 
 ## Phase 3: Prisma & Contracts (strict TDD)
 
-- [ ] 3.1 Create `prisma/schema.prisma` (empty baseline, postgresql datasource) + `prisma.config.ts`; `pnpx prisma generate` passes (database-connection R4)
-- [ ] 3.2 RED: `src/lib/contracts/__tests__/url-input.test.ts` — safeParse accepts valid URL, rejects `"not-a-url"`/empty with "Invalid URL format"
-- [ ] 3.3 GREEN: create `src/lib/contracts/url-input.ts` with Zod 4 schema (design interface)
-- [ ] 3.4 RED: `src/lib/__tests__/prisma.test.ts` — missing DATABASE_URL throws error mentioning it; `prisma` export is singleton
-- [ ] 3.5 GREEN: create `src/lib/prisma.ts` — PrismaClient + adapter-pg singleton, env validation (database-connection R2), skip-if-no-env connectivity test (R1/R3)
-- [ ] 3.6 RED: `src/app/__tests__/page.test.tsx` — render root page, assert heading (project-setup R7)
-- [ ] 3.7 GREEN: adapt `app/page.tsx` + `app/layout.tsx` (Inter font, metadata) so smoke test passes
+- [x] 3.1 Create `prisma/schema.prisma` (empty baseline, postgresql datasource) + `prisma.config.ts`; `pnpx prisma generate` passes (database-connection R4)
+- [x] 3.2 RED: `src/lib/contracts/__tests__/url-input.test.ts` — safeParse accepts valid URL, rejects `"not-a-url"`/empty with "Invalid URL format"
+- [x] 3.3 GREEN: create `src/lib/contracts/url-input.ts` with Zod 4 schema (design interface)
+- [x] 3.4 RED: `src/lib/__tests__/prisma.test.ts` — missing DATABASE_URL throws error mentioning it; `prisma` export is singleton
+- [x] 3.5 GREEN: create `src/lib/prisma.ts` — PrismaClient + adapter-pg singleton, env validation (database-connection R2), skip-if-no-env connectivity test (R1/R3)
+- [x] 3.6 RED: `src/app/__tests__/page.test.tsx` — render root page, assert heading (project-setup R7)
+- [x] 3.7 GREEN: adapt `app/page.tsx` + `app/layout.tsx` (Inter font, metadata) so smoke test passes
 
 ## Phase 4: Auth Skeleton (TDD)
 
