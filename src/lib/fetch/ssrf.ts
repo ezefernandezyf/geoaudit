@@ -37,8 +37,6 @@ export class SsrfError extends Error {
   }
 }
 
-const IPV4_MAX = 0xffffffff;
-
 function ipv4ToInt(ip: string): number | null {
   const parts = ip.split(".");
   if (parts.length !== 4) return null;
@@ -50,66 +48,6 @@ function ipv4ToInt(ip: string): number | null {
     value = (value << 8) | octet;
   }
   return value >>> 0;
-}
-
-function ipv6ToBigInt(ip: string): bigint | null {
-  let head = ip;
-  let v4: number[] | null = null;
-
-  const v4Match = ip.match(/^(.*?):(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
-  if (v4Match) {
-    head = v4Match[1];
-    v4 = [
-      Number(v4Match[2]),
-      Number(v4Match[3]),
-      Number(v4Match[4]),
-      Number(v4Match[5]),
-    ];
-    if (v4.some((octet) => octet > 255)) return null;
-  }
-
-  const splitGroups = (part: string): string[] =>
-    part === "" ? [] : part.split(":");
-  const doubleColon = head.indexOf("::");
-  let left: string[];
-  let right: string[];
-  if (doubleColon === -1) {
-    left = splitGroups(head);
-    right = [];
-  } else {
-    left = splitGroups(head.slice(0, doubleColon));
-    right = splitGroups(head.slice(doubleColon + 2));
-  }
-
-  const parseGroup = (group: string): number => {
-    if (!/^[0-9a-fA-F]{1,4}$/.test(group)) return NaN;
-    return parseInt(group, 16);
-  };
-  const leftValues = left.map(parseGroup);
-  const rightValues = right.map(parseGroup);
-  if (leftValues.some(Number.isNaN) || rightValues.some(Number.isNaN))
-    return null;
-
-  const total = leftValues.length + rightValues.length + (v4 ? 2 : 0);
-  if (doubleColon === -1 && total !== 8) return null;
-  if (doubleColon !== -1 && total > 8) return null;
-
-  const groups: number[] = [...leftValues];
-  for (let i = 0; i < 8 - total; i++) groups.push(0);
-  groups.push(...rightValues);
-  if (v4) {
-    groups.push((v4[0] << 8) | v4[1]);
-    groups.push((v4[2] << 8) | v4[3]);
-  }
-
-  let value = 0n;
-  for (const group of groups) value = (value << 16n) | BigInt(group);
-  return value;
-}
-
-function ipv6MappedToIpv4(value: bigint): string {
-  const low = Number(value & BigInt(IPV4_MAX));
-  return `${(low >>> 24) & 0xff}.${(low >>> 16) & 0xff}.${(low >>> 8) & 0xff}.${low & 0xff}`;
 }
 
 /**
@@ -135,12 +73,18 @@ export function classifyIp(ip: string): IpClassification {
   }
 
   if (family === 6) {
-    const value = ipv6ToBigInt(ip);
-    if (value === null) return "reserved";
-    if (value === 1n) return "loopback"; // ::1
-    if (value >> 121n === 0x7en) return "unique_local"; // fc00::/7
-    if (value >> 118n === 0x3fan) return "link_local_reserved"; // fe80::/10
-    if (value >> 32n === 0xffffn) return classifyIp(ipv6MappedToIpv4(value)); // ::ffff:0:0/96
+    const lower = ip.toLowerCase();
+    // IPv4-mapped IPv6 must not bypass the IPv4 range rules (D6 bypass defense).
+    const mapped = lower.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+    if (mapped) return classifyIp(mapped[1]);
+    if (lower === "::1") return "loopback"; // ::1
+    const firstHextet = lower.split(":")[0];
+    if (firstHextet.startsWith("fc") || firstHextet.startsWith("fd")) {
+      return "unique_local"; // fc00::/7
+    }
+    if (/^fe[89ab]/.test(firstHextet)) {
+      return "link_local_reserved"; // fe80::/10 (fe80-febf)
+    }
     return "public";
   }
 
