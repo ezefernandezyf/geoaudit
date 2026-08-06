@@ -1,0 +1,6 @@
+# pnpm build-script allowlist — GeoAudit (see openspec/changes/sprint-0-setup-scaffold)
+# Only these packages may run native postinstall/build scripts. Add new entries
+# explicitly (pnpm approve-builds); never enable a blanket allow.
+allowBuilds:
+  sharp: true
+  unrs-resolver: true

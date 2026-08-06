@@ -1,0 +1,53 @@
+schema: spec-driven
+
+context: |
+  Project: GeoAudit (geo-saas) — micro-SaaS for automated GEO/SEO auditing. URL in -> GEO Score 0-100 + AI visibility report.
+  Stack (declared target, scaffold pending for Sprint 0): Next.js 15 App Router + TypeScript strict + Tailwind CSS 4 +
+  Prisma (PostgreSQL/Supabase) + NextAuth v5 + Stripe + Resend + Puppeteer + Zod 4 + Vitest/RTL/Playwright + pnpm + Vercel.
+  Architecture: single Next.js app (no monorepo). Screaming Architecture — business domains are top-level src/ folders
+  (crawlers, citability, schema, eeat, platform, scoring); app/ is routing only; Zod contracts in src/lib/contracts/.
+  Testing target: Vitest + React Testing Library (unit/integration) + Playwright (E2E).
+  Style: token-based design system, no component libraries; STYLE-BRIEF.md before Sprint 2 (navy/emerald/amber/red, Instrument Serif + Work Sans + JetBrains Mono).
+  Conventions: Conventional Commits (title EN, description ES); git flow develop -> main; lint/format/test before merge.
+  SDD: phases explore -> propose -> spec -> design -> tasks -> apply -> verify -> archive; artifacts `both`; PRs ask-on-risk; review budget 400 lines.
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    guidelines:
+      - Follow existing code patterns
+    tdd: false           # No test runner installed yet; Vitest target lands with scaffold in Sprint 0
+    test_command: pnpm test
+  verify:
+    test_command: pnpm test
+    build_command: pnpm run lint && pnpm run typecheck && pnpm run build
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
+
+testing:
+  strict_tdd: false
+  status: pending-scaffold
+  test_command: pnpm test
+  runner: vitest
+  layers:
+    unit: "@testing-library/react + vitest"
+    integration: "@testing-library/react + vitest"
+    e2e: "@playwright/test"
+  coverage:
+    available: false
+    command: pnpm test -- --coverage
+  quality:
+    linter: eslint
+    typechecker: tsc --noEmit
+    formatter: prettier
