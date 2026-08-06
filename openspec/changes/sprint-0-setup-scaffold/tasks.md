@@ -50,8 +50,8 @@ Chain strategy: pending
 
 ## Phase 5: CI, Hooks & Config Flip
 
-- [ ] 5.1 RED (threat matrix "PR commands"): create `.github/workflows/ci.yml` — `pull_request` on develop/main, jobs lint/typecheck/test gated by `${{ secrets.* }}`; temporary lint violation proves lint job fails check
-- [ ] 5.2 GREEN: remove violation; push branch, open PR to `develop`; all three jobs green (github-ci R1-R5)
-- [ ] 5.3 Create `.husky/pre-commit` + `.lintstagedrc`: eslint --fix + prettier --write on staged `*.{ts,tsx}`
-- [ ] 5.4 Create `docs/stripe-test-setup.md` (manual test-mode guide, no SDK)
-- [ ] 5.5 Flip `openspec/config.yaml`: `tdd: true`, `strict_tdd: true`, `status: ready`, `coverage.available: true`
+- [x] 5.1 RED (threat matrix "PR commands"): create `.github/workflows/ci.yml` — `pull_request` on develop/main, jobs lint/typecheck/test gated by `${{ secrets.* }}`; temporary lint violation proves lint job fails check
+- [x] 5.2 GREEN: remove violation; push branch, open PR to `develop`; all three jobs green (github-ci R1-R5)
+- [x] 5.3 Create `.husky/pre-commit` + `.lintstagedrc`: eslint --fix + prettier --write on staged `*.{ts,tsx}`
+- [x] 5.4 Create `docs/stripe-test-setup.md` (manual test-mode guide, no SDK)
+- [x] 5.5 Flip `openspec/config.yaml`: `tdd: true`, `strict_tdd: true`, `status: ready`, `coverage.available: true`

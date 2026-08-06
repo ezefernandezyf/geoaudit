@@ -12,7 +12,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "prepare": "husky"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.9.1",
@@ -38,7 +39,9 @@
     "@vitest/coverage-v8": "4.1.10",
     "eslint": "^9",
     "eslint-config-next": "15.5.22",
+    "husky": "^9.1.7",
     "jsdom": "30.0.1",
+    "lint-staged": "^17.3.0",
     "prettier": "^3.6.2",
     "prisma": "7.9.1",
     "tailwindcss": "^4",
