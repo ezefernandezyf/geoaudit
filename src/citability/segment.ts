@@ -1,5 +1,6 @@
 import type { Cheerio, CheerioAPI } from "cheerio";
 import type { AnyNode, ContentBlock } from "./types";
+import { countSentences, countWords } from "./text";
 
 /**
  * H2/H3 segmentation (RCI-2, RCI-13).
@@ -21,15 +22,6 @@ import type { AnyNode, ContentBlock } from "./types";
  */
 
 const SEGMENT_SELECTOR = "h2, h3, p, table, ul, ol";
-
-function countWords(text: string): number {
-  return text.trim().split(/\s+/).filter(Boolean).length;
-}
-
-function countSentences(text: string): number {
-  const matches = text.match(/[.!?]+(?=\s|$)/g);
-  return matches ? matches.length : 0;
-}
 
 function newBlock(
   heading: string,
