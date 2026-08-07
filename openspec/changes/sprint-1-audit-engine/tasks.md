@@ -38,8 +38,8 @@
 - [x] T6 [1] Body reader: `src/lib/fetch/body-reader.ts` | RFL-7 | RED: >5MB stream aborted → TOO_LARGE | T2 | ~50
 - [x] T7 [1] Fetch API: `src/lib/fetch/index.ts` | RFL-1, RFL-4/5, RFL-8, RFL-11, RFL-12 | RED: mock fetcher; http→https; ftp rejected; PDF → unsupported_content_type; timeout → TIMEOUT | T3-T6 | ~80
 - [x] T8 [1] Bot registry: `src/crawlers/bots.ts` | RCR-1 | RED: 17 unique agents w/ tier+impact; 5 Tier1 Critical | T2 | ~45
-- [ ] T9 [1] robots parser: `src/crawlers/robots-parser.ts` | RCR-2, RCR-3, RCR-7, RCR-10, RCR-11 | RED: pathological fixtures — exact>wildcard, Allow-tie, $ anchor, case-insensitive, longest-match, empty/404, disallow-all | T2 | ~160
-- [ ] T10 [1] Access map: `src/crawlers/access-map.ts` + `index.ts` | RCR-4, RCR-5, RCR-6, RCR-8, RCR-9, RCR-11 | RED: all-allowed → 100; GPTBot blocked → reduced; X-Robots-Tag global/bot-scoped; meta noai; disallow-all + bot-specific Allow | T8,T9 | ~130
+- [x] T9 [1] robots parser: `src/crawlers/robots-parser.ts` | RCR-2, RCR-3, RCR-7, RCR-10, RCR-11 | RED: pathological fixtures — exact>wildcard, Allow-tie, $ anchor, case-insensitive, longest-match, empty/404, disallow-all | T2 | ~160
+- [x] T10 [1] Access map: `src/crawlers/access-map.ts` + `index.ts` | RCR-4, RCR-5, RCR-6, RCR-8, RCR-9, RCR-11 | RED: all-allowed → 100; GPTBot blocked → reduced; X-Robots-Tag global/bot-scoped; meta noai; disallow-all + bot-specific Allow | T8,T9 | ~130
 
 ## Slice 2 — content-engines (~680; sub 2a T11-T14=380, 2b T15-T16=300)
 
