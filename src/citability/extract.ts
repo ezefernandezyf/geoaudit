@@ -1,15 +1,5 @@
-import { load } from "cheerio";
 import type { Cheerio, CheerioAPI } from "cheerio";
-
-/**
- * Cheerio does not re-export its node types and `domhandler` is not a direct
- * dependency (pnpm strict layout), so the element type is derived from the
- * `load()` signature instead of a transitive import.
- */
-type AnyNode = Exclude<
-  NonNullable<Parameters<typeof load>[0]>,
-  string | Buffer | unknown[]
->;
+import type { AnyNode } from "./types";
 
 /**
  * Main content extraction (RCI-1, RCI-14).
