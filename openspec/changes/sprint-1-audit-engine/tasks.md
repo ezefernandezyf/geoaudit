@@ -53,7 +53,7 @@
 ## Slice 3 — schema-engine (~400)
 
 - [x] T17 [3] Extract+parse: `src/schema/extract.ts` + `parse.ts` | RSC-1, RSC-2, RSC-12 | RED: 2 blocks preserved exactly; zero → no_structured_data; invalid JSON → warning+index, no throw | T1 | ~110
-- [ ] T18 [3] Registry+validate: `src/schema/registry.ts` + `validate.ts` | RSC-3..RSC-7, RSC-10 | RED: known type clean; unknown flagged + still included; @graph per-node; sameAs valid/missing; HowTo/FAQPage deprecated | T17 | ~140
+- [x] T18 [3] Registry+validate: `src/schema/registry.ts` + `validate.ts` | RSC-3..RSC-7, RSC-10 | RED: known type clean; unknown flagged + still included; @graph per-node; sameAs valid/missing; HowTo/FAQPage deprecated | T17 | ~140
 - [ ] T19 [3] Business type: `src/schema/classify.ts` | RSC-8 | RED: SaaS signals → SaaS; ecommerce signals → ecommerce | T17 | ~60
 - [ ] T20 [3] Generate+index: `src/schema/generate.ts` + `index.ts` | RSC-9, RSC-11 | RED: Org missing url → TODO marker + props preserved; zero JSON-LD + local → LocalBusiness template; clean empty result | T18,T19 | ~90
 
