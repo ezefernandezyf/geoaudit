@@ -2,12 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Mixed valid and invalid JSON-LD</title>
+    <title>Acme — Organization without sameAs</title>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Acme","url":"https://acme.example"}</script>
-    <script type="application/ld+json">{bad</script>
   </head>
   <body>
     <h1>Acme</h1>
-    <p>One valid block followed by one with broken JSON.</p>
+    <p>Organization schema with no sameAs profile links.</p>
   </body>
 </html>
