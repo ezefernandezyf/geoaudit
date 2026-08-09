@@ -24,7 +24,7 @@ import type {
 const HTTP_URL_RE = /^https?:\/\//i;
 
 /** A property counts as present when it holds a non-empty value. */
-function hasValue(data: Record<string, unknown>, prop: string): boolean {
+export function hasValue(data: Record<string, unknown>, prop: string): boolean {
   const value = data[prop];
   if (value === undefined || value === null) return false;
   if (typeof value === "string") return value.trim() !== "";
