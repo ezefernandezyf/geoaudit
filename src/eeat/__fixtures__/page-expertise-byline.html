@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Expertise: author byline and Person schema</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Dr. Jane Smith",
+        "jobTitle": "Senior Data Scientist",
+        "sameAs": ["https://www.linkedin.com/in/janesmith", "https://x.com/janesmith"]
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>Engineering an LLM evaluation pipeline</h1>
+        <div class="byline">By Dr. Jane Smith</div>
+        <p>We designed a benchmark that measures latency and throughput across server-side rendering targets.</p>
+        <p>The protocol uses a cache-friendly schema and an HTTPS endpoint with a bounded crawl budget.</p>
+        <pre><code>const pipeline = new AuditPipeline({ maxBytes: 5_000_000 });</code></pre>
+        <p>
+          Results correlate with public research from
+          <a href="https://en.wikipedia.org/wiki/Information_retrieval">Wikipedia</a>,
+          <a href="https://www.nature.com/articles/s41586-020-2649-2">Nature</a> and
+          <a href="https://example.net/report">a third-party report</a>.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

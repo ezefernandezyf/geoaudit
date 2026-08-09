@@ -43,11 +43,11 @@
 
 ## Slice 2 — content-engines (~680; sub 2a T11-T14=380, 2b T15-T16=300)
 
-- [ ] T11 [2] Extract: `src/citability/extract.ts` | RCI-1, RCI-14 | RED: article vs nav/footer/aside excluded; div-only → largest div; malformed no-throw; empty → score 0 | T1 | ~90
-- [ ] T12 [2] Segment: `src/citability/segment.ts` | RCI-2, RCI-13 | RED: 4×H2 → 4 blocks; H2+H3 → 3 blocks; no-heading → single block | T11 | ~70
-- [ ] T13 [2] Scorer: `src/citability/scorer.ts` + `constants.ts` | RCI-3..RCI-9 | RED: definition ≥70; pronoun-lead <30; stats-rich ≥70; stats-poor ≤10; weighted avg 30/25/20/15/10 | T12 | ~140
-- [ ] T14 [2] Output: `src/citability/rewrite.ts` + `index.ts` | RCI-10, RCI-11, RCI-12 | RED: top3/bottom3 exact; coverage %; bottom block → template key | T13 | ~80
-- [ ] T15 [2] E-E-A-T dims: `src/eeat/{experience,expertise,authoritativeness,trustworthiness}.ts` | REE-1..REE-4 | RED: first-person ≥15; third-person ≤5; byline+schema ≥15; no-author ≤5 + no_author_detected; tech-depth ≥5; trust ≥18; no-legal ≤8 | T1 | ~160
+- [x] T11 [2] Extract: `src/citability/extract.ts` | RCI-1, RCI-14 | RED: article vs nav/footer/aside excluded; div-only → largest div; malformed no-throw; empty → score 0 | T1 | ~90
+- [x] T12 [2] Segment: `src/citability/segment.ts` | RCI-2, RCI-13 | RED: 4×H2 → 4 blocks; H2+H3 → 3 blocks; no-heading → single block | T11 | ~70
+- [x] T13 [2] Scorer: `src/citability/scorer.ts` + `constants.ts` | RCI-3..RCI-9 | RED: definition ≥70; pronoun-lead <30; stats-rich ≥70; stats-poor ≤10; weighted avg 30/25/20/15/10 | T12 | ~140
+- [x] T14 [2] Output: `src/citability/rewrite.ts` + `index.ts` | RCI-10, RCI-11, RCI-12 | RED: top3/bottom3 exact; coverage %; bottom block → template key | T13 | ~80
+- [x] T15 [2] E-E-A-T dims: `src/eeat/{experience,expertise,authoritativeness,trustworthiness}.ts` | REE-1..REE-4 | RED: first-person ≥15; third-person ≤5; byline+schema ≥15; no-author ≤5 + no_author_detected; tech-depth ≥5; trust ≥18; no-legal ≤8 | T1 | ~160
 - [ ] T16 [2] E-E-A-T meta+composite: `src/eeat/meta.ts` + `index.ts` | REE-5..REE-10 | RED: clean H1→H2→H3; H1→H3 → H2_skipped; datePublished + days-since; no-date; topicalAuthority not_measured + rationale; composite = sum | T15 | ~140
 
 ## Slice 3 — schema-engine (~400)
