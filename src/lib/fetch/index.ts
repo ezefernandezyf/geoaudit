@@ -144,9 +144,14 @@ export async function fetchAuditResource(
     };
   }
 
-  // RFL-8: gate on text/html before reading any body.
+  // RFL-8: gate on content-type before reading any body. Pages must be
+  // text/html; auxiliary probes additionally accept text/plain because real
+  // robots.txt files are served with that Content-Type — gating them would
+  // silently treat every robots directive as missing ("all allowed").
+  const acceptedContentType =
+    opts.kind === "probe" ? /^(?:text\/html|text\/plain)\b/i : /^text\/html\b/i;
   const contentType = response.headers.get("content-type");
-  if (!contentType || !/^text\/html/i.test(contentType)) {
+  if (!contentType || !acceptedContentType.test(contentType)) {
     return { ok: false, reason: "unsupported_content_type", contentType };
   }
 

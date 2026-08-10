@@ -15,7 +15,7 @@ Provide a safe, deterministic, and fully injectable HTTP(S) fetch layer for the 
 | RFL-5 | Auxiliary timeout (10s) | MUST | Apply 10-second AbortSignal timeout on auxiliary probes (robots.txt, sitemap, llms.txt) |
 | RFL-6 | Redirect handling | MUST | Follow redirects manually (≤5 hops); re-validate DNS at each hop |
 | RFL-7 | Decoded size cap | MUST | Cap decoded body at ~5MB; stream body and abort if exceeded |
-| RFL-8 | Content-Type gate | MUST | Accept only `text/html` Content-Type; non-HTML → return `null` with reason "unsupported_content_type" |
+| RFL-8 | Content-Type gate | MUST | Accept `text/html`; `kind: 'probe'` additionally accepts `text/plain` (robots.txt); other Content-Types → return `null` with reason "unsupported_content_type" |
 | RFL-9 | Charset resolution | MUST | Resolve charset from Content-Type header → `<meta charset>` → UTF-8 fallback; decode via TextDecoder |
 | RFL-10 | Latin-1 handling | MUST | Correctly decode ISO-8859-1 (latin-1) encoded pages via charset resolution |
 | RFL-11 | Error handling | MUST | Connection errors, DNS failures, and timeouts MUST return typed error results (never throw) |
@@ -80,7 +80,7 @@ The system MUST follow redirects manually with DNS re-validation at each hop.
 
 ### Requirement: Content-Type Gate (RFL-8)
 
-The system MUST accept only HTML responses.
+The system MUST accept HTML responses. For `kind: 'probe'` (auxiliary resources such as robots.txt) the gate MUST additionally accept `text/plain`, because real robots.txt files are served with that Content-Type — gating them would silently treat every robots directive as missing ("all allowed").
 
 #### Scenario: HTML Content-Type
 
@@ -95,6 +95,19 @@ The system MUST accept only HTML responses.
 - WHEN the Content-Type is gated
 - THEN the response is rejected with reason "unsupported_content_type"
 - AND the caller receives `null` body with the reason string
+
+#### Scenario: Probe kind accepts text/plain robots.txt
+
+- GIVEN a `kind: 'probe'` fetch with `Content-Type: text/plain; charset=utf-8`
+- WHEN the Content-Type is gated
+- THEN the response passes
+- AND the robots.txt body is available for parsing
+
+#### Scenario: Page kind still rejects text/plain
+
+- GIVEN a `kind: 'page'` fetch with `Content-Type: text/plain`
+- WHEN the Content-Type is gated
+- THEN the response is rejected with reason "unsupported_content_type"
 
 ### Requirement: Charset Resolution (RFL-9)
 
@@ -156,7 +169,7 @@ The fetch layer MUST accept a custom fetch implementation for testing.
 | RFL-5 | (auxiliary timeout fixture — 10s AbortSignal on probe) | Covered |
 | RFL-6 | Redirect within limit, Redirect chain exceeds limit | Covered |
 | RFL-7 | (5MB fixture — body stream exceeds cap → aborted) | Covered |
-| RFL-8 | HTML Content-Type, PDF Content-Type rejected | Covered |
+| RFL-8 | HTML Content-Type, PDF Content-Type rejected, probe text/plain accepted, page text/plain rejected | Covered |
 | RFL-9 | Charset in Content-Type, Charset from meta, No charset anywhere | Covered |
 | RFL-10 | French latin-1 fixture | Covered |
 | RFL-11 | (tested via RFL-2 rejections + RFL-8 rejections — typed errors) | Implicit |

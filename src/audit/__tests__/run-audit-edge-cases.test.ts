@@ -87,15 +87,16 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.crawlers.perBot).toEqual({});
   });
 
-  it("RAO-2/RCR-10: a gated (text/plain) robots.txt is treated as missing → all allowed", async () => {
+  it("RAO-2/RCR-10: a text/plain robots.txt is parsed (probe gate fix) → rules apply", async () => {
     const fetcher: FetchImpl = async (input, init) => {
       const url = String(input);
       if (init?.method === "HEAD") {
         return new Response(null, { status: 200 });
       }
       if (url.endsWith("/robots.txt")) {
-        // Real robots.txt is text/plain — the fetch layer's RFL-8 gate returns
-        // unsupported_content_type, so the orchestrator treats it as missing.
+        // Real robots.txt is text/plain. Since the fetch-layer probe gate fix,
+        // the probe kind accepts text/plain so the directives are actually
+        // parsed instead of being silently treated as "all allowed".
         return new Response("User-agent: GPTBot\nDisallow: /", {
           status: 200,
           headers: { "content-type": "text/plain; charset=utf-8" },
@@ -113,18 +114,16 @@ describe("runAudit edge cases (T25 part B)", () => {
       now: () => NOW,
     });
 
-    // The gated robots must NOT be parsed — GPTBot is allowed despite the
-    // text/plain "Disallow" rule it never reached.
-    expect(result.crawlers.perBot["GPTBot"]).toBe("allowed");
-    expect(
-      Object.values(result.crawlers.perBot).every(
-        (status) => status === "allowed",
-      ),
-    ).toBe(true);
+    // The text/plain robots IS parsed — GPTBot is blocked by its Disallow rule.
+    expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
 
     const headers = new Headers({ "content-type": "text/html; charset=utf-8" });
     const $ = load(PAGE_HTML);
-    const expected = scoreAccess(parseRobotsTxt(""), headers, $);
+    const expected = scoreAccess(
+      parseRobotsTxt("User-agent: GPTBot\nDisallow: /"),
+      headers,
+      $,
+    );
     expect(result.crawlers.compositeScore).toBe(expected.compositeScore);
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });
