@@ -1,0 +1,97 @@
+import { z } from "zod";
+
+/**
+ * Cross-engine AuditResult contract (D3 shape, RAO-10).
+ * Only shapes consumed by >= 2 modules live here; engine-local I/O types stay in
+ * each engine's `src/<domain>/types.ts`.
+ */
+
+export const severityBandSchema = z.enum([
+  "Excellent",
+  "Good",
+  "Fair",
+  "Poor",
+  "Critical",
+]);
+
+export type SeverityBand = z.infer<typeof severityBandSchema>;
+
+export const crawlerResultSchema = z.object({
+  compositeScore: z.number().min(0).max(100),
+  perBot: z.record(z.string(), z.enum(["allowed", "blocked", "unknown"])),
+});
+
+export type CrawlerResult = z.infer<typeof crawlerResultSchema>;
+
+export const citabilityResultSchema = z.object({
+  pageScore: z.number().min(0).max(100),
+  coverage: z.number().min(0).max(100),
+  top3: z.array(z.string()),
+  bottom3: z.array(z.string()),
+  suggestions: z.array(
+    z.object({
+      block: z.string(),
+      key: z.string(),
+    }),
+  ),
+});
+
+export type CitabilityResult = z.infer<typeof citabilityResultSchema>;
+
+export const schemaResultSchema = z.object({
+  detected: z.array(z.record(z.string(), z.unknown())),
+  issues: z.array(z.string()),
+  generated: z.record(z.string(), z.unknown()).nullable(),
+  businessType: z.string(),
+});
+
+export type SchemaResult = z.infer<typeof schemaResultSchema>;
+
+export const platformResultSchema = z.object({
+  headers: z.array(z.record(z.string(), z.unknown())),
+  meta: z.record(z.string(), z.unknown()),
+  og: z.record(z.string(), z.unknown()),
+  twitter: z.record(z.string(), z.unknown()),
+  ssr: z.record(z.string(), z.unknown()),
+  probes: z.record(z.string(), z.unknown()),
+  perPlatform: z.record(z.string(), z.unknown()),
+});
+
+export type PlatformResult = z.infer<typeof platformResultSchema>;
+
+export const contentResultSchema = z.object({
+  experience: z.number().min(0).max(25),
+  expertise: z.number().min(0).max(25),
+  authoritativeness: z.number().min(0).max(25),
+  trustworthiness: z.number().min(0).max(25),
+  composite: z.number().min(0).max(100),
+  wordCount: z.number().nonnegative(),
+  headings: z.number().nonnegative(),
+  freshness: z.record(z.string(), z.unknown()),
+  topicalAuthority: z.string(),
+});
+
+export type ContentResult = z.infer<typeof contentResultSchema>;
+
+export const auditResultSchema = z.object({
+  summary: z.object({
+    url: z.url("Invalid URL format"),
+    geoScore: z.number().min(0).max(100),
+    severityBand: severityBandSchema,
+    durationMs: z.number().nonnegative(),
+  }),
+  crawlers: crawlerResultSchema,
+  citability: citabilityResultSchema,
+  schema: schemaResultSchema,
+  platform: platformResultSchema,
+  content: contentResultSchema,
+  scoringModelVersion: z.literal("1.0.0"),
+  meta: z.object({
+    auditVersion: z.string(),
+    startedAt: z.number(),
+    completedAt: z.number(),
+    errors: z.array(z.string()),
+  }),
+});
+
+export type AuditResult = z.infer<typeof auditResultSchema>;
