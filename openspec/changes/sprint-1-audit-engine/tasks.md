@@ -60,7 +60,7 @@
 ## Slice 4 — platform-scoring (~770; sub 4a T21-T23=330, 4b T24=180, 4c T25=260)
 
 - [x] T21 [4] Headers+meta: `src/platform/headers.ts` + `meta.ts` | RPL-1..RPL-4 | RED: complete headers no warnings + HSTS; missing canonical → Low; OG full/absent → High; twitter:card; title/desc/viewport | T2 | ~120
-- [ ] T22 [4] SSR+questions: `src/platform/ssr.ts` | RPL-5, RPL-8, RPL-9 | RED: ≥500 chars → ssr_present + ratio; <100 → client_side_shell Critical; question-H2 count; answer `<p>` detected | T1 | ~90
+- [x] T22 [4] SSR+questions: `src/platform/ssr.ts` | RPL-5, RPL-8, RPL-9 | RED: ≥500 chars → ssr_present + ratio; <100 → client_side_shell Critical; question-H2 count; answer `<p>` detected | T1 | ~90
 - [ ] T23 [4] Probes+platforms: `src/platform/probes.ts` + `per-platform.ts` + `index.ts` | RPL-6, RPL-7, RPL-10, RPL-11 | RED: HEAD 200 → present, no parse; 404 → absent + Low findings; AIO-ready ≥70; external signals not_measured | T7,T21,T22 | ~120
 - [ ] T24 [4] Calculator: `src/scoring/weights.ts` + `calculator.ts` | RGS-1..RGS-10 | RED: all-80 → 80; uneven → 68; 92.3→Excellent; 73.8→Fair; 39→Critical; 103→100; schema-fail rebalance+note; empty → valid not NaN; version 1.0.0 + BA note | T2 | ~180
 - [ ] T25 [4] Orchestrator: `src/audit/index.ts` | RAO-1..RAO-14 | RED: mock-fetch full audit → deterministic AuditResult, zero network; invalid URL → Zod error, no fetch; robots 404 → all allowed; citability-throws → isolation + meta.errors; PDF → 4 unsupported + crawler runs; single Cheerio load | T7,T10,T14,T16,T20,T23,T24 | ~260
