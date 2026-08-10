@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Multiple JSON-LD blocks</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Acme","url":"https://acme.example"}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Acme","url":"https://acme.example","potentialAction":{"@type":"SearchAction","target":"https://acme.example/search?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+  </head>
+  <body>
+    <h1>Acme</h1>
+    <p>Two JSON-LD blocks: Organization and WebSite.</p>
+  </body>
+</html>

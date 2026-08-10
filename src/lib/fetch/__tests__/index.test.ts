@@ -347,3 +347,49 @@ describe("fetchAuditResource (RFL-4/5 default timeouts per kind)", () => {
     }
   });
 });
+
+describe("fetchAuditResource (robots.txt text/plain gate fix)", () => {
+  it("accepts text/plain robots.txt for kind 'probe' and parses it", async () => {
+    const robotsBody = "User-agent: *\nDisallow: /private\n";
+    const fetcher: FetchImpl = vi.fn(async () => {
+      return new Response(robotsBody, {
+        status: 200,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      });
+    });
+
+    const result = await fetchAuditResource("https://example.com/robots.txt", {
+      kind: "probe",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.parsed.html).toBe(robotsBody);
+      expect(result.parsed.contentType).toBe("text/plain; charset=utf-8");
+    }
+  });
+
+  it("still gates non-HTML pages for kind 'page' as unsupported", async () => {
+    const fetcher: FetchImpl = vi.fn(async () => {
+      return new Response("data", {
+        status: 200,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      });
+    });
+
+    const result = await fetchAuditResource("https://example.com/", {
+      kind: "page",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok && "reason" in result) {
+      expect(result.reason).toBe("unsupported_content_type");
+    }
+  });
+});

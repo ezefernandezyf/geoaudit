@@ -1,0 +1,9 @@
+# Nasty mix: comments, odd casing, blank lines
+User-Agent: *
+Disallow: /admin
+allow: /public
+
+User-agent: gptbot
+Disallow: /private
+Sitemap: https://example.com/sitemap.xml
+Crawl-delay: 2

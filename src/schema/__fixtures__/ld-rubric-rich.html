@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Acme — rich schema graph</title>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","name":"Acme","url":"https://acme.example","sameAs":["https://twitter.com/acme","https://linkedin.com/company/acme","https://github.com/acme","https://facebook.com/acme","https://youtube.com/@acme"],"knowsAbout":["GEO","SEO","AI Search","LLM"]},{"@type":"WebSite","name":"Acme","url":"https://acme.example","potentialAction":{"@type":"SearchAction","target":"https://acme.example/search?q={search_term_string}","query-input":"required name=search_term_string"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home"},{"@type":"ListItem","position":2,"name":"Blog"}]},{"@type":"Article","headline":"Why GEO matters","datePublished":"2025-06-01","author":{"@type":"Person","name":"Jane Doe","url":"https://acme.example/jane","sameAs":["https://twitter.com/janedoe"]},"speakable":{"@type":"SpeakableSpecification","cssSelector":[".summary"]}}]}</script>
+  </head>
+  <body>
+    <h1>Acme</h1>
+    <p>Full @graph: Organization, WebSite+SearchAction, BreadcrumbList and Article with author and speakable.</p>
+  </body>
+</html>
