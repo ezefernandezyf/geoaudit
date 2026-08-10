@@ -1,0 +1,63 @@
+# CI — GeoAudit (github-ci R1-R5)
+# Triggers on PRs targeting `develop` or `main` (R4). Three parallel jobs
+# (R5 fast failure): lint, typecheck, test. Any failing job blocks merge.
+#
+# Threat-matrix note ("PR commands"): no secrets are consumed by any step, so
+# fork PRs run with zero secret exposure. If a future job needs credentials it
+# MUST read them via `${{ secrets.* }}` and follow the skip-if-no-env pattern
+# (see src/lib/__tests__/prisma.test.ts — connectivity suite skips without
+# DATABASE_URL).
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test

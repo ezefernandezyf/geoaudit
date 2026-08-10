@@ -26,7 +26,7 @@ rules:
   apply:
     guidelines:
       - Follow existing code patterns
-    tdd: false           # No test runner installed yet; Vitest target lands with scaffold in Sprint 0
+    tdd: true            # Strict TDD active since Sprint 0 scaffold (Vitest 4 installed, tests green)
     test_command: pnpm test
   verify:
     test_command: pnpm test
@@ -36,8 +36,8 @@ rules:
     - Warn before merging destructive deltas
 
 testing:
-  strict_tdd: false
-  status: pending-scaffold
+  strict_tdd: true
+  status: ready
   test_command: pnpm test
   runner: vitest
   layers:
@@ -45,7 +45,7 @@ testing:
     integration: "@testing-library/react + vitest"
     e2e: "@playwright/test"
   coverage:
-    available: false
+    available: true
     command: pnpm test -- --coverage
   quality:
     linter: eslint

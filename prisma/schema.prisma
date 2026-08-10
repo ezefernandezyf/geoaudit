@@ -1,0 +1,11 @@
+// Prisma 7 baseline — Sprint 0: no models yet (empty baseline, spec database-connection R4).
+// Driver adapter model: the runtime client (src/lib/prisma.ts) supplies the connection
+// via @prisma/adapter-pg; the schema datasource carries no url. Migrations start in S1/S3.
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}

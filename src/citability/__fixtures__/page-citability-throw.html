@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+  RAO-12 edge fixture (built in T11 corpus per tasks.md risk note).
+
+  This page is the deliberately pathological "malformed content edge case" the
+  audit-orchestrator RAO-12 scenario feeds into runAudit(): a maximally broken
+  document — unterminated tags, mismatched nesting, an attribute value that
+  never closes and content spilling outside every container.
+
+  The citability engine itself is defensive by design (RCI-14: malformed HTML
+  MUST NOT throw), so this fixture alone does not throw. The T25 RAO-12 test
+  forces the citability engine to throw for this page by injecting a throwing
+  engine through runAudit deps and asserts the orchestrator isolates the
+  failure into meta.errors while the other engines still produce results.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Throw edge</title>
+  </head>
+  <body>
+    <article class="content" data-x="unterminated
+      <h2>Broken section
+        <p>Text inside an unterminated attribute region.
+        <ul>
+          <li>Item one
+          <li>Item two
+        </ul>
+      <div>
+        <h3>Deeper broken subsection
+          <p>More recoverable text.
+        </h3>
+      </article>
+    <footer>Trailing copy after the unclosed article.</footer>
+  </body>
+</html>
