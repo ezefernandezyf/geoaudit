@@ -63,7 +63,7 @@
 - [x] T22 [4] SSR+questions: `src/platform/ssr.ts` | RPL-5, RPL-8, RPL-9 | RED: ≥500 chars → ssr_present + ratio; <100 → client_side_shell Critical; question-H2 count; answer `<p>` detected | T1 | ~90
 - [x] T23 [4] Probes+platforms: `src/platform/probes.ts` + `per-platform.ts` + `index.ts` | RPL-6, RPL-7, RPL-10, RPL-11 | RED: HEAD 200 → present, no parse; 404 → absent + Low findings; AIO-ready ≥70; external signals not_measured | T7,T21,T22 | ~120
 - [x] T24 [4] Calculator: `src/scoring/weights.ts` + `calculator.ts` | RGS-1..RGS-10 | RED: all-80 → 80; uneven → 68; 92.3→Excellent; 73.8→Fair; 39→Critical; 103→100; schema-fail rebalance+note; empty → valid not NaN; version 1.0.0 + BA note | T2 | ~180
-- [ ] T25 [4] Orchestrator: `src/audit/index.ts` | RAO-1..RAO-14 | RED: mock-fetch full audit → deterministic AuditResult, zero network; invalid URL → Zod error, no fetch; robots 404 → all allowed; citability-throws → isolation + meta.errors; PDF → 4 unsupported + crawler runs; single Cheerio load | T7,T10,T14,T16,T20,T23,T24 | ~260
+- [x] T25 [4] Orchestrator: `src/audit/index.ts` | RAO-1..RAO-14 | RED: mock-fetch full audit → deterministic AuditResult, zero network; invalid URL → Zod error, no fetch; robots 404 → all allowed; citability-throws → isolation + meta.errors; PDF → 4 unsupported + crawler runs; single Cheerio load | T7,T10,T14,T16,T20,T23,T24 | ~260
 
 ## Slice Mapping (D5 apply order T1→T25; chain via work units)
 
