@@ -9,6 +9,19 @@
  * -> per-platform readiness scoring (RPL-10/RPL-11).
  */
 
+import { load } from "cheerio";
+
+/**
+ * Cheerio does not re-export its node types and `domhandler` is not a direct
+ * dependency (pnpm strict layout), so the element type is derived from the
+ * `load()` signature instead of a transitive import (same pattern as
+ * `src/citability/types.ts` and `src/eeat/types.ts`).
+ */
+export type PlatformNode = Exclude<
+  NonNullable<Parameters<typeof load>[0]>,
+  string | Buffer | unknown[]
+>;
+
 export type FindingSeverity = "Critical" | "High" | "Medium" | "Low" | "Info";
 
 /** A single platform-readiness finding (never thrown, always collected). */
