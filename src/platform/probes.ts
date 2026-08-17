@@ -6,6 +6,10 @@ import type { ProbeResult, SiteProbes } from "./types";
  * present/absent; the response body is never read or parsed. The fetcher is
  * injectable so tests never touch the network; probe failures are recorded
  * as typed errors, never thrown.
+ *
+ * An optional `signal` bounds the worst-case latency (ARU-9): a hung host
+ * aborts instead of hanging past the function timeout. When the signal fires
+ * the probe records a controlled error — it is never left pending.
  */
 
 export type ProbeFn = (
@@ -16,9 +20,14 @@ export type ProbeFn = (
 export async function probeResource(
   url: string,
   fetcher: ProbeFn = fetch,
+  signal?: AbortSignal,
 ): Promise<ProbeResult> {
   try {
-    const response = await fetcher(url, { method: "HEAD", redirect: "follow" });
+    const response = await fetcher(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal,
+    });
     return {
       url,
       run: true,
@@ -41,11 +50,12 @@ export async function probeResource(
 export async function probeSite(
   origin: string,
   fetcher: ProbeFn = fetch,
+  signal?: AbortSignal,
 ): Promise<SiteProbes> {
   const base = origin.replace(/\/+$/, "");
   const [sitemap, llmsTxt] = await Promise.all([
-    probeResource(`${base}/sitemap.xml`, fetcher),
-    probeResource(`${base}/llms.txt`, fetcher),
+    probeResource(`${base}/sitemap.xml`, fetcher, signal),
+    probeResource(`${base}/llms.txt`, fetcher, signal),
   ]);
   return { sitemap, llmsTxt };
 }

@@ -1,5 +1,6 @@
 import type { CheerioAPI } from "cheerio";
 import type { PlatformResult } from "@/lib/contracts/audit-result";
+import { PROBE_TIMEOUT_MS } from "@/lib/fetch";
 import { analyzeHeaders } from "./headers";
 import { analyzeMeta, analyzeOpenGraph, analyzeTwitter } from "./meta";
 import { extractStructure, scorePlatforms } from "./per-platform";
@@ -44,7 +45,13 @@ export async function scorePlatform(
   const og = analyzeOpenGraph(input.$);
   const twitter = analyzeTwitter(input.$);
   const ssr = analyzeSsr(input.$, input.html);
-  const probes = await probeSite(input.origin, opts?.fetcher);
+  const probes = await probeSite(
+    input.origin,
+    opts?.fetcher,
+    // ARU-9: bound the probes with the fetch layer's probe timeout so a hung
+    // host cannot exceed the function limit.
+    AbortSignal.timeout(PROBE_TIMEOUT_MS),
+  );
   const structure = extractStructure(input.$, ssr, meta);
   const platforms = scorePlatforms(structure);
 

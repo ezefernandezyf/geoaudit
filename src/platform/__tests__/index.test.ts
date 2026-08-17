@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { load } from "cheerio";
 import { platformResultSchema } from "@/lib/contracts/audit-result";
 import { scorePlatform, toContractResult } from "@/platform/index";
+import { PROBE_TIMEOUT_MS } from "@/lib/fetch";
 import type { ProbeFn } from "@/platform/probes";
 import {
   HEADERS_COMPLETE,
@@ -95,6 +96,20 @@ describe("scorePlatform (RPL-10, RPL-6, RPL-7)", () => {
     );
     expect(finding).toBeDefined();
     expect(finding?.severity).toBe("Critical");
+  });
+
+  it("bounds the probes with AbortSignal.timeout(PROBE_TIMEOUT_MS) (ARU-9)", async () => {
+    const timeoutSpy = vi.spyOn(AbortSignal, "timeout");
+    try {
+      const { $, html } = page("page-ssr-rich.html");
+      await scorePlatform(
+        { $, html, headers: HEADERS_COMPLETE, origin: "https://example.com" },
+        { fetcher: ALL_PRESENT },
+      );
+      expect(timeoutSpy).toHaveBeenCalledWith(PROBE_TIMEOUT_MS);
+    } finally {
+      timeoutSpy.mockRestore();
+    }
   });
 });
 
