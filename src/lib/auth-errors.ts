@@ -1,0 +1,29 @@
+/**
+ * NextAuth error-param code → user-facing copy (ATH-5).
+ * Shared by the /login and /signup cards. Product copy follows the project
+ * convention (Spanish, neutral/professional).
+ */
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  AccessDenied: "Acceso denegado: cancelaste la autorización con GitHub.",
+  OAuthAccountNotLinked:
+    "Este email ya está vinculado a otra cuenta. Iniciá sesión con esa cuenta.",
+  OAuthSignin: "No se pudo iniciar el flujo de GitHub. Intentalo de nuevo.",
+  OAuthCallback: "GitHub no completó el inicio de sesión. Intentalo de nuevo.",
+  OAuthCreateAccount:
+    "No se pudo crear la cuenta con GitHub. Intentalo de nuevo.",
+  Configuration: "Error de configuración del servidor. Contactá a soporte.",
+};
+
+const DEFAULT_AUTH_ERROR = "No se pudo iniciar sesión. Intentalo de nuevo.";
+
+/**
+ * Maps a NextAuth error code to a user-facing message. Returns null when
+ * there is no error (empty string counts as absent) so the caller renders no
+ * banner; unknown codes fall back to a generic message.
+ */
+export function authErrorMessage(error: string | null): string | null {
+  if (!error) {
+    return null;
+  }
+  return AUTH_ERROR_MESSAGES[error] ?? DEFAULT_AUTH_ERROR;
+}
