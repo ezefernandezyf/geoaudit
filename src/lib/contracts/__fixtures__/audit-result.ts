@@ -70,7 +70,13 @@ export const auditResultFixture: AuditResult = {
     twitter: { card: "summary" },
     ssr: { verdict: "ssr_present", ratio: 0.4 },
     probes: { sitemap: true, llmsTxt: false },
-    perPlatform: { chatgpt: { readiness: 70 } },
+    perPlatform: {
+      aio: { score: 70, criteria: [] },
+      chatgpt: { score: 65, criteria: [] },
+      perplexity: { score: 60, criteria: [] },
+      gemini: { score: 62, criteria: [] },
+      copilot: { score: 58, criteria: [] },
+    },
   },
   content: {
     experience: 18,

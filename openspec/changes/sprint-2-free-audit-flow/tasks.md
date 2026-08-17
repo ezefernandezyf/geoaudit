@@ -40,35 +40,35 @@ Tracker `feat/sprint-2-free-audit` (base develop) ← PR1(U1); PR2..PR5 base = p
 
 ## U2 — Landing + Form + Action (PR2)
 
-- [ ] U2.T1 RED `src/lib/audit/__tests__/actions.test.ts`: filter/normalize/redirect (ADF-3/4/5)
-- [ ] U2.T2 `src/lib/audit/actions.ts`: Zod→filter→normalize→redirect, no audit; done: unit+integration
-- [ ] U2.T3 `src/ui/audit-form.tsx`: Zod, aria-busy, role=alert (ADF-2/6/7); done: RTL
-- [ ] U2.T4 `src/app/page.tsx`: landing + form, no dashboard (ADF-1/8); done: page RTL
-- [ ] U2.T5 Smoke dev: 302 + inline errors
+- [x] U2.T1 RED `src/lib/audit/__tests__/actions.test.ts`: filter/normalize/redirect (ADF-3/4/5)
+- [x] U2.T2 `src/lib/audit/actions.ts`: Zod→filter→normalize→redirect, no audit; done: unit+integration
+- [x] U2.T3 `src/ui/audit-form.tsx`: Zod, aria-busy, role=alert (ADF-2/6/7); done: RTL
+- [x] U2.T4 `src/app/page.tsx`: landing + form, no dashboard (ADF-1/8); done: page RTL
+- [x] U2.T5 Smoke dev: 302 + inline errors
 
 ## U3 — Report Shell (PR3)
 
-- [ ] U3.T1 `src/app/report/page.tsx`: force-dynamic+nodejs, url→Empty/Suspense (ARU-1/2/5); done: RTL
-- [ ] U3.T2 `src/app/report/loading.tsx` pulse skeleton (ARU-3); done: RTL
-- [ ] U3.T3 `src/app/report/error.tsx` boundary+Reintentar (ARU-4); done: RTL
-- [ ] U3.T4 Smoke dev: streaming (not jsdom-testable)
+- [x] U3.T1 `src/app/report/page.tsx`: force-dynamic+nodejs, url→Empty/Suspense (ARU-1/2/5); done: RTL
+- [x] U3.T2 `src/app/report/loading.tsx` pulse skeleton (ARU-3); done: RTL
+- [x] U3.T3 `src/app/report/error.tsx` boundary+Reintentar (ARU-4); done: RTL
+- [x] U3.T4 Smoke dev: streaming (not jsdom-testable)
 
 ## U4 — Report MVP (PR4)
 
-- [ ] U4.T1 `src/report/audit-runner.tsx`: runAudit+FETCH_ERROR_COPY (ARU-6); done: RTL
-- [ ] U4.T2 `src/report/score-hero.tsx` score/band/url/duration (ARU-8); done: RTL
-- [ ] U4.T3 `src/report/domain-scorecard.tsx` 5 rows+"no disponible" (ARU-7/8); done: RTL
-- [ ] U4.T4 `src/report/top-findings.tsx` top3/bottom3+issues+bots (ARU-8); done: RTL
-- [ ] U4.T5 `src/report/report-meta.tsx` meta.errors (ARU-7); done: RTL
+- [x] U4.T1 `src/report/audit-runner.tsx`: runAudit+FETCH_ERROR_COPY (ARU-6); done: RTL
+- [x] U4.T2 `src/report/score-hero.tsx` score/band/url/duration (ARU-8); done: RTL
+- [x] U4.T3 `src/report/domain-scorecard.tsx` 5 rows+"no disponible" (ARU-7/8); done: RTL
+- [x] U4.T4 `src/report/top-findings.tsx` top3/bottom3+issues+bots (ARU-8); done: RTL
+- [x] U4.T5 `src/report/report-meta.tsx` meta.errors (ARU-7); done: RTL
 
 ## U5 — Rate Limit + Polish (PR5)
 
-- [ ] U5.T1 RED `src/lib/rate-limit/__tests__/`: window/mock/kill switch (RTL-1/2/7)
-- [ ] U5.T2 `src/lib/rate-limit/store.ts`: RateLimitStore+InMemoryStore (RTL-2); done: green
-- [ ] U5.T3 `src/lib/rate-limit/index.ts`: fixed window, IP key, flag bypass (RTL-1/3/7); done: green
-- [ ] U5.T4 Wire action→429 inline (ADF-9/RTL-4/5)+JSDoc (RTL-6); done: integration
-- [ ] U5.T5 SHOULD ARU-9: AbortSignal in `src/platform/probes.ts`; defer if tight
-- [ ] U5.T6 lint+format+test+dev smoke (HARD GATE)
+- [x] U5.T1 RED `src/lib/rate-limit/__tests__/`: window/mock/kill switch (RTL-1/2/7)
+- [x] U5.T2 `src/lib/rate-limit/store.ts`: RateLimitStore+InMemoryStore (RTL-2); done: green
+- [x] U5.T3 `src/lib/rate-limit/index.ts`: fixed window, IP key, flag bypass (RTL-1/3/7); done: green
+- [x] U5.T4 Wire action→429 inline (ADF-9/RTL-4/5)+JSDoc (RTL-6); done: integration
+- [x] U5.T5 SHOULD ARU-9: AbortSignal in `src/platform/probes.ts`; defer if tight
+- [x] U5.T6 lint+format+test+dev smoke (HARD GATE)
 
 ## Order
 
