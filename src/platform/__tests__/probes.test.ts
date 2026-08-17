@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { probeResource, probeSite } from "@/platform/probes";
 import type { ProbeFn } from "@/platform/probes";
 
