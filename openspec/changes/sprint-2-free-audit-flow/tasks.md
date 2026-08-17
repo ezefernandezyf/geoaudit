@@ -40,11 +40,11 @@ Tracker `feat/sprint-2-free-audit` (base develop) ← PR1(U1); PR2..PR5 base = p
 
 ## U2 — Landing + Form + Action (PR2)
 
-- [ ] U2.T1 RED `src/lib/audit/__tests__/actions.test.ts`: filter/normalize/redirect (ADF-3/4/5)
-- [ ] U2.T2 `src/lib/audit/actions.ts`: Zod→filter→normalize→redirect, no audit; done: unit+integration
-- [ ] U2.T3 `src/ui/audit-form.tsx`: Zod, aria-busy, role=alert (ADF-2/6/7); done: RTL
-- [ ] U2.T4 `src/app/page.tsx`: landing + form, no dashboard (ADF-1/8); done: page RTL
-- [ ] U2.T5 Smoke dev: 302 + inline errors
+- [x] U2.T1 RED `src/lib/audit/__tests__/actions.test.ts`: filter/normalize/redirect (ADF-3/4/5)
+- [x] U2.T2 `src/lib/audit/actions.ts`: Zod→filter→normalize→redirect, no audit; done: unit+integration
+- [x] U2.T3 `src/ui/audit-form.tsx`: Zod, aria-busy, role=alert (ADF-2/6/7); done: RTL
+- [x] U2.T4 `src/app/page.tsx`: landing + form, no dashboard (ADF-1/8); done: page RTL
+- [x] U2.T5 Smoke dev: 302 + inline errors
 
 ## U3 — Report Shell (PR3)
 
