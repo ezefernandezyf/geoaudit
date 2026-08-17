@@ -12,6 +12,11 @@ const INITIAL_STATE: AuditFormState = { error: null };
 type AuditFormProps = {
   /** Server Action passed from a Server Component (never imported client-side). */
   action: AuditAction;
+  /**
+   * Initial value pre-filled into the URL input (ARU-5): lets the report
+   * empty state keep the invalid param visible for user correction.
+   */
+  defaultValue?: string;
 };
 
 /**
@@ -23,7 +28,7 @@ type AuditFormProps = {
  * action is in flight the form is `aria-busy` and the submit shows a spinner
  * + "Analizando…" (ADF-6).
  */
-export function AuditForm({ action }: AuditFormProps) {
+export function AuditForm({ action, defaultValue }: AuditFormProps) {
   const [serverState, formAction, isPending] = useActionState(
     action,
     INITIAL_STATE,
@@ -58,6 +63,7 @@ export function AuditForm({ action }: AuditFormProps) {
         name="url"
         label="URL del sitio"
         placeholder="https://ejemplo.com"
+        defaultValue={defaultValue}
         error={error}
         disabled={isPending}
       />

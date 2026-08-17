@@ -116,3 +116,21 @@ describe("AuditForm pending state (ADF-6)", () => {
     expect(screen.getByRole("button", { name: "Auditar" })).not.toBeDisabled();
   });
 });
+
+describe("AuditForm defaultValue (ARU-5)", () => {
+  it("pre-fills the URL input with the given default value", () => {
+    render(<AuditForm action={okAction} defaultValue="ftp://x" />);
+    expect(screen.getByLabelText("URL del sitio")).toHaveValue("ftp://x");
+  });
+
+  it("submits the pre-filled value when the user does not edit it", async () => {
+    const action = vi.fn(okAction);
+    render(<AuditForm action={action} defaultValue="https://ejemplo.com" />);
+    fireEvent.click(screen.getByRole("button", { name: "Auditar" }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const formData = action.mock.calls[0][1] as FormData;
+    expect(formData.get("url")).toBe("https://ejemplo.com");
+  });
+});

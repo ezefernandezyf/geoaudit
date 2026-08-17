@@ -48,10 +48,10 @@ Tracker `feat/sprint-2-free-audit` (base develop) ← PR1(U1); PR2..PR5 base = p
 
 ## U3 — Report Shell (PR3)
 
-- [ ] U3.T1 `src/app/report/page.tsx`: force-dynamic+nodejs, url→Empty/Suspense (ARU-1/2/5); done: RTL
-- [ ] U3.T2 `src/app/report/loading.tsx` pulse skeleton (ARU-3); done: RTL
-- [ ] U3.T3 `src/app/report/error.tsx` boundary+Reintentar (ARU-4); done: RTL
-- [ ] U3.T4 Smoke dev: streaming (not jsdom-testable)
+- [x] U3.T1 `src/app/report/page.tsx`: force-dynamic+nodejs, url→Empty/Suspense (ARU-1/2/5); done: RTL
+- [x] U3.T2 `src/app/report/loading.tsx` pulse skeleton (ARU-3); done: RTL
+- [x] U3.T3 `src/app/report/error.tsx` boundary+Reintentar (ARU-4); done: RTL
+- [x] U3.T4 Smoke dev: streaming (not jsdom-testable)
 
 ## U4 — Report MVP (PR4)
 
