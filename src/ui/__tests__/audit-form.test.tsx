@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AuditForm } from "@/ui/audit-form";
+import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
 import type { AuditAction, AuditFormState } from "@/lib/audit/actions";
 
 /**
@@ -78,6 +79,16 @@ describe("AuditForm server error display (ADF-7)", () => {
     submitValidUrl(rejectingAction);
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Solo URLs http/https",
+    );
+  });
+
+  it("renders the rate-limit error from the action with role=alert (ADF-9)", async () => {
+    const limitedAction: AuditAction = async () => ({
+      error: AUDIT_FORM_ERRORS.rateLimited,
+    });
+    submitValidUrl(limitedAction);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Demasiadas solicitudes. Esperá un momento.",
     );
   });
 

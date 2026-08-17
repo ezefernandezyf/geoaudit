@@ -63,12 +63,12 @@ Tracker `feat/sprint-2-free-audit` (base develop) ← PR1(U1); PR2..PR5 base = p
 
 ## U5 — Rate Limit + Polish (PR5)
 
-- [ ] U5.T1 RED `src/lib/rate-limit/__tests__/`: window/mock/kill switch (RTL-1/2/7)
-- [ ] U5.T2 `src/lib/rate-limit/store.ts`: RateLimitStore+InMemoryStore (RTL-2); done: green
-- [ ] U5.T3 `src/lib/rate-limit/index.ts`: fixed window, IP key, flag bypass (RTL-1/3/7); done: green
-- [ ] U5.T4 Wire action→429 inline (ADF-9/RTL-4/5)+JSDoc (RTL-6); done: integration
-- [ ] U5.T5 SHOULD ARU-9: AbortSignal in `src/platform/probes.ts`; defer if tight
-- [ ] U5.T6 lint+format+test+dev smoke (HARD GATE)
+- [x] U5.T1 RED `src/lib/rate-limit/__tests__/`: window/mock/kill switch (RTL-1/2/7)
+- [x] U5.T2 `src/lib/rate-limit/store.ts`: RateLimitStore+InMemoryStore (RTL-2); done: green
+- [x] U5.T3 `src/lib/rate-limit/index.ts`: fixed window, IP key, flag bypass (RTL-1/3/7); done: green
+- [x] U5.T4 Wire action→429 inline (ADF-9/RTL-4/5)+JSDoc (RTL-6); done: integration
+- [x] U5.T5 SHOULD ARU-9: AbortSignal in `src/platform/probes.ts`; defer if tight
+- [x] U5.T6 lint+format+test+dev smoke (HARD GATE)
 
 ## Order
 

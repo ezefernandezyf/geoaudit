@@ -10,6 +10,7 @@
 export const AUDIT_FORM_ERRORS = {
   invalidUrl: "Formato de URL inválido",
   protocol: "Solo URLs http/https",
+  rateLimited: "Demasiadas solicitudes. Esperá un momento.",
 } as const;
 
 /**

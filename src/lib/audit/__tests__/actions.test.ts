@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { headers } from "next/headers";
 import { urlInputSchema } from "@/lib/contracts/url-input";
 import {
   AUDIT_FORM_ERRORS,
@@ -6,7 +7,50 @@ import {
   normalizeToHttps,
 } from "@/lib/audit/url-policy";
 import { auditAction } from "@/lib/audit/actions";
+import { defaultRateLimiter } from "@/lib/rate-limit";
 import type { AuditFormState } from "@/lib/audit/actions";
+
+/**
+ * U5.T4 — rate limiting integration (ADF-9, RTL-4/5). The action module's
+ * limiter singleton is mocked so tests control the decision; the IP key
+ * resolution stays REAL (imported from the actual module) so the header→key
+ * wiring is exercised. `next/headers` is mocked because vitest has no request
+ * context; the default (empty headers) yields the local-dev fallback key.
+ */
+vi.mock("@/lib/rate-limit", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rate-limit")>();
+  return {
+    ...actual,
+    defaultRateLimiter: {
+      check: vi.fn(() => ({ allowed: true, remaining: 5, resetMs: 0 })),
+      reset: vi.fn(),
+    },
+  };
+});
+
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => new Headers()),
+}));
+
+const fd = (url: string): FormData => {
+  const formData = new FormData();
+  formData.set("url", url);
+  return formData;
+};
+
+async function expectRedirect(
+  formData: FormData,
+  expectedTarget: string,
+): Promise<void> {
+  try {
+    await auditAction({ error: null }, formData);
+    expect.unreachable("auditAction should have redirected");
+  } catch (err) {
+    const digest = (err as { digest?: string }).digest ?? "";
+    expect(digest).toContain("NEXT_REDIRECT");
+    expect(digest).toContain(expectedTarget);
+  }
+}
 
 /**
  * U2.T1/U2.T2 — Server Action contract (ADF-3/4/5).
@@ -65,26 +109,6 @@ describe("urlInputSchema accepts ftp (protocol filter is mandatory)", () => {
 });
 
 describe("auditAction (ADF-5)", () => {
-  const fd = (url: string): FormData => {
-    const formData = new FormData();
-    formData.set("url", url);
-    return formData;
-  };
-
-  async function expectRedirect(
-    formData: FormData,
-    expectedTarget: string,
-  ): Promise<void> {
-    try {
-      await auditAction({ error: null }, formData);
-      expect.unreachable("auditAction should have redirected");
-    } catch (err) {
-      const digest = (err as { digest?: string }).digest ?? "";
-      expect(digest).toContain("NEXT_REDIRECT");
-      expect(digest).toContain(expectedTarget);
-    }
-  }
-
   it("redirects to /report?url= for a valid https URL", async () => {
     await expectRedirect(
       fd("https://ejemplo.com"),
@@ -128,5 +152,63 @@ describe("auditAction (ADF-5)", () => {
       );
       expect(state.error).not.toBeNull();
     }
+  });
+});
+
+describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
+  beforeEach(() => {
+    vi.mocked(headers).mockResolvedValue(new Headers());
+    vi.mocked(defaultRateLimiter.check).mockReset();
+    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+      allowed: true,
+      remaining: 5,
+      resetMs: 0,
+    });
+  });
+
+  it("returns the friendly over-limit error instead of redirecting", async () => {
+    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+      allowed: false,
+      remaining: 0,
+      resetMs: 60_000,
+    });
+
+    const state = await auditAction({ error: null }, fd("https://ejemplo.com"));
+
+    expect(state).toEqual({ error: AUDIT_FORM_ERRORS.rateLimited });
+  });
+
+  it("checks the limiter before validation — over-limit wins over a bad URL", async () => {
+    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+      allowed: false,
+      remaining: 0,
+      resetMs: 60_000,
+    });
+
+    const state = await auditAction({ error: null }, fd("not a url"));
+
+    expect(state).toEqual({ error: AUDIT_FORM_ERRORS.rateLimited });
+  });
+
+  it("keys the limiter by the x-forwarded-for client IP (RTL-3)", async () => {
+    vi.mocked(headers).mockResolvedValue(
+      new Headers({ "x-forwarded-for": "203.0.113.9" }),
+    );
+
+    await expectRedirect(
+      fd("https://ejemplo.com"),
+      "/report?url=https%3A%2F%2Fejemplo.com%2F",
+    );
+
+    expect(defaultRateLimiter.check).toHaveBeenCalledWith("203.0.113.9");
+  });
+
+  it("uses the local-dev fallback key when no client header exists", async () => {
+    await expectRedirect(
+      fd("https://ejemplo.com"),
+      "/report?url=https%3A%2F%2Fejemplo.com%2F",
+    );
+
+    expect(defaultRateLimiter.check).toHaveBeenCalledWith("local-dev");
   });
 });

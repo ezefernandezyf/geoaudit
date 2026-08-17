@@ -72,3 +72,53 @@ describe("probeSite (RPL-6 + RPL-7 combined)", () => {
     expect(result.llmsTxt.present).toBe(false);
   });
 });
+
+describe("AbortSignal support (ARU-9)", () => {
+  it("probeResource forwards the provided signal to the fetcher", async () => {
+    const signal = new AbortController().signal;
+    const fetcher: ProbeFn = vi.fn(
+      async () => new Response(null, { status: 200 }),
+    );
+
+    await probeResource("https://example.com/sitemap.xml", fetcher, signal);
+
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://example.com/sitemap.xml",
+      expect.objectContaining({ signal }),
+    );
+  });
+
+  it("probeResource returns a controlled error (not a hanging promise) when the signal fires", async () => {
+    const signal = AbortSignal.abort();
+    const fetcher: ProbeFn = vi.fn(async (_input, init) => {
+      if (init?.signal?.aborted) {
+        throw new DOMException("The operation was aborted", "AbortError");
+      }
+      return new Response(null, { status: 200 });
+    });
+
+    const result = await probeResource(
+      "https://example.com/sitemap.xml",
+      fetcher,
+      signal,
+    );
+
+    expect(result.run).toBe(false);
+    expect(result.present).toBe(false);
+    expect(result.error).toContain("aborted");
+  });
+
+  it("probeSite forwards the signal to both the sitemap and llms.txt probes", async () => {
+    const signal = new AbortController().signal;
+    const fetcher: ProbeFn = vi.fn(
+      async () => new Response(null, { status: 200 }),
+    );
+
+    await probeSite("https://example.com", fetcher, signal);
+
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    for (const call of vi.mocked(fetcher).mock.calls) {
+      expect(call[1]).toMatchObject({ signal });
+    }
+  });
+});
