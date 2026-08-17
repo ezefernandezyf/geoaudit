@@ -55,11 +55,11 @@ Tracker `feat/sprint-2-free-audit` (base develop) ← PR1(U1); PR2..PR5 base = p
 
 ## U4 — Report MVP (PR4)
 
-- [ ] U4.T1 `src/report/audit-runner.tsx`: runAudit+FETCH_ERROR_COPY (ARU-6); done: RTL
-- [ ] U4.T2 `src/report/score-hero.tsx` score/band/url/duration (ARU-8); done: RTL
-- [ ] U4.T3 `src/report/domain-scorecard.tsx` 5 rows+"no disponible" (ARU-7/8); done: RTL
-- [ ] U4.T4 `src/report/top-findings.tsx` top3/bottom3+issues+bots (ARU-8); done: RTL
-- [ ] U4.T5 `src/report/report-meta.tsx` meta.errors (ARU-7); done: RTL
+- [x] U4.T1 `src/report/audit-runner.tsx`: runAudit+FETCH_ERROR_COPY (ARU-6); done: RTL
+- [x] U4.T2 `src/report/score-hero.tsx` score/band/url/duration (ARU-8); done: RTL
+- [x] U4.T3 `src/report/domain-scorecard.tsx` 5 rows+"no disponible" (ARU-7/8); done: RTL
+- [x] U4.T4 `src/report/top-findings.tsx` top3/bottom3+issues+bots (ARU-8); done: RTL
+- [x] U4.T5 `src/report/report-meta.tsx` meta.errors (ARU-7); done: RTL
 
 ## U5 — Rate Limit + Polish (PR5)
 

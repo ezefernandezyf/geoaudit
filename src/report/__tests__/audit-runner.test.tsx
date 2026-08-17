@@ -3,18 +3,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runAudit } from "@/audit";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { AuditRunner } from "@/report/audit-runner";
+import {
+  degradedCitabilityResult,
+  unsupportedPageResult,
+} from "@/report/__tests__/variants";
 
 vi.mock("@/audit", () => ({ runAudit: vi.fn() }));
 
 const runAuditMock = vi.mocked(runAudit);
 
 /**
- * U3.T1 (ARU-6 pull-forward) — minimal AuditRunner: calls runAudit(url),
- * renders a "reporte próximo" placeholder with the basic meta (URL + estado)
- * and maps fetch failures to friendly Spanish copy. The full scorecard render
- * is U4.T1.
+ * U4.T1 — AuditRunner composes the full MVP report: ScoreHero +
+ * DomainScorecard + TopFindings + ReportMeta (ARU-8), keeps the fetch-failure
+ * copy mapping (ARU-6, pulled forward in U3) and renders degraded results
+ * honestly (ARU-7 / RAO-13).
  */
-describe("AuditRunner placeholder (U3.T1)", () => {
+describe("AuditRunner report render (U4.T1)", () => {
   beforeEach(() => {
     runAuditMock.mockReset();
   });
@@ -25,35 +29,53 @@ describe("AuditRunner placeholder (U3.T1)", () => {
     expect(runAuditMock).toHaveBeenCalledWith("https://example.com/");
   });
 
-  it("renders the URL and the severity band state from the result", async () => {
+  it("renders the full MVP report: hero, scorecard, findings and meta", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     render(await AuditRunner({ url: "https://example.com/" }));
 
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
-    // SeverityBadge ES label for the "Fair" band of the fixture.
-    expect(screen.getByText("Regular")).toBeInTheDocument();
+    // ScoreHero: score + URL + band chip.
     expect(screen.getByText("68")).toBeInTheDocument();
+    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
+    expect(screen.getByText("Regular")).toBeInTheDocument();
+
+    // DomainScorecard rows.
+    expect(screen.getByText("Acceso de bots")).toBeInTheDocument();
+    expect(screen.getByText("Citabilidad")).toBeInTheDocument();
+    expect(screen.getByText("E-E-A-T")).toBeInTheDocument();
+    expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
+    expect(screen.getByText("Plataforma")).toBeInTheDocument();
+
+    // TopFindings: blocked bot + schema issue.
+    expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
+    expect(screen.getByText("Organization missing sameAs")).toBeInTheDocument();
   });
 
-  it("renders a placeholder note that the full report is coming", async () => {
+  it("no longer renders the U3 placeholder note", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     render(await AuditRunner({ url: "https://example.com/" }));
 
-    expect(screen.getByText(/reporte completo/i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/reporte completo estará disponible/),
+    ).not.toBeInTheDocument();
   });
 
-  it("lists meta.errors when the audit is degraded (ARU-7)", async () => {
-    const degraded = {
-      ...auditResultFixture,
-      meta: {
-        ...auditResultFixture.meta,
-        errors: ["citability: boom"],
-      },
-    };
-    runAuditMock.mockResolvedValue(degraded);
+  it("renders degraded results honestly: chips + meta.errors (ARU-7)", async () => {
+    runAuditMock.mockResolvedValue(degradedCitabilityResult);
     render(await AuditRunner({ url: "https://example.com/" }));
 
+    expect(screen.getByText("No disponible")).toBeInTheDocument();
     expect(screen.getByText("citability: boom")).toBeInTheDocument();
+    // The remaining engines still score.
+    expect(screen.getByText("71")).toBeInTheDocument();
+  });
+
+  it("renders the RAO-13 non-HTML report with crawler data only", async () => {
+    runAuditMock.mockResolvedValue(unsupportedPageResult);
+    render(await AuditRunner({ url: "https://cdn.example.com/file.pdf" }));
+
+    expect(screen.getAllByText("No disponible")).toHaveLength(4);
+    expect(screen.getByText("71")).toBeInTheDocument();
+    expect(screen.getByText("Crítico")).toBeInTheDocument();
   });
 });
 

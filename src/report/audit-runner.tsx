@@ -1,10 +1,13 @@
 import { runAudit } from "@/audit";
 import type { AuditResult } from "@/lib/contracts/audit-result";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { DomainScorecard } from "@/report/domain-scorecard";
 import {
   detectFetchFailureCode,
   resolveFetchErrorCopy,
 } from "@/report/fetch-error-copy";
+import { ReportMeta } from "@/report/report-meta";
+import { ScoreHero } from "@/report/score-hero";
+import { TopFindings } from "@/report/top-findings";
 
 export type AuditRunnerProps = {
   /** Normalized http/https URL to audit (already validated by resolve.ts). */
@@ -14,12 +17,14 @@ export type AuditRunnerProps = {
 /**
  * Report driver (ARU-1/ARU-2): runs `runAudit(url)` under the page Suspense.
  *
- * U3 minimal version (ARU-6 pull-forward): catches the page-fetch failure
- * throw and renders the mapped friendly Spanish copy + a Reintentar link;
- * unexpected errors are rethrown so the `error.tsx` boundary (ARU-4) handles
- * them. On success it renders a "reporte próximo" placeholder with the basic
- * meta (URL + estado + GEO Score + duration + meta.errors) — the full
- * scorecard render lands in U4.T1.
+ * U4: on success it composes the full MVP report (D1) — ScoreHero +
+ * DomainScorecard + TopFindings + ReportMeta (ARU-8). Degraded results
+ * (RAO-12/RAO-13) render honestly: "No disponible" chips, visible
+ * `meta.errors` and the true (rebalanced) GEO Score (ARU-7).
+ *
+ * It catches the page-fetch failure throw and renders the mapped friendly
+ * Spanish copy + a Reintentar link (ARU-6); unexpected errors are rethrown so
+ * the `error.tsx` boundary (ARU-4) handles them.
  */
 export async function AuditRunner({ url }: AuditRunnerProps) {
   let result: AuditResult;
@@ -33,7 +38,7 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
     }
     return <FetchErrorState url={url} copy={resolveFetchErrorCopy(error)} />;
   }
-  return <AuditPlaceholder result={result} />;
+  return <AuditReport result={result} />;
 }
 
 function FetchErrorState({ url, copy }: { url: string; copy: string }) {
@@ -56,67 +61,20 @@ function FetchErrorState({ url, copy }: { url: string; copy: string }) {
   );
 }
 
-function AuditPlaceholder({ result }: { result: AuditResult }) {
-  const { summary, meta } = result;
+function AuditReport({ result }: { result: AuditResult }) {
   return (
     <section
       aria-label="Reporte de auditoría"
-      className="mx-auto w-full max-w-3xl px-6 py-16"
+      className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16"
     >
-      <p className="mb-8 text-sm text-text-secondary">
-        El reporte completo estará disponible en una próxima actualización.
-      </p>
-      <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-md border border-border bg-surface p-4">
-          <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">
-            URL
-          </dt>
-          <dd className="mt-1 break-all text-sm text-text-primary">
-            {summary.url}
-          </dd>
-        </div>
-        <div className="rounded-md border border-border bg-surface p-4">
-          <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">
-            GEO Score
-          </dt>
-          <dd className="mt-1 font-display text-3xl text-navy">
-            {summary.geoScore}
-          </dd>
-        </div>
-        <div className="rounded-md border border-border bg-surface p-4">
-          <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">
-            Estado
-          </dt>
-          <dd className="mt-1">
-            <SeverityBadge band={summary.severityBand} />
-          </dd>
-        </div>
-        <div className="rounded-md border border-border bg-surface p-4">
-          <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">
-            Duración
-          </dt>
-          <dd className="mt-1 text-sm text-text-primary">
-            {(summary.durationMs / 1000).toFixed(1)} s
-          </dd>
-        </div>
-      </dl>
-      {meta.errors.length > 0 ? (
-        <div className="mt-8">
-          <h3 className="text-sm font-medium text-text-primary">
-            Errores del análisis
-          </h3>
-          <ul className="mt-2 flex flex-col gap-2">
-            {meta.errors.map((error) => (
-              <li
-                key={error}
-                className="rounded-md border border-border bg-surface-muted px-3 py-2 text-sm text-text-secondary"
-              >
-                {error}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <ScoreHero summary={result.summary} />
+      <DomainScorecard result={result} />
+      <TopFindings
+        citability={result.citability}
+        schema={result.schema}
+        crawlers={result.crawlers}
+      />
+      <ReportMeta summary={result.summary} meta={result.meta} />
     </section>
   );
 }
