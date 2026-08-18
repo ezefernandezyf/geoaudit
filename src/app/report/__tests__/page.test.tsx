@@ -9,6 +9,13 @@ vi.mock("@/report/audit-runner", () => ({
   AuditRunner: ({ url }: { url: string }) => <div>AuditRunner:{url}</div>,
 }));
 
+// The page imports auditAction, which now calls auth() for the tier pre-check
+// (TLM-3). next-auth/lib/env.js imports next/server (unresolvable in vitest),
+// so the module is mocked; the auth behavior itself is covered in
+// src/lib/audit/__tests__/actions.test.ts.
+vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
+vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+
 async function renderPage(params: Record<string, string>) {
   return render(await ReportPage({ searchParams: Promise.resolve(params) }));
 }
