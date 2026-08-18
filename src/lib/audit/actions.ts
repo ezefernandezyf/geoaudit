@@ -9,7 +9,7 @@ import {
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countAuditsInWindow, hasFreeAuditsLeft } from "@/lib/audit/tier";
-import { defaultRateLimiter, resolveClientKey } from "@/lib/rate-limit";
+import { getDefaultRateLimiter, resolveClientKey } from "@/lib/rate-limit";
 
 /** State returned to the form: `{ error: null }` on success (redirect fires). */
 export type AuditFormState = { error: string | null };
@@ -49,7 +49,8 @@ export async function auditAction(
   // Rate limit check first (ADF-9/RTL-4): cheapest gate, blocks abuse before
   // any processing. Inline error, no throw, no redirect (RTL-5).
   const requestHeaders = await headers();
-  const decision = defaultRateLimiter.check(resolveClientKey(requestHeaders));
+  const limiter = await getDefaultRateLimiter();
+  const decision = await limiter.check(resolveClientKey(requestHeaders));
   if (!decision.allowed) {
     return { error: AUDIT_FORM_ERRORS.rateLimited };
   }

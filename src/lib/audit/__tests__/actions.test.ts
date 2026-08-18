@@ -10,7 +10,7 @@ import {
 import { auditAction } from "@/lib/audit/actions";
 import { auth } from "@/lib/auth";
 import { countAuditsInWindow } from "@/lib/audit/tier";
-import { defaultRateLimiter } from "@/lib/rate-limit";
+import { getDefaultRateLimiter } from "@/lib/rate-limit";
 import type { AuditFormState } from "@/lib/audit/actions";
 
 /**
@@ -22,19 +22,26 @@ const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
 
 /**
  * U5.T4 — rate limiting integration (ADF-9, RTL-4/5). The action module's
- * limiter singleton is mocked so tests control the decision; the IP key
+ * limiter factory is mocked so tests control the decision; the IP key
  * resolution stays REAL (imported from the actual module) so the header→key
  * wiring is exercised. `next/headers` is mocked because vitest has no request
  * context; the default (empty headers) yields the local-dev fallback key.
+ *
+ * The limiter is ASYNC (design U5): the factory resolves the limiter and
+ * `check` resolves a decision, matching the awaited calls in the action.
  */
+const { limiterMock } = vi.hoisted(() => ({
+  limiterMock: {
+    check: vi.fn(async () => ({ allowed: true, remaining: 5, resetMs: 0 })),
+    reset: vi.fn(async () => {}),
+  },
+}));
+
 vi.mock("@/lib/rate-limit", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/rate-limit")>();
   return {
     ...actual,
-    defaultRateLimiter: {
-      check: vi.fn(() => ({ allowed: true, remaining: 5, resetMs: 0 })),
-      reset: vi.fn(),
-    },
+    getDefaultRateLimiter: vi.fn(async () => limiterMock),
   };
 });
 
@@ -190,8 +197,9 @@ describe("auditAction (ADF-5)", () => {
 describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   beforeEach(() => {
     vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(defaultRateLimiter.check).mockReset();
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    vi.mocked(getDefaultRateLimiter).mockClear();
+    limiterMock.check.mockReset();
+    limiterMock.check.mockResolvedValue({
       allowed: true,
       remaining: 5,
       resetMs: 0,
@@ -199,7 +207,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   });
 
   it("returns the friendly over-limit error instead of redirecting", async () => {
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    limiterMock.check.mockResolvedValue({
       allowed: false,
       remaining: 0,
       resetMs: 60_000,
@@ -211,7 +219,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   });
 
   it("checks the limiter before validation — over-limit wins over a bad URL", async () => {
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    limiterMock.check.mockResolvedValue({
       allowed: false,
       remaining: 0,
       resetMs: 60_000,
@@ -232,7 +240,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(defaultRateLimiter.check).toHaveBeenCalledWith("203.0.113.9");
+    expect(limiterMock.check).toHaveBeenCalledWith("203.0.113.9");
   });
 
   it("uses the local-dev fallback key when no client header exists", async () => {
@@ -241,15 +249,16 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(defaultRateLimiter.check).toHaveBeenCalledWith("local-dev");
+    expect(limiterMock.check).toHaveBeenCalledWith("local-dev");
   });
 });
 
 describe("auditAction tier pre-check (TLM-3)", () => {
   beforeEach(() => {
     vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(defaultRateLimiter.check).mockReset();
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    vi.mocked(getDefaultRateLimiter).mockClear();
+    limiterMock.check.mockReset();
+    limiterMock.check.mockResolvedValue({
       allowed: true,
       remaining: 5,
       resetMs: 0,
