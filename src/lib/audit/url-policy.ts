@@ -11,6 +11,8 @@ export const AUDIT_FORM_ERRORS = {
   invalidUrl: "Formato de URL inválido",
   protocol: "Solo URLs http/https",
   rateLimited: "Demasiadas solicitudes. Esperá un momento.",
+  limitReached:
+    "Alcanzaste el límite de 3 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
 } as const;
 
 /**

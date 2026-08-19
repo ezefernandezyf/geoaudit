@@ -6,7 +6,10 @@ import {
   isAllowedProtocol,
   normalizeToHttps,
 } from "@/lib/audit/url-policy";
-import { defaultRateLimiter, resolveClientKey } from "@/lib/rate-limit";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { countAuditsInWindow, hasFreeAuditsLeft } from "@/lib/audit/tier";
+import { getDefaultRateLimiter, resolveClientKey } from "@/lib/rate-limit";
 
 /** State returned to the form: `{ error: null }` on success (redirect fires). */
 export type AuditFormState = { error: string | null };
@@ -46,7 +49,8 @@ export async function auditAction(
   // Rate limit check first (ADF-9/RTL-4): cheapest gate, blocks abuse before
   // any processing. Inline error, no throw, no redirect (RTL-5).
   const requestHeaders = await headers();
-  const decision = defaultRateLimiter.check(resolveClientKey(requestHeaders));
+  const limiter = await getDefaultRateLimiter();
+  const decision = await limiter.check(resolveClientKey(requestHeaders));
   if (!decision.allowed) {
     return { error: AUDIT_FORM_ERRORS.rateLimited };
   }
@@ -59,6 +63,24 @@ export async function auditAction(
   const url = result.data.url;
   if (!isAllowedProtocol(url)) {
     return { error: AUDIT_FORM_ERRORS.protocol };
+  }
+
+  // Tier pre-check (TLM-3, design U3): a signed-in FREE user who reached the
+  // 30-day limit is blocked BEFORE the redirect (the report page re-runs the
+  // audit, so this prevents the work). Cheap gate — one indexed COUNT. Runs
+  // after the free sync validation, right before the redirect. Anonymous
+  // requests skip the tier entirely (TLM-6). TOCTOU is accepted and closed by
+  // the authoritative re-check in the report page (TLM-4).
+  const session = await auth();
+  if (session?.user?.id) {
+    const count = await countAuditsInWindow(
+      prisma,
+      session.user.id,
+      Date.now(),
+    );
+    if (!hasFreeAuditsLeft(count)) {
+      return { error: AUDIT_FORM_ERRORS.limitReached };
+    }
   }
 
   redirect(`/report?url=${encodeURIComponent(normalizeToHttps(url))}`);

@@ -1,6 +1,7 @@
-// Prisma 7 baseline — Sprint 0: no models yet (empty baseline, spec database-connection R4).
-// Driver adapter model: the runtime client (src/lib/prisma.ts) supplies the connection
-// via @prisma/adapter-pg; the schema datasource carries no url. Migrations start in S1/S3.
+// Prisma 7 — Sprint 3: Auth & Dashboard data models (database-connection R4/R5/R6).
+// Driver-adapter model: the runtime client (src/lib/prisma.ts) supplies the connection
+// via @prisma/adapter-pg; the CLI connection URL lives in prisma.config.ts
+// (`datasource.url`, Prisma 7 removed `url` from schema datasources).
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -8,4 +9,76 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Tier {
+  FREE
+  PRO
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  tier          Tier      @default(FREE)
+  createdAt     DateTime  @default(now())
+  accounts      Account[]
+  sessions      Session[]
+  audits        Audit[]
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Audit {
+  id           String   @id @default(cuid())
+  userId       String
+  url          String
+  geoScore     Int
+  severityBand String
+  durationMs   Int
+  result       Json
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model RateLimitEntry {
+  key         String
+  windowStart BigInt
+  count       Int    @default(1)
+
+  @@id([key, windowStart])
 }

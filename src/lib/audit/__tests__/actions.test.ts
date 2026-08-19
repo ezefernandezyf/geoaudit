@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
+import type { Session } from "next-auth";
 import { headers } from "next/headers";
 import { urlInputSchema } from "@/lib/contracts/url-input";
 import {
@@ -7,30 +8,68 @@ import {
   normalizeToHttps,
 } from "@/lib/audit/url-policy";
 import { auditAction } from "@/lib/audit/actions";
-import { defaultRateLimiter } from "@/lib/rate-limit";
+import { auth } from "@/lib/auth";
+import { countAuditsInWindow } from "@/lib/audit/tier";
+import { getDefaultRateLimiter } from "@/lib/rate-limit";
 import type { AuditFormState } from "@/lib/audit/actions";
 
 /**
+ * NextAuth v5 exports `auth` overloaded (middleware + `() => Session | null`);
+ * vi.mocked() resolves the middleware overload, so the mock is cast to the
+ * session-returning call shape the action actually uses.
+ */
+const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
+
+/**
  * U5.T4 — rate limiting integration (ADF-9, RTL-4/5). The action module's
- * limiter singleton is mocked so tests control the decision; the IP key
+ * limiter factory is mocked so tests control the decision; the IP key
  * resolution stays REAL (imported from the actual module) so the header→key
  * wiring is exercised. `next/headers` is mocked because vitest has no request
  * context; the default (empty headers) yields the local-dev fallback key.
+ *
+ * The limiter is ASYNC (design U5): the factory resolves the limiter and
+ * `check` resolves a decision, matching the awaited calls in the action.
  */
+const { limiterMock } = vi.hoisted(() => ({
+  limiterMock: {
+    check: vi.fn(async () => ({ allowed: true, remaining: 5, resetMs: 0 })),
+    reset: vi.fn(async () => {}),
+  },
+}));
+
 vi.mock("@/lib/rate-limit", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/rate-limit")>();
   return {
     ...actual,
-    defaultRateLimiter: {
-      check: vi.fn(() => ({ allowed: true, remaining: 5, resetMs: 0 })),
-      reset: vi.fn(),
-    },
+    getDefaultRateLimiter: vi.fn(async () => limiterMock),
   };
 });
 
 vi.mock("next/headers", () => ({
   headers: vi.fn(async () => new Headers()),
 }));
+
+/**
+ * U3.T2 — tier pre-check (TLM-3). The auth stack and the prisma singleton are
+ * mocked so the action never touches a real DB nor instantiates NextAuth.
+ * `countAuditsInWindow` is mocked (the pure query contract is covered in
+ * tier.test.ts); `hasFreeAuditsLeft` stays REAL (importOriginal spread) so the
+ * action's gate is exercised through the actual helper.
+ */
+vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
+vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+vi.mock("@/lib/audit/tier", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/audit/tier")>();
+  return {
+    ...actual,
+    countAuditsInWindow: vi.fn(async () => 0),
+  };
+});
+
+const session = (): Session => ({
+  user: { id: "user-1", name: "Ana", email: "ana@example.com" },
+  expires: new Date("2026-08-19T00:00:00.000Z").toISOString(),
+});
 
 const fd = (url: string): FormData => {
   const formData = new FormData();
@@ -158,8 +197,9 @@ describe("auditAction (ADF-5)", () => {
 describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   beforeEach(() => {
     vi.mocked(headers).mockResolvedValue(new Headers());
-    vi.mocked(defaultRateLimiter.check).mockReset();
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    vi.mocked(getDefaultRateLimiter).mockClear();
+    limiterMock.check.mockReset();
+    limiterMock.check.mockResolvedValue({
       allowed: true,
       remaining: 5,
       resetMs: 0,
@@ -167,7 +207,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   });
 
   it("returns the friendly over-limit error instead of redirecting", async () => {
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    limiterMock.check.mockResolvedValue({
       allowed: false,
       remaining: 0,
       resetMs: 60_000,
@@ -179,7 +219,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
   });
 
   it("checks the limiter before validation — over-limit wins over a bad URL", async () => {
-    vi.mocked(defaultRateLimiter.check).mockReturnValue({
+    limiterMock.check.mockResolvedValue({
       allowed: false,
       remaining: 0,
       resetMs: 60_000,
@@ -200,7 +240,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(defaultRateLimiter.check).toHaveBeenCalledWith("203.0.113.9");
+    expect(limiterMock.check).toHaveBeenCalledWith("203.0.113.9");
   });
 
   it("uses the local-dev fallback key when no client header exists", async () => {
@@ -209,6 +249,68 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(defaultRateLimiter.check).toHaveBeenCalledWith("local-dev");
+    expect(limiterMock.check).toHaveBeenCalledWith("local-dev");
+  });
+});
+
+describe("auditAction tier pre-check (TLM-3)", () => {
+  beforeEach(() => {
+    vi.mocked(headers).mockResolvedValue(new Headers());
+    vi.mocked(getDefaultRateLimiter).mockClear();
+    limiterMock.check.mockReset();
+    limiterMock.check.mockResolvedValue({
+      allowed: true,
+      remaining: 5,
+      resetMs: 0,
+    });
+    authMock.mockReset();
+    vi.mocked(countAuditsInWindow).mockReset();
+    vi.mocked(countAuditsInWindow).mockResolvedValue(0);
+  });
+
+  it("blocks the 4th audit in the window before redirecting (TLM-3)", async () => {
+    authMock.mockResolvedValue(session());
+    vi.mocked(countAuditsInWindow).mockResolvedValue(3);
+
+    const state = await auditAction({ error: null }, fd("https://ejemplo.com"));
+
+    expect(state).toEqual({ error: AUDIT_FORM_ERRORS.limitReached });
+  });
+
+  it("counts the signed-in user's audits for the pre-check", async () => {
+    authMock.mockResolvedValue(session());
+    vi.mocked(countAuditsInWindow).mockResolvedValue(2);
+
+    await expectRedirect(
+      fd("https://ejemplo.com"),
+      "/report?url=https%3A%2F%2Fejemplo.com%2F",
+    );
+
+    expect(countAuditsInWindow).toHaveBeenCalledWith(
+      expect.anything(),
+      "user-1",
+      expect.any(Number),
+    );
+  });
+
+  it("allows a signed-in user with audits left and redirects (TLM-2)", async () => {
+    authMock.mockResolvedValue(session());
+    vi.mocked(countAuditsInWindow).mockResolvedValue(2);
+
+    await expectRedirect(
+      fd("https://ejemplo.com"),
+      "/report?url=https%3A%2F%2Fejemplo.com%2F",
+    );
+  });
+
+  it("skips the tier check for anonymous users (TLM-6)", async () => {
+    authMock.mockResolvedValue(null);
+
+    await expectRedirect(
+      fd("https://ejemplo.com"),
+      "/report?url=https%3A%2F%2Fejemplo.com%2F",
+    );
+
+    expect(countAuditsInWindow).not.toHaveBeenCalled();
   });
 });
