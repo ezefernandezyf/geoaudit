@@ -1,31 +1,6 @@
-# Auth (GitHub OAuth) Specification
+# Delta for Auth (GitHub OAuth)
 
-## Purpose
-
-Define the authentication skeleton for GeoAudit using NextAuth v5 with GitHub as the sole OAuth provider during Sprint 0. The setup must be minimal — configuration, a route handler, and middleware — without a user database or session persistence yet.
-
-## Requirements
-
-| # | Requirement | Strength | Summary |
-|---|-------------|----------|---------|
-| R1 | GitHub OAuth provider | MUST | NextAuth must be configured with GitHub as the only provider |
-| R2 | Auth route handler | MUST | `GET` and `POST` at `/api/auth/[...nextauth]` must be handled; the sign-in entry resolves to the custom `/login` page |
-| R3 | Protected route | MUST | `/dashboard/:path*` must require authentication; unauthenticated requests must redirect to `/login?callbackUrl=` (307) |
-| R4 | Configuration safety | MUST | `AUTH_SECRET` and `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET` must be documented in `.env.example` |
-| R5 | Sign-in flow | MUST | Clicking "Sign in with GitHub" must complete the OAuth handshake and return the user to the app |
-| R6 | Prisma adapter persistence | MUST | GitHub sign-ups/sign-ins persist `User` + `Account` via `@auth/prisma-adapter`; sessions stay stateless (JWT strategy — no `Session` rows) |
-| R7 | Custom sign-in/sign-up pages | MUST | `/login` and `/signup` are wired as the sign-in entry points (`pages.signIn`) |
-
-### Requirement: GitHub OAuth Provider (R1)
-
-The system MUST configure NextAuth v5 with GitHub as the only OAuth provider.
-
-#### Scenario: Provider is recognized by NextAuth
-
-- GIVEN `AUTH_GITHUB_ID` and `AUTH_GITHUB_SECRET` are set
-- WHEN the auth handler processes a sign-in request
-- THEN NextAuth recognizes GitHub as an available provider
-- AND the GitHub logo/name appears on the default sign-in page
+## MODIFIED Requirements
 
 ### Requirement: Auth Route Handler (R2)
 
@@ -44,6 +19,8 @@ The system MUST expose `GET` and `POST` handlers at `/api/auth/[...nextauth]`.
 - WHEN GitHub redirects to `/api/auth/callback/github`
 - THEN the `POST` handler processes the callback code and state
 
+(Previously: `GET /api/auth/signin` rendered the default NextAuth sign-in page.)
+
 ### Requirement: Protected Route (R3)
 
 The middleware MUST redirect unauthenticated requests to any `/dashboard/:path*` route to the custom `/login` page, preserving the original path as `callbackUrl`.
@@ -61,17 +38,9 @@ The middleware MUST redirect unauthenticated requests to any `/dashboard/:path*`
 - WHEN they navigate to `/dashboard`
 - THEN the dashboard page renders
 
-### Requirement: Configuration Safety (R4)
+(Previously: the matcher was the exact `/dashboard` path and the redirect target was `/api/auth/signin`.)
 
-The system MUST document all required environment variables in `.env.example`.
-
-#### Scenario: Template lists all auth variables
-
-- GIVEN `.env.example` is present
-- WHEN a developer reads it
-- THEN `AUTH_SECRET` is listed as required
-- AND `AUTH_GITHUB_ID` is listed as required
-- AND `AUTH_GITHUB_SECRET` is listed as required
+## ADDED Requirements
 
 ### Requirement: Prisma Adapter Persistence (R6)
 

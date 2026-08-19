@@ -11,7 +11,9 @@ Define the database connectivity layer for GeoAudit. The system must connect to 
 | R1 | Prisma connectivity | MUST | PrismaClient singleton must connect to the DATABASE_URL PostgreSQL instance |
 | R2 | Configuration validation | MUST | Missing DATABASE_URL must produce a clear, actionable error |
 | R3 | Graceful startup | SHOULD | Application startup SHOULD NOT crash if the database is unreachable at boot |
-| R4 | Schema baseline | MUST | An empty Prisma schema (no models yet) must be present and generate cleanly |
+| R4 | Schema baseline | MUST | Prisma schema must define the Sprint 3 data models (`User`, `Account`, `Session`, `VerificationToken`, `Audit`, `RateLimitEntry`) and a first migration must apply them to Supabase |
+| R5 | Audit model | MUST | `Audit` must store the full result JSON per authenticated audit, indexed by user and creation time |
+| R6 | RateLimitEntry model | MUST | `RateLimitEntry` must be keyed by `(key, windowStart)` with a `count`, supporting atomic UPSERT |
 
 ### Requirement: Prisma Connectivity (R1)
 
@@ -54,10 +56,37 @@ The application SHOULD start even when the database is unreachable.
 
 ### Requirement: Schema Baseline (R4)
 
-The system MUST contain an empty Prisma schema that generates without errors.
+The system MUST contain a Prisma schema with the Sprint 3 data models (`User`, `Account`, `Session`, `VerificationToken`, `Audit`, `RateLimitEntry`) and a first migration that applies them to Supabase.
+
+#### Scenario: Migration applies cleanly
+
+- GIVEN `DATABASE_URL` resolves to the Supabase instance
+- WHEN `pnpm run prisma:migrate` runs the first migration
+- THEN all models are created without errors
 
 #### Scenario: Schema generation succeeds
 
-- GIVEN the empty Prisma schema file
+- GIVEN the populated Prisma schema file
 - WHEN `pnpx prisma generate` is invoked
 - THEN the PrismaClient is generated without errors
+
+### Requirement: Audit Model (R5)
+
+The system MUST define an `Audit` model with a `userId` foreign key (cascade on delete), `url`, `geoScore`, `severityBand`, `durationMs`, a `result` JSON column, and `createdAt`, indexed by `(userId, createdAt desc)`.
+
+#### Scenario: Audit row persists the full result
+
+- GIVEN an authenticated audit completes
+- WHEN it is persisted
+- THEN the full `AuditResult` JSON is stored in the `result` column
+- AND the row is indexed by user and creation time for history lookups
+
+### Requirement: RateLimitEntry Model (R6)
+
+The system MUST define a `RateLimitEntry` model keyed by `(key, windowStart)` with a `count`, supporting atomic UPSERT for the DB-backed rate limiter.
+
+#### Scenario: Counter increments atomically
+
+- GIVEN a `RateLimitEntry` for `(key, windowStart)`
+- WHEN the limiter increments the key
+- THEN the count is updated atomically without a read-modify-write race
