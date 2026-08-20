@@ -5,7 +5,7 @@ import { runAudit } from "@/audit";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { countAuditsInWindow } from "@/lib/audit/tier";
+import { checkTierLimit, recordPaidAudit } from "@/lib/audit/enforcement";
 import { AuditRunner } from "@/report/audit-runner";
 import {
   degradedCitabilityResult,
@@ -15,20 +15,29 @@ import {
 vi.mock("@/audit", () => ({ runAudit: vi.fn() }));
 
 /**
- * U3.T4 — tier persist gate (TLM-4/5/6, D5). auth + prisma are mocked so the
- * runner never instantiates NextAuth nor touches a real DB; the pure
- * countAuditsInWindow query contract is covered in tier.test.ts.
- * `hasFreeAuditsLeft` stays REAL (importOriginal spread).
+ * U3.T4 / U4 — tier persist gate (TLM-4/5/6, D5). auth + prisma are mocked so
+ * the runner never instantiates NextAuth nor touches a real DB.
+ * `checkTierLimit` is mocked (per-tier selection covered in
+ * enforcement.test.ts); `isPaidTier` stays REAL (importOriginal spread) so the
+ * runner's branch (FREE direct-write vs paid $transaction, TLM-8) is
+ * exercised through the actual helper.
  */
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
 vi.mock("@/lib/prisma", () => ({
-  prisma: { audit: { create: vi.fn() } },
+  prisma: {
+    audit: { create: vi.fn() },
+    user: { findUnique: vi.fn() },
+    $transaction: vi.fn(),
+  },
+}));
+vi.mock("@/lib/audit/enforcement", () => ({
+  checkTierLimit: vi.fn(async () => ({ allowed: true })),
+  recordPaidAudit: vi.fn(async () => {}),
 }));
 vi.mock("@/lib/audit/tier", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/audit/tier")>();
   return {
     ...actual,
-    countAuditsInWindow: vi.fn(async () => 0),
   };
 });
 
@@ -40,8 +49,15 @@ const runAuditMock = vi.mocked(runAudit);
  * session-returning call shape the runner actually uses.
  */
 const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
-const countMock = vi.mocked(countAuditsInWindow);
+const checkTierLimitMock = vi.mocked(checkTierLimit);
+const recordPaidAuditMock = vi.mocked(recordPaidAudit);
 const auditCreateMock = vi.mocked(prisma.audit.create);
+const userFindUniqueMock = vi.mocked(prisma.user.findUnique) as unknown as Mock<
+  () => Promise<{ tier: string } | null>
+>;
+const transactionMock = vi.mocked(prisma.$transaction) as unknown as Mock<
+  (...args: unknown[]) => Promise<unknown>
+>;
 
 const session = (): Session => ({
   user: { id: "user-1", name: "Ana", email: "ana@example.com" },
@@ -178,16 +194,29 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
   beforeEach(() => {
     runAuditMock.mockReset();
     authMock.mockReset();
-    countMock.mockReset();
+    checkTierLimitMock.mockReset();
+    recordPaidAuditMock.mockReset();
     auditCreateMock.mockReset();
+    userFindUniqueMock.mockReset();
+    transactionMock.mockReset();
     authMock.mockResolvedValue(null);
-    countMock.mockResolvedValue(0);
+    checkTierLimitMock.mockResolvedValue({ allowed: true });
+    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+    // Default $transaction runs the callback with a tx exposing audit.create
+    // (the free/persist path and the paid branch both call through it).
+    transactionMock.mockImplementation(async (...args: unknown[]) => {
+      const fn = args[0] as (tx: unknown) => Promise<unknown>;
+      return fn({
+        audit: { create: auditCreateMock },
+        subscription: { findUnique: vi.fn(), update: vi.fn() },
+      });
+    });
   });
 
-  it("persists an Audit for a signed-in user within the limit (TLM-4)", async () => {
+  it("persists an Audit for a signed-in FREE user within the limit (TLM-4)", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     authMock.mockResolvedValue(session());
-    countMock.mockResolvedValue(2);
+    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
 
     render(await AuditRunner({ url: "https://example.com/" }));
 
@@ -201,6 +230,8 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
         result: auditResultFixture,
       },
     });
+    expect(transactionMock).not.toHaveBeenCalled();
+    expect(recordPaidAuditMock).not.toHaveBeenCalled();
     // The report still renders after persisting.
     expect(screen.getByText("68")).toBeInTheDocument();
   });
@@ -208,7 +239,7 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
   it("renders the limit copy and does NOT persist when over the limit (TLM-5)", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     authMock.mockResolvedValue(session());
-    countMock.mockResolvedValue(3);
+    checkTierLimitMock.mockResolvedValue({ allowed: false });
 
     render(await AuditRunner({ url: "https://example.com/" }));
 
@@ -234,11 +265,74 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
   it("still renders the report when persistence fails (degraded)", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     authMock.mockResolvedValue(session());
-    countMock.mockResolvedValue(0);
+    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
     auditCreateMock.mockRejectedValue(new Error("db down"));
 
     render(await AuditRunner({ url: "https://example.com/" }));
 
     expect(screen.getByText("68")).toBeInTheDocument();
+  });
+});
+
+describe("AuditRunner paid tier persist (TLM-7/8)", () => {
+  beforeEach(() => {
+    runAuditMock.mockReset();
+    authMock.mockReset();
+    checkTierLimitMock.mockReset();
+    recordPaidAuditMock.mockReset();
+    auditCreateMock.mockReset();
+    userFindUniqueMock.mockReset();
+    transactionMock.mockReset();
+    authMock.mockResolvedValue(session());
+    checkTierLimitMock.mockResolvedValue({ allowed: true });
+    transactionMock.mockImplementation(async (...args: unknown[]) => {
+      const fn = args[0] as (tx: unknown) => Promise<unknown>;
+      return fn({
+        audit: { create: auditCreateMock },
+        subscription: { findUnique: vi.fn(), update: vi.fn() },
+      });
+    });
+  });
+
+  it("PRO user: increments the counter and creates the Audit in one $transaction (TLM-7/8)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(transactionMock).toHaveBeenCalledTimes(1);
+    expect(recordPaidAuditMock).toHaveBeenCalledTimes(1);
+    // recordPaidAudit runs inside the tx, then audit.create through the same tx.
+    expect(auditCreateMock).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        userId: "user-1",
+        url: "https://example.com/",
+        geoScore: 68,
+        severityBand: "Fair",
+      }),
+    });
+    expect(screen.getByText("68")).toBeInTheDocument();
+  });
+
+  it("ENTERPRISE user: uses the paid transaction path (triangulation)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    userFindUniqueMock.mockResolvedValue({ tier: "ENTERPRISE" });
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(transactionMock).toHaveBeenCalledTimes(1);
+    expect(recordPaidAuditMock).toHaveBeenCalledTimes(1);
+    expect(auditCreateMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("FREE user: does NOT use the paid transaction path", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(transactionMock).not.toHaveBeenCalled();
+    expect(recordPaidAuditMock).not.toHaveBeenCalled();
+    expect(auditCreateMock).toHaveBeenCalledTimes(1);
   });
 });

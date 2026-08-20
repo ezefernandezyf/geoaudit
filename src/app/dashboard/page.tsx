@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
+import { BillingCta } from "@/dashboard/billing-cta";
 import { DashboardEmptyState } from "@/dashboard/dashboard-empty-state";
 import { ScoreTrend } from "@/dashboard/score-trend";
 import type { DashboardAudit } from "@/dashboard/types";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { SeverityBand } from "@/lib/contracts/audit-result";
+import { portalAction } from "@/billing/actions";
 import { Card } from "@/ui/card";
 
 /**
@@ -35,6 +37,15 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  // U4 (DSH-6): the billing CTA adapts to tier — read from the DB (the session
+  // carries only user.id). FREE → "Upgrade" to /pricing; PRO/Enterprise →
+  // portal action.
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { tier: true },
+  });
+  const tier = user?.tier ?? "FREE";
+
   const audits: DashboardAudit[] = rows.map((row) => ({
     id: row.id,
     url: row.url,
@@ -55,6 +66,9 @@ export default async function DashboardPage() {
           <p className="max-w-lg text-text-secondary">
             Los resultados de tus auditorías GEO y la evolución de tu score.
           </p>
+          <div className="mt-2">
+            <BillingCta tier={tier} portalAction={portalAction} />
+          </div>
         </header>
 
         {audits.length === 0 ? (
