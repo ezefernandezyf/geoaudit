@@ -45,12 +45,12 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3 (U3): Webhook + Tier Sync — PR 3 (depends U1)
 
-- [ ] U3.1 RED test: `apply-subscription-event.ts` — ACTIVE+PRO→PRO, ACTIVE+ENT→ENTERPRISE, CANCELED/UNPAID/INCOMPLETE_EXPIRED→FREE, unknown price→FREE (BLG-9).
-- [ ] U3.2 `src/billing/apply-subscription-event.ts`: pure `aplicaSubscriptionEvent(tx, event, env)` + `resolveTier`, upsert `Subscription`, sync `User.tier` only if changed (BLG-9, TLM-7).
-- [ ] U3.3 RED test: `webhook-handler.ts` — duplicate event id → no mutation; dispatch by type; unhandled acked (BLG-8/10).
-- [ ] U3.4 `src/billing/webhook-handler.ts`: `handleStripeEvent(prisma, stripe, event)` — idempotency via `stripeWebhookEvent.create` (P2002 no-op) + dispatch (BLG-8/10).
-- [ ] U3.5 RED test: `route.ts` `POST` — invalid signature→400, no mutation; valid→200 (BLG-7/8).
-- [ ] U3.6 `src/app/api/webhooks/stripe/route.ts`: `runtime: nodejs` + `force-dynamic`, raw `req.text()`, `constructEvent`, call `handleStripeEvent` (BLG-7/10).
+- [x] U3.1 RED test: `apply-subscription-event.ts` — ACTIVE+PRO→PRO, ACTIVE+ENT→ENTERPRISE, CANCELED/UNPAID/INCOMPLETE_EXPIRED→FREE, unknown price→FREE (BLG-9).
+- [x] U3.2 `src/billing/apply-subscription-event.ts`: pure `aplicaSubscriptionEvent(tx, event, env)` + `resolveTier`, upsert `Subscription`, sync `User.tier` only if changed (BLG-9, TLM-7).
+- [x] U3.3 RED test: `webhook-handler.ts` — duplicate event id → no mutation; dispatch by type; unhandled acked (BLG-8/10).
+- [x] U3.4 `src/billing/webhook-handler.ts`: `handleStripeEvent(prisma, stripe, event)` — idempotency via `stripeWebhookEvent.create` (P2002 no-op) + dispatch (BLG-8/10).
+- [x] U3.5 RED test: `route.ts` `POST` — invalid signature→400, no mutation; valid→200 (BLG-7/8).
+- [x] U3.6 `src/app/api/webhooks/stripe/route.ts`: `runtime: nodejs` + `force-dynamic`, raw `req.text()`, `constructEvent`, call `handleStripeEvent` (BLG-7/10).
 
 ## Phase 4 (U4): Pricing + Enforcement — PR 4 (depends U1+U3)
 
