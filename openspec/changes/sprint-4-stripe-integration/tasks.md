@@ -54,17 +54,17 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4 (U4): Pricing + Enforcement — PR 4 (depends U1+U3)
 
-- [ ] U4.1 RED test: `lib/audit/tier.ts` additions — `PAID_TIER_LIMITS` (PRO=10/ENT=50), `getTierLimit` (FREE→3), `hasPaidAuditsLeft`, `resolvePaidCounter` reset at periodEnd, `isPaidTier` (TLM-2/7/8).
-- [ ] U4.2 `src/lib/audit/tier.ts`: add paid-tier helpers + counter selection (FREE window vs paid counter) (TLM-2/7/8).
-- [ ] U4.3 RED test: `lib/audit/enforcement.ts` — `checkTierLimit` by tier, `recordPaidAudit` increment+resetAt (TLM-3/7/8).
-- [ ] U4.4 `src/lib/audit/enforcement.ts`: `checkTierLimit(prisma,userId,now)`, `recordPaidAudit(tx,userId,now)` (TLM-3/7/8).
-- [ ] U4.5 `src/lib/audit/actions.ts`: add `checkTierLimit` pre-check before audit (TLM-3).
-- [ ] U4.6 `src/report/audit-runner.tsx`: branch by tier; paid runs `recordPaidAudit` in same `$transaction` as `prisma.audit.create` (TLM-7/8).
-- [ ] U4.7 RED component tests: `pricing-cards.tsx` renders 3 plans with price+limits (PRC-1/2).
-- [ ] U4.8 `src/billing/pricing-cards.tsx`: presentational plan cards Free/Pro/Enterprise (PRC-1/2).
-- [ ] U4.9 RED component test: `checkout-button.tsx` — loading/error/idle via `useActionState` (PRC-4).
-- [ ] U4.10 `src/billing/checkout-button.tsx` (`"use client"`): `useActionState(checkoutAction)`, loading + `role="alert"` error (PRC-4).
-- [ ] U4.11 RED test: `billing-cta.tsx` — FREE→"Upgrade" to `/pricing`; PRO/ENT→portal form (DSH-6, PRC-3).
-- [ ] U4.12 `src/dashboard/billing-cta.tsx`: tier-adaptive CTA (DSH-6).
-- [ ] U4.13 `src/app/pricing/page.tsx`: server component → `auth()` → render `PricingCards` with per-tier `CheckoutButton`/portal (PRC-1/3).
-- [ ] U4.14 Wire `billing-cta.tsx` into dashboard; verify `/pricing` reachable from CTA (DSH-6, PRC-3).
+- [x] U4.1 RED test: `lib/audit/tier.ts` additions — `PAID_TIER_LIMITS` (PRO=10/ENT=50), `getTierLimit` (FREE→3), `hasPaidAuditsLeft`, `resolvePaidCounter` reset at periodEnd, `isPaidTier` (TLM-2/7/8).
+- [x] U4.2 `src/lib/audit/tier.ts`: add paid-tier helpers + counter selection (FREE window vs paid counter) (TLM-2/7/8).
+- [x] U4.3 RED test: `lib/audit/enforcement.ts` — `checkTierLimit` by tier, `recordPaidAudit` increment+resetAt (TLM-3/7/8).
+- [x] U4.4 `src/lib/audit/enforcement.ts`: `checkTierLimit(prisma,userId,now)`, `recordPaidAudit(tx,userId,now)` (TLM-3/7/8).
+- [x] U4.5 `src/lib/audit/actions.ts`: add `checkTierLimit` pre-check before audit (TLM-3).
+- [x] U4.6 `src/report/audit-runner.tsx`: branch by tier; paid runs `recordPaidAudit` in same `$transaction` as `prisma.audit.create` (TLM-7/8).
+- [x] U4.7 RED component tests: `pricing-cards.tsx` renders 3 plans with price+limits (PRC-1/2).
+- [x] U4.8 `src/billing/pricing-cards.tsx`: presentational plan cards Free/Pro/Enterprise (PRC-1/2).
+- [x] U4.9 RED component test: `checkout-button.tsx` — loading/error/idle via `useActionState` (PRC-4).
+- [x] U4.10 `src/billing/checkout-button.tsx` (`"use client"`): `useActionState(checkoutAction)`, loading + `role="alert"` error (PRC-4).
+- [x] U4.11 RED test: `billing-cta.tsx` — FREE→"Upgrade" to `/pricing`; PRO/ENT→portal form (DSH-6, PRC-3).
+- [x] U4.12 `src/dashboard/billing-cta.tsx`: tier-adaptive CTA (DSH-6).
+- [x] U4.13 `src/app/pricing/page.tsx`: server component → `auth()` → render `PricingCards` with per-tier `CheckoutButton`/portal (PRC-1/3).
+- [x] U4.14 Wire `billing-cta.tsx` into dashboard; verify `/pricing` reachable from CTA (DSH-6, PRC-3).
