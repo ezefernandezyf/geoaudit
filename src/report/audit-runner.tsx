@@ -2,7 +2,8 @@ import { runAudit } from "@/audit";
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { countAuditsInWindow, hasFreeAuditsLeft } from "@/lib/audit/tier";
+import { checkTierLimit, recordPaidAudit } from "@/lib/audit/enforcement";
+import { isPaidTier } from "@/lib/audit/tier";
 import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
 import type { Prisma } from "@/generated/prisma/client";
 import { DomainScorecard } from "@/report/domain-scorecard";
@@ -34,6 +35,12 @@ export type AuditRunnerProps = {
  * anonymous audits never persist (TLM-6). Persistence is best-effort: a DB
  * failure logs and still renders the report (the audit already ran).
  *
+ * U4: the gate now branches by tier (TLM-8, design U4) through the SAME
+ * `checkTierLimit` used by the action pre-check. For PRO/ENTERPRISE the audit
+ * counter is incremented — `recordPaidAudit` runs inside the SAME
+ * `$transaction` that creates the Audit row (TLM-7), so the increment is
+ * atomic with the persisted result.
+ *
  * It catches the page-fetch failure throw and renders the mapped friendly
  * Spanish copy + a Reintentar link (ARU-6); unexpected errors are rethrown so
  * the `error.tsx` boundary (ARU-4) handles them.
@@ -52,31 +59,53 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
   }
 
   const session = await auth();
-  if (session?.user?.id) {
-    const count = await countAuditsInWindow(
-      prisma,
-      session.user.id,
-      Date.now(),
-    );
-    if (!hasFreeAuditsLeft(count)) {
+  const userId = session?.user?.id;
+  if (userId) {
+    const { allowed } = await checkTierLimit(prisma, userId, Date.now());
+    if (!allowed) {
       // Authoritative gate (TLM-4): the audit ran, but the tier says no — show
       // the limit copy (TLM-5) and do NOT persist.
       return <TierLimitState />;
     }
+
+    // U4 (TLM-8): the persist path depends on tier — FREE writes the Audit row
+    // directly; PRO/ENTERPRISE increments the paid counter in the same
+    // transaction as the Audit row (TLM-7).
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { tier: true },
+    });
     try {
-      await prisma.audit.create({
-        data: {
-          userId: session.user.id,
-          url,
-          geoScore: Math.round(result.summary.geoScore),
-          severityBand: result.summary.severityBand,
-          durationMs: Math.round(result.summary.durationMs),
-          // AuditResult is JSON-serializable by contract (RAO-10); the engines
-          // produce plain data, so this cast only satisfies Prisma's Json input
-          // typing (nested `unknown` values in records are not assignable).
-          result: result as unknown as Prisma.InputJsonValue,
-        },
-      });
+      if (user && isPaidTier(user.tier)) {
+        await prisma.$transaction(async (tx) => {
+          await recordPaidAudit(tx, userId, Date.now());
+          await tx.audit.create({
+            data: {
+              userId,
+              url,
+              geoScore: Math.round(result.summary.geoScore),
+              severityBand: result.summary.severityBand,
+              durationMs: Math.round(result.summary.durationMs),
+              // AuditResult is JSON-serializable by contract (RAO-10); the
+              // engines produce plain data, so this cast only satisfies
+              // Prisma's Json input typing (nested `unknown` values in records
+              // are not assignable).
+              result: result as unknown as Prisma.InputJsonValue,
+            },
+          });
+        });
+      } else {
+        await prisma.audit.create({
+          data: {
+            userId,
+            url,
+            geoScore: Math.round(result.summary.geoScore),
+            severityBand: result.summary.severityBand,
+            durationMs: Math.round(result.summary.durationMs),
+            result: result as unknown as Prisma.InputJsonValue,
+          },
+        });
+      }
     } catch (error) {
       // Best-effort persist: never hide the finished report behind a DB error.
       console.error("audit persist failed", error);

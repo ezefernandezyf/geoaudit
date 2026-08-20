@@ -8,7 +8,7 @@ import {
 } from "@/lib/audit/url-policy";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { countAuditsInWindow, hasFreeAuditsLeft } from "@/lib/audit/tier";
+import { checkTierLimit } from "@/lib/audit/enforcement";
 import { getDefaultRateLimiter, resolveClientKey } from "@/lib/rate-limit";
 
 /** State returned to the form: `{ error: null }` on success (redirect fires). */
@@ -65,20 +65,23 @@ export async function auditAction(
     return { error: AUDIT_FORM_ERRORS.protocol };
   }
 
-  // Tier pre-check (TLM-3, design U3): a signed-in FREE user who reached the
-  // 30-day limit is blocked BEFORE the redirect (the report page re-runs the
-  // audit, so this prevents the work). Cheap gate — one indexed COUNT. Runs
-  // after the free sync validation, right before the redirect. Anonymous
-  // requests skip the tier entirely (TLM-6). TOCTOU is accepted and closed by
-  // the authoritative re-check in the report page (TLM-4).
+  // Tier pre-check (TLM-3, design U4): a signed-in user who reached their
+  // tier's limit is blocked BEFORE the redirect (the report page re-runs the
+  // audit, so this prevents the work). Cheap gate — ONE indexed query per tier
+  // (FREE: COUNT of Audit rows in the window; PRO/ENTERPRISE: the paid counter
+  // on Subscription). The counter is selected by tier (TLM-8) through the
+  // SHARED `checkTierLimit`, so this pre-check and the authoritative re-check
+  // in the report page always agree. Anonymous requests skip the tier entirely
+  // (TLM-6). TOCTOU is accepted and closed by the authoritative re-check in
+  // the report page (TLM-4).
   const session = await auth();
   if (session?.user?.id) {
-    const count = await countAuditsInWindow(
+    const { allowed } = await checkTierLimit(
       prisma,
       session.user.id,
       Date.now(),
     );
-    if (!hasFreeAuditsLeft(count)) {
+    if (!allowed) {
       return { error: AUDIT_FORM_ERRORS.limitReached };
     }
   }
