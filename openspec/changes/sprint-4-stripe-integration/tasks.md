@@ -40,8 +40,8 @@ Chain strategy: feature-branch-chain
 
 - [x] U2.1 RED test: `subscription-service.ts` — getOrCreateCustomer, createCheckoutSession (env priceId, `client_reference_id=userId`), createPortalSession (BLG-5/6).
 - [x] U2.2 `src/billing/subscription-service.ts`: implement `getOrCreateCustomer`, `createCheckoutSession`, `createPortalSession` (BLG-5/6).
-- [ ] U2.3 RED test: `actions.ts` — auth reject, invalid plan, missing key → `{error}`; success `redirect` (BLG-4/5/6, PRC-4).
-- [ ] U2.4 `src/billing/actions.ts` (`"use server"`): `checkoutAction` (auth→customer→session→redirect), `portalAction` (auth+stripeCustomerId→portal→redirect) (BLG-5/6).
+- [x] U2.3 RED test: `actions.ts` — auth reject, invalid plan, missing key → `{error}`; success `redirect` (BLG-4/5/6, PRC-4).
+- [x] U2.4 `src/billing/actions.ts` (`"use server"`): `checkoutAction` (auth→customer→session→redirect), `portalAction` (auth+stripeCustomerId→portal→redirect) (BLG-5/6).
 
 ## Phase 3 (U3): Webhook + Tier Sync — PR 3 (depends U1)
 
