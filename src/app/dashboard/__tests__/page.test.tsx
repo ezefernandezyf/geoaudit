@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import DashboardPage from "@/app/dashboard/page";
 import { formatAuditDate } from "@/report/format";
 
-const { authMock, findManyMock } = vi.hoisted(() => ({
+const { authMock, findManyMock, userFindUniqueMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
   findManyMock: vi.fn(),
+  userFindUniqueMock: vi.fn(),
 }));
 
 // next-auth/lib/env.js imports next/server (unresolvable in vitest); the auth
@@ -15,7 +16,15 @@ vi.mock("@/lib/auth", () => ({ auth: authMock }));
 // Read-only source (DSH-5): the mocked audit delegate exposes ONLY findMany, so
 // any write call the page (or its imports) attempted would throw at runtime.
 vi.mock("@/lib/prisma", () => ({
-  prisma: { audit: { findMany: findManyMock } },
+  prisma: {
+    audit: { findMany: findManyMock },
+    user: { findUnique: userFindUniqueMock },
+  },
+}));
+// The billing CTA (DSH-6) receives the portal Server Action; mock the module so
+// the page test doesn't pull in the Stripe stack.
+vi.mock("@/billing/actions", () => ({
+  portalAction: vi.fn(async () => ({ error: null })),
 }));
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
@@ -48,6 +57,8 @@ beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: "user-1" } });
   findManyMock.mockClear();
   findManyMock.mockResolvedValue(prismaRows);
+  userFindUniqueMock.mockClear();
+  userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
   vi.mocked(redirect).mockClear();
 });
 

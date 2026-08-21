@@ -3,7 +3,9 @@ import { urlInputSchema } from "@/lib/contracts/url-input";
 
 describe("urlInputSchema", () => {
   it("accepts a valid absolute URL", () => {
-    const result = urlInputSchema.safeParse({ url: "https://example.com/page" });
+    const result = urlInputSchema.safeParse({
+      url: "https://example.com/page",
+    });
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.url).toBe("https://example.com/page");

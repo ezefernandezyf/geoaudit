@@ -11,11 +11,11 @@ Server-action in-memory rate limiter to protect the free audit flow from abuse. 
 | # | Requirement | Strength | Summary |
 |---|-------------|----------|---------|
 | RTL-1 | Fixed window algorithm | MUST | Track request counts per window; configurable `windowMs` and `maxRequests` |
-| RTL-2 | Store injectable | MUST | Store behind interface (`get`/`increment`/`reset`); production default: in-memory `Map` |
+| RTL-2 | Store injectable | MUST | Store behind interface (`get`/`increment`/`reset`, async); production default: DB-backed `PrismaRateLimitStore` |
 | RTL-3 | Key by client IP | MUST | Extract IP from `x-forwarded-for` header fallback `x-real-ip` |
 | RTL-4 | Server Action only | MUST | Enforce only in the audit form Server Action; no standalone route handler |
 | RTL-5 | Over-limit response | MUST | Return `{ allowed: false, remaining: 0, resetMs }`; form shows inline error with `role="alert"` |
-| RTL-6 | Best-effort doc | SHOULD | Document per-instance limitation in serverless; real limiter with DB in Sprint 3 |
+| RTL-6 | DB-backed store | MUST | Default store is `PrismaRateLimitStore` performing atomic UPSERT on `(key, windowStart)`; `RATE_LIMIT_ENABLED=false` bypasses it |
 | RTL-7 | Feature flag | MUST | Read `RATE_LIMIT_ENABLED`; when `"false"`, bypass all checks (no counter increment) |
 
 ### RTL-1: Fixed window algorithm
@@ -45,7 +45,7 @@ Server-action in-memory rate limiter to protect the free audit flow from abuse. 
 
 ### RTL-2: Store injectable
 
-**Rationale**: The store must be injectable so unit tests can assert limiter behavior without real Maps or race conditions.
+**Rationale**: The store must be injectable so unit tests can assert limiter behavior against a mock and so the production default can swap between in-memory and DB-backed implementations without changing the limiter.
 
 #### Scenario: Injected mock store
 
@@ -66,6 +66,24 @@ Server-action in-memory rate limiter to protect the free audit flow from abuse. 
 - THEN it returns `{ allowed: true }` immediately (bypass)
 - AND no counter is incremented and no store method is called
 
+### RTL-6: DB-backed store
+
+**Rationale**: The in-memory store is per-instance; in serverless each instance enforces its own budget, multiplying the effective limit by the instance count. A DB-backed store shares state across instances.
+
+The system MUST use a DB-backed `PrismaRateLimitStore` as the default store, performing an atomic UPSERT on `(key, windowStart)`.
+
+#### Scenario: Shared counter across instances
+
+- GIVEN two serverless instances share the same database
+- WHEN both instances check the same client IP in the same window
+- THEN both read and increment the same persisted counter, with no per-instance drift
+
+#### Scenario: Kill switch still bypasses the store
+
+- GIVEN `RATE_LIMIT_ENABLED="false"`
+- WHEN the limiter checks any key
+- THEN no DB read or write occurs and the check returns allowed
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -75,5 +93,5 @@ Server-action in-memory rate limiter to protect the free audit flow from abuse. 
 | RTL-3 | (IP extraction from headers — integration test) | Implicit |
 | RTL-4 | (integration: limiter only wired in audit action) | Implicit |
 | RTL-5 | (via ADF-9 rate limit scenario) | Implicit |
-| RTL-6 | (README/JSDoc — documented limitation) | Implicit |
+| RTL-6 | Shared counter across instances, Kill switch bypasses store | Covered (prisma-store tests + HARD GATE DB real) |
 | RTL-7 | Rate limiting disabled | Covered |

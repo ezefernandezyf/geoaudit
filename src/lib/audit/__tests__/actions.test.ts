@@ -9,7 +9,7 @@ import {
 } from "@/lib/audit/url-policy";
 import { auditAction } from "@/lib/audit/actions";
 import { auth } from "@/lib/auth";
-import { countAuditsInWindow } from "@/lib/audit/tier";
+import { checkTierLimit } from "@/lib/audit/enforcement";
 import { getDefaultRateLimiter } from "@/lib/rate-limit";
 import type { AuditFormState } from "@/lib/audit/actions";
 
@@ -19,6 +19,7 @@ import type { AuditFormState } from "@/lib/audit/actions";
  * session-returning call shape the action actually uses.
  */
 const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
+const checkTierLimitMock = vi.mocked(checkTierLimit);
 
 /**
  * U5.T4 — rate limiting integration (ADF-9, RTL-4/5). The action module's
@@ -52,19 +53,14 @@ vi.mock("next/headers", () => ({
 /**
  * U3.T2 — tier pre-check (TLM-3). The auth stack and the prisma singleton are
  * mocked so the action never touches a real DB nor instantiates NextAuth.
- * `countAuditsInWindow` is mocked (the pure query contract is covered in
- * tier.test.ts); `hasFreeAuditsLeft` stays REAL (importOriginal spread) so the
- * action's gate is exercised through the actual helper.
+ * `checkTierLimit` is mocked (its per-tier counter selection is covered in
+ * enforcement.test.ts) so the action's gate wiring is exercised in isolation.
  */
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
-vi.mock("@/lib/audit/tier", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/audit/tier")>();
-  return {
-    ...actual,
-    countAuditsInWindow: vi.fn(async () => 0),
-  };
-});
+vi.mock("@/lib/audit/enforcement", () => ({
+  checkTierLimit: vi.fn(async () => ({ allowed: true })),
+}));
 
 const session = (): Session => ({
   user: { id: "user-1", name: "Ana", email: "ana@example.com" },
@@ -264,38 +260,37 @@ describe("auditAction tier pre-check (TLM-3)", () => {
       resetMs: 0,
     });
     authMock.mockReset();
-    vi.mocked(countAuditsInWindow).mockReset();
-    vi.mocked(countAuditsInWindow).mockResolvedValue(0);
+    checkTierLimitMock.mockReset();
+    checkTierLimitMock.mockResolvedValue({ allowed: true });
   });
 
-  it("blocks the 4th audit in the window before redirecting (TLM-3)", async () => {
+  it("blocks an over-limit user before redirecting (TLM-3)", async () => {
     authMock.mockResolvedValue(session());
-    vi.mocked(countAuditsInWindow).mockResolvedValue(3);
+    checkTierLimitMock.mockResolvedValue({ allowed: false });
 
     const state = await auditAction({ error: null }, fd("https://ejemplo.com"));
 
     expect(state).toEqual({ error: AUDIT_FORM_ERRORS.limitReached });
   });
 
-  it("counts the signed-in user's audits for the pre-check", async () => {
+  it("evaluates the signed-in user's tier for the pre-check", async () => {
     authMock.mockResolvedValue(session());
-    vi.mocked(countAuditsInWindow).mockResolvedValue(2);
 
     await expectRedirect(
       fd("https://ejemplo.com"),
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(countAuditsInWindow).toHaveBeenCalledWith(
+    expect(checkTierLimitMock).toHaveBeenCalledWith(
       expect.anything(),
       "user-1",
       expect.any(Number),
     );
   });
 
-  it("allows a signed-in user with audits left and redirects (TLM-2)", async () => {
+  it("allows a signed-in user within their limit and redirects (TLM-2)", async () => {
     authMock.mockResolvedValue(session());
-    vi.mocked(countAuditsInWindow).mockResolvedValue(2);
+    checkTierLimitMock.mockResolvedValue({ allowed: true });
 
     await expectRedirect(
       fd("https://ejemplo.com"),
@@ -311,6 +306,6 @@ describe("auditAction tier pre-check (TLM-3)", () => {
       "/report?url=https%3A%2F%2Fejemplo.com%2F",
     );
 
-    expect(countAuditsInWindow).not.toHaveBeenCalled();
+    expect(checkTierLimitMock).not.toHaveBeenCalled();
   });
 });
