@@ -1,10 +1,10 @@
 # Dashboard Specification
 
-> **Change**: `sprint-3-auth-dashboard` · **Type**: New capability (ADDED)
+> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, and an empty state. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library.
+Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, an empty state, and a tier-adaptive billing CTA. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library. The billing CTA shows "Upgrade" for `FREE` users (→ `/pricing`) and "Gestionar suscripción" for PRO/Enterprise users (→ Customer Portal). No global nav link is introduced.
 
 ## Requirements
 
@@ -15,6 +15,7 @@ Authenticated dashboard listing the user's audit history with a score trend, a r
 | DSH-3 | Re-audit link | MUST | Each row MUST offer a re-audit link for its URL |
 | DSH-4 | Empty state | MUST | Zero audits MUST render an empty state with a call-to-action |
 | DSH-5 | Read-only source | MUST | Dashboard MUST read `Audit` rows without re-running audits |
+| DSH-6 | Billing CTA | MUST | Dashboard shows "Upgrade" (FREE→/pricing) or "Gestionar suscripción" (PRO/Enterprise→portal) |
 
 ### Requirement: History Table (DSH-1)
 
@@ -67,3 +68,19 @@ The dashboard MUST read persisted `Audit` rows and MUST NOT re-run audits to dis
 - GIVEN audits are already persisted
 - WHEN the dashboard reads them
 - THEN no audit re-execution occurs and the persisted `result` JSON is the source of truth
+
+### Requirement: Billing CTA (DSH-6)
+
+When the dashboard renders for an authenticated user, then it MUST show a billing CTA that adapts to tier: `FREE` shows "Upgrade" linking to `/pricing`, and PRO/Enterprise show "Gestionar suscripción" triggering the Customer Portal action.
+
+#### Scenario: Free user sees upgrade CTA
+
+- GIVEN an authenticated `FREE` user
+- WHEN the dashboard renders
+- THEN an "Upgrade" CTA is shown linking to `/pricing`
+
+#### Scenario: Pro user sees manage CTA
+
+- GIVEN an authenticated PRO or Enterprise user
+- WHEN the dashboard renders
+- THEN a "Gestionar suscripción" CTA is shown and it triggers the portal action

@@ -26,7 +26,7 @@ build_output_hash: sha256:616bec95ff229b4d4492114cab5d8ade788a3c6952116f01ad7ead
 
 Sprint 4 (Stripe billing: unified `Tier` enum, `Subscription` model, lazy Stripe client, Checkout/Portal Server Actions, signature-verified idempotent webhook, per-tier enforcement, `/pricing` page, and tier-adaptive dashboard CTA) is **functionally complete across all four work units (U1–U4, 32 tasks)**. Every requirement that can be exercised in unit/jsdom/runtime is **COMPLIANT with a passing covering test**: `pnpm test` passes (**613 passed | 1 skipped**, exit 0), `pnpm run lint` passes (**0 errors**, 1 pre-existing warning on the gitignored `coverage/` artifact), `pnpm run typecheck` is clean (exit 0), and `pnpm run prisma:generate` succeeds (exit 0, Prisma Client 7.9.1 — proving the `Tier`/`SubscriptionStatus`/`Subscription` schema generates, BLG-1/R4). The Sprint 4 migration is **purely additive** (`CREATE TYPE SubscriptionStatus`, `ALTER TYPE "Tier" ADD VALUE 'ENTERPRISE'`, `CREATE TABLE Subscription/StripeWebhookEvent`, indexes + FK cascade — no drops, no destructive alters).
 
-Two items are carried as **WARNING, not blockers**: (1) the **real Stripe webhook end-to-end** (`stripe listen` → `/api/webhooks/stripe` + a real test-mode checkout) and the **real `prisma migrate dev` against Supabase** cannot be re-executed here without Stripe credentials, a live listener, and `DATABASE_URL`; the unit tests for signature verification (BLG-7), idempotency (BLG-8), and tier sync (BLG-9) already cover the behavior, so the remaining surface is a manual HARD GATE the orchestrator/user runs before launch (documented in `docs/stripe-test-setup.md`). (2) A minor UI-copy inconsistency: the dashboard FREE CTA reads "Upgrade" (English) while the pricing page uses "Mejorar" (Spanish) — see SUGGESTION. Neither is a failure.
+At verification time two items were carried as **WARNING, not blockers**: (1) the **real Stripe webhook end-to-end** (`stripe listen` → `/api/webhooks/stripe` + a real test-mode checkout) and the **real `prisma migrate dev` against Supabase** could not be re-executed in that environment without Stripe credentials, a live listener, and `DATABASE_URL`. **Both HARD GATEs have since been RESOLVED by the orchestrator against the real Supabase instance** — see the HARD GATE Status table below for the verified evidence (real 4242 checkout → webhook 200 → Subscription PRO/ACTIVE + `User.tier=PRO`; `prisma migrate status` = "Database schema is up to date"). (2) A minor UI-copy inconsistency: the dashboard FREE CTA reads "Upgrade" (English) while the pricing page uses "Mejorar" (Spanish) — see SUGGESTION. Neither is a failure.
 
 **Verdict: PASS WITH WARNINGS** — 22/22 requirements COMPLIANT, 28/28 scenarios COMPLIANT, full unit/runtime evidence green, two pending manual HARD GATE items carried as WARNING.
 
@@ -118,7 +118,7 @@ pnpm test
 | R4 Schema baseline | Migration applies the new model | `prisma/schema.prisma` (adds `Subscription`, `StripeWebhookEvent`, `SubscriptionStatus`, `Tier.ENTERPRISE` alongside Sprint-3 models) + `prisma/migrations/20260820133615_add_subscription_and_billing/migration.sql` (additive: CREATE TYPE/TABLE + ADD VALUE + indexes + FK cascade) + `pnpm run prisma:generate` exit 0 (re-run this verification) | ✅ COMPLIANT (real `migrate dev` on Supabase = HARD GATE) |
 | R7 Subscription model | Subscription links to user | `prisma/schema.prisma` `Subscription` 1:1 `User` (unique `userId` FK cascade, `stripeCustomerId` unique, `plan Tier`, `status SubscriptionStatus`, `currentPeriodEnd?`, `auditsUsed @default(0)`, `auditsResetAt?`) + migration.sql (unique indexes + FK) | ✅ COMPLIANT |
 
-**Compliance summary**: 22/22 requirements COMPLIANT, 28/28 scenarios COMPLIANT. Two requirements (BLG-7, R4) additionally carry a real-Stripe / real-Supabase HARD GATE that is unit-proven but not re-executed here.
+**Compliance summary**: 22/22 requirements COMPLIANT, 28/28 scenarios COMPLIANT. The two requirements (BLG-7, R4) that also carried a real-Stripe / real-Supabase HARD GATE (unit-proven) have had that HARD GATE **resolved by the orchestrator against real Supabase** — see HARD GATE Status.
 
 ## Correctness (Static Evidence)
 
@@ -154,8 +154,8 @@ pnpm test
 **CRITICAL**: None.
 
 **WARNING**:
-1. **HARD GATE pending (manual, Stripe)** — real `stripe listen` → `/api/webhooks/stripe` + a real test-mode checkout (Free→Pro) exercises the live signature handshake, the `checkout.session.completed` dispatch, and the `User.tier` sync end-to-end. This cannot run here without `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` + a live listener. The unit tests (BLG-7 route `constructEvent` throw/return, BLG-8 P2002 idempotency, BLG-9 tier sync) already cover the behavior; the remaining surface is a documented manual smoke the user runs before launch (`docs/stripe-test-setup.md`). Not a blocker.
-2. **HARD GATE pending (manual, DB)** — the Sprint 4 migration is present and additive, and `prisma generate` succeeds, but `pnpm run prisma:migrate` against the real Supabase instance was not re-executed in this verification (requires `DATABASE_URL`). Task U1.8 is marked complete and the migration SQL contains no destructive ops; confirm the applied state before archive. Not a blocker.
+1. **HARD GATE RESOLVED (manual, Stripe)** — the real Stripe e2e was verified by the orchestrator after this verification: a real test-mode checkout (card 4242) produced `customer.created` → `checkout.session.completed` → webhook `200` (signature verified OK) → `Subscription` PRO/ACTIVE + `User.tier=PRO` on real Supabase. The "Gestionar suscripción" CTA was confirmed to appear after reload (expected behavior for the async webhook). Unit tests (BLG-7 route `constructEvent`, BLG-8 P2002 idempotency, BLG-9 tier sync) cover the behavior; the live handshake is now confirmed end-to-end. **No longer pending.**
+2. **HARD GATE RESOLVED (manual, DB)** — `pnpm run prisma:migrate` against the real Supabase instance was executed by the orchestrator after this verification: `prisma migrate status` reports "Database schema is up to date" with both migrations applied. Real DB confirmed: 1 Subscription PRO/ACTIVE (currentPeriodEnd 2026-09-21, auditsUsed 0), `User.tier=PRO`, 15 `StripeWebhookEvent` processed (idempotency confirmed). **No longer pending.**
 3. **ESLint** — 1 pre-existing warning on `coverage/block-navigation.js` (gitignored generated artifact, not source).
 
 **SUGGESTION**:
@@ -173,8 +173,8 @@ pnpm test
 | `pnpm run prisma:generate` | ✅ re-run | exit 0, Client 7.9.1 (BLG-1/R4 schema generates) |
 | Migration SQL additive (no drops/destructive alters) | ✅ inspected | `CREATE TYPE` + `ALTER TYPE ADD VALUE` + `CREATE TABLE` + indexes/FK only |
 | 32/32 tasks `[x]` in `tasks.md` | ✅ inspected | all checked |
-| **Real Stripe webhook + test-mode checkout (BLG-7/9 e2e)** | ❌ requires credentials + listener | **PENDING manual HARD GATE** (unit-proven; `docs/stripe-test-setup.md`) |
-| **`prisma migrate dev` on real Supabase (R4)** | ❌ requires `DATABASE_URL` | **PENDING manual HARD GATE** (migration additive + `prisma generate` clean) |
+| **Real Stripe webhook + test-mode checkout (BLG-7/9 e2e)** | ✅ verified post-verification (orchestrator, real Supabase) | card 4242 → `checkout.session.completed` → webhook 200 (signature OK) → `Subscription` PRO/ACTIVE + `User.tier=PRO`; "Gestionar suscripción" appears after reload |
+| **`prisma migrate dev` on real Supabase (R4)** | ✅ verified post-verification (orchestrator) | `prisma migrate status` = "Database schema is up to date" (2 migrations applied); real DB: 1 Subscription PRO/ACTIVE, 15 StripeWebhookEvent |
 
 ## TDD Compliance
 
@@ -199,4 +199,4 @@ pnpm test
 
 ## Verdict
 
-**PASS WITH WARNINGS** — 22/22 requirements COMPLIANT, 28/28 scenarios COMPLIANT, `pnpm test` 613 passed | 1 skipped (exit 0), `pnpm run lint` 0 errors, `pnpm run typecheck` clean, `prisma generate` clean, additive migration inspected, 32/32 tasks complete. Two pending manual HARD GATE items (real Stripe webhook + real Supabase migration apply) and one minor UI-copy inconsistency carried as WARNING/SUGGESTION — no blockers, no critical findings, and no new contradiction or failing check discovered.
+**PASS WITH WARNINGS** — 22/22 requirements COMPLIANT, 28/28 scenarios COMPLIANT, `pnpm test` 613 passed | 1 skipped (exit 0), `pnpm run lint` 0 errors, `pnpm run typecheck` clean, `prisma generate` clean, additive migration inspected, 32/32 tasks complete. The two previously-pending manual HARD GATEs (real Stripe webhook + real Supabase migration apply) have been **RESOLVED by the orchestrator against the real Supabase instance** and are no longer pending. One minor UI-copy inconsistency carried as SUGGESTION — no blockers, no critical findings, and no new contradiction or failing check discovered.
