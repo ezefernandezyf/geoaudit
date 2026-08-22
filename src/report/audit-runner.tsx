@@ -6,14 +6,11 @@ import { checkTierLimit, recordPaidAudit } from "@/lib/audit/enforcement";
 import { isPaidTier } from "@/lib/audit/tier";
 import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
 import type { Prisma } from "@/generated/prisma/client";
-import { DomainScorecard } from "@/report/domain-scorecard";
 import {
   detectFetchFailureCode,
   resolveFetchErrorCopy,
 } from "@/report/fetch-error-copy";
-import { ReportMeta } from "@/report/report-meta";
-import { ScoreHero } from "@/report/score-hero";
-import { TopFindings } from "@/report/top-findings";
+import { AuditReport } from "@/report/audit-report";
 
 export type AuditRunnerProps = {
   /** Normalized http/https URL to audit (already validated by resolve.ts). */
@@ -147,24 +144,6 @@ function FetchErrorState({ url, copy }: { url: string; copy: string }) {
       >
         Reintentar
       </a>
-    </section>
-  );
-}
-
-function AuditReport({ result }: { result: AuditResult }) {
-  return (
-    <section
-      aria-label="Reporte de auditoría"
-      className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-16"
-    >
-      <ScoreHero summary={result.summary} />
-      <DomainScorecard result={result} />
-      <TopFindings
-        citability={result.citability}
-        schema={result.schema}
-        crawlers={result.crawlers}
-      />
-      <ReportMeta summary={result.summary} meta={result.meta} />
     </section>
   );
 }
