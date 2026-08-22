@@ -6,16 +6,17 @@ import chromium from "@sparticuz/chromium-min";
  *
  * `renderPdf(html, deps)` launches headless Chromium, loads the template HTML
  * and returns PDF bytes. Production uses `puppeteer-core` +
- * `@sparticuz/chromium-min` (the Vercel-blessed pair, PDF-4): chromium-min is
- * a stripped Chromium built for serverless, wired through `serverExternalPackages`
- * + `outputFileTracingIncludes` (PDF-8). Local dev uses the full `puppeteer`
- * dev dependency instead.
+ * `@sparticuz/chromium-min` (the Vercel-blessed pair, PDF-4). chromium-min
+ * ships NO binary in the package: the stripped Chromium is downloaded at
+ * runtime from the pinned GitHub release pack (the official Vercel template
+ * pattern) and cached in /tmp per warm instance. Local dev uses the full
+ * `puppeteer` dev dependency and its bundled Chrome instead of that download.
  *
  * - PDF-6: `printBackground: true` so navy/emerald/amber/red survive print.
  * - `--no-sandbox`: serverless Chromium cannot use the sandbox (no setuid).
  * - Fonts (PDF-5): the template references `/fonts/*.ttf`; `setContent` has no
  *   origin, so a `<base>` points the browser at the traced `public/` bundle
- *   and the fonts resolve OFFLINE (no network, no CDN).
+ *   (PDF-8) and the fonts resolve OFFLINE (no network, no CDN).
  * - Threat: any launch/render rejection is wrapped in the typed
  *   `PdfRenderError` — the route maps it to a 5xx, never an uncaught throw —
  *   and the browser is always closed (finally), so a failed render leaks no
@@ -56,14 +57,41 @@ export type PdfRenderDeps = {
 /** Serverless-safe Chrome flags (threat matrix: Chromium subprocess). */
 export const CHROMIUM_ARGS = ["--no-sandbox"];
 
+/** Pinned chromium-min release pack — same Chromium major as the pin (149). */
+export const CHROMIUM_PACK_URL =
+  "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.tar";
+
+/** Launch config resolved per environment (dev: puppeteer; prod: chromium-min). */
+async function resolveLaunchConfig(): Promise<{
+  executablePath: string;
+  headless: boolean;
+  defaultViewport: { width: number; height: number };
+}> {
+  if (process.env.NODE_ENV !== "production") {
+    // Local dev: the full `puppeteer` dev dep ships its own bundled Chrome
+    // (installed via the approved postinstall) — no 50MB+ remote download.
+    const devPuppeteer = await import("puppeteer");
+    return {
+      executablePath: devPuppeteer.default.executablePath(),
+      headless: true,
+      defaultViewport: { width: 1920, height: 1080 },
+    };
+  }
+  return {
+    executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
+    headless: chromium.headless,
+    defaultViewport: chromium.defaultViewport,
+  };
+}
+
 const defaultDeps: PdfRenderDeps = {
   async launch() {
-    const executablePath = await chromium.executablePath();
+    const config = await resolveLaunchConfig();
     return puppeteer.launch({
       args: CHROMIUM_ARGS,
-      defaultViewport: chromium.defaultViewport,
-      executablePath,
-      headless: chromium.headless,
+      defaultViewport: config.defaultViewport,
+      executablePath: config.executablePath,
+      headless: config.headless,
     });
   },
 };
