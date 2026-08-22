@@ -1,13 +1,33 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import type { AuditResult } from "@/lib/contracts/audit-result";
+import type {
+  AuditResult,
+  MultiPageResult,
+} from "@/lib/contracts/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AuditReport } from "@/report/audit-report";
+import { MultiPageReport } from "@/report/multi-page-report";
 import { ShareLinkPanel } from "@/dashboard/share-link-panel";
 import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { createShareToken, revokeShareToken } from "@/lib/audit/share-actions";
 import { Card } from "@/ui/card";
+
+/**
+ * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
+ * audit persists the light `{ aggregate, pages }` shape (`multiPageResultSchema`)
+ * while single-page audits keep the full `AuditResult`. Structural check — the
+ * persisted JSON is contract-shaped by construction (same cast convention as
+ * the write side).
+ */
+function isMultiPageResult(value: unknown): value is MultiPageResult {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "aggregate" in value &&
+    Array.isArray((value as { pages?: unknown }).pages)
+  );
+}
 
 /**
  * Audit detail page (ADP-1..ADP-3, design D1/D2). First dynamic route of the
@@ -65,7 +85,11 @@ export default async function AuditDetailPage({
 
   return (
     <main className="min-h-dvh bg-surface">
-      <AuditReport result={audit.result as unknown as AuditResult} />
+      {isMultiPageResult(audit.result) ? (
+        <MultiPageReport result={audit.result} />
+      ) : (
+        <AuditReport result={audit.result as unknown as AuditResult} />
+      )}
       <div className="mx-auto w-full max-w-3xl px-6 pb-16">
         <Card
           header={

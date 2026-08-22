@@ -111,6 +111,50 @@ describe("AuditDetailPage (ADP-3)", () => {
   });
 });
 
+describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
+  it("renders the MultiPageReport for a persisted multi-page audit", async () => {
+    const multiPageResult = {
+      aggregate: {
+        url: "https://example.com/",
+        geoScore: 74,
+        severityBand: "Fair",
+        durationMs: 2400,
+      },
+      pages: [
+        {
+          url: "https://example.com/",
+          geoScore: 68,
+          severityBand: "Fair",
+          durationMs: 900,
+        },
+        {
+          url: "https://example.com/blog",
+          geoScore: 80,
+          severityBand: "Good",
+          durationMs: 1100,
+        },
+      ],
+    };
+    findFirstMock.mockResolvedValue({ ...auditRow, result: multiPageResult });
+
+    render(await AuditDetailPage({ params }));
+
+    // Aggregate hero + per-page rows (NOT the single-page AuditReport).
+    expect(
+      screen.getByRole("region", {
+        name: "Reporte de auditoría multi-página",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Páginas analizadas")).toBeInTheDocument();
+    expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
+    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("Bueno")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: "Reporte de auditoría" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
   it("shows the upgrade CTA for a FREE user — never the share panel", async () => {
     userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
