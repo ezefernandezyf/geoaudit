@@ -37,13 +37,13 @@ Chain strategy: feature-branch-chain
 
 ## Unit 2 — Share links
 
-- [ ] U2.1 RED: `requirePaidTier` FREE→cta / PRO→allowed (TLM-9)
-- [ ] U2.2 GREEN: `src/lib/audit/feature-gate.ts` (D7)
-- [ ] U2.3 RED: create UUID; revoke nulls (SHR-1/4)
-- [ ] U2.4 GREEN: `src/lib/audit/share-actions.ts` create/revoke+gate (SHR-3)
-- [ ] U2.5 RED: `/share/[token]` no re-run, no private fields (SHR-2/5)
-- [ ] U2.6 GREEN: `src/app/share/[token]/page.tsx`; unknown→404 (SHR-6)
-- [ ] U2.7 RTL: share UI on detail (SHR-3, TLM-9)
+- [x] U2.1 RED: `requirePaidTier` FREE→cta / PRO→allowed (TLM-9)
+- [x] U2.2 GREEN: `src/lib/audit/feature-gate.ts` (D7)
+- [x] U2.3 RED: create UUID; revoke nulls (SHR-1/4)
+- [x] U2.4 GREEN: `src/lib/audit/share-actions.ts` create/revoke+gate (SHR-3)
+- [x] U2.5 RED: `/share/[token]` no re-run, no private fields (SHR-2/5)
+- [x] U2.6 GREEN: `src/app/share/[token]/page.tsx`; unknown→404 (SHR-6)
+- [x] U2.7 RTL: share UI on detail (SHR-3, TLM-9)
 
 ## Unit 3 — Multi-page audit
 
