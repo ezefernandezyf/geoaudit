@@ -76,7 +76,7 @@ export async function GET(_request: Request, { params }: PdfRouteContext) {
     return NextResponse.json({ error: "render_failed" }, { status: 500 });
   }
 
-  return new Response(pdf, {
+  return new Response(new Uint8Array(pdf), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

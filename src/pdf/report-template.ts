@@ -220,7 +220,7 @@ function blockedBots(result: AuditResult): string[] {
 }
 
 function findings(result: AuditResult): string {
-  const { citability, schema, crawlers } = result;
+  const { citability, schema } = result;
   const bots = blockedBots(result);
   const hasCitability =
     citability.top3.length > 0 ||

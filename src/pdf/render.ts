@@ -39,7 +39,7 @@ export type PdfPageLike = {
   ): Promise<void>;
   pdf(options: {
     printBackground?: boolean;
-    format?: string;
+    format?: "A4";
   }): Promise<Uint8Array>;
 };
 
@@ -72,15 +72,15 @@ async function resolveLaunchConfig(): Promise<{
     // (installed via the approved postinstall) — no 50MB+ remote download.
     const devPuppeteer = await import("puppeteer");
     return {
-      executablePath: devPuppeteer.default.executablePath(),
+      executablePath: await devPuppeteer.default.executablePath(),
       headless: true,
       defaultViewport: { width: 1920, height: 1080 },
     };
   }
   return {
     executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
-    headless: chromium.headless,
-    defaultViewport: chromium.defaultViewport,
+    headless: true,
+    defaultViewport: { width: 1920, height: 1080 },
   };
 }
 
@@ -115,7 +115,7 @@ export async function renderPdf(
     await page.setContent(documentHtml, { waitUntil: "networkidle0" });
     const pdf = await page.pdf({ printBackground: true, format: "A4" });
     return Buffer.from(pdf);
-  } catch (cause) {
+  } catch {
     throw new PdfRenderError(
       "No se pudo generar el PDF del reporte. Intente nuevamente.",
     );
