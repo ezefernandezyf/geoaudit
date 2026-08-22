@@ -60,12 +60,12 @@ Chain strategy: feature-branch-chain
 
 ## Unit 4 — PDF export
 
-- [ ] U4.1 deps: pin puppeteer-core+chromium-min; approve-builds
-- [ ] U4.2 fonts: OFL `public/fonts/` (PDF-5)
-- [ ] U4.3 RED: template tokens+`@font-face` (PDF-5/6)
-- [ ] U4.4 GREEN: `src/pdf/report-template.ts` (PDF-4)
-- [ ] U4.5 RED: `printBackground:true`; launch reject→typed (PDF-6, threat)
-- [ ] U4.6 GREEN: `src/pdf/render.ts` chromium-min, --no-sandbox
-- [ ] U4.7 RED: route 404/403/200+filename/5xx (PDF-1/2/3/7/9)
-- [ ] U4.8 GREEN: `src/app/api/report/[id]/pdf/route.ts` nodejs+gate
-- [ ] U4.9 GREEN: `next.config.ts` externals+tracing (PDF-8)
+- [x] U4.1 deps: pin puppeteer-core+chromium-min; approve-builds
+- [x] U4.2 fonts: OFL `public/fonts/` (PDF-5)
+- [x] U4.3 RED: template tokens+`@font-face` (PDF-5/6)
+- [x] U4.4 GREEN: `src/pdf/report-template.ts` (PDF-4)
+- [x] U4.5 RED: `printBackground:true`; launch reject→typed (PDF-6, threat)
+- [x] U4.6 GREEN: `src/pdf/render.ts` chromium-min, --no-sandbox
+- [x] U4.7 RED: route 404/403/200+filename/5xx (PDF-1/2/3/7/9)
+- [x] U4.8 GREEN: `src/app/api/report/[id]/pdf/route.ts` nodejs+gate
+- [x] U4.9 GREEN: `next.config.ts` externals+tracing (PDF-8)
