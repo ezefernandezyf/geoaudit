@@ -47,16 +47,16 @@ Chain strategy: feature-branch-chain
 
 ## Unit 3 — Multi-page audit
 
-- [ ] U3.1 RED: `"sitemap"` kind accepts XML; page/probe reject (MPA-5)
-- [ ] U3.2 GREEN: extend `FetchKind` + gate (D5)
-- [ ] U3.3 RED: cap 5, ≤3 in-flight, 1 runAudit/URL, isolation (MPA-1/2/3)
-- [ ] U3.4 RED: robots→/sitemap.xml; SSRF (MPA-4, threat)
-- [ ] U3.5 GREEN: `src/audit/multi-page.ts` `runMultiPageAudit` (D6)
-- [ ] U3.6 RED: `multiPageResultSchema` parses aggregate+pages (D3)
-- [ ] U3.7 GREEN: additive contract; single-page untouched (MPA-9)
-- [ ] U3.8 RED: tx 1 Audit + N AuditPage rows (MPA-6/7, TLM-10)
-- [ ] U3.9 GREEN: action multi-page + tx + gate; FREE CTA (MPA-8, TLM-9)
-- [ ] U3.10 RTL→GREEN: `multi-page-report.tsx`; detail renders it (D3)
+- [x] U3.1 RED: `"sitemap"` kind accepts XML; page/probe reject (MPA-5)
+- [x] U3.2 GREEN: extend `FetchKind` + gate (D5)
+- [x] U3.3 RED: cap 5, ≤3 in-flight, 1 runAudit/URL, isolation (MPA-1/2/3)
+- [x] U3.4 RED: robots→/sitemap.xml; SSRF (MPA-4, threat)
+- [x] U3.5 GREEN: `src/audit/multi-page.ts` `runMultiPageAudit` (D6)
+- [x] U3.6 RED: `multiPageResultSchema` parses aggregate+pages (D3)
+- [x] U3.7 GREEN: additive contract; single-page untouched (MPA-9)
+- [x] U3.8 RED: tx 1 Audit + N AuditPage rows (MPA-6/7, TLM-10)
+- [x] U3.9 GREEN: action multi-page + tx + gate; FREE CTA (MPA-8, TLM-9)
+- [x] U3.10 RTL→GREEN: `multi-page-report.tsx`; detail renders it (D3)
 
 ## Unit 4 — PDF export
 
