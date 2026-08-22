@@ -1,9 +1,34 @@
 import { describe, expect, it } from "vitest";
 import {
   auditResultSchema,
+  multiPageResultSchema,
   severityBandSchema,
 } from "@/lib/contracts/audit-result";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+
+/** D3 master light shape — aggregate + per-page summaries (MPA-6). */
+const multiPageFixture = {
+  aggregate: {
+    url: "https://example.com/",
+    geoScore: 74,
+    severityBand: "Fair",
+    durationMs: 2400,
+  },
+  pages: [
+    {
+      url: "https://example.com/",
+      geoScore: 68,
+      severityBand: "Fair",
+      durationMs: 900,
+    },
+    {
+      url: "https://example.com/blog",
+      geoScore: 80,
+      severityBand: "Good",
+      durationMs: 1100,
+    },
+  ],
+};
 
 describe("auditResultSchema (RAO-10 typed output)", () => {
   it("parses the full AuditResult fixture and preserves key values", () => {
@@ -84,5 +109,65 @@ describe("severityBandSchema (RGS-5 bands)", () => {
       expect(severityBandSchema.safeParse(band).success).toBe(true);
     }
     expect(severityBandSchema.safeParse("Amazing").success).toBe(false);
+  });
+});
+
+describe("multiPageResultSchema (D3 master light shape, MPA-6)", () => {
+  it("parses the aggregate + pages light shape and preserves key values", () => {
+    const result = multiPageResultSchema.safeParse(multiPageFixture);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      const data = result.data;
+      expect(data.aggregate.url).toBe("https://example.com/");
+      expect(data.aggregate.geoScore).toBe(74);
+      expect(data.aggregate.severityBand).toBe("Fair");
+      expect(data.pages).toHaveLength(2);
+      expect(data.pages[0]).toEqual({
+        url: "https://example.com/",
+        geoScore: 68,
+        severityBand: "Fair",
+        durationMs: 900,
+      });
+      expect(data.pages[1].geoScore).toBe(80);
+      expect(data.pages[1].severityBand).toBe("Good");
+    }
+  });
+
+  it("rejects an aggregate geoScore outside 0-100", () => {
+    const result = multiPageResultSchema.safeParse({
+      ...multiPageFixture,
+      aggregate: { ...multiPageFixture.aggregate, geoScore: 101 },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a page severityBand outside the 5-band enum", () => {
+    const result = multiPageResultSchema.safeParse({
+      ...multiPageFixture,
+      pages: [
+        { ...multiPageFixture.pages[0], severityBand: "Amazing" },
+        multiPageFixture.pages[1],
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a negative page durationMs", () => {
+    const result = multiPageResultSchema.safeParse({
+      ...multiPageFixture,
+      pages: [
+        { ...multiPageFixture.pages[0], durationMs: -5 },
+        multiPageFixture.pages[1],
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a single-page multi-page result (1 page, triangulation)", () => {
+    const single = {
+      aggregate: multiPageFixture.aggregate,
+      pages: [multiPageFixture.pages[0]],
+    };
+    expect(multiPageResultSchema.safeParse(single).success).toBe(true);
   });
 });

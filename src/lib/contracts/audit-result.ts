@@ -95,3 +95,29 @@ export const auditResultSchema = z.object({
 });
 
 export type AuditResult = z.infer<typeof auditResultSchema>;
+
+/**
+ * Multi-page master result light shape (D3, MPA-6) — what the master `Audit`
+ * row persists in `result`. Aditive to `auditResultSchema`: single-page
+ * results keep their own shape and are untouched (MPA-9). Each `AuditPage`
+ * row holds the FULL per-page `AuditResult`; the master keeps only the
+ * aggregate + per-page summaries so the master JSON stays small.
+ */
+export const multiPageResultSchema = z.object({
+  aggregate: z.object({
+    url: z.string(),
+    geoScore: z.number().min(0).max(100),
+    severityBand: severityBandSchema,
+    durationMs: z.number().nonnegative(),
+  }),
+  pages: z.array(
+    z.object({
+      url: z.string(),
+      geoScore: z.number().min(0).max(100),
+      severityBand: severityBandSchema,
+      durationMs: z.number().nonnegative(),
+    }),
+  ),
+});
+
+export type MultiPageResult = z.infer<typeof multiPageResultSchema>;
