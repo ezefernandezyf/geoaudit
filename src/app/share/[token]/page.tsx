@@ -1,7 +1,27 @@
 import { notFound } from "next/navigation";
-import type { AuditResult } from "@/lib/contracts/audit-result";
+import type {
+  AuditResult,
+  MultiPageResult,
+} from "@/lib/contracts/audit-result";
 import { prisma } from "@/lib/prisma";
 import { AuditReport } from "@/report/audit-report";
+import { MultiPageReport } from "@/report/multi-page-report";
+
+/**
+ * Discriminates the two persisted result shapes (same structural check as the
+ * detail page): a multi-page audit persists the light `{ aggregate, pages }`
+ * shape while single-page audits keep the full `AuditResult`. Without this, a
+ * shared multi-page audit would dereference `summary`/`meta` undefined in
+ * ScoreHero/DomainScorecard and crash (verify warning #4).
+ */
+function isMultiPageResult(value: unknown): value is MultiPageResult {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "aggregate" in value &&
+    Array.isArray((value as { pages?: unknown }).pages)
+  );
+}
 
 /**
  * Public share page (SHR-2/5/6, design D4). `/share/[token]` renders a
@@ -12,9 +32,10 @@ import { AuditReport } from "@/report/audit-report";
  * token returns `null` → single `notFound()` (404) path. The nullable-unique
  * column is the exact match (SHR-1).
  *
- * Render (SHR-2): the persisted `result` JSON is rendered directly through
- * the shared `<AuditReport>` — the audit is NEVER re-run (no audit engine
- * import at all).
+ * Render (SHR-2): the persisted `result` JSON is rendered directly through the
+ * shared report components — the audit is NEVER re-run (no audit engine
+ * import at all). Single-page → `<AuditReport>`; multi-page → `<MultiPageReport>`
+ * (fixes the verify warning #4 crash on shared multi-page audits).
  *
  * Exposure (SHR-5): the query selects the audit row only (no user relation)
  * and the page passes ONLY `audit.result` to the report — `userId`, email and
@@ -38,7 +59,11 @@ export default async function SharePage({ params }: SharePageProps) {
 
   return (
     <main className="min-h-dvh bg-surface">
-      <AuditReport result={audit.result as unknown as AuditResult} />
+      {isMultiPageResult(audit.result) ? (
+        <MultiPageReport result={audit.result} />
+      ) : (
+        <AuditReport result={audit.result as unknown as AuditResult} />
+      )}
     </main>
   );
 }

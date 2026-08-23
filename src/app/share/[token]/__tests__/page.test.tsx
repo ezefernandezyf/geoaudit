@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { notFound } from "next/navigation";
 import SharePage from "@/app/share/[token]/page";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import type { MultiPageResult } from "@/lib/contracts/audit-result";
 
 const { findUniqueMock } = vi.hoisted(() => ({
   findUniqueMock: vi.fn(),
@@ -86,5 +87,53 @@ describe("SharePage (SHR-6)", () => {
 
     await expect(SharePage({ params })).rejects.toThrow("NEXT_NOT_FOUND");
     expect(notFound).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("SharePage (multi-page fix, verify warning #4)", () => {
+  const multiPageRow = {
+    id: "audit-mp",
+    userId: "user-1",
+    url: "https://example.com/",
+    geoScore: 74,
+    severityBand: "Fair",
+    durationMs: 2400,
+    shareToken: "tok-mp",
+    result: {
+      aggregate: {
+        url: "https://example.com/",
+        geoScore: 74,
+        severityBand: "Fair",
+        durationMs: 2400,
+      },
+      pages: [
+        {
+          url: "https://example.com/",
+          geoScore: 68,
+          severityBand: "Fair",
+          durationMs: 900,
+        },
+        {
+          url: "https://example.com/blog",
+          geoScore: 80,
+          severityBand: "Good",
+          durationMs: 1100,
+        },
+      ],
+    } satisfies MultiPageResult,
+    createdAt: new Date("2026-08-10T12:00:00.000Z"),
+  };
+
+  it("renders MultiPageReport for a shared multi-page audit (no crash)", async () => {
+    findUniqueMock.mockResolvedValue(multiPageRow);
+
+    render(await SharePage({ params: Promise.resolve({ token: "tok-mp" }) }));
+
+    // Aggregate hero + per-page rows come from the light multi-page shape.
+    expect(screen.getByText("74")).toBeInTheDocument();
+    expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
+    expect(screen.getByText("80")).toBeInTheDocument();
+    // findUnique is still the ONLY delegate call — no re-run, no writes.
+    expect(findUniqueMock).toHaveBeenCalledTimes(1);
   });
 });
