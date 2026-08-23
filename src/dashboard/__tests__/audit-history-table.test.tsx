@@ -64,3 +64,40 @@ describe("AuditHistoryTable (DSH-3)", () => {
     );
   });
 });
+
+/**
+ * U1 — Detail navigation (DSH-7): every history row links to its own detail
+ * page, so the dashboard becomes the entry point to `/dashboard/audits/[id]`.
+ */
+describe("AuditHistoryTable (DSH-7)", () => {
+  it("links every row's URL to its detail page", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+
+    const links = screen.getAllByRole("link", { name: "https://example.com" });
+    expect(links[0]).toHaveAttribute("href", "/dashboard/audits/a1");
+    expect(
+      screen.getByRole("link", { name: "https://ejemplo.org/blog" }),
+    ).toHaveAttribute("href", "/dashboard/audits/a2");
+    expect(
+      screen.getByRole("link", { name: "https://tienda.com" }),
+    ).toHaveAttribute("href", "/dashboard/audits/a3");
+    expect(
+      screen.getByRole("link", { name: "https://legacy.net" }),
+    ).toHaveAttribute("href", "/dashboard/audits/a4");
+    expect(
+      screen.getByRole("link", { name: "https://old.com" }),
+    ).toHaveAttribute("href", "/dashboard/audits/a5");
+  });
+
+  it("keeps the re-audit link alongside the detail link", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    const row = screen.getAllByRole("row")[1];
+
+    expect(
+      // URL cell links to the detail page…
+      row.querySelector('a[href="/dashboard/audits/a1"]'),
+    ).toBeInTheDocument();
+    // …while the Re-auditar action stays per row.
+    expect(row.querySelector('a[href^="/report?url="]')).toBeInTheDocument();
+  });
+});

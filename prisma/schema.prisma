@@ -81,10 +81,31 @@ model Audit {
   severityBand String
   durationMs   Int
   result       Json
+  // Sprint 5 (R5): nullable unique share token — null = revoked/no link.
+  shareToken String?     @unique
+  pages      AuditPage[]
   createdAt    DateTime @default(now())
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
+}
+
+// Sprint 5 (R8): one master Audit → many per-page results (multi-page audit,
+// D3). Each row stores its own URL and full per-page AuditResult JSON; the
+// master `Audit.result` keeps only the lightweight aggregate.
+model AuditPage {
+  id           String   @id @default(cuid())
+  auditId      String
+  url          String
+  position     Int
+  geoScore     Int
+  severityBand String
+  durationMs   Int
+  result       Json
+  createdAt    DateTime @default(now())
+  audit        Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
 }
 
 model RateLimitEntry {

@@ -18,10 +18,17 @@ const REAUDIT_LINK_CLASSES =
   "hover:text-emerald-800 hover:underline focus-visible:outline-none " +
   "focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2";
 
+const DETAIL_LINK_CLASSES =
+  "inline-block max-w-full truncate align-middle text-text-primary transition-colors " +
+  "hover:text-emerald-700 hover:underline focus-visible:outline-none " +
+  "focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2";
+
 /**
- * History table (DSH-1/DSH-3, design U4): URL, GEO score (mono), band badge,
- * es-AR date and a per-row re-audit link that reuses the landing audit flow
- * (`/report?url=<encoded>`). Pure presentation, fully fixture-testable.
+ * History table (DSH-1/DSH-3/DSH-7, design U4/U1): URL, GEO score (mono),
+ * band badge, es-AR date and a per-row re-audit link that reuses the landing
+ * audit flow (`/report?url=<encoded>`). Since U1, each row's URL links to its
+ * detail page (`/dashboard/audits/[id]`, DSH-7). Pure presentation, fully
+ * fixture-testable.
  */
 export function AuditHistoryTable({ audits }: AuditHistoryTableProps) {
   return (
@@ -52,7 +59,12 @@ export function AuditHistoryTable({ audits }: AuditHistoryTableProps) {
               className="max-w-[20rem] truncate py-3 pr-4 text-text-primary"
               title={audit.url}
             >
-              {audit.url}
+              <a
+                href={`/dashboard/audits/${audit.id}`}
+                className={DETAIL_LINK_CLASSES}
+              >
+                {audit.url}
+              </a>
             </td>
             <td className="py-3 pr-4 font-mono font-medium text-navy">
               {audit.geoScore}

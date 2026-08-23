@@ -348,6 +348,139 @@ describe("fetchAuditResource (RFL-4/5 default timeouts per kind)", () => {
   });
 });
 
+describe("fetchAuditResource sitemap kind (MPA-5, D5)", () => {
+  it("accepts application/xml for kind 'sitemap' and decodes the body", async () => {
+    const sitemapBody =
+      '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://example.com/</loc></url></urlset>';
+    const fetcher: FetchImpl = vi.fn(
+      async () =>
+        new Response(sitemapBody, {
+          status: 200,
+          headers: { "content-type": "application/xml; charset=utf-8" },
+        }),
+    );
+
+    const result = await fetchAuditResource("https://example.com/sitemap.xml", {
+      kind: "sitemap",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.parsed.html).toBe(sitemapBody);
+      expect(result.parsed.contentType).toBe("application/xml; charset=utf-8");
+    }
+  });
+
+  it("accepts text/xml for kind 'sitemap' (triangulation)", async () => {
+    const fetcher: FetchImpl = vi.fn(
+      async () =>
+        new Response(
+          "<urlset><url><loc>https://example.com/</loc></url></urlset>",
+          {
+            status: 200,
+            headers: { "content-type": "text/xml" },
+          },
+        ),
+    );
+
+    const result = await fetchAuditResource("https://example.com/sitemap.xml", {
+      kind: "sitemap",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.parsed.contentType).toBe("text/xml");
+    }
+  });
+
+  it("gates a text/html response for kind 'sitemap' as unsupported (XML only)", async () => {
+    const fetcher: FetchImpl = vi.fn(async () => htmlResponse());
+
+    const result = await fetchAuditResource("https://example.com/sitemap.xml", {
+      kind: "sitemap",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok && "reason" in result) {
+      expect(result.reason).toBe("unsupported_content_type");
+    }
+  });
+
+  it("still gates application/xml for kind 'page' as unsupported (RFL-8 unchanged)", async () => {
+    const fetcher: FetchImpl = vi.fn(
+      async () =>
+        new Response("<urlset></urlset>", {
+          status: 200,
+          headers: { "content-type": "application/xml" },
+        }),
+    );
+
+    const result = await fetchAuditResource("https://example.com/", {
+      kind: "page",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok && "reason" in result) {
+      expect(result.reason).toBe("unsupported_content_type");
+      expect(result.contentType).toBe("application/xml");
+    }
+  });
+
+  it("still gates application/xml for kind 'probe' as unsupported (RFL-8 unchanged)", async () => {
+    const fetcher: FetchImpl = vi.fn(
+      async () =>
+        new Response("<urlset></urlset>", {
+          status: 200,
+          headers: { "content-type": "application/xml" },
+        }),
+    );
+
+    const result = await fetchAuditResource("https://example.com/robots.txt", {
+      kind: "probe",
+      maxBytes: 1024,
+      lookup: publicLookup,
+      fetcher,
+    });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok && "reason" in result) {
+      expect(result.reason).toBe("unsupported_content_type");
+    }
+  });
+
+  it("blocks a sitemap hostname resolving to a private IP with SSRF_BLOCKED (threat)", async () => {
+    const fetcher: FetchImpl = vi.fn();
+
+    const result = await fetchAuditResource(
+      "https://sitemap.internal/sitemap.xml",
+      {
+        kind: "sitemap",
+        maxBytes: 1024,
+        lookup: privateLookup,
+        fetcher,
+      },
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code: "SSRF_BLOCKED" },
+    });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+});
+
 describe("fetchAuditResource (robots.txt text/plain gate fix)", () => {
   it("accepts text/plain robots.txt for kind 'probe' and parses it", async () => {
     const robotsBody = "User-agent: *\nDisallow: /private\n";

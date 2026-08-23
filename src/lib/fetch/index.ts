@@ -25,11 +25,17 @@ import { assertPublicHost, SsrfError, type LookupFn } from "./ssrf";
 export const PAGE_TIMEOUT_MS = 15_000;
 export const PROBE_TIMEOUT_MS = 10_000;
 
-export type FetchKind = "page" | "probe";
+/**
+ * Fetch kinds (MPA-5, design D5): `"sitemap"` is scoped ONLY to sitemap probes
+ * (sitemap discovery in `src/audit/multi-page.ts`) — it relaxes the RFL-8
+ * content-type gate to accept XML without changing the page/probe gates.
+ */
+export type FetchKind = "page" | "probe" | "sitemap";
 
 /**
  * P4 timeout resolution: explicit `timeoutMs` wins; otherwise the kind's
- * default applies (15000ms page / 10000ms probe). Pure so defaulting is
+ * default applies (15000ms page / 10000ms probe — sitemaps are small files
+ * like robots.txt, so they share the probe default). Pure so defaulting is
  * testable without wall-clock waits.
  */
 export function resolveTimeoutMs(kind: FetchKind, timeoutMs?: number): number {
@@ -147,9 +153,16 @@ export async function fetchAuditResource(
   // RFL-8: gate on content-type before reading any body. Pages must be
   // text/html; auxiliary probes additionally accept text/plain because real
   // robots.txt files are served with that Content-Type — gating them would
-  // silently treat every robots directive as missing ("all allowed").
+  // silently treat every robots directive as missing ("all allowed"). Sitemap
+  // probes (MPA-5, D5) accept application/xml|text/xml ONLY — the RFL-8
+  // relaxation is scoped to the `"sitemap"` kind; page/probe gates are
+  // unchanged.
   const acceptedContentType =
-    opts.kind === "probe" ? /^(?:text\/html|text\/plain)\b/i : /^text\/html\b/i;
+    opts.kind === "page"
+      ? /^text\/html\b/i
+      : opts.kind === "sitemap"
+        ? /^(?:application\/xml|text\/xml)\b/i
+        : /^(?:text\/html|text\/plain)\b/i;
   const contentType = response.headers.get("content-type");
   if (!contentType || !acceptedContentType.test(contentType)) {
     return { ok: false, reason: "unsupported_content_type", contentType };
