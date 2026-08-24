@@ -12,16 +12,22 @@ vi.mock("next/font/google", () => ({
   JetBrains_Mono: () => ({ variable: "mock-font-mono" }),
 }));
 
+// The layout now resolves auth() to feed the Navbar (U2.1/SHL-1). Mock it —
+// it imports next/server (unresolvable in vitest). An anonymous session keeps
+// the shell free of /dashboard links for anon visitors (D6).
+vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
+vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+
 import RootLayout from "@/app/layout";
 
-describe("root layout (DNF-3)", () => {
-  it("loads Instrument Serif, Work Sans and JetBrains Mono via next/font", () => {
-    render(
-      <RootLayout>
-        <p>contenido</p>
-      </RootLayout>,
-    );
+/** Layout is an async server component (awaits auth()) — render the resolved JSX. */
+async function renderLayout(children: React.ReactNode) {
+  return render(await RootLayout({ children }));
+}
 
+describe("root layout (DNF-3)", () => {
+  it("loads Instrument Serif, Work Sans and JetBrains Mono via next/font", async () => {
+    await renderLayout(<p>contenido</p>);
     // React mounts <html>/<body> onto the real document (jsdom root hoisting).
     expect(document.body.className).toContain("mock-font-display");
     expect(document.body.className).toContain("mock-font-sans");
@@ -29,26 +35,32 @@ describe("root layout (DNF-3)", () => {
     expect(document.body.className).toContain("antialiased");
   });
 
-  it("keeps the app language and renders children", () => {
-    render(
-      <RootLayout>
-        <p>contenido</p>
-      </RootLayout>,
-    );
+  it("keeps the app language and renders children", async () => {
+    await renderLayout(<p>contenido</p>);
 
     expect(document.documentElement).toHaveAttribute("lang", "en");
     expect(screen.getByText("contenido")).toBeInTheDocument();
   });
 
-  it("does not link to /dashboard (D6)", () => {
-    render(
-      <RootLayout>
-        <p>contenido</p>
-      </RootLayout>,
-    );
+  it("does not link to /dashboard (D6)", async () => {
+    await renderLayout(<p>contenido</p>);
 
     expect(
       screen.queryByRole("link", { name: /dashboard/i }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("root layout shell (SHL-1, U2.1)", () => {
+  it("wraps children in the global Navbar and Footer", async () => {
+    await renderLayout(<p>contenido</p>);
+
+    expect(
+      screen.getAllByRole("link", { name: "Precios" }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByLabelText("GeoAudit Inicio")).toBeInTheDocument();
+    // Navbar + Footer both render the brand.
+    expect(screen.getAllByText("GeoAudit").length).toBeGreaterThan(0);
+    expect(screen.getByText("contenido")).toBeInTheDocument();
   });
 });
