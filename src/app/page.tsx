@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { auditAction } from "@/lib/audit/actions";
 import { AuditForm } from "@/ui/audit-form";
 import { Card } from "@/ui/card";
+import { SeverityBadge } from "@/ui/severity-badge";
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 
 /**
@@ -192,7 +193,7 @@ export default function Home() {
                 </div>
               </Card>
 
-              <Card className="flex flex-col items-start gap-4 bg-navy text-white sm:flex-row">
+              <Card className="flex flex-col items-start gap-4 bg-navy text-white shadow-md sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald font-mono text-sm font-bold text-navy">
                   03
                 </div>
@@ -272,9 +273,7 @@ export default function Home() {
                   <span className="w-16 font-mono text-xs font-bold text-text-primary">
                     {row.range}
                   </span>
-                  <span className="inline-flex items-center rounded-full border border-transparent bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
-                    {row.label}
-                  </span>
+                  <SeverityBadge band={row.band} />
                 </div>
                 <p className="flex-1 text-xs text-text-secondary sm:text-sm">
                   {row.description}
