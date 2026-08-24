@@ -57,8 +57,17 @@ describe("SharePage (SHR-2)", () => {
 
     // Report sections come from the persisted result JSON (SHR-2).
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
+    // URL appears in both the public banner and the ScoreHero.
+    expect(
+      screen.getAllByText("https://example.com/").length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Regular")).toBeInTheDocument();
+
+    // Public share shell is present (SHR-3 restyle).
+    expect(
+      screen.getByText("Reporte de Visibilidad de IA"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Verificado")).toBeInTheDocument();
 
     expect(findUniqueMock).toHaveBeenCalledWith({
       where: { shareToken: "tok-1" },
