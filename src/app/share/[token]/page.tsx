@@ -58,12 +58,46 @@ export default async function SharePage({ params }: SharePageProps) {
   }
 
   return (
-    <main className="min-h-dvh bg-surface">
-      {isMultiPageResult(audit.result) ? (
-        <MultiPageReport result={audit.result} />
-      ) : (
-        <AuditReport result={audit.result as unknown as AuditResult} />
-      )}
+    <main className="min-h-dvh bg-surface pb-16">
+      {/* Public share shell (SHR-3 restyle): no app chrome, no billing. */}
+      <header className="sticky top-0 z-30 border-b border-border bg-surface/95 backdrop-blur-sm">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-navy font-display text-sm font-bold text-white">
+              G
+            </div>
+            <div className="leading-none">
+              <span className="block font-display text-lg text-navy">
+                GeoAudit
+              </span>
+              <span className="font-mono text-[10px] text-text-secondary">
+                Reporte de Visibilidad de IA
+              </span>
+            </div>
+            <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-emerald/20 bg-emerald/10 px-2 py-0.5 font-mono text-[11px] font-semibold text-emerald-700">
+              Verificado
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto w-full max-w-5xl px-6 pt-8">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2.5 text-xs text-text-secondary">
+          <span className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald" />
+            Reporte público generado para{" "}
+            <strong className="font-mono font-medium text-navy">
+              {audit.url}
+            </strong>
+          </span>
+        </div>
+
+        {isMultiPageResult(audit.result) ? (
+          <MultiPageReport result={audit.result} />
+        ) : (
+          <AuditReport result={audit.result as unknown as AuditResult} />
+        )}
+      </div>
     </main>
   );
 }

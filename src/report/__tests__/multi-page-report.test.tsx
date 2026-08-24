@@ -50,8 +50,8 @@ describe("MultiPageReport (D3)", () => {
     render(<MultiPageReport result={multiPageResult} />);
 
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
-    expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("68/100")).toBeInTheDocument();
+    expect(screen.getByText("80/100")).toBeInTheDocument();
     expect(screen.getByText("Bueno")).toBeInTheDocument();
   });
 
@@ -62,5 +62,26 @@ describe("MultiPageReport (D3)", () => {
         name: "Reporte de auditoría multi-página",
       }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("MultiPageReport page rows (MPA-10)", () => {
+  it("renders each page row with a ScoreBar progressbar matching its score", () => {
+    render(<MultiPageReport result={multiPageResult} />);
+
+    const bars = screen.getAllByRole("progressbar");
+    // One bar per audited page (the hero is a big number, not a bar).
+    expect(bars).toHaveLength(multiPageResult.pages.length);
+
+    const pageScores = multiPageResult.pages.map((p) => p.geoScore);
+    const barValues = bars.map((bar) => bar.getAttribute("aria-valuenow"));
+    expect(barValues).toEqual(pageScores.map(String));
+  });
+
+  it("shows each page's severity badge in its row", () => {
+    render(<MultiPageReport result={multiPageResult} />);
+    // "Regular" (Fair) appears in the hero + page 1 row; "Bueno" (Good) in page 2.
+    expect(screen.getAllByText("Regular")).toHaveLength(2);
+    expect(screen.getByText("Bueno")).toBeInTheDocument();
   });
 });

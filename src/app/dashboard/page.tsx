@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AggregateHero } from "@/dashboard/aggregate-hero";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
 import { BillingCta } from "@/dashboard/billing-cta";
 import { DashboardEmptyState } from "@/dashboard/dashboard-empty-state";
@@ -75,6 +76,11 @@ export default async function DashboardPage() {
           <DashboardEmptyState />
         ) : (
           <>
+            {/* DSH-8: aggregate hero from the most recent persisted audit. */}
+            <AggregateHero
+              latestScore={audits[0].geoScore}
+              latestBand={audits[0].severityBand}
+            />
             <Card
               header={
                 <h2 className="font-display text-xl tracking-tight text-navy">

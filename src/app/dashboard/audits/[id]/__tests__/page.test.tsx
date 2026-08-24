@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { notFound, redirect } from "next/navigation";
 import AuditDetailPage from "@/app/dashboard/audits/[id]/page";
@@ -147,7 +147,7 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Páginas analizadas")).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("80/100")).toBeInTheDocument();
     expect(screen.getByText("Bueno")).toBeInTheDocument();
     expect(
       screen.queryByRole("region", { name: "Reporte de auditoría" }),
@@ -168,21 +168,29 @@ describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows the share panel with 'Crear link' for a PRO user without a token", async () => {
+  it("shows the 'Compartir reporte' trigger that opens the modal with 'Crear link' for a PRO user (SHR-7)", async () => {
     render(await AuditDetailPage({ params }));
 
     expect(
-      screen.getByRole("button", { name: "Crear link" }),
+      screen.getByRole("button", { name: "Compartir reporte" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Mejorar a PRO" }),
     ).not.toBeInTheDocument();
+
+    // Opening the modal reveals the create action (no token yet).
+    fireEvent.click(screen.getByRole("button", { name: "Compartir reporte" }));
+    expect(
+      screen.getByRole("button", { name: "Crear link" }),
+    ).toBeInTheDocument();
   });
 
-  it("shows the existing public link and revoke for a PRO user with a token (SHR-3/4)", async () => {
+  it("opens the modal showing the existing public link and revoke for a PRO user with a token (SHR-3/4)", async () => {
     findFirstMock.mockResolvedValue({ ...auditRow, shareToken: "tok-9" });
 
     render(await AuditDetailPage({ params }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Compartir reporte" }));
 
     expect(
       screen.getByText(`${window.location.origin}/share/tok-9`),

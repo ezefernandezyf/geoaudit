@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import SignupPage from "@/app/signup/page";
 
 /**
- * U2 — ATH-2: /signup renders the custom page with the same GitHub action
+ * U2 — ATH-2: /signup renders the restyled page with the same GitHub card
  * (sign-up and login conflue in GitHub OAuth — account creation is automatic
  * on first sign-in).
  */
@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({ useSearchParams: nav.useSearchParams }));
 vi.mock("next-auth/react", () => ({ signIn: vi.fn() }));
 
 describe("SignupPage (ATH-2)", () => {
-  it("renders the custom signup page with the GitHub button", () => {
+  it("renders the restyled signup page with the GitHub button", () => {
     nav.useSearchParams.mockReturnValue(new URLSearchParams(""));
     render(<SignupPage />);
     expect(
@@ -26,5 +26,11 @@ describe("SignupPage (ATH-2)", () => {
       "href",
       "/login",
     );
+  });
+
+  it("renders the brand mark in the auth shell", () => {
+    nav.useSearchParams.mockReturnValue(new URLSearchParams(""));
+    render(<SignupPage />);
+    expect(screen.getAllByText("G")[0]).toBeInTheDocument();
   });
 });

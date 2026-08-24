@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { DomainScorecard } from "@/report/domain-scorecard";
@@ -9,12 +9,13 @@ import {
 } from "@/report/__tests__/variants";
 
 /**
- * U4.T3 — DomainScorecard (ARU-7/ARU-8): five domain rows with scores and
- * mini-bars; a degraded engine (RAO-12/RAO-13) renders an honest "No
+ * U3.5 — DomainScorecard (ARU-7/ARU-8): five domain rows rendered with the
+ * shared `ScoreBar` primitive (U1). Each bar reads `rowScore` (same source as
+ * the PDF). A degraded engine (RAO-12/RAO-13) renders an honest "No
  * disponible" chip instead of a fake score.
  */
 describe("DomainScorecard valid audit (ARU-8)", () => {
-  it("renders the five domain rows with their scores", () => {
+  it("renders the five domain rows with their scores via ScoreBar", () => {
     render(<DomainScorecard result={auditResultFixture} />);
 
     expect(screen.getByText("Acceso de bots")).toBeInTheDocument();
@@ -33,22 +34,21 @@ describe("DomainScorecard valid audit (ARU-8)", () => {
     expect(screen.queryByText("No disponible")).not.toBeInTheDocument();
   });
 
-  it("sizes each mini-bar to its domain score", () => {
+  it("renders five ScoreBar progressbars with the correct aria-valuenow", () => {
     render(<DomainScorecard result={auditResultFixture} />);
-    const citabilityBar = screen
-      .getByText("Citabilidad")
-      .closest("li")!
-      .querySelector("[data-testid='row-bar']") as HTMLElement;
-    expect(citabilityBar).toHaveStyle({ width: "62%" });
+    const bars = screen.getAllByRole("progressbar");
+    expect(bars).toHaveLength(5);
+    const values = bars.map((b) => Number(b.getAttribute("aria-valuenow")));
+    expect(values).toEqual([71, 62, 65, 90, 70]);
   });
 
-  it("colors the crawler bar by the Fair band of its score", () => {
+  it("sizes each ScoreBar fill to its domain score", () => {
     render(<DomainScorecard result={auditResultFixture} />);
-    const crawlerBar = screen
-      .getByText("Acceso de bots")
-      .closest("li")!
-      .querySelector("[data-testid='row-bar']") as HTMLElement;
-    expect(crawlerBar.className).toContain("bg-amber-");
+    const citabilityRow = screen.getByText("Citabilidad").closest("li")!;
+    const fill = citabilityRow.querySelector(
+      "[data-score-fill]",
+    ) as HTMLElement;
+    expect(fill).toHaveStyle({ width: "62%" });
   });
 });
 
@@ -57,8 +57,10 @@ describe("DomainScorecard degraded engine (ARU-7)", () => {
     render(<DomainScorecard result={degradedCitabilityResult} />);
 
     const citabilityRow = screen.getByText("Citabilidad").closest("li")!;
-    expect(citabilityRow).toHaveTextContent("No disponible");
-    expect(citabilityRow).not.toHaveTextContent("62");
+    expect(
+      within(citabilityRow).getByText("No disponible"),
+    ).toBeInTheDocument();
+    expect(within(citabilityRow).queryByText("62")).not.toBeInTheDocument();
 
     expect(screen.queryAllByText("No disponible")).toHaveLength(1);
     expect(screen.getByText("71")).toBeInTheDocument();
@@ -73,7 +75,7 @@ describe("DomainScorecard degraded engine (ARU-7)", () => {
     render(<DomainScorecard result={crawlerDegraded} />);
 
     const crawlerRow = screen.getByText("Acceso de bots").closest("li")!;
-    expect(crawlerRow).toHaveTextContent("No disponible");
+    expect(within(crawlerRow).getByText("No disponible")).toBeInTheDocument();
     expect(screen.queryAllByText("No disponible")).toHaveLength(1);
   });
 
@@ -94,11 +96,8 @@ describe("DomainScorecard score derivation", () => {
     render(<DomainScorecard result={noSchema} />);
 
     const schemaRow = screen.getByText("Datos estructurados").closest("li")!;
-    expect(schemaRow).toHaveTextContent("0");
-    const bar = schemaRow.querySelector(
-      "[data-testid='row-bar']",
-    ) as HTMLElement;
-    expect(bar).toHaveStyle({ width: "0%" });
+    const fill = schemaRow.querySelector("[data-score-fill]") as HTMLElement;
+    expect(fill).toHaveStyle({ width: "0%" });
   });
 
   it("falls back to the first platform entry with a score when aio is absent", () => {
@@ -112,6 +111,6 @@ describe("DomainScorecard score derivation", () => {
     render(<DomainScorecard result={noAio} />);
 
     const platformRow = screen.getByText("Plataforma").closest("li")!;
-    expect(platformRow).toHaveTextContent("55");
+    expect(within(platformRow).getByText("55")).toBeInTheDocument();
   });
 });

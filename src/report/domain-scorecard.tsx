@@ -1,5 +1,5 @@
-import type { AuditResult, SeverityBand } from "@/lib/contracts/audit-result";
-import { severityForScore } from "@/scoring/calculator";
+import type { AuditResult } from "@/lib/contracts/audit-result";
+import { ScoreBar } from "@/ui/score-bar";
 import {
   DOMAIN_ROWS,
   isEngineDegraded,
@@ -11,15 +11,6 @@ export type DomainScorecardProps = {
   result: AuditResult;
 };
 
-/** Band → mini-bar fill color (shared P3 thresholds via severityForScore). */
-const BAND_BAR: Record<SeverityBand, string> = {
-  Excellent: "bg-green-500",
-  Good: "bg-emerald-500",
-  Fair: "bg-amber-500",
-  Poor: "bg-orange-500",
-  Critical: "bg-red-500",
-};
-
 function UnavailableChip() {
   return (
     <span className="inline-flex items-center rounded-full border border-border bg-surface-muted px-2.5 py-0.5 text-xs font-medium text-text-secondary">
@@ -29,11 +20,11 @@ function UnavailableChip() {
 }
 
 /**
- * DomainScorecard (ARU-7/ARU-8): five domain rows, each with its score and a
- * band-colored mini-bar sized to the score. A degraded engine (RAO-12/RAO-13)
- * renders an honest "No disponible" chip instead of a fake score. Row scores
- * and degradation come from the shared `domain-metrics` module (U4) so the
- * PDF template prints the same numbers.
+ * DomainScorecard (ARU-7/ARU-8): five domain rows rendered with the shared
+ * `ScoreBar` primitive (U1). A degraded engine (RAO-12/RAO-13) renders an
+ * honest "No disponible" chip instead of a fake score. Row scores and
+ * degradation come from the shared `domain-metrics` module so the PDF template
+ * prints the same numbers.
  */
 export function DomainScorecard({ result }: DomainScorecardProps) {
   const { errors } = result.meta;
@@ -46,32 +37,20 @@ export function DomainScorecard({ result }: DomainScorecardProps) {
         {DOMAIN_ROWS.map(({ engine, label }) => {
           const degraded = isEngineDegraded(errors, engine);
           const score = rowScore(result, engine);
-          const band = severityForScore(score);
           return (
             <li
               key={engine}
               className="rounded-md border border-border bg-surface p-4"
             >
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-text-primary">
-                  {label}
-                </span>
-                {degraded ? (
-                  <UnavailableChip />
-                ) : (
-                  <span className="font-display text-xl text-navy">
-                    {score}
+              {degraded ? (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-sm font-medium text-text-primary">
+                    {label}
                   </span>
-                )}
-              </div>
-              {degraded ? null : (
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-muted">
-                  <div
-                    data-testid="row-bar"
-                    className={`h-2 rounded-full ${BAND_BAR[band]}`}
-                    style={{ width: `${score}%` }}
-                  />
+                  <UnavailableChip />
                 </div>
+              ) : (
+                <ScoreBar score={score} label={label} />
               )}
             </li>
           );

@@ -117,7 +117,7 @@ export function TopFindings({
                     key={issue}
                     className="rounded-md border border-border bg-surface-muted px-3 py-2 text-sm text-text-primary"
                   >
-                    {issue}
+                    <code className="font-mono text-xs">{issue}</code>
                   </li>
                 ))}
               </ul>
@@ -134,7 +134,9 @@ export function TopFindings({
                     key={bot}
                     className="flex items-center gap-2 rounded-md border border-border bg-surface-muted px-3 py-2 text-sm"
                   >
-                    <span className="font-medium text-text-primary">{bot}</span>
+                    <code className="font-mono text-xs font-medium text-text-primary">
+                      {bot}
+                    </code>
                     <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">
                       bloqueado
                     </span>

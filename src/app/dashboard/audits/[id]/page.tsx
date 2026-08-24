@@ -8,7 +8,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AuditReport } from "@/report/audit-report";
 import { MultiPageReport } from "@/report/multi-page-report";
-import { ShareLinkPanel } from "@/dashboard/share-link-panel";
+import { ShareModal } from "@/dashboard/share-modal";
 import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { createShareToken, revokeShareToken } from "@/lib/audit/share-actions";
 import { Card } from "@/ui/card";
@@ -48,11 +48,12 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
  * contract types it as AuditResult; the persisted value is contract-shaped by
  * construction).
  *
- * Share (U2.7, SHR-3, TLM-9, design D7): the share feature is PRO-gated. The
- * tier is read from the DB (the session carries only user.id — dashboard
- * pattern) and fed through the SAME `requirePaidTier` the Server Actions use:
- * PRO/ENTERPRISE render the `<ShareLinkPanel>` (with the two actions injected,
- * the BillingCta → CheckoutButton pattern); FREE renders the upgrade CTA.
+ * Share (U3.11, SHR-3/7, TLM-9, design ShareModal): the share feature is
+ * PRO-gated. The tier is read from the DB (the session carries only user.id —
+ * dashboard pattern) and fed through the SAME `requirePaidTier` the Server
+ * Actions use: PRO/ENTERPRISE render the `<ShareModal>` (with the two actions
+ * injected, the BillingCta → CheckoutButton pattern); FREE renders the
+ * upgrade CTA. The modal replaces the inline panel (ADP-8).
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -91,21 +92,23 @@ export default async function AuditDetailPage({
         <AuditReport result={audit.result as unknown as AuditResult} />
       )}
       <div className="mx-auto w-full max-w-3xl px-6 pb-16">
-        <Card
-          header={
-            <h2 className="font-display text-xl tracking-tight text-navy">
-              Compartir reporte
-            </h2>
-          }
-        >
-          {gate.allowed ? (
-            <ShareLinkPanel
+        {gate.allowed ? (
+          <div className="flex justify-end">
+            <ShareModal
               auditId={audit.id}
               initialToken={audit.shareToken}
               createAction={createShareToken}
               revokeAction={revokeShareToken}
             />
-          ) : (
+          </div>
+        ) : (
+          <Card
+            header={
+              <h2 className="font-display text-xl tracking-tight text-navy">
+                Compartir reporte
+              </h2>
+            }
+          >
             <div className="flex flex-col gap-4">
               <p className="text-sm text-text-secondary">
                 Los links de share son una función PRO. Mejorá tu plan para
@@ -118,8 +121,8 @@ export default async function AuditDetailPage({
                 Mejorar a PRO
               </Link>
             </div>
-          )}
-        </Card>
+          </Card>
+        )}
       </div>
     </main>
   );

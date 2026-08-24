@@ -92,4 +92,55 @@ describe("Button (DNF-7)", () => {
       expect(screen.queryByText("Analizando…")).not.toBeInTheDocument();
     });
   });
+
+  describe("emerald and danger variants (U1.2, DNF-7)", () => {
+    it("applies the emerald variant classes", () => {
+      render(<Button variant="emerald">Auditar</Button>);
+      expect(screen.getByRole("button").className).toContain("bg-emerald");
+    });
+
+    it("applies the danger variant classes", () => {
+      render(<Button variant="danger">Eliminar</Button>);
+      expect(screen.getByRole("button").className).toContain("bg-red");
+    });
+  });
+
+  describe("size lg (U1.2, DNF-7)", () => {
+    it("applies the lg size classes", () => {
+      render(<Button size="lg">Auditar</Button>);
+      expect(screen.getByRole("button").className).toContain("px-6");
+    });
+  });
+
+  describe("icon slots (U1.2, DNF-7)", () => {
+    it("renders a left icon beside the label", () => {
+      render(
+        <Button leftIcon={<span data-testid="left">L</span>}>Auditar</Button>,
+      );
+      expect(screen.getByTestId("left")).toBeInTheDocument();
+      expect(screen.getByText("Auditar")).toBeInTheDocument();
+    });
+
+    it("renders a right icon beside the label", () => {
+      render(
+        <Button rightIcon={<span data-testid="right">R</span>}>Auditar</Button>,
+      );
+      expect(screen.getByTestId("right")).toBeInTheDocument();
+    });
+
+    it("hides icons while loading and still shows the spinner", () => {
+      render(
+        <Button
+          loading
+          leftIcon={<span data-testid="left">L</span>}
+          rightIcon={<span data-testid="right">R</span>}
+        >
+          Auditar
+        </Button>,
+      );
+      expect(screen.queryByTestId("left")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("right")).not.toBeInTheDocument();
+      expect(screen.getByText("Analizando…")).toBeInTheDocument();
+    });
+  });
 });

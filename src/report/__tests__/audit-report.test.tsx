@@ -4,11 +4,11 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { AuditReport } from "@/report/audit-report";
 
 /**
- * U1 — Extracted shared report component (ADP-4/ADP-5). `<AuditReport
- * result>` renders the full MVP report from a persisted result object —
- * ScoreHero + DomainScorecard + TopFindings + ReportMeta. This is the markup
- * the AuditRunner used to own privately; the extraction moves it verbatim so
- * `/report` and the detail page render from ONE source of truth.
+ * U3.6 — Shared report component (ADP-4/ADP-5/ADP-7). `<AuditReport result>`
+ * renders the full MVP report from a persisted result object — ScoreHero +
+ * DomainScorecard + PlatformMatrix + TopFindings + ReportMeta. The platform
+ * matrix and mono-formatted code findings are part of the shared component
+ * (not duplicated per page), so /report and the detail page match.
  */
 describe("AuditReport (ADP-4)", () => {
   it("renders the report sections from a result object", () => {
@@ -24,7 +24,8 @@ describe("AuditReport (ADP-4)", () => {
     expect(screen.getByText("Citabilidad")).toBeInTheDocument();
     expect(screen.getByText("E-E-A-T")).toBeInTheDocument();
     expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
-    expect(screen.getByText("Plataforma")).toBeInTheDocument();
+    // "Plataforma" appears twice: scorecard row + matrix column header.
+    expect(screen.getAllByText("Plataforma").length).toBeGreaterThanOrEqual(1);
 
     // TopFindings: blocked bot + schema issue.
     expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
@@ -36,5 +37,27 @@ describe("AuditReport (ADP-4)", () => {
     expect(
       screen.getByRole("region", { name: "Reporte de auditoría" }),
     ).toBeInTheDocument();
+  });
+
+  it("includes the platform matrix in the shared report (ADP-4/ADP-6)", () => {
+    render(<AuditReport result={auditResultFixture} />);
+    expect(
+      screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("ChatGPT")).toBeInTheDocument();
+    // Claude has no perPlatform measurement → "No medido".
+    expect(screen.getByText("No medido")).toBeInTheDocument();
+  });
+
+  it("renders code findings in monospace (ADP-7)", () => {
+    render(<AuditReport result={auditResultFixture} />);
+
+    // Schema issues render as code (mono).
+    const schemaIssue = screen.getByText("Organization missing sameAs");
+    expect(schemaIssue.className).toContain("font-mono");
+
+    // Suggestion keys render as code (mono).
+    const suggestionKey = screen.getByText("define_core_concept");
+    expect(suggestionKey.className).toContain("font-mono");
   });
 });

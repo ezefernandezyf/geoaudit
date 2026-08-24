@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
 import { formatAuditDate } from "@/report/format";
@@ -99,5 +99,44 @@ describe("AuditHistoryTable (DSH-7)", () => {
     ).toBeInTheDocument();
     // …while the Re-auditar action stays per row.
     expect(row.querySelector('a[href^="/report?url="]')).toBeInTheDocument();
+  });
+});
+
+/**
+ * U3.9 — History search (DSH-9): a client search input filters the table by
+ * URL substring, and clearing it restores the full list.
+ */
+describe("AuditHistoryTable search (DSH-9)", () => {
+  it("renders a search input for filtering by URL", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    expect(
+      screen.getByRole("searchbox", { name: "Filtrar por URL" }),
+    ).toBeInTheDocument();
+  });
+
+  it("filters rows by URL substring (case-insensitive)", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: "Filtrar por URL" }),
+      { target: { value: "EJEMPLO" } },
+    );
+
+    expect(screen.getByText("https://ejemplo.org/blog")).toBeInTheDocument();
+    expect(screen.queryByText("https://example.com")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("row")).toHaveLength(2); // header + 1 match
+  });
+
+  it("clearing the input restores the full list", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    const input = screen.getByRole("searchbox", { name: "Filtrar por URL" });
+
+    fireEvent.change(input, { target: { value: "tienda" } });
+    expect(screen.getByText("https://tienda.com")).toBeInTheDocument();
+    expect(screen.queryByText("https://example.com")).not.toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: "" } });
+    expect(screen.getByText("https://example.com")).toBeInTheDocument();
+    expect(screen.getAllByRole("row")).toHaveLength(auditFixtures.length + 1);
   });
 });

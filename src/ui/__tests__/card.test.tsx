@@ -47,4 +47,31 @@ describe("Card (DNF-6)", () => {
       "max-w-md",
     );
   });
+
+  describe("noPadding and variant (U1.4, DNF-6)", () => {
+    it("removes the body padding when noPadding is set", () => {
+      const { container } = render(<Card noPadding>cuerpo</Card>);
+      const card = container.firstChild as HTMLElement;
+      expect(card.className).not.toContain("p-");
+    });
+
+    it("keeps the padding by default", () => {
+      const { container } = render(<Card>cuerpo</Card>);
+      expect((container.firstChild as HTMLElement).className).toContain("p-");
+    });
+
+    it("applies the muted variant classes", () => {
+      const { container } = render(<Card variant="muted">cuerpo</Card>);
+      expect((container.firstChild as HTMLElement).className).toContain(
+        "bg-surface-muted",
+      );
+    });
+
+    it("applies the highlight variant classes", () => {
+      const { container } = render(<Card variant="highlight">cuerpo</Card>);
+      expect((container.firstChild as HTMLElement).className).toContain(
+        "border-emerald",
+      );
+    });
+  });
 });

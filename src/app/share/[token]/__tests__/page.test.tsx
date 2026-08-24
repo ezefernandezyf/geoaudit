@@ -57,8 +57,17 @@ describe("SharePage (SHR-2)", () => {
 
     // Report sections come from the persisted result JSON (SHR-2).
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
+    // URL appears in both the public banner and the ScoreHero.
+    expect(
+      screen.getAllByText("https://example.com/").length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Regular")).toBeInTheDocument();
+
+    // Public share shell is present (SHR-3 restyle).
+    expect(
+      screen.getByText("Reporte de Visibilidad de IA"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Verificado")).toBeInTheDocument();
 
     expect(findUniqueMock).toHaveBeenCalledWith({
       where: { shareToken: "tok-1" },
@@ -132,7 +141,7 @@ describe("SharePage (multi-page fix, verify warning #4)", () => {
     // Aggregate hero + per-page rows come from the light multi-page shape.
     expect(screen.getByText("74")).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("80/100")).toBeInTheDocument();
     // findUnique is still the ONLY delegate call — no re-run, no writes.
     expect(findUniqueMock).toHaveBeenCalledTimes(1);
   });
