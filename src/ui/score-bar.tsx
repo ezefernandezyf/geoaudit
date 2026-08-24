@@ -9,9 +9,9 @@ import type { SeverityBand } from "@/lib/contracts/audit-result";
  */
 const BAND_FILL: Record<SeverityBand, string> = {
   Excellent: "bg-emerald",
-  Good: "bg-green",
+  Good: "bg-emerald",
   Fair: "bg-amber",
-  Poor: "bg-orange",
+  Poor: "bg-amber",
   Critical: "bg-red",
 };
 
