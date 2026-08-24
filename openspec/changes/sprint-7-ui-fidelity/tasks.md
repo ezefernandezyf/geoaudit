@@ -44,12 +44,12 @@ Chain strategy: feature-branch-chain
 
 ## U2 — Landing + auth + copy neutro (Dep: U1)
 
-- [ ] U2.1 `src/lib/copy.ts`: `COPY` tipado central, voseo→neutro (AUDIT_FORM_ERRORS, FETCH_ERROR_COPY, share-modal, AUTH_COPY, landing) (ATH-9, LGL-4) + test string
-- [ ] U2.2 `url-policy.ts` + `fetch-error-copy.ts` importan de `copy.ts` (source-of-truth) + test
-- [ ] U2.3 `app/page.tsx` hero: badge "GEO Engine" (LND-5) + isla `AuditForm` con botón DENTRO del input + sample URLs prefill (LND-1) + test
-- [ ] U2.4 cards 01-05 contrastados, card 03 navy `#0f172a` + número emerald (LND-2) + test
-- [ ] U2.5 ScoreHero demo + tabla bandas reales 90/75/60/40 (LND-3) + test
-- [ ] U2.6 seis plataformas (LND-4) + CTA pricing + test
+- [x] U2.1 `src/lib/copy.ts`: `COPY` tipado central, voseo→neutro (AUDIT_FORM_ERRORS, FETCH_ERROR_COPY, share-modal, AUTH_COPY, landing) (ATH-9, LGL-4) + test string
+- [x] U2.2 `url-policy.ts` + `fetch-error-copy.ts` importan de `copy.ts` (source-of-truth) + test
+- [x] U2.3 `app/page.tsx` hero: badge "GEO Engine" (LND-5) + isla `AuditForm` con botón DENTRO del input + sample URLs prefill (LND-1) + test
+- [x] U2.4 cards 01-05 contrastados, card 03 navy `#0f172a` + número emerald (LND-2) + test
+- [x] U2.5 ScoreHero demo + tabla bandas reales 90/75/60/40 (LND-3) + test
+- [x] U2.6 seis plataformas (LND-4) + CTA pricing + test
 - [ ] U2.7 `app/login`: card centrada Gemini, "Continuar con GitHub", link "Inicie sesión" (ATH-6,8,9) + test
 - [ ] U2.8 `app/signup`: card + beneficios + copy neutro (ATH-6,7,9) + test
 - [ ] U2.9 `src/ui/github-auth-card.tsx` restyle Gemini + test
