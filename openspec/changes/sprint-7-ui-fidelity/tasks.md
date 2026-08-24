@@ -50,10 +50,10 @@ Chain strategy: feature-branch-chain
 - [x] U2.4 cards 01-05 contrastados, card 03 navy `#0f172a` + número emerald (LND-2) + test
 - [x] U2.5 ScoreHero demo + tabla bandas reales 90/75/60/40 (LND-3) + test
 - [x] U2.6 seis plataformas (LND-4) + CTA pricing + test
-- [ ] U2.7 `app/login`: card centrada Gemini, "Continuar con GitHub", link "Inicie sesión" (ATH-6,8,9) + test
-- [ ] U2.8 `app/signup`: card + beneficios + copy neutro (ATH-6,7,9) + test
-- [ ] U2.9 `src/ui/github-auth-card.tsx` restyle Gemini + test
-- [ ] U2.10 Reescribir tests landing/auth/copy (token→hex, voseo→neutro)
+- [x] U2.7 `app/login`: card centrada Gemini, "Continuar con GitHub", link "Inicie sesión" (ATH-6,8,9) + test
+- [x] U2.8 `app/signup`: card + beneficios + copy neutro (ATH-6,7,9) + test
+- [x] U2.9 `src/ui/github-auth-card.tsx` restyle Gemini + test
+- [x] U2.10 Reescribir tests landing/auth/copy (token→hex, voseo→neutro)
 
 ## U3 — Pricing + FAQ (Dep: U1, U2)
 
