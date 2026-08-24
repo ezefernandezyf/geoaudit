@@ -1,10 +1,10 @@
 # Tier Limits Specification
 
-> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Tiered usage limits. Users carry a tier (`FREE`/`PRO`/`ENTERPRISE`); `FREE` allows 3 audits per 30-day moving window, `PRO` 10 per billing period, and `ENTERPRISE` 50 per billing period. Paid tiers use a `Subscription`-backed monthly counter (`auditsUsed`/`auditsResetAt`) reset at `currentPeriodEnd`; `FREE` keeps its 30-day moving window. Enforcement happens in the audit Server Action (pre-check) and in the report page (authoritative check before persist). Anonymous audits are allowed and do not count toward the tier.
+Tiered usage limits. Users carry a tier (`FREE`/`PRO`/`ENTERPRISE`); `FREE` allows 3 audits per 30-day moving window, `PRO` 10 per billing period, and `ENTERPRISE` 50 per billing period. Paid tiers use a `Subscription`-backed monthly counter (`auditsUsed`/`auditsResetAt`) reset at `currentPeriodEnd`; `FREE` keeps its 30-day moving window. Enforcement happens in the audit Server Action (pre-check) and in the report page (authoritative check before persist). Anonymous audits are allowed and do not count toward the tier. Since Sprint 5, the three PRO features (multi-page audit, PDF export, share links) are gated to paid tiers via the `isPaidTier` helper, and one multi-page audit counts as exactly one audit toward the limit.
 
 ## Requirements
 
@@ -18,6 +18,8 @@ Tiered usage limits. Users carry a tier (`FREE`/`PRO`/`ENTERPRISE`); `FREE` allo
 | TLM-6 | Anonymous allowed | MUST | Anonymous audits MUST be permitted and MUST NOT count toward the tier |
 | TLM-7 | Paid monthly counter | MUST | `Subscription.auditsUsed`/`auditsResetAt` reset when `currentPeriodEnd` passes |
 | TLM-8 | Counter selection | MUST | `FREE` counts `Audit` rows in window; PRO/ENTERPRISE count `Subscription.auditsUsed` |
+| TLM-9 | PRO feature gate | MUST | Multi-page, PDF, and share MUST be gated to PRO/Enterprise via `isPaidTier` |
+| TLM-10 | Multi-page counts once | MUST | One multi-page audit MUST count as exactly one toward the limit |
 
 ### Requirement: Tier Field (TLM-1)
 
@@ -125,3 +127,29 @@ When enforcement counts a user's usage, then it MUST select the counter by tier:
 - WHEN each user's limit is evaluated
 - THEN FREE is measured by `Audit` rows in the last 30 days
 - AND PRO is measured by `Subscription.auditsUsed` since `auditsResetAt`
+
+### Requirement: PRO Feature Gate (TLM-9)
+
+When a user attempts a multi-page audit, PDF export, or share-link creation, then the system MUST allow it only when `isPaidTier(user.tier)` is true; FREE users MUST be denied with an upgrade CTA.
+
+#### Scenario: FREE denied all three features
+
+- GIVEN a FREE user
+- WHEN they attempt multi-page audit, PDF export, or share creation
+- THEN each is denied with an upgrade CTA
+
+#### Scenario: PRO allowed all three features
+
+- GIVEN a PRO or Enterprise user
+- WHEN they attempt multi-page audit, PDF export, or share creation
+- THEN each proceeds
+
+### Requirement: Multi-page Counts Once (TLM-10)
+
+When a multi-page audit is counted against the tier limit, then it MUST count as exactly one audit regardless of page count.
+
+#### Scenario: Five-page audit increments once
+
+- GIVEN a PRO user runs a 5-page multi-page audit
+- WHEN the counter is updated
+- THEN `Subscription.auditsUsed` increments by one

@@ -1,25 +1,26 @@
 # Dashboard Specification
 
-> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, an empty state, and a tier-adaptive billing CTA. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library. The billing CTA shows "Upgrade" for `FREE` users (→ `/pricing`) and "Gestionar suscripción" for PRO/Enterprise users (→ Customer Portal). No global nav link is introduced.
+Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, an empty state, and a tier-adaptive billing CTA. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library. The billing CTA shows "Upgrade" for `FREE` users (→ `/pricing`) and "Gestionar suscripción" for PRO/Enterprise users (→ Customer Portal). No global nav link is introduced. Since Sprint 5, each history row also links to its audit detail page (`/dashboard/audits/[id]`).
 
 ## Requirements
 
 | # | Requirement | Strength | Summary |
 |---|-------------|----------|---------|
-| DSH-1 | History table | MUST | Dashboard MUST list persisted audits (URL, GEO score, date) newest→oldest |
+| DSH-1 | History table | MUST | Dashboard MUST list persisted audits (URL, GEO score, date) newest→oldest, and each row MUST link to its detail page |
 | DSH-2 | Score trend | MUST | A pure-CSS bar trend MUST visualize scores without a chart library |
 | DSH-3 | Re-audit link | MUST | Each row MUST offer a re-audit link for its URL |
 | DSH-4 | Empty state | MUST | Zero audits MUST render an empty state with a call-to-action |
 | DSH-5 | Read-only source | MUST | Dashboard MUST read `Audit` rows without re-running audits |
 | DSH-6 | Billing CTA | MUST | Dashboard shows "Upgrade" (FREE→/pricing) or "Gestionar suscripción" (PRO/Enterprise→portal) |
+| DSH-7 | Detail navigation | MUST | Each history row MUST link to `/dashboard/audits/[id]` |
 
 ### Requirement: History Table (DSH-1)
 
-The dashboard MUST list the authenticated user's persisted audits, newest first, showing URL, GEO score, and date.
+The dashboard MUST list the authenticated user's persisted audits, newest first, showing URL, GEO score, and date, and each row MUST link to that audit's detail page.
 
 #### Scenario: User with history sees their audits
 
@@ -27,6 +28,12 @@ The dashboard MUST list the authenticated user's persisted audits, newest first,
 - WHEN the dashboard renders
 - THEN the audits appear in a table ordered newest→oldest
 - AND each row shows URL, GEO score, and date
+
+#### Scenario: Row links to detail page
+
+- GIVEN a history row for audit id `123`
+- WHEN the user activates the row's title/link
+- THEN they navigate to `/dashboard/audits/123`
 
 ### Requirement: Score Trend (DSH-2)
 
@@ -84,3 +91,13 @@ When the dashboard renders for an authenticated user, then it MUST show a billin
 - GIVEN an authenticated PRO or Enterprise user
 - WHEN the dashboard renders
 - THEN a "Gestionar suscripción" CTA is shown and it triggers the portal action
+
+### Requirement: Detail Navigation (DSH-7)
+
+When a history row renders, then it MUST provide a link to `/dashboard/audits/[id]` for that audit.
+
+#### Scenario: Detail link present on every row
+
+- GIVEN a dashboard with persisted audits
+- WHEN the history table renders
+- THEN every row links to its own detail page
