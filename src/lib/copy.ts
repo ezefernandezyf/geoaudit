@@ -57,25 +57,47 @@ type AuthMode = "login" | "signup";
 type AuthCopy = {
   heading: string;
   description: string;
+  /** Primary action label — MUST read "Continuar con GitHub" (ATH-8). */
   buttonLabel: string;
+  /** Question before the switch link (Gemini card footer). */
+  switchPrompt: string;
   switchLink: { href: string; label: string };
+  /** Terms/privacy note under the primary action (Gemini card). */
+  termsNote: string;
+  /** Signup-only benefits list (ATH-7). */
+  benefits?: { label: string; items: string[] };
 };
 
-/** GitHub auth card copy (ATH-9) — neutral Spanish. */
+/** GitHub auth card copy (ATH-8, ATH-9) — neutral Spanish, Gemini wording. */
 export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
   login: {
     heading: "Inicie sesión",
     description:
       "Acceda a su historial de auditorías y siga su progreso de visibilidad en IA.",
-    buttonLabel: "Iniciar sesión con GitHub",
-    switchLink: { href: "/signup", label: "¿No tiene cuenta? Créela" },
+    buttonLabel: "Continuar con GitHub",
+    switchPrompt: "¿No tiene cuenta?",
+    switchLink: { href: "/signup", label: "Cree una" },
+    termsNote:
+      "Al continuar, acepta nuestros términos de servicio y políticas de privacidad de datos técnicos.",
   },
   signup: {
     heading: "Cree su cuenta",
     description:
       "Audite sus URLs, guarde sus reportes y siga su evolución en los buscadores con IA.",
-    buttonLabel: "Crear cuenta con GitHub",
-    switchLink: { href: "/login", label: "¿Ya tiene cuenta? Inicie sesión" },
+    buttonLabel: "Continuar con GitHub",
+    switchPrompt: "¿Ya tiene una cuenta registrada?",
+    switchLink: { href: "/login", label: "Inicie sesión" },
+    termsNote:
+      "Al continuar, acepta nuestros términos de servicio y políticas de privacidad de datos técnicos.",
+    benefits: {
+      label: "Beneficios incluidos en su cuenta:",
+      items: [
+        "3 auditorías GEO mensuales sin costo con desglose por modelo",
+        "Historial persistente para comparar mejoras de GEO Score",
+        "Diagnóstico preventivo de bloqueos en robots.txt y cabeceras",
+        "Generación de enlaces públicos compartibles con token seguro",
+      ],
+    },
   },
 };
 

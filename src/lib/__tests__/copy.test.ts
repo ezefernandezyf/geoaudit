@@ -68,16 +68,32 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     );
   });
 
-  it("keeps AUTH_COPY neutral", () => {
+  it("keeps AUTH_COPY neutral (ATH-8/9)", () => {
     expect(AUTH_COPY.login.heading).toBe("Inicie sesión");
     expect(AUTH_COPY.login.description).toBe(
       "Acceda a su historial de auditorías y siga su progreso de visibilidad en IA.",
     );
-    expect(AUTH_COPY.login.switchLink.label).toBe("¿No tiene cuenta? Créela");
-    expect(AUTH_COPY.signup.heading).toBe("Cree su cuenta");
-    expect(AUTH_COPY.signup.switchLink.label).toBe(
-      "¿Ya tiene cuenta? Inicie sesión",
+    expect(AUTH_COPY.login.buttonLabel).toBe("Continuar con GitHub");
+    expect(AUTH_COPY.login.switchPrompt).toBe("¿No tiene cuenta?");
+    expect(AUTH_COPY.login.switchLink.label).toBe("Cree una");
+    expect(AUTH_COPY.login.termsNote).toBe(
+      "Al continuar, acepta nuestros términos de servicio y políticas de privacidad de datos técnicos.",
     );
+    expect(AUTH_COPY.signup.heading).toBe("Cree su cuenta");
+    expect(AUTH_COPY.signup.buttonLabel).toBe("Continuar con GitHub");
+    expect(AUTH_COPY.signup.switchPrompt).toBe(
+      "¿Ya tiene una cuenta registrada?",
+    );
+    expect(AUTH_COPY.signup.switchLink.label).toBe("Inicie sesión");
+    expect(AUTH_COPY.signup.benefits?.label).toBe(
+      "Beneficios incluidos en su cuenta:",
+    );
+    expect(AUTH_COPY.signup.benefits?.items).toEqual([
+      "3 auditorías GEO mensuales sin costo con desglose por modelo",
+      "Historial persistente para comparar mejoras de GEO Score",
+      "Diagnóstico preventivo de bloqueos en robots.txt y cabeceras",
+      "Generación de enlaces públicos compartibles con token seguro",
+    ]);
   });
 
   it("keeps the landing copy neutral", () => {
