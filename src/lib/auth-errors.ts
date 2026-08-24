@@ -4,17 +4,17 @@
  * convention (Spanish, neutral/professional).
  */
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
-  AccessDenied: "Acceso denegado: cancelaste la autorización con GitHub.",
+  AccessDenied: "Acceso denegado: canceló la autorización con GitHub.",
   OAuthAccountNotLinked:
-    "Este email ya está vinculado a otra cuenta. Iniciá sesión con esa cuenta.",
-  OAuthSignin: "No se pudo iniciar el flujo de GitHub. Intentalo de nuevo.",
-  OAuthCallback: "GitHub no completó el inicio de sesión. Intentalo de nuevo.",
+    "Este email ya está vinculado a otra cuenta. Inicie sesión con esa cuenta.",
+  OAuthSignin: "No se pudo iniciar el flujo de GitHub. Inténtelo de nuevo.",
+  OAuthCallback: "GitHub no completó el inicio de sesión. Inténtelo de nuevo.",
   OAuthCreateAccount:
-    "No se pudo crear la cuenta con GitHub. Intentalo de nuevo.",
-  Configuration: "Error de configuración del servidor. Contactá a soporte.",
+    "No se pudo crear la cuenta con GitHub. Inténtelo de nuevo.",
+  Configuration: "Error de configuración del servidor. Contacte a soporte.",
 };
 
-const DEFAULT_AUTH_ERROR = "No se pudo iniciar sesión. Intentalo de nuevo.";
+const DEFAULT_AUTH_ERROR = "No se pudo iniciar sesión. Inténtelo de nuevo.";
 
 /**
  * Maps a NextAuth error code to a user-facing message. Returns null when

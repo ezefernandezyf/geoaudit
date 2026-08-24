@@ -13,9 +13,9 @@ describe("authErrorMessage (ATH-5)", () => {
   });
 
   it("maps known NextAuth codes to a user-facing message", () => {
-    expect(authErrorMessage("AccessDenied")).toContain("cancelaste");
+    expect(authErrorMessage("AccessDenied")).toContain("canceló");
     expect(authErrorMessage("OAuthAccountNotLinked")).toContain("otra cuenta");
-    expect(authErrorMessage("OAuthCallback")).toContain("Intentalo");
+    expect(authErrorMessage("OAuthCallback")).toContain("Inténtelo");
   });
 
   it("falls back to the default message for unknown codes", () => {
