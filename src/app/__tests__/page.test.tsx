@@ -56,6 +56,31 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows five numbered contrast cards with Gemini hex surfaces (LND-2)", () => {
+    render(<Page />);
+    const section = screen
+      .getByText("Metodología de análisis")
+      .closest("section");
+    expect(section).not.toBeNull();
+    const numbers = within(section as HTMLElement).getAllByText(/^0[1-5]$/);
+    expect(numbers).toHaveLength(5);
+    // Light cards use the Gemini muted surface directly (no tokens).
+    expect(
+      section?.querySelectorAll("div[class*='#f8fafc']").length,
+    ).toBeGreaterThanOrEqual(4);
+    // No semantic token classes in the feature row.
+    expect(section?.querySelector(".bg-surface-muted")).toBeNull();
+  });
+
+  it("renders card 03 on dark navy #0f172a with an emerald number (LND-2)", () => {
+    render(<Page />);
+    const number03 = screen.getByText("03");
+    const numberContainer = number03.closest("div");
+    expect(numberContainer?.className).toContain("bg-emerald-500");
+    const card = numberContainer?.closest("div[class*='#0f172a']");
+    expect(card).not.toBeNull();
+  });
+
   it("previews the five severity bands with Spanish labels (LND-3)", () => {
     render(<Page />);
     for (const label of [

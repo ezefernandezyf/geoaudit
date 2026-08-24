@@ -1,18 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { auditAction } from "@/lib/audit/actions";
 import { AuditForm } from "@/ui/audit-form";
-import { Card } from "@/ui/card";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
+import { LANDING_COPY } from "@/lib/copy";
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 
 /**
- * Root landing page (U2, LND-1..5, ADF-1/8): full marketing landing.
- * The hero drives the REAL audit flow via AuditForm + auditAction (LND-1), the
- * "how it works" section explains the five real domains (LND-2), the scorecard
- * preview shows the real severity bands (LND-3), the platform section names the
- * six supported AI platforms (LND-4), and the closing teaser links to /pricing
- * (LND-5) without inventing features or prices.
+ * Root landing page (U2, LND-1..5, ADF-1/8): Gemini composition verbatim
+ * (hex directos, font-serif, surfaces contrastadas) sobre el flujo REAL:
+ * hero con AuditForm (botón dentro del input + sample URLs, LND-1), cards
+ * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero demo + bandas
+ * reales 90/75/60/40 (LND-3), seis plataformas (LND-4) y CTA pricing
+ * (LND-5). El copy de usuario viene de src/lib/copy.ts (neutro, ATH-9).
  */
 
 /** Band → illustrative range + Spanish label, from the shared P3 contract. */
@@ -98,30 +98,33 @@ const PLATFORMS = [
 
 export default function Home() {
   return (
-    <main className="w-full">
-      {/* 1. HERO — real audit form (LND-1) */}
+    <main className="w-full bg-[#f8fafc]">
+      {/* 1. HERO — badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
       <section className="mx-auto max-w-5xl px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-18">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs text-text-secondary">
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white px-3 py-1 text-xs text-[#475569] shadow-xs">
           <span
             aria-hidden="true"
-            className="h-2 w-2 rounded-full bg-emerald"
+            className="h-2 w-2 rounded-full bg-[#10b981]"
           />
-          <span className="font-medium text-text-primary">GEO Engine</span>
-          <span className="text-border-strong">|</span>
-          <span>Auditoría de visibilidad en motores de IA</span>
+          <span className="font-medium text-[#0f172a]">
+            {LANDING_COPY.hero.badge}
+          </span>
+          <span className="text-[#94a3b8]">
+            {LANDING_COPY.hero.badgeDivider}
+          </span>
+          <span>{LANDING_COPY.hero.badgeSuffix}</span>
         </div>
 
-        <h1 className="mx-auto mb-6 max-w-4xl font-display text-4xl leading-[1.08] tracking-tight text-navy sm:text-6xl md:text-7xl">
-          ¿Cómo te citan los motores de IA cuando buscan tu categoría?
+        <h1 className="mx-auto mb-6 max-w-4xl font-serif text-4xl leading-[1.08] tracking-tight text-[#0f172a] sm:text-6xl md:text-7xl">
+          {LANDING_COPY.hero.title}
         </h1>
 
-        <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
-          Pega tu URL y obtené en segundos un{" "}
-          <strong className="font-semibold text-text-primary">
-            GEO Score 0-100
-          </strong>{" "}
-          con diagnóstico detallado de presencia en ChatGPT, Claude, Perplexity,
-          Gemini, Google AI Overviews y Bing Copilot.
+        <p className="mx-auto mb-10 max-w-2xl text-base leading-relaxed text-[#475569] sm:text-lg">
+          {LANDING_COPY.hero.subtitleLead}
+          <strong className="font-semibold text-[#0f172a]">
+            {LANDING_COPY.hero.subtitleHighlight}
+          </strong>
+          {LANDING_COPY.hero.subtitleTail}
         </p>
 
         <div className="mx-auto mb-8 max-w-2xl">
@@ -129,76 +132,77 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. CÓMO FUNCIONA — 5 dominios reales (LND-2) */}
-      <section className="border-y border-border bg-surface-muted py-16">
+      {/* 2. CÓMO FUNCIONA — cards 01-05 contrastadas, card 03 navy (LND-2) */}
+      <section className="border-y border-[#e2e8f0] bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-12 max-w-2xl">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-text-secondary">
-              Metodología de análisis
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+              {LANDING_COPY.sections.howItWorksEyebrow}
             </span>
-            <h2 className="mt-2 font-display text-3xl tracking-tight text-navy sm:text-4xl">
-              Cómo analiza GeoAudit tu visibilidad sintética
+            <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              {LANDING_COPY.sections.howItWorksTitle}
             </h2>
-            <p className="mt-2 text-sm text-text-secondary sm:text-base">
-              Inspección técnica multidimensional sobre los cinco dominios que
-              deciden cómo te citan los motores generativos.
+            <p className="mt-2 text-sm text-[#475569] sm:text-base">
+              Inspección técnica multidimensional en 3 capas de indexación
+              generativa.
             </p>
           </div>
 
           <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
-            {/* Dominio 1 — tarjeta ancha destacada */}
-            <Card className="flex flex-col justify-between lg:col-span-5">
+            {/* Dominio 01 — tarjeta ancha destacada (Gemini col-span-5) */}
+            <div className="flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-7 lg:col-span-5">
               <div>
-                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-navy font-mono text-sm font-bold text-white">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
                   01
                 </div>
-                <h3 className="mb-2 font-display text-2xl tracking-tight text-navy">
+                <h3 className="mb-2 font-serif text-2xl tracking-tight text-[#0f172a]">
                   Acceso de bots
                 </h3>
-                <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+                <p className="mb-4 text-sm leading-relaxed text-[#475569]">
                   Verificamos si{" "}
-                  <code className="rounded border border-border bg-surface px-1.5 py-0.5 font-mono text-xs text-text-primary">
+                  <code className="rounded border border-[#e2e8f0] bg-white px-1.5 py-0.5 font-mono text-xs text-[#0f172a]">
                     robots.txt
                   </code>
                   , encabezados HTTP y metaetiquetas permiten o bloquean a los
                   crawlers de IA.
                 </p>
               </div>
-              <div className="space-y-1 rounded-lg border border-border bg-surface p-3 font-mono text-xs text-text-secondary">
-                <div className="flex items-center gap-1.5 font-medium text-emerald">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                  GPTBot / OAI-SearchBot: acceso permitido
+              <div className="space-y-1 rounded-lg border border-[#e2e8f0] bg-white p-3 font-mono text-xs text-[#475569]">
+                <div className="flex items-center gap-1.5 font-medium text-[#047857]">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" /> GPTBot /
+                  OAI-SearchBot: 200 OK
                 </div>
-                <div className="flex items-center gap-1.5 font-medium text-emerald">
-                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />{" "}
-                  ClaudeBot: Allow
+                <div className="flex items-center gap-1.5 font-medium text-[#047857]">
+                  <Check className="h-3.5 w-3.5" aria-hidden="true" />{" "}
+                  ClaudeBot: Allow index
                 </div>
               </div>
-            </Card>
+            </div>
 
-            {/* Dominios 2-5 — columna derecha */}
+            {/* Dominios 02-05 — columna derecha (Gemini col-span-7) */}
             <div className="flex flex-col gap-6 lg:col-span-7">
-              <Card className="flex flex-col items-start gap-4 sm:flex-row">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy font-mono text-sm font-bold text-white">
+              <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
                   02
                 </div>
                 <div>
-                  <h3 className="font-display text-xl tracking-tight text-navy">
+                  <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
                     Citabilidad
                   </h3>
-                  <p className="text-sm leading-relaxed text-text-secondary">
-                    Medimos qué tan probable es que los modelos citen o citen
+                  <p className="text-sm leading-relaxed text-[#475569]">
+                    Medimos qué tan probable es que los modelos citen
                     textualmente pasajes de tu página como fuente canónica.
                   </p>
                 </div>
-              </Card>
+              </div>
 
-              <Card className="flex flex-col items-start gap-4 bg-navy text-white shadow-md sm:flex-row">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald font-mono text-sm font-bold text-navy">
+              {/* Card 03 — navy #0f172a + número emerald (LND-2) */}
+              <div className="flex flex-col items-start gap-6 rounded-xl border border-[#1e293b] bg-[#0f172a] p-6 text-white sm:flex-row">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500 font-mono text-sm font-bold text-slate-950">
                   03
                 </div>
                 <div>
-                  <h3 className="font-display text-xl tracking-tight text-white">
+                  <h3 className="mb-1 font-serif text-xl text-white">
                     E-E-A-T
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-300">
@@ -206,37 +210,37 @@ export default function Home() {
                     del contenido para la ponderación de fuentes.
                   </p>
                 </div>
-              </Card>
+              </div>
 
-              <Card className="flex flex-col items-start gap-4 sm:flex-row">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy font-mono text-sm font-bold text-white">
+              <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
                   04
                 </div>
                 <div>
-                  <h3 className="font-display text-xl tracking-tight text-navy">
+                  <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
                     Datos estructurados
                   </h3>
-                  <p className="text-sm leading-relaxed text-text-secondary">
+                  <p className="text-sm leading-relaxed text-[#475569]">
                     Detectamos y validamos el JSON-LD y Schema.org que los LLMs
                     usan para corroborar entidades y hechos.
                   </p>
                 </div>
-              </Card>
+              </div>
 
-              <Card className="flex flex-col items-start gap-4 sm:flex-row">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy font-mono text-sm font-bold text-white">
+              <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
                   05
                 </div>
                 <div>
-                  <h3 className="font-display text-xl tracking-tight text-navy">
+                  <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
                     Plataforma
                   </h3>
-                  <p className="text-sm leading-relaxed text-text-secondary">
+                  <p className="text-sm leading-relaxed text-[#475569]">
                     Comprobamos readiness, SSR, OG y headers para cada motor de
                     búsqueda generativa.
                   </p>
                 </div>
-              </Card>
+              </div>
             </div>
           </div>
         </div>
