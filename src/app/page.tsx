@@ -143,43 +143,43 @@ const DEMO_CATEGORIES: {
   },
 ];
 
-/** The six AI search platforms audited by the engine (LND-4). */
+/** The six AI search platforms audited by the engine (LND-4) — Gemini verbatim. */
 const PLATFORMS = [
   {
     name: "ChatGPT",
     bot: "GPTBot / OAI-SearchBot",
     company: "OpenAI",
-    desc: "Búsqueda web en vivo y navegación del modelo de OpenAI.",
+    desc: "Búsqueda web en vivo para usuarios Plus/Pro y navegación de GPT-4o.",
   },
   {
     name: "Claude",
-    bot: "Claude-Web",
+    bot: "ClaudeBot / Anthropic-AI",
     company: "Anthropic",
-    desc: "Ingesta de documentación y ponderación de fuentes E-E-A-T.",
+    desc: "Ingesta de documentación técnica y ponderación de fuentes E-E-A-T.",
   },
   {
     name: "Perplexity",
     bot: "PerplexityBot",
     company: "Perplexity AI",
-    desc: "Citas directas y enlaces fuente verificados.",
+    desc: "Citas directas y enlaces fuente verificados en tiempo real.",
   },
   {
     name: "Gemini",
     bot: "Google-Extended",
     company: "Google",
-    desc: "Integración con el ecosistema y respuestas generativas.",
+    desc: "Integración en ecosistema Workspace y consultas directas en Gemini Live.",
   },
   {
     name: "Google AI Overviews",
-    bot: "Googlebot",
+    bot: "Googlebot Smartphone",
     company: "Google Search",
-    desc: "Síntesis en la cabecera de los resultados de búsqueda.",
+    desc: "Tarjetas de síntesis y carruseles en la cabecera del buscador tradicional.",
   },
   {
     name: "Bing Copilot",
-    bot: "Bingbot",
+    bot: "Bingbot / IndexNow",
     company: "Microsoft",
-    desc: "Búsqueda enriquecida y asistentes en el ecosistema de Microsoft.",
+    desc: "Búsqueda enriquecida con feeds de productos y documentación en Edge.",
   },
 ];
 
@@ -474,18 +474,17 @@ export default function Home() {
       </section>
 
       {/* 4. PLATAFORMAS — 6 motores de IA (LND-4) */}
-      <section className="border-y border-border bg-surface-muted py-16">
+      <section className="border-y border-[#e2e8f0] bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-text-secondary">
-              Ecosistema de búsqueda de IA
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+              {LANDING_COPY.sections.platformsEyebrow}
             </span>
-            <h2 className="mt-2 font-display text-3xl tracking-tight text-navy sm:text-4xl">
-              6 plataformas de búsqueda generativa auditadas
+            <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              {LANDING_COPY.sections.platformsTitle}
             </h2>
-            <p className="mt-2 text-sm text-text-secondary">
-              Analizamos la interacción de cada crawler y motor de respuesta con
-              tu contenido.
+            <p className="mt-2 text-sm text-[#475569]">
+              {LANDING_COPY.sections.platformsLead}
             </p>
           </div>
 
@@ -493,20 +492,20 @@ export default function Home() {
             {PLATFORMS.map((p) => (
               <div
                 key={p.name}
-                className="rounded-xl border border-border bg-surface p-5 transition-colors hover:border-border-strong"
+                className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 transition-colors hover:border-[#cbd5e1]"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-display text-xl tracking-tight text-navy">
+                  <h3 className="font-serif text-xl tracking-tight text-[#0f172a]">
                     {p.name}
                   </h3>
-                  <span className="rounded border border-border bg-surface px-2 py-0.5 font-mono text-[11px] text-text-secondary">
+                  <span className="rounded border border-[#e2e8f0] bg-white px-2 py-0.5 font-mono text-[11px] text-[#64748b]">
                     {p.company}
                   </span>
                 </div>
-                <div className="mb-2 font-mono text-xs font-semibold text-emerald">
+                <div className="mb-2 font-mono text-xs font-semibold text-[#047857]">
                   {p.bot}
                 </div>
-                <p className="text-xs leading-relaxed text-text-secondary">
+                <p className="text-xs leading-relaxed text-[#475569]">
                   {p.desc}
                 </p>
               </div>
@@ -517,30 +516,29 @@ export default function Home() {
 
       {/* 5. PRICING TEASER → /pricing (LND-5) */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
-        <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm sm:p-12">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-text-secondary">
-            Planes y acceso
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm sm:p-12">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {LANDING_COPY.sections.pricingEyebrow}
           </span>
-          <h2 className="mb-4 mt-2 font-display text-3xl tracking-tight text-navy sm:text-4xl">
-            Comenzá a monitorear la visibilidad de tu marca en la IA
+          <h2 className="mb-4 mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+            {LANDING_COPY.sections.pricingTitle}
           </h2>
-          <p className="mx-auto mb-8 max-w-xl text-sm text-text-secondary sm:text-base">
-            Desde auditorías gratuitas hasta planes profesionales con monitoreo
-            continuo, multi-page y reportes compartibles.
+          <p className="mx-auto mb-8 max-w-xl text-sm text-[#475569] sm:text-base">
+            {LANDING_COPY.sections.pricingSubtitle}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/pricing"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-navy px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md bg-[#0f172a] px-6 text-base font-medium text-white transition-all duration-150 hover:bg-[#1e293b] active:scale-[0.98]"
             >
-              Ver Planes y Precios
+              {LANDING_COPY.sections.pricingCta}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
               href="/signup"
-              className="inline-flex items-center justify-center rounded-md border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface-muted"
+              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
             >
-              Crear cuenta gratis
+              {LANDING_COPY.sections.pricingSecondaryCta}
             </Link>
           </div>
         </div>

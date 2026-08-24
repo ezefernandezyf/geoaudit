@@ -174,11 +174,48 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
+  it("shows each platform card with its bot and company (LND-4)", () => {
+    render(<Page />);
+    const section = screen
+      .getByText("6 plataformas de búsqueda generativa auditadas")
+      .closest("section");
+    expect(section).not.toBeNull();
+    for (const bot of [
+      "GPTBot / OAI-SearchBot",
+      "ClaudeBot / Anthropic-AI",
+      "PerplexityBot",
+      "Google-Extended",
+      "Googlebot Smartphone",
+      "Bingbot / IndexNow",
+    ]) {
+      expect(within(section as HTMLElement).getByText(bot)).toBeInTheDocument();
+    }
+    for (const company of [
+      "OpenAI",
+      "Anthropic",
+      "Perplexity AI",
+      "Google",
+      "Google Search",
+      "Microsoft",
+    ]) {
+      expect(
+        within(section as HTMLElement).getByText(company),
+      ).toBeInTheDocument();
+    }
+  });
+
   it("teases pricing with a link to /pricing (LND-5)", () => {
     render(<Page />);
     expect(
       screen.getByRole("link", { name: /ver planes y precios/i }),
     ).toHaveAttribute("href", "/pricing");
+  });
+
+  it("links the secondary CTA to /signup (LND-5)", () => {
+    render(<Page />);
+    expect(
+      screen.getByRole("link", { name: /crear cuenta gratis/i }),
+    ).toHaveAttribute("href", "/signup");
   });
 
   it("exposes no link to /dashboard (ADF-8)", () => {
