@@ -83,6 +83,10 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
 
   it("previews the five severity bands with Spanish labels (LND-3)", () => {
     render(<Page />);
+    const table = screen
+      .getByText("Escala de Bandas y Criterios Técnicos")
+      .closest("div.overflow-hidden");
+    expect(table).not.toBeNull();
     for (const label of [
       "Excelente",
       "Bueno",
@@ -90,8 +94,70 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       "Deficiente",
       "Crítico",
     ]) {
-      expect(screen.getByText(label)).toBeInTheDocument();
+      expect(within(table as HTMLElement).getByText(label)).toBeInTheDocument();
     }
+  });
+
+  it("shows the real band thresholds 90/75/60/40 (LND-3)", () => {
+    render(<Page />);
+    const table = screen
+      .getByText("Escala de Bandas y Criterios Técnicos")
+      .closest("div.overflow-hidden");
+    expect(table).not.toBeNull();
+    for (const range of [
+      "90 - 100",
+      "75 - 89",
+      "60 - 74",
+      "40 - 59",
+      "0 - 39",
+    ]) {
+      expect(within(table as HTMLElement).getByText(range)).toBeInTheDocument();
+    }
+  });
+
+  it("renders a demo ScoreHero with the real severity band (LND-3)", () => {
+    render(<Page />);
+    const section = screen.getByText("Scorecard Unificado").closest("section");
+    expect(section).not.toBeNull();
+    const scorebox = within(section as HTMLElement)
+      .getByText("GEO Score")
+      .closest("div.overflow-hidden");
+    expect(scorebox).not.toBeNull();
+    expect(within(scorebox as HTMLElement).getByText("92")).toBeInTheDocument();
+    expect(
+      within(scorebox as HTMLElement).getByText("/100"),
+    ).toBeInTheDocument();
+    // 92 falls in the REAL excellent band (≥90), not Gemini's 80+.
+    expect(
+      within(scorebox as HTMLElement).getByText("Excelente"),
+    ).toBeInTheDocument();
+    expect(
+      within(section as HTMLElement).getByText("linear.app"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the five demo categories with score, real band and weight (LND-3)", () => {
+    render(<Page />);
+    const table = screen
+      .getByText("Desglose de ejemplo por categoría")
+      .closest("div.overflow-hidden");
+    expect(table).not.toBeNull();
+    expect(
+      within(table as HTMLElement).getByText("AI Crawlers & robots.txt"),
+    ).toBeInTheDocument();
+    expect(
+      within(table as HTMLElement).getByText("Alcance Multi-Modelo"),
+    ).toBeInTheDocument();
+    // weights from the Gemini demo (25/25/20/15/15).
+    expect(
+      within(table as HTMLElement).getAllByText(/25%|20%|15%/),
+    ).toHaveLength(5);
+    // Bands come from severityForScore (real thresholds): 95 → excellent,
+    // 88/82/86/81 → good (75-89), so "Bueno" shows once per good category.
+    expect(
+      within(table as HTMLElement).getByText("Excelente"),
+    ).toBeInTheDocument();
+    expect(within(table as HTMLElement).getAllByText("Bueno")).toHaveLength(4);
   });
 
   it("names the six supported AI platforms (LND-4)", () => {

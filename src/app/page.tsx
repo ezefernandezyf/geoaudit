@@ -4,7 +4,7 @@ import { auditAction } from "@/lib/audit/actions";
 import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
-import type { SeverityBand } from "@/lib/contracts/audit-result";
+import { severityForScore } from "@/scoring/calculator";
 
 /**
  * Root landing page (U2, LND-1..5, ADF-1/8): Gemini composition verbatim
@@ -15,44 +15,131 @@ import type { SeverityBand } from "@/lib/contracts/audit-result";
  * (LND-5). El copy de usuario viene de src/lib/copy.ts (neutro, ATH-9).
  */
 
-/** Band → illustrative range + Spanish label, from the shared P3 contract. */
+/** Real severity bands 90/75/60/40 (LND-3) — Gemini table composition. */
 const BAND_ROWS: {
-  band: SeverityBand;
+  band: GeminiBand;
   range: string;
-  label: string;
   description: string;
 }[] = [
   {
-    band: "Excellent",
-    range: "90–100",
-    label: "Excelente",
+    band: "excellent",
+    range: "90 - 100",
     description:
       "Visibilidad sobresaliente en buscadores con IA y citas frecuentes.",
   },
   {
-    band: "Good",
-    range: "75–89",
-    label: "Bueno",
+    band: "good",
+    range: "75 - 89",
     description: "Buena base, con oportunidades puntuales de mejora.",
   },
   {
-    band: "Fair",
-    range: "60–74",
-    label: "Regular",
+    band: "fair",
+    range: "60 - 74",
     description: "Presencia parcial que conviene reforzar en varios dominios.",
   },
   {
-    band: "Poor",
-    range: "40–59",
-    label: "Deficiente",
+    band: "poor",
+    range: "40 - 59",
     description: "Baja citabilidad; hay trabajo estructural por delante.",
   },
   {
-    band: "Critical",
-    range: "0–39",
-    label: "Crítico",
+    band: "critical",
+    range: "0 - 39",
     description:
       "Problemas de acceso o contenido que bloquean a los motores de IA.",
+  },
+];
+
+/** Benchmark bars of the demo ScoreHero — REAL thresholds (LND-3). */
+const BENCHMARK_ROWS: {
+  range: string;
+  label: string;
+  className: string;
+}[] = [
+  {
+    range: "90 - 100",
+    label: "Excelente (Top 10%)",
+    className: "font-semibold text-[#10b981]",
+  },
+  {
+    range: "75 - 89",
+    label: "Bueno (Promedio B2B)",
+    className: "font-medium text-[#10b981]",
+  },
+  {
+    range: "60 - 74",
+    label: "Regular (Riesgo omisión)",
+    className: "font-medium text-[#f59e0b]",
+  },
+  {
+    range: "40 - 59",
+    label: "Deficiente",
+    className: "font-medium text-[#ef4444]",
+  },
+  {
+    range: "0 - 39",
+    label: "Crítico",
+    className: "font-medium text-[#ef4444]",
+  },
+];
+
+/**
+ * Demo category breakdown (Gemini mockAudits linear.app verbatim) with bands
+ * derived from the REAL severityForScore thresholds (90/75/60/40) — the
+ * landing never invents bands (LND-3, design U2).
+ */
+const DEMO_CATEGORIES: {
+  id: string;
+  name: string;
+  score: number;
+  weight: string;
+  band: GeminiBand;
+  description: string;
+}[] = [
+  {
+    id: "crawlers",
+    name: "AI Crawlers & robots.txt",
+    score: 95,
+    weight: "25%",
+    band: severityForScore(95).toLowerCase() as GeminiBand,
+    description:
+      "Directivas abiertas y óptimas para GPTBot, ClaudeBot, PerplexityBot y Google-Extended.",
+  },
+  {
+    id: "citability",
+    name: "Citabilidad & E-E-A-T",
+    score: 88,
+    weight: "25%",
+    band: severityForScore(88).toLowerCase() as GeminiBand,
+    description:
+      "Documentación técnica con alta densidad factual y firma de ingenieros verificados.",
+  },
+  {
+    id: "schema",
+    name: "Structured Data & JSON-LD",
+    score: 82,
+    weight: "20%",
+    band: severityForScore(82).toLowerCase() as GeminiBand,
+    description:
+      "Schema SoftwareApplication con featureList y precios explícitos.",
+  },
+  {
+    id: "density",
+    name: "Densidad de Información & Contexto",
+    score: 86,
+    weight: "15%",
+    band: severityForScore(86).toLowerCase() as GeminiBand,
+    description:
+      "Textos directos sin jerga publicitaria vacía; definiciones concisas en hero.",
+  },
+  {
+    id: "platforms",
+    name: "Alcance Multi-Modelo",
+    score: 81,
+    weight: "15%",
+    band: severityForScore(81).toLowerCase() as GeminiBand,
+    description:
+      "Aparición constante como recomendación líder en queries de issue tracking.",
   },
 ];
 
@@ -246,40 +333,138 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. SCORECARD PREVIEW — bandas reales (LND-3) */}
+      {/* 3. SCORECARD — demo ScoreHero + bandas reales 90/75/60/40 (LND-3) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-text-secondary">
-            Scorecard unificado
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {LANDING_COPY.sections.scorecardEyebrow}
           </span>
-          <h2 className="mt-2 font-display text-3xl tracking-tight text-navy sm:text-4xl">
-            El GEO Score: un estándar de 0 a 100
+          <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+            {LANDING_COPY.sections.scorecardTitle}
           </h2>
-          <p className="mt-2 text-sm text-text-secondary sm:text-base">
-            Cada puntuación se traduce en una banda de severidad con impacto
-            directo en tu visibilidad. Preview ilustrativo de la escala.
+          <p className="mt-2 text-sm text-[#475569] sm:text-base">
+            {LANDING_COPY.sections.scorecardLead}
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
-          <div className="border-b border-border bg-surface-muted px-6 py-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Escala de bandas y criterios técnicos
+        {/* Demo ScoreHero (Gemini composition, real thresholds) */}
+        <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-6 sm:p-8">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+            <div className="flex items-start gap-6 sm:items-center">
+              <div className="flex min-w-[130px] flex-col justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 sm:min-w-[160px]">
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[#475569]">
+                  GEO Score
+                </p>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
+                    92
+                  </span>
+                  <span className="font-mono text-xl font-bold text-[#10b981]">
+                    /100
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <SeverityBadge band="excellent" size="sm" />
+                </div>
+              </div>
+
+              <div className="flex max-w-xl flex-col justify-center space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded border border-[#e2e8f0] bg-[#f1f5f9] px-2.5 py-1 font-mono text-xs font-semibold text-[#0f172a]">
+                    linear.app
+                  </span>
+                  <span className="text-xs text-[#475569]">
+                    Auditoría en{" "}
+                    <strong className="font-mono font-medium text-[#0f172a]">
+                      14s
+                    </strong>
+                  </span>
+                </div>
+                <h2 className="font-serif text-lg italic leading-snug text-[#0f172a] sm:text-xl">
+                  Excelente visibilidad e indexación en modelos generativos
+                </h2>
+                <p className="text-xs leading-relaxed text-[#475569]">
+                  linear.app tiene una citabilidad sobresaliente en ChatGPT,
+                  Claude y Perplexity. Su marcado JSON-LD SoftwareApplication y
+                  directivas de robots.txt están en el percentil superior.
+                </p>
+              </div>
+            </div>
+
+            {/* Benchmark — umbrales reales 90/75/60/40 */}
+            <div className="flex shrink-0 flex-col justify-center gap-3 text-left md:min-w-[210px] md:border-l md:border-[#e2e8f0] md:pl-6">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
+                Baremos de Referencia
+              </div>
+              <div className="space-y-1.5 text-xs">
+                {BENCHMARK_ROWS.map((row) => (
+                  <div
+                    key={row.range}
+                    className="flex items-center justify-between gap-4"
+                  >
+                    <span className="font-mono text-[#64748b]">
+                      {row.range}
+                    </span>
+                    <span className={row.className}>{row.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabla de categorías demo — score, band real y weight */}
+        <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+          <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
+              Desglose de ejemplo por categoría
             </h3>
           </div>
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-[#e2e8f0]">
+            {DEMO_CATEGORIES.map((c) => (
+              <div
+                key={c.id}
+                className="flex flex-col justify-between gap-2 p-4 transition-colors hover:bg-[#f8fafc] sm:flex-row sm:items-center sm:px-6 sm:py-3.5"
+              >
+                <div className="flex min-w-[200px] items-center gap-3">
+                  <span className="w-10 font-mono text-xs font-bold text-[#0f172a]">
+                    {c.score}
+                  </span>
+                  <span className="text-sm font-medium text-[#0f172a]">
+                    {c.name}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <SeverityBadge band={c.band} size="sm" />
+                  <span className="w-12 text-right font-mono text-xs text-[#64748b]">
+                    {c.weight}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tabla de bandas — thresholds reales 90/75/60/40 */}
+        <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+          <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
+              Escala de Bandas y Criterios Técnicos
+            </h3>
+          </div>
+          <div className="divide-y divide-[#e2e8f0]">
             {BAND_ROWS.map((row) => (
               <div
                 key={row.band}
-                className="flex flex-col justify-between gap-2 p-4 transition-colors hover:bg-surface-muted sm:flex-row sm:items-center sm:px-6 sm:py-3.5"
+                className="flex flex-col justify-between gap-2 p-4 transition-colors hover:bg-[#f8fafc] sm:flex-row sm:items-center sm:px-6 sm:py-3.5"
               >
                 <div className="flex min-w-[200px] items-center gap-3">
-                  <span className="w-16 font-mono text-xs font-bold text-text-primary">
+                  <span className="w-16 font-mono text-xs font-bold text-[#0f172a]">
                     {row.range}
                   </span>
-                  <SeverityBadge band={row.band.toLowerCase() as GeminiBand} />
+                  <SeverityBadge band={row.band} size="sm" />
                 </div>
-                <p className="flex-1 text-xs text-text-secondary sm:text-sm">
+                <p className="flex-1 text-xs text-[#475569] sm:text-sm">
                   {row.description}
                 </p>
               </div>
