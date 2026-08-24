@@ -6,14 +6,12 @@
  * import this module without pulling in a server action module.
  */
 
-/** Spanish error copy for the audit form — single source of truth (ADF-7). */
-export const AUDIT_FORM_ERRORS = {
-  invalidUrl: "Formato de URL inválido",
-  protocol: "Solo URLs http/https",
-  rateLimited: "Demasiadas solicitudes. Esperá un momento.",
-  limitReached:
-    "Alcanzaste el límite de 3 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
-} as const;
+/**
+ * Spanish error copy for the audit form (ADF-7) — re-exported from
+ * `src/lib/copy.ts` (U2.2, single source of truth). Callers keep importing
+ * from this module so the Server Action and the client form compile unchanged.
+ */
+export { AUDIT_FORM_ERRORS } from "@/lib/copy";
 
 /**
  * ADF-3: only http/https schemes are allowed. The contract schema accepts any

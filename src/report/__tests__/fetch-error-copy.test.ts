@@ -66,7 +66,7 @@ describe("FETCH_ERROR_COPY (ARU-6)", () => {
         ),
       ),
     ).toBe(
-      "El sitio tardó demasiado en responder. Verificá que la URL sea correcta.",
+      "El sitio tardó demasiado en responder. Verifique que la URL sea correcta.",
     );
   });
 
@@ -87,15 +87,15 @@ describe("FETCH_ERROR_COPY (ARU-6)", () => {
           "audit page fetch failed for https://x.com/: HTTP_STATUS: 500",
         ),
       ),
-    ).toBe("El sitio respondió con un error. Probá visitarlo directamente.");
+    ).toBe("El sitio respondió con un error. Pruebe visitarlo directamente.");
   });
 
   it("falls back to the generic copy for unknown errors", () => {
     expect(resolveFetchErrorCopy(new Error("engine exploded"))).toBe(
-      "No pudimos analizar el sitio. Probá nuevamente.",
+      "No pudimos analizar el sitio. Pruebe nuevamente.",
     );
     expect(resolveFetchErrorCopy("raw string")).toBe(
-      "No pudimos analizar el sitio. Probá nuevamente.",
+      "No pudimos analizar el sitio. Pruebe nuevamente.",
     );
   });
 });

@@ -152,7 +152,7 @@ describe("AuditRunner fetch failure (ARU-6)", () => {
 
     expect(
       screen.getByText(
-        "El sitio tardó demasiado en responder. Verificá que la URL sea correcta.",
+        "El sitio tardó demasiado en responder. Verifique que la URL sea correcta.",
       ),
     ).toBeInTheDocument();
     const retry = screen.getByRole("link", { name: "Reintentar" });
@@ -183,7 +183,7 @@ describe("AuditRunner fetch failure (ARU-6)", () => {
 
     expect(
       screen.getByText(
-        "El sitio respondió con un error. Probá visitarlo directamente.",
+        "El sitio respondió con un error. Pruebe visitarlo directamente.",
       ),
     ).toBeInTheDocument();
   });
