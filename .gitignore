@@ -43,3 +43,6 @@ next-env.d.ts
 
 # prisma generated client (regenerated via `pnpm prisma:generate`)
 /src/generated/
+
+# codegraph index (local, regenerable)
+/.codegraph/
