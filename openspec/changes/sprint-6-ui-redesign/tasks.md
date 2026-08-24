@@ -65,7 +65,7 @@ Dependencies: U2, U3, U4 depend on U1 (ScoreBar, Card noPadding, Button variants
 
 ## Work Unit 4 — Pricing + Multi-Page (depends U1)
 
-- [ ] U4.1 RED pricing test: monthly only, no toggle/-17% (PRC-5)
-- [ ] U4.2 `pricing-cards.tsx`: monthly restyle, keep checkout/portal (PRC-1)
-- [ ] U4.3 `pricing/page.tsx`: restyle three plans
-- [ ] U4.4 `multi-page-report.tsx`: rows with ScoreBar + SeverityBadge (MPA-10)
+- [x] U4.1 RED pricing test: monthly only, no toggle/-17% (PRC-5)
+- [x] U4.2 `pricing-cards.tsx`: monthly restyle, keep checkout/portal (PRC-1)
+- [x] U4.3 `pricing/page.tsx`: restyle three plans
+- [x] U4.4 `multi-page-report.tsx`: rows with ScoreBar + SeverityBadge (MPA-10)

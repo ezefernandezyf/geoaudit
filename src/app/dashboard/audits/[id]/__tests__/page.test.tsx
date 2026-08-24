@@ -147,7 +147,7 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Páginas analizadas")).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("80/100")).toBeInTheDocument();
     expect(screen.getByText("Bueno")).toBeInTheDocument();
     expect(
       screen.queryByRole("region", { name: "Reporte de auditoría" }),

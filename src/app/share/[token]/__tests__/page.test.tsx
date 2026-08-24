@@ -141,7 +141,7 @@ describe("SharePage (multi-page fix, verify warning #4)", () => {
     // Aggregate hero + per-page rows come from the light multi-page shape.
     expect(screen.getByText("74")).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
-    expect(screen.getByText("80")).toBeInTheDocument();
+    expect(screen.getByText("80/100")).toBeInTheDocument();
     // findUnique is still the ONLY delegate call — no re-run, no writes.
     expect(findUniqueMock).toHaveBeenCalledTimes(1);
   });
