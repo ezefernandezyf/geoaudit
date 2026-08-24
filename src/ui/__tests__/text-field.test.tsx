@@ -75,4 +75,71 @@ describe("TextField (DNF-8)", () => {
     expect(errorSlot).not.toBeNull();
     expect(errorSlot?.className).toContain("min-h-");
   });
+
+  describe("leftIcon, helperText and rightElement (U1.6, DNF-8)", () => {
+    it("renders a left icon", () => {
+      render(
+        <TextField
+          id="url"
+          label="URL del sitio"
+          leftIcon={<span data-testid="left">L</span>}
+        />,
+      );
+      expect(screen.getByTestId("left")).toBeInTheDocument();
+    });
+
+    it("renders a right element", () => {
+      render(
+        <TextField
+          id="url"
+          label="URL del sitio"
+          rightElement={<button data-testid="right">Ver</button>}
+        />,
+      );
+      expect(screen.getByTestId("right")).toBeInTheDocument();
+    });
+
+    it("renders helperText below the input", () => {
+      render(
+        <TextField
+          id="url"
+          label="URL del sitio"
+          helperText="Ingresá la URL completa con https"
+        />,
+      );
+      expect(
+        screen.getByText("Ingresá la URL completa con https"),
+      ).toBeInTheDocument();
+    });
+
+    it("describes the input with the helper text", () => {
+      render(
+        <TextField
+          id="url"
+          label="URL del sitio"
+          helperText="Ingresá la URL completa"
+        />,
+      );
+      expect(screen.getByLabelText("URL del sitio")).toHaveAttribute(
+        "aria-describedby",
+        "url-helper",
+      );
+    });
+
+    it("shows the error over the helper text and keeps role=alert", () => {
+      render(
+        <TextField
+          id="url"
+          label="URL del sitio"
+          error="Ingresá una URL válida"
+          helperText="Ingresá la URL completa"
+        />,
+      );
+      const alert = screen.getByRole("alert");
+      expect(alert).toHaveTextContent("Ingresá una URL válida");
+      expect(
+        screen.queryByText("Ingresá la URL completa"),
+      ).not.toBeInTheDocument();
+    });
+  });
 });
