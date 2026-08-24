@@ -1,5 +1,6 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { DomainScorecard } from "@/report/domain-scorecard";
+import { PlatformMatrix } from "@/report/platform-matrix";
 import { ReportMeta } from "@/report/report-meta";
 import { ScoreHero } from "@/report/score-hero";
 import { TopFindings } from "@/report/top-findings";
@@ -27,6 +28,7 @@ export function AuditReport({ result }: { result: AuditResult }) {
     >
       <ScoreHero summary={result.summary} />
       <DomainScorecard result={result} />
+      <PlatformMatrix result={result} />
       <TopFindings
         citability={result.citability}
         schema={result.schema}

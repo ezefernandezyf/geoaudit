@@ -95,7 +95,13 @@ describe("AuditRunner report render (U4.T1)", () => {
     expect(screen.getByText("Citabilidad")).toBeInTheDocument();
     expect(screen.getByText("E-E-A-T")).toBeInTheDocument();
     expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
-    expect(screen.getByText("Plataforma")).toBeInTheDocument();
+    // "Plataforma" appears twice: scorecard row + matrix column header.
+    expect(screen.getAllByText("Plataforma").length).toBeGreaterThanOrEqual(1);
+
+    // Platform matrix is part of the shared report (ADP-4).
+    expect(
+      screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
+    ).toBeInTheDocument();
 
     // TopFindings: blocked bot + schema issue.
     expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
