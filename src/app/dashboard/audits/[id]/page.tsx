@@ -102,14 +102,11 @@ export default async function AuditDetailPage({
             />
           </div>
         ) : (
-          <Card
-            header={
-              <h2 className="font-display text-xl tracking-tight text-navy">
-                Compartir reporte
-              </h2>
-            }
-          >
-            <div className="flex flex-col gap-4">
+          <Card>
+            <h2 className="font-display text-xl tracking-tight text-navy">
+              Compartir reporte
+            </h2>
+            <div className="mt-4 flex flex-col gap-4">
               <p className="text-sm text-text-secondary">
                 Los links de share son una función PRO. Mejorá tu plan para
                 compartir reportes con tu equipo o tus clientes.

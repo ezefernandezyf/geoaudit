@@ -3,8 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 import { TextField } from "@/ui/text-field";
 
 /**
- * U1.T7 — TextField primitive (DNF-8): <label> + <input type="url"> with a
- * reserved error slot that announces errors via role="alert".
+ * U1.4 — TextField primitive (DNF-8 delta): Gemini verbatim — label uppercase
+ * tracking-wider, useId-generated ids, reserved error slot min-h-[18px],
+ * leftIcon/rightElement/helperText/hideLabelVisually, hex border/ring states.
  */
 describe("TextField (DNF-8)", () => {
   it("renders a label associated with the input", () => {
@@ -12,12 +13,17 @@ describe("TextField (DNF-8)", () => {
     expect(screen.getByLabelText("URL del sitio")).toHaveAttribute("id", "url");
   });
 
-  it("defaults the input type to url", () => {
+  it("applies the Gemini uppercase label classes (hex)", () => {
     render(<TextField id="url" label="URL del sitio" />);
-    expect(screen.getByLabelText("URL del sitio")).toHaveAttribute(
-      "type",
-      "url",
-    );
+    const label = screen.getByText("URL del sitio");
+    expect(label.className).toContain("uppercase");
+    expect(label.className).toContain("tracking-wider");
+    expect(label.className).toContain("text-[#475569]");
+  });
+
+  it("generates an id via useId when none is passed", () => {
+    render(<TextField label="URL del sitio" />);
+    expect(screen.getByLabelText("URL del sitio")).toHaveAttribute("id");
   });
 
   it("renders the error with role=alert", () => {
@@ -25,11 +31,12 @@ describe("TextField (DNF-8)", () => {
       <TextField
         id="url"
         label="URL del sitio"
-        error="Ingresá una URL válida"
+        error="Ingrese una URL válida"
       />,
     );
     const alert = screen.getByRole("alert");
-    expect(alert).toHaveTextContent("Ingresá una URL válida");
+    expect(alert).toHaveTextContent("Ingrese una URL válida");
+    expect(alert.className).toContain("text-[#ef4444]");
   });
 
   it("marks the input invalid and describes the error", () => {
@@ -37,7 +44,7 @@ describe("TextField (DNF-8)", () => {
       <TextField
         id="url"
         label="URL del sitio"
-        error="Ingresá una URL válida"
+        error="Ingrese una URL válida"
       />,
     );
     const input = screen.getByLabelText("URL del sitio");
@@ -45,11 +52,14 @@ describe("TextField (DNF-8)", () => {
     expect(input).toHaveAttribute("aria-describedby", "url-error");
   });
 
-  it("renders no alert and no aria-invalid when there is no error", () => {
+  it("renders no alert when there is no error", () => {
     render(<TextField id="url" label="URL del sitio" />);
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    // Gemini renders aria-invalid="false" (Boolean(error)); a value of "true"
+    // is what marks the field invalid.
     expect(screen.getByLabelText("URL del sitio")).not.toHaveAttribute(
       "aria-invalid",
+      "true",
     );
   });
 
@@ -73,10 +83,10 @@ describe("TextField (DNF-8)", () => {
     const { container } = render(<TextField id="url" label="URL del sitio" />);
     const errorSlot = container.querySelector("[data-error-slot]");
     expect(errorSlot).not.toBeNull();
-    expect(errorSlot?.className).toContain("min-h-");
+    expect(errorSlot?.className).toContain("min-h-[18px]");
   });
 
-  describe("leftIcon, helperText and rightElement (U1.6, DNF-8)", () => {
+  describe("leftIcon, helperText, rightElement and hideLabelVisually", () => {
     it("renders a left icon", () => {
       render(
         <TextField
@@ -104,11 +114,11 @@ describe("TextField (DNF-8)", () => {
         <TextField
           id="url"
           label="URL del sitio"
-          helperText="Ingresá la URL completa con https"
+          helperText="Ingrese la URL completa con https"
         />,
       );
       expect(
-        screen.getByText("Ingresá la URL completa con https"),
+        screen.getByText("Ingrese la URL completa con https"),
       ).toBeInTheDocument();
     });
 
@@ -117,7 +127,7 @@ describe("TextField (DNF-8)", () => {
         <TextField
           id="url"
           label="URL del sitio"
-          helperText="Ingresá la URL completa"
+          helperText="Ingrese la URL completa"
         />,
       );
       expect(screen.getByLabelText("URL del sitio")).toHaveAttribute(
@@ -131,15 +141,21 @@ describe("TextField (DNF-8)", () => {
         <TextField
           id="url"
           label="URL del sitio"
-          error="Ingresá una URL válida"
-          helperText="Ingresá la URL completa"
+          error="Ingrese una URL válida"
+          helperText="Ingrese la URL completa"
         />,
       );
       const alert = screen.getByRole("alert");
-      expect(alert).toHaveTextContent("Ingresá una URL válida");
+      expect(alert).toHaveTextContent("Ingrese una URL válida");
       expect(
-        screen.queryByText("Ingresá la URL completa"),
+        screen.queryByText("Ingrese la URL completa"),
       ).not.toBeInTheDocument();
+    });
+
+    it("hides the label visually with sr-only while keeping it accessible", () => {
+      render(<TextField id="url" label="URL del sitio" hideLabelVisually />);
+      const label = screen.getByText("URL del sitio");
+      expect(label.className).toContain("sr-only");
     });
   });
 });

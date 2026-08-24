@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { DashboardAudit } from "@/dashboard/types";
 import { formatAuditDate } from "@/report/format";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 
 type AuditHistoryTableProps = {
   /**
@@ -102,7 +102,9 @@ export function AuditHistoryTable({ audits }: AuditHistoryTableProps) {
                   {audit.geoScore}
                 </td>
                 <td className="py-3 pr-4">
-                  <SeverityBadge band={audit.severityBand} />
+                  <SeverityBadge
+                    band={audit.severityBand.toLowerCase() as GeminiBand}
+                  />
                 </td>
                 <td className="whitespace-nowrap py-3 pr-4 text-text-secondary">
                   {formatAuditDate(audit.createdAt.getTime())}

@@ -3,9 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 import { Button } from "@/ui/button";
 
 /**
- * U1.T6 — Button primitive (DNF-7): variants (primary/secondary/ghost),
- * sizes (sm/md) and a loading state that prevents double-submit and
- * communicates progress (aria-busy, disabled, spinner, "Analizando…").
+ * U1.2 — Button primitive (DNF-7): Gemini verbatim classes (hex directos),
+ * variants (primary/secondary/ghost/emerald/danger), sizes (sm/md/lg) and a
+ * loading state that prevents double-submit (isLoading → Loader2 spin +
+ * disabled + aria-busy, label "Analizando…").
  */
 describe("Button (DNF-7)", () => {
   it("renders children by default", () => {
@@ -15,23 +16,26 @@ describe("Button (DNF-7)", () => {
     ).toBeInTheDocument();
   });
 
-  it("applies variant classes", () => {
+  it("applies Gemini hex variant classes, not tokens", () => {
     const { rerender } = render(<Button variant="primary">A</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-navy");
+    expect(screen.getByRole("button").className).toContain("bg-[#0f172a]");
 
     rerender(<Button variant="secondary">B</Button>);
-    expect(screen.getByRole("button").className).toContain("border");
+    expect(screen.getByRole("button").className).toContain("border-[#e2e8f0]");
 
-    rerender(<Button variant="ghost">C</Button>);
-    expect(screen.getByRole("button").className).toContain("bg-transparent");
+    rerender(<Button variant="emerald">C</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-[#10b981]");
+
+    rerender(<Button variant="danger">D</Button>);
+    expect(screen.getByRole("button").className).toContain("bg-[#ef4444]");
   });
 
   it("applies size classes", () => {
     const { rerender } = render(<Button size="sm">A</Button>);
-    expect(screen.getByRole("button").className).toContain("px-3");
+    expect(screen.getByRole("button").className).toContain("h-8");
 
-    rerender(<Button size="md">B</Button>);
-    expect(screen.getByRole("button").className).toContain("px-4");
+    rerender(<Button size="lg">B</Button>);
+    expect(screen.getByRole("button").className).toContain("h-12");
   });
 
   it("defaults to type=button", () => {
@@ -52,10 +56,10 @@ describe("Button (DNF-7)", () => {
     expect(button.className).toContain("mt-4");
   });
 
-  describe("loading state", () => {
+  describe("loading state (isLoading)", () => {
     it("disables the button and sets aria-busy", () => {
       render(
-        <Button variant="primary" loading>
+        <Button variant="primary" isLoading>
           Analizar
         </Button>,
       );
@@ -64,20 +68,20 @@ describe("Button (DNF-7)", () => {
       expect(button).toHaveAttribute("aria-busy", "true");
     });
 
-    it("shows a spinner and the Analizando… label", () => {
+    it("shows the Loader2 spinner and the Analizando… label", () => {
       const { container } = render(
-        <Button variant="primary" loading>
+        <Button variant="primary" isLoading>
           Analizar
         </Button>,
       );
       expect(screen.getByText("Analizando…")).toBeInTheDocument();
       expect(screen.queryByText("Analizar")).not.toBeInTheDocument();
-      expect(container.querySelector('[class*="animate-spin"]')).not.toBeNull();
+      expect(container.querySelector("[class*='animate-spin']")).not.toBeNull();
     });
 
     it("applies disabled affordance classes", () => {
       render(
-        <Button variant="primary" loading>
+        <Button variant="primary" isLoading>
           Analizar
         </Button>,
       );
@@ -93,26 +97,17 @@ describe("Button (DNF-7)", () => {
     });
   });
 
-  describe("emerald and danger variants (U1.2, DNF-7)", () => {
-    it("applies the emerald variant classes", () => {
-      render(<Button variant="emerald">Auditar</Button>);
-      expect(screen.getByRole("button").className).toContain("bg-emerald");
-    });
-
-    it("applies the danger variant classes", () => {
-      render(<Button variant="danger">Eliminar</Button>);
-      expect(screen.getByRole("button").className).toContain("bg-red");
+  describe("loading alias (deprecated `loading`)", () => {
+    it("maps the deprecated loading prop to the same pending state", () => {
+      render(<Button loading>Analizar</Button>);
+      const button = screen.getByRole("button");
+      expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(screen.getByText("Analizando…")).toBeInTheDocument();
     });
   });
 
-  describe("size lg (U1.2, DNF-7)", () => {
-    it("applies the lg size classes", () => {
-      render(<Button size="lg">Auditar</Button>);
-      expect(screen.getByRole("button").className).toContain("px-6");
-    });
-  });
-
-  describe("icon slots (U1.2, DNF-7)", () => {
+  describe("icon slots", () => {
     it("renders a left icon beside the label", () => {
       render(
         <Button leftIcon={<span data-testid="left">L</span>}>Auditar</Button>,
@@ -131,7 +126,7 @@ describe("Button (DNF-7)", () => {
     it("hides icons while loading and still shows the spinner", () => {
       render(
         <Button
-          loading
+          isLoading
           leftIcon={<span data-testid="left">L</span>}
           rightIcon={<span data-testid="right">R</span>}
         >

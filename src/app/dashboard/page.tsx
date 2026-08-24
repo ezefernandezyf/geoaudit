@@ -81,23 +81,21 @@ export default async function DashboardPage() {
               latestScore={audits[0].geoScore}
               latestBand={audits[0].severityBand}
             />
-            <Card
-              header={
-                <h2 className="font-display text-xl tracking-tight text-navy">
-                  Tendencia de GEO Score
-                </h2>
-              }
-            >
-              <ScoreTrend audits={audits} />
+            <Card>
+              <h2 className="font-display text-xl tracking-tight text-navy">
+                Tendencia de GEO Score
+              </h2>
+              <div className="mt-4">
+                <ScoreTrend audits={audits} />
+              </div>
             </Card>
-            <Card
-              header={
-                <h2 className="font-display text-xl tracking-tight text-navy">
-                  Historial
-                </h2>
-              }
-            >
-              <AuditHistoryTable audits={audits} />
+            <Card>
+              <h2 className="font-display text-xl tracking-tight text-navy">
+                Historial
+              </h2>
+              <div className="mt-4">
+                <AuditHistoryTable audits={audits} />
+              </div>
             </Card>
           </>
         )}

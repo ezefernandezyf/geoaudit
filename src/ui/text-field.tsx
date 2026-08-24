@@ -1,81 +1,90 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode } from "react";
 
 type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  /** Input id — also used to wire the label and the error description. */
-  id: string;
+  /** Visible label. Uppercase small-caps per Gemini (tracking-wider). */
   label: string;
   /** Validation message shown in the reserved error slot (role="alert"). */
   error?: string | null;
   /** Optional helper text shown in the reserved slot when there is no error. */
   helperText?: string;
-  /** Optional icon rendered inside the left of the input (DNF-10). */
+  /** Optional icon rendered inside the left of the input (Gemini). */
   leftIcon?: ReactNode;
-  /** Optional element rendered inside the right of the input. */
+  /** Optional element rendered inside the right of the input (Gemini). */
   rightElement?: ReactNode;
+  /** Visually hides the label (sr-only) while keeping it for a11y. */
+  hideLabelVisually?: boolean;
 };
 
-const INPUT_CLASSES =
-  "w-full rounded-md border border-border bg-surface px-3 py-2 text-sm " +
-  "text-text-primary placeholder:text-text-secondary focus-visible:outline-none " +
-  "focus-visible:ring-2 focus-visible:ring-emerald-500 " +
-  "aria-[invalid=true]:border-red aria-[invalid=true]:focus-visible:ring-red";
-
 /**
- * TextField primitive (STYLE-BRIEF §7, spec DNF-8): label above input, error
- * below. The error slot always reserves space (min-h) so validation messages
- * never cause layout shift; when present, the message is announced via
- * `role="alert"` and the input is marked `aria-invalid`. `helperText`,
- * `leftIcon` and `rightElement` are additive (U1.7, DNF-8).
+ * TextField primitive (U1.4, DNF-8 delta): Gemini verbatim — label uppercase
+ * `tracking-wider` in slate-500, input with hex border/ring states, a reserved
+ * error slot (`min-h-[18px]`) so validation never causes layout shift, and
+ * `useId`-generated ids when the caller omits `id`. `data-error-slot` is a
+ * non-visual test hook kept from the previous implementation.
  */
 export function TextField({
-  id,
   label,
   error,
   helperText,
   leftIcon,
   rightElement,
-  type = "url",
+  hideLabelVisually = false,
+  id,
   className = "",
-  ...rest
+  ...props
 }: TextFieldProps) {
-  const errorId = `${id}-error`;
-  const helperId = `${id}-helper`;
-  const describedBy = error ? errorId : helperText ? helperId : undefined;
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const errorId = `${inputId}-error`;
+  const helperId = `${inputId}-helper`;
+
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={id} className="text-sm font-medium text-text-primary">
+    <div className="flex w-full flex-col gap-1.5 text-left font-sans">
+      <label
+        htmlFor={inputId}
+        className={`select-none text-xs font-semibold uppercase tracking-wider text-[#475569] ${hideLabelVisually ? "sr-only" : "block"}`}
+      >
         {label}
       </label>
-      <div className="relative flex items-center">
+
+      <div className="relative flex w-full items-center">
         {leftIcon ? (
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 text-text-secondary"
-          >
+          <div className="pointer-events-none absolute left-3.5 flex items-center justify-center text-[#64748b]">
             {leftIcon}
-          </span>
+          </div>
         ) : null}
         <input
-          id={id}
-          type={type}
-          className={`${INPUT_CLASSES} ${leftIcon ? "pl-9" : ""} ${rightElement ? "pr-10" : ""} ${className}`}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy}
-          {...rest}
+          id={inputId}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? errorId : helperText ? helperId : undefined}
+          className={`w-full rounded-md border bg-white py-2.5 text-sm text-[#0f172a] transition-all duration-150 placeholder-[#94a3b8] ${
+            leftIcon ? "pl-10" : "pl-3.5"
+          } ${rightElement ? "pr-24" : "pr-3.5"} ${
+            error
+              ? "border-[#ef4444] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/20"
+              : "border-[#cbd5e1] hover:border-[#94a3b8] focus:border-[#0f172a] focus:outline-none focus:ring-2 focus:ring-[#0f172a]/15"
+          } ${className}`}
+          {...props}
         />
         {rightElement ? (
-          <span className="absolute right-2 flex items-center">
+          <div className="absolute right-2 flex items-center">
             {rightElement}
-          </span>
+          </div>
         ) : null}
       </div>
-      <div data-error-slot className="min-h-5">
+
+      {/* Reserved Error/Helper slot */}
+      <div data-error-slot className="min-h-[18px]">
         {error ? (
-          <p id={errorId} role="alert" className="text-sm text-red">
-            {error}
+          <p
+            id={errorId}
+            role="alert"
+            className="flex items-center gap-1 text-xs font-medium text-[#ef4444]"
+          >
+            <span aria-hidden="true">•</span> {error}
           </p>
         ) : helperText ? (
-          <p id={helperId} className="text-sm text-text-secondary">
+          <p id={helperId} className="text-xs text-[#64748b]">
             {helperText}
           </p>
         ) : null}

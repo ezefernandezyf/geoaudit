@@ -1,5 +1,5 @@
 import type { SeverityBand } from "@/lib/contracts/audit-result";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 
 type AggregateHeroProps = {
   /** Latest audit's GEO score (0-100), from the persisted rows. */
@@ -28,7 +28,7 @@ export function AggregateHero({ latestScore, latestBand }: AggregateHeroProps) {
         </span>
         <span className="font-mono text-sm text-text-secondary">/100</span>
       </div>
-      <SeverityBadge band={latestBand} />
+      <SeverityBadge band={latestBand.toLowerCase() as GeminiBand} />
     </section>
   );
 }

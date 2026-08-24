@@ -17,6 +17,8 @@ vi.mock("next/font/google", () => ({
 // the shell free of /dashboard links for anon visitors (D6).
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
+// The Navbar renders the client NavLinks island (usePathname) — mock the hook.
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 import RootLayout from "@/app/layout";
 

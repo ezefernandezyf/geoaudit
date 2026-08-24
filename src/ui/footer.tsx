@@ -1,29 +1,58 @@
 import Link from "next/link";
+import type { Session } from "next-auth";
+import { Logo } from "@/ui/logo";
+
+type FooterProps = {
+  /** Optional session — gates the Dashboard link (D6: anon shell has none). */
+  session?: Session | null;
+};
 
 /**
- * Footer (SHL-4, DNF-10): minimal global footer with product info and a link
- * to /pricing. No invented features or claims.
+ * Footer (SHL-5, LGL-5, U1.10): minimal global footer — logo, product links
+ * and copyright. Copy neutro: Términos / Privacidad per the legal pages. The
+ * Dashboard link only renders for authenticated users (D6).
  */
-export function Footer() {
+export function Footer({ session }: FooterProps = {}) {
+  const isAuthed = Boolean(session?.user);
   return (
-    <footer className="border-t border-border bg-surface-muted">
+    <footer className="border-t border-[#e2e8f0] bg-[#f8fafc]">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6 lg:px-8">
-        <p className="font-display text-lg text-text-primary">GeoAudit</p>
+        <Logo size={20} />
         <nav aria-label="Pie de página" className="flex items-center gap-4">
           <Link
             href="/pricing"
-            className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
           >
             Precios
           </Link>
           <Link
-            href="/login"
-            className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+            href="/"
+            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
           >
-            Iniciar sesión
+            Inicio
+          </Link>
+          {isAuthed ? (
+            <Link
+              href="/dashboard"
+              className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
+            >
+              Dashboard
+            </Link>
+          ) : null}
+          <Link
+            href="/terms"
+            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
+          >
+            Términos
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
+          >
+            Privacidad
           </Link>
         </nav>
-        <p className="text-xs text-text-secondary">
+        <p className="text-xs text-[#475569]">
           © {new Date().getFullYear()} GeoAudit
         </p>
       </div>

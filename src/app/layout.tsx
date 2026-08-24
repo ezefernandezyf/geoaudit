@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, JetBrains_Mono, Work_Sans } from "next/font/google";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { resolveNavPlan, type NavPlan } from "@/lib/nav-plan";
 import { Footer } from "@/ui/footer";
 import { Navbar } from "@/ui/navbar";
 import "./globals.css";
@@ -46,15 +48,20 @@ export default async function RootLayout({
   // (a synchronous server component that cannot itself await auth() — RTL and
   // static prerendering can't await an async component in the tree).
   const session = await auth();
+  // SHL-2: the plan pill needs real tier + usage; the layout resolves it once
+  // and hands the Navbar a serializable value (it stays a sync component).
+  const plan: NavPlan | null = session?.user?.id
+    ? await resolveNavPlan(prisma, session.user.id, Date.now())
+    : null;
 
   return (
     <html lang="en">
       <body
         className={`${instrumentSerif.variable} ${workSans.variable} ${jetBrainsMono.variable} antialiased`}
       >
-        <Navbar session={session} />
+        <Navbar session={session} plan={plan} />
         {children}
-        <Footer />
+        <Footer session={session} />
       </body>
     </html>
   );

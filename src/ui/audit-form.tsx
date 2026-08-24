@@ -61,6 +61,7 @@ export function AuditForm({ action, defaultValue }: AuditFormProps) {
       <TextField
         id="audit-url"
         name="url"
+        type="url"
         label="URL del sitio"
         placeholder="https://ejemplo.com"
         defaultValue={defaultValue}

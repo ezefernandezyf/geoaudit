@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { auditAction } from "@/lib/audit/actions";
 import { AuditForm } from "@/ui/audit-form";
 import { Card } from "@/ui/card";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 
 /**
@@ -273,7 +273,7 @@ export default function Home() {
                   <span className="w-16 font-mono text-xs font-bold text-text-primary">
                     {row.range}
                   </span>
-                  <SeverityBadge band={row.band} />
+                  <SeverityBadge band={row.band.toLowerCase() as GeminiBand} />
                 </div>
                 <p className="flex-1 text-xs text-text-secondary sm:text-sm">
                   {row.description}

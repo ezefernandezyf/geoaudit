@@ -1,8 +1,8 @@
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
 import { ScoreHero } from "@/report/score-hero";
 import { formatDurationMs } from "@/report/format";
-import { ScoreBar } from "@/ui/score-bar";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { ScoreBar, type ScoreCategory } from "@/ui/score-bar";
+import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 
 /**
  * Multi-page report (U3, U4.4 / MPA-10). Renders a persisted multi-page audit
@@ -42,10 +42,21 @@ export function MultiPageReport({ result }: { result: MultiPageResult }) {
                   <span className="font-mono text-sm font-semibold text-text-primary">
                     {page.geoScore}/100
                   </span>
-                  <SeverityBadge band={page.severityBand} />
+                  <SeverityBadge
+                    band={page.severityBand.toLowerCase() as GeminiBand}
+                  />
                 </span>
               </div>
-              <ScoreBar score={page.geoScore} />
+              <ScoreBar
+                category={
+                  {
+                    id: page.url,
+                    score: page.geoScore,
+                    maxScore: 100,
+                    status: page.severityBand.toLowerCase() as GeminiBand,
+                  } satisfies ScoreCategory
+                }
+              />
               <span className="text-xs text-text-secondary">
                 Duración: {formatDurationMs(page.durationMs)}
               </span>

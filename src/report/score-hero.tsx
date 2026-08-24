@@ -1,6 +1,6 @@
 import type { AuditResult, SeverityBand } from "@/lib/contracts/audit-result";
 import { formatDurationMs } from "@/report/format";
-import { SeverityBadge } from "@/ui/severity-badge";
+import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 
 export type ScoreHeroProps = {
   /** Audit summary: normalized URL, GEO Score, severity band, duration. */
@@ -37,7 +37,7 @@ export function ScoreHero({ summary }: ScoreHeroProps) {
         >
           {geoScore}
         </p>
-        <SeverityBadge band={severityBand} />
+        <SeverityBadge band={severityBand.toLowerCase() as GeminiBand} />
       </div>
       <dl className="flex flex-col gap-1 text-sm">
         <div>

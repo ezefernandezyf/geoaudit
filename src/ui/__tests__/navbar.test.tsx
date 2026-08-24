@@ -1,55 +1,103 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Navbar } from "@/ui/navbar";
 import { LogoutButton } from "@/ui/logout-button";
 
 /**
- * U1.10 — Navbar (SHL-2/3): links to home and /pricing, adapts to auth state.
- * Anonymous → login/signup links; authenticated → avatar + logout.
+ * U1.9 — Navbar (SHL-1..4): sync server component receiving session + plan by
+ * prop. Anonymous → "Inicia sesión"/"Crea cuenta"; authenticated → plan pill +
+ * user chip + logout; active route via the client NavLinks island (usePathname
+ * mocked here).
  */
-describe("Navbar (SHL-2/3)", () => {
+const nav = vi.hoisted(() => ({ usePathname: vi.fn(() => "/") }));
+vi.mock("next/navigation", () => ({ usePathname: nav.usePathname }));
+
+const PRO_SESSION = {
+  user: { name: "Martina Test", email: "m@example.com" },
+  expires: "2099-01-01T00:00:00.000Z",
+};
+
+describe("Navbar (SHL-2/3/4)", () => {
   it("links the logo to home", () => {
     render(<Navbar />);
     const logo = screen.getByLabelText("GeoAudit Inicio");
     expect(logo).toHaveAttribute("href", "/");
   });
 
-  it("links Precios to /pricing", () => {
+  it("shows the new logo and wordmark", () => {
     render(<Navbar />);
-    const pricing = screen.getByRole("link", { name: "Precios" });
-    expect(pricing).toHaveAttribute("href", "/pricing");
+    expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
+    expect(screen.getByText("GeoAudit")).toBeInTheDocument();
+  });
+
+  it("links Producto to / and Precios to /pricing", () => {
+    render(<Navbar />);
+    expect(screen.getByRole("link", { name: "Producto" })).toHaveAttribute(
+      "href",
+      "/",
+    );
+    expect(screen.getByRole("link", { name: "Precios" })).toHaveAttribute(
+      "href",
+      "/pricing",
+    );
   });
 
   it("shows login/signup links to anonymous visitors", () => {
     render(<Navbar session={null} />);
-    expect(
-      screen.getByRole("link", { name: "Iniciar sesión" }),
-    ).toHaveAttribute("href", "/login");
-    expect(screen.getByRole("link", { name: "Crear cuenta" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Inicia sesión" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    expect(screen.getByRole("link", { name: "Crea cuenta" })).toHaveAttribute(
       "href",
       "/signup",
     );
   });
 
-  it("shows avatar + logout and hides login links to authenticated users", () => {
+  it("shows the plan pill with usage for an authenticated PRO user (SHL-2)", () => {
     render(
       <Navbar
-        session={{
-          user: { name: "Martina Test", email: "m@example.com" },
-          expires: "2099-01-01T00:00:00.000Z",
-        }}
+        session={PRO_SESSION}
+        plan={{ tier: "PRO", used: 2, limit: 10 }}
       />,
     );
-    expect(screen.queryByRole("link", { name: "Iniciar sesión" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Crear cuenta" })).toBeNull();
-    expect(screen.getByText("M")).toBeInTheDocument(); // avatar initial
-    expect(screen.getByLabelText("Cerrar sesión")).toBeInTheDocument();
+    const pill = screen.getByRole("link", { name: /Plan Pro/ });
+    expect(pill).toHaveAttribute("href", "/pricing");
+    expect(screen.getByText(/\(2\/10\)/)).toBeInTheDocument();
+  });
+
+  it("renders no plan pill for an authenticated user without plan data", () => {
+    render(<Navbar session={PRO_SESSION} plan={null} />);
+    expect(
+      screen.queryByRole("link", { name: /Plan Pro/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows avatar initials + logout and hides login links to authenticated users (SHL-3)", () => {
+    render(<Navbar session={PRO_SESSION} plan={null} />);
+    expect(screen.queryByRole("link", { name: "Inicia sesión" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Crea cuenta" })).toBeNull();
+    expect(screen.getByText("MT")).toBeInTheDocument(); // avatar initials
+    expect(screen.getByLabelText("Cierra sesión")).toBeInTheDocument();
+  });
+
+  it("highlights the active route link (SHL-1)", () => {
+    nav.usePathname.mockReturnValue("/pricing");
+    render(<Navbar />);
+    expect(screen.getByRole("link", { name: "Precios" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(screen.getByRole("link", { name: "Producto" })).not.toHaveAttribute(
+      "aria-current",
+    );
+    nav.usePathname.mockReturnValue("/");
   });
 });
 
 describe("LogoutButton (SHL-3)", () => {
-  it("renders a logout action labeled Cerrar sesión", () => {
+  it("renders a logout action labeled Cierra sesión", () => {
     render(<LogoutButton />);
-    expect(screen.getByLabelText("Cerrar sesión")).toBeInTheDocument();
+    expect(screen.getByLabelText("Cierra sesión")).toBeInTheDocument();
   });
 });

@@ -1,41 +1,106 @@
-import type { SeverityBand } from "@/lib/contracts/audit-result";
-
 /**
- * Band → chip styling. Tinted 50-level backgrounds + 700-level text keep
- * every chip at WCAG AA contrast (STYLE-BRIEF §2). The bands themselves are
- * the shared `SeverityBand` contract from the GEO Score; only the Spanish
- * label and color are presentation concerns.
+ * Lowercase Gemini severity band (Gemini types.ts verbatim). The shared
+ * Capitalized `SeverityBand` contract stays untouched — the adapter (U5)
+ * delivers lowercase view-model bands, so the badge only knows lowercase.
  */
-const BAND_STYLES: Record<
-  SeverityBand,
-  { label: string; chipClassName: string }
+export type GeminiBand = "excellent" | "good" | "fair" | "poor" | "critical";
+
+/** Band → Spanish label (Gemini geoUtils SEVERITY_BANDS labels verbatim). */
+const BAND_LABELS: Record<GeminiBand, string> = {
+  excellent: "Excelente",
+  good: "Bueno",
+  fair: "Regular",
+  poor: "Deficiente",
+  critical: "Crítico",
+};
+
+/** Gemini SeverityBadge colorMap verbatim (hex directos). */
+const COLOR_MAP: Record<
+  GeminiBand,
+  { bg: string; text: string; border: string; dot: string }
 > = {
-  Excellent: {
-    label: "Excelente",
-    chipClassName: "bg-green-50 text-green-700",
+  excellent: {
+    bg: "bg-[#10b981]/10",
+    text: "text-[#10b981]",
+    border: "border-[#10b981]/20",
+    dot: "bg-[#10b981]",
   },
-  Good: { label: "Bueno", chipClassName: "bg-emerald-50 text-emerald-700" },
-  Fair: { label: "Regular", chipClassName: "bg-amber-50 text-amber-700" },
-  Poor: { label: "Deficiente", chipClassName: "bg-orange-50 text-orange-700" },
-  Critical: { label: "Crítico", chipClassName: "bg-red-50 text-red-700" },
+  good: {
+    bg: "bg-[#10b981]/10",
+    text: "text-[#10b981]",
+    border: "border-[#10b981]/20",
+    dot: "bg-[#10b981]",
+  },
+  fair: {
+    bg: "bg-[#f59e0b]/10",
+    text: "text-[#d97706]",
+    border: "border-[#f59e0b]/20",
+    dot: "bg-[#f59e0b]",
+  },
+  poor: {
+    bg: "bg-[#ef4444]/10",
+    text: "text-[#ef4444]",
+    border: "border-[#ef4444]/20",
+    dot: "bg-[#ef4444]",
+  },
+  critical: {
+    bg: "bg-[#ef4444]/10",
+    text: "text-[#dc2626]",
+    border: "border-[#ef4444]/30",
+    dot: "bg-[#dc2626]",
+  },
+};
+
+const SIZE_STYLES: Record<"sm" | "md" | "lg", string> = {
+  sm: "text-[11px] font-semibold px-2 py-0.5 gap-1.5",
+  md: "text-xs font-semibold px-2.5 py-1 gap-1.5",
+  lg: "text-sm font-semibold px-3 py-1.5 gap-2",
 };
 
 type SeverityBadgeProps = {
-  /** Severity band from the shared AuditResult contract. */
-  band: SeverityBand;
+  /** Lowercase Gemini band (adapter output). */
+  band: GeminiBand;
+  /** Overrides the default Spanish label. */
+  labelOverride?: string;
+  size?: "sm" | "md" | "lg";
+  /** Shows the colored dot (Gemini default). */
+  showDot?: boolean;
+  /** Optional numeric score rendered in mono before the label. */
+  score?: number;
+  className?: string;
 };
 
 /**
- * Severity chip (STYLE-BRIEF §7, spec DNF-5). Pure presentation: band in,
- * color-coded Spanish label out.
+ * SeverityBadge (DNF-5 delta, U1.5): re-copied Gemini verbatim — sleek pill
+ * with a tinted background, crisp border, optional dot + mono score, lowercase
+ * band input. Capitalized→lowercase normalization does NOT live here: the
+ * adapter (U5) delivers lowercase bands to this badge.
  */
-export function SeverityBadge({ band }: SeverityBadgeProps) {
-  const { label, chipClassName } = BAND_STYLES[band];
+export function SeverityBadge({
+  band,
+  labelOverride,
+  size = "md",
+  showDot = true,
+  score,
+  className = "",
+}: SeverityBadgeProps) {
+  const label = labelOverride ?? BAND_LABELS[band];
+  const style = COLOR_MAP[band] ?? COLOR_MAP.fair;
+
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${chipClassName} border-transparent`}
+      className={`inline-flex items-center rounded-full border ${style.bg} ${style.text} ${style.border} ${SIZE_STYLES[size]} select-none whitespace-nowrap tracking-normal font-sans ${className}`}
     >
-      {label}
+      {showDot ? (
+        <span
+          className={`h-1.5 w-1.5 rounded-full ${style.dot} shrink-0`}
+          aria-hidden="true"
+        />
+      ) : null}
+      {typeof score === "number" ? (
+        <span className="mr-0.5 font-mono font-bold">{score}</span>
+      ) : null}
+      <span>{label}</span>
     </span>
   );
 }

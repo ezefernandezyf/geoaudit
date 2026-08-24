@@ -12,31 +12,41 @@ GeoAudit is a data-first SaaS for GEO/SEO audits: URL in → GEO Score 0-100 →
 
 ## 2. Color Palette
 
+> **Sprint 7 (UI Fidelity)**: the shared primitives (`src/ui/*`, navbar, footer)
+> now use **Gemini hex directos** (e.g. `bg-[#0f172a]`, `text-[#475569]`,
+> `border-[#e2e8f0]`) per spec DNF-9, NOT the `@theme` tokens. The tokens below
+> remain declared in `globals.css` (nothing deleted) for legacy consumers until
+> their units migrate; new/rewritten UI copies Gemini's exact hex values.
+
 Brand colors — tokens `--color-*` in `src/app/globals.css` (`@theme`):
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `navy` | `#0f172a` | Primary ink; primary buttons; headings on light surfaces |
-| `emerald` | `#10b981` | Positive / success; GEO score accents |
-| `amber` | `#f59e0b` | Warning / "Fair" bands |
-| `red` | `#ef4444` | Critical / errors |
+| Token | Hex | Gemini directo |
+|-------|-----|----------------|
+| `navy` | `#0f172a` | `bg-[#0f172a]` / `text-[#0f172a]` |
+| `emerald` | `#10b981` | `bg-[#10b981]` |
+| `amber` | `#f59e0b` | `bg-[#f59e0b]` |
+| `red` | `#ef4444` | `bg-[#ef4444]` |
 
-Semantic tokens:
+Semantic tokens (legacy; primitives use the hex column):
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| `surface` | `#ffffff` | Page / card background |
-| `surface-muted` | `#f8fafc` | Hover states, subtle section backgrounds |
-| `text-primary` | `#0f172a` | Primary text |
-| `text-secondary` | `#475569` | Secondary / supporting text |
-| `border` | `#e2e8f0` | Hairlines, card borders |
-| `border-strong` | `#cbd5e1` | Emphasized borders |
+| Token | Hex | Gemini directo |
+|-------|-----|----------------|
+| `surface` | `#ffffff` | `bg-white` |
+| `surface-muted` | `#f8fafc` | `bg-[#f8fafc]` |
+| `text-primary` | `#0f172a` | `text-[#0f172a]` |
+| `text-secondary` | `#475569` | `text-[#475569]` |
+| `border` | `#e2e8f0` | `border-[#e2e8f0]` |
+| `border-strong` | `#cbd5e1` | `border-[#cbd5e1]` |
 
 Rules:
 
-- Never pure `#000` / `#fff` in components — use `navy` / `surface`.
+- **Primitives and the shell are Gemini verbatim**: direct hex in class names,
+  same compositions, radii (`rounded-md` buttons/inputs, `rounded-xl` cards,
+  `rounded-full` chips), shadows (`shadow-xs`), gaps and sizes.
+- Never pure `#000` / `#fff` in components — use the navy/surface hex above.
 - **One accent per context.** Emerald is the only positive accent; a warm-grey page never gets a blue CTA or a teal status badge mid-section.
-- Severity chips use tinted backgrounds (50-level) with 700-level text — **WCAG AA contrast** (≥ 4.5:1) for all text.
+- Severity chips use tinted backgrounds (`bg-[#10b981]/10`, etc.) with
+  high-contrast text (`text-[#10b981]`, `text-[#dc2626]`) — **WCAG AA**.
 - Light theme only for now. Dark-mode tokens are a follow-up decision; do not mix half-dark sections into light pages.
 
 ## 3. Typography
@@ -49,6 +59,10 @@ Rules:
 
 Loaded via `next/font/google` in the root layout (`--font-display`, `--font-sans`, `--font-mono`); body font is Work Sans. Headings: tight leading, `tracking-tight` on display sizes. Body text max ~65ch.
 
+**Sprint 7**: `globals.css` also aliases `--font-serif` to the display serif
+(DNF-10), so the `font-serif` utility resolves to Instrument Serif (the Gemini
+wordmark uses `font-serif`).
+
 ## 4. Spacing & Shape
 
 - **4px base grid** (Tailwind default `--spacing` scale): 4 / 8 / 12 / 16 / 24 / 32 / 48.
@@ -60,7 +74,7 @@ Loaded via `next/font/google` in the root layout (`--font-display`, `--font-sans
 
 **Functional only. Decorative animation is banned.**
 
-- The skeleton pulse is the only required animation (audit runs 10–60s); it must respect `prefers-reduced-motion` (`motion-reduce:animate-none`).
+- The skeleton pulse is the only required animation (audit runs 10–60s). Sprint 7: `globals.css` defines the `pulse` keyframes + `.animate-pulse-subtle` (Gemini verbatim, DNF-11); it must respect `prefers-reduced-motion`.
 - Micro-interactions at a minimum: 150ms color/opacity transitions on hover, `scale-[0.98]` on `:active` for interactive elements.
 - Every async process ships the four states: **Loading / Success / Error / Empty** (skeleton pulse for loading; inline `role="alert"` errors; empty states that explain how to proceed).
 - No infinite loops, no scroll-jacked motion, no entrance choreography.
@@ -72,16 +86,21 @@ Loaded via `next/font/google` in the root layout (`--font-display`, `--font-sans
 - **Context-free scores** — a number without its band, label and explanation is broken UI (score → band chip → why).
 - **Placeholder-as-label** — inputs always have a real `<label>`.
 - **AI-default slop** — purple gradients, glassmorphism everywhere, Inter + slate-900 stacks, decorative infinite animations.
-- **Component libraries** (DaisyUI, shadcn, etc.) — GeoAudit builds its own primitives in `src/ui/` on the token system.
+- **Component libraries** (DaisyUI, shadcn, etc.) — GeoAudit builds its own primitives in `src/ui/`.
 
 ## 7. Primitives (`src/ui/`)
 
-Pure, typed, token-based building blocks (no business logic):
+Pure, typed, Gemini-verbatim building blocks (hex directos, no business logic):
 
 | Component | Contract |
 |-----------|----------|
-| `skeleton` | Pulse placeholder; `role="status"`, `aria-label="Cargando…"`, `motion-reduce:animate-none` |
-| `severity-badge` | 5 bands (`Excellent/Good/Fair/Poor/Critical`) → tinted chip + ES label (Excelente / Bueno / Regular / Deficiente / Crítico) |
-| `button` | `primary` / `secondary` / `ghost`, `sm` / `md`, loading state (`aria-busy`, spinner, disabled) |
-| `text-field` | `<label>` + `<input type="url">` + reserved error slot with `role="alert"` |
-| `card` | Surface container: padding, border, rounded, optional header / footer slots |
+| `skeleton` | `Skeleton` (variants rectangular/circular/text, width/height/label, `bg-[#e2e8f0]` + `animate-pulse-subtle`) + `AuditReportSkeleton` |
+| `severity-badge` | Lowercase Gemini bands (`excellent/good/fair/poor/critical`) → tinted hex chip + ES label; props `score`/`showDot`/`size`/`labelOverride` |
+| `button` | 5 variants (`primary/secondary/ghost/emerald/danger`) + 3 sizes (`sm/md/lg`), `isLoading` → Loader2 + disabled + `aria-busy`, `leftIcon`/`rightIcon` |
+| `text-field` | Gemini verbatim: uppercase `tracking-wider` label, `useId`, error/helper slot `min-h-[18px]`, `leftIcon`/`rightElement`/`hideLabelVisually` |
+| `card` | Gemini verbatim: `default/muted/highlight`, `noPadding`, NO header/footer slots |
+| `score-bar` | Receives `category` (`name`, `score`, `maxScore`, `status`, …); fill color derives from `category.status` (real bands 90/75/60/40) |
+| `logo` | SVG mark (serif G + emerald wave + globe) + wordmark; `app/icon.svg` favicon |
+
+> The Capitalized `SeverityBand` contract stays in `src/lib/contracts/`; the
+> Capitalized→lowercase normalization belongs to the report adapter (U5).

@@ -1,5 +1,6 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
-import { ScoreBar } from "@/ui/score-bar";
+import { ScoreBar, type ScoreCategory } from "@/ui/score-bar";
+import { severityForScore } from "@/scoring/index";
 import {
   DOMAIN_ROWS,
   isEngineDegraded,
@@ -37,6 +38,19 @@ export function DomainScorecard({ result }: DomainScorecardProps) {
         {DOMAIN_ROWS.map(({ engine, label }) => {
           const degraded = isEngineDegraded(errors, engine);
           const score = rowScore(result, engine);
+          // U1 bridge: the ScoreBar now takes a Gemini-style `category`; the
+          // status band is derived from the REAL severityForScore thresholds
+          // (90/75/60/40), lowercased for the view-model band. The adapter
+          // (U5) will centralize this mapping.
+          const category: ScoreCategory = {
+            id: engine,
+            name: label,
+            score,
+            maxScore: 100,
+            status: severityForScore(
+              score,
+            ).toLowerCase() as ScoreCategory["status"],
+          };
           return (
             <li
               key={engine}
@@ -50,7 +64,7 @@ export function DomainScorecard({ result }: DomainScorecardProps) {
                   <UnavailableChip />
                 </div>
               ) : (
-                <ScoreBar score={score} label={label} />
+                <ScoreBar category={category} />
               )}
             </li>
           );

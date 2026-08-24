@@ -44,6 +44,10 @@ describe("design tokens (DNF-2)", () => {
     expect(theme).toMatch(/--font-mono:\s*var\(--font-jetbrains-mono\)/);
   });
 
+  it("aliases --font-serif to the display serif (DNF-10)", () => {
+    expect(theme).toMatch(/--font-serif:\s*var\(--font-display\)/);
+  });
+
   it("exposes a spacing scale (--spacing-* tokens) on the 4px grid", () => {
     expect(theme).toMatch(/--spacing-4:\s*1rem/);
     expect(theme).toMatch(/--spacing-6:\s*1\.5rem/);
@@ -66,5 +70,11 @@ describe("design tokens (DNF-2)", () => {
         tokenPattern,
       );
     }
+  });
+
+  it("defines the pulse keyframes used by the skeleton (DNF-11)", () => {
+    expect(css).toMatch(/@keyframes pulse/);
+    expect(css).toMatch(/\.animate-pulse-subtle/);
+    expect(css).toMatch(/prefers-reduced-motion/);
   });
 });

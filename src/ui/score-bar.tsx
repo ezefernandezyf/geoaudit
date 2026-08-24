@@ -1,61 +1,112 @@
-import { severityForScore } from "@/scoring/index";
-import type { SeverityBand } from "@/lib/contracts/audit-result";
+import type { GeminiBand } from "@/ui/severity-badge";
 
 /**
- * Band → fill color. Tinted 500-level fills derived from the shared P3
- * `SeverityBand` contract (STYLE-BRIEF §2). The band itself comes from
- * `severityForScore(score)` — the single source of truth, NOT a duplicated
- * threshold map.
+ * ScoreBar category — the adapter (U5) builds these from real AuditResult
+ * data. `status` is the lowercase Gemini band; the fill color derives from it
+ * (real thresholds 90/75/60/40 via severityForScore) instead of Gemini's
+ * numeric getBarColor (80/65/45/25). `name`/weight/keyMetric/description are
+ * optional so interim consumers never invent data the report doesn't provide.
  */
-const BAND_FILL: Record<SeverityBand, string> = {
-  Excellent: "bg-emerald",
-  Good: "bg-emerald",
-  Fair: "bg-amber",
-  Poor: "bg-amber",
-  Critical: "bg-red",
+export type ScoreCategory = {
+  id: string;
+  /** Row label shown above the bar (omitted when the row already shows it). */
+  name?: string;
+  score: number;
+  maxScore: number;
+  weight?: string;
+  keyMetric?: string;
+  status: GeminiBand;
+  description?: string;
 };
 
 type ScoreBarProps = {
-  /** Numeric 0-100 score. Clamped to the 0-100 range for the fill width. */
-  score: number;
-  /** Optional row label rendered above the bar. */
-  label?: string;
-  /** Additional classes for the outer container. */
-  className?: string;
+  category: ScoreCategory;
+  onClick?: () => void;
+  isInteractive?: boolean;
+};
+
+/** Fill color per real Gemini band (excellent/good → emerald, fair/poor → amber, critical → red). */
+const STATUS_FILL: Record<GeminiBand, string> = {
+  excellent: "bg-[#10b981]",
+  good: "bg-[#10b981]/80",
+  fair: "bg-[#f59e0b]",
+  poor: "bg-[#f59e0b]/90",
+  critical: "bg-[#ef4444]",
 };
 
 /**
- * ScoreBar primitive (DNF-9): a reusable 0-100 band-colored bar. The fill
- * width equals the score and the fill color maps to the severity band derived
- * from the shared `severityForScore` contract. Pure presentation — no data.
+ * ScoreBar (U1.6, DNF-9): Gemini ScoreBar verbatim composition (hex directos)
+ * with ONE change per design decision: the fill color derives from
+ * `category.status` (the real band), never from the numeric 80/65/45/25 map.
+ * Keeps the `data-score-fill` test hook so existing report tests stay green.
+ * Note: unlike Gemini, the band badge is NOT embedded — composition-level
+ * consumers (ScoreHero, multi-page rows) already render it, avoiding
+ * duplicated band text in pages with several bars.
  */
-export function ScoreBar({ score, label, className = "" }: ScoreBarProps) {
-  const clamped = Math.min(100, Math.max(0, score));
-  const band = severityForScore(clamped);
+export function ScoreBar({
+  category,
+  onClick,
+  isInteractive = false,
+}: ScoreBarProps) {
+  const percentage = Math.min(
+    100,
+    Math.max(0, (category.score / category.maxScore) * 100),
+  );
+
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      {label ? (
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium text-text-primary">{label}</span>
-          <span className="text-sm font-mono text-text-secondary">
-            {clamped}
-            <span className="text-xs text-text-secondary">/100</span>
-          </span>
+    <div
+      onClick={isInteractive ? onClick : undefined}
+      className={`p-4 bg-white rounded-lg border border-[#e2e8f0] transition-colors ${
+        isInteractive ? "hover:border-[#cbd5e1] cursor-pointer" : ""
+      }`}
+    >
+      <div className="flex items-center justify-between gap-4 mb-2 flex-wrap">
+        <div className="flex items-center gap-2">
+          {category.name ? (
+            <h3 className="text-sm font-semibold text-[#0f172a] font-sans">
+              {category.name}
+            </h3>
+          ) : null}
+          {category.weight ? (
+            <span className="text-xs text-[#64748b] font-mono">
+              (Peso: {category.weight})
+            </span>
+          ) : null}
         </div>
-      ) : null}
-      <div
-        role="progressbar"
-        aria-valuenow={clamped}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        className="h-2 w-full overflow-hidden rounded-full bg-border"
-      >
+
+        <div className="flex items-center gap-3">
+          {category.keyMetric ? (
+            <span className="text-xs font-mono text-[#64748b] bg-[#f8fafc] px-2 py-0.5 rounded border border-[#e2e8f0]">
+              {category.keyMetric}
+            </span>
+          ) : null}
+          <div className="flex items-center gap-1.5 font-mono">
+            <span className="text-base font-bold text-[#0f172a]">
+              {category.score}
+            </span>
+            <span className="text-xs text-[#94a3b8]">/100</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress Track */}
+      <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden mb-2">
         <div
           data-score-fill
-          className={`h-full ${BAND_FILL[band]} rounded-full transition-all motion-reduce:transition-none`}
-          style={{ width: `${clamped}%` }}
+          className={`h-full ${STATUS_FILL[category.status]} transition-all duration-500 rounded-full`}
+          style={{ width: `${percentage}%` }}
+          role="progressbar"
+          aria-valuenow={category.score}
+          aria-valuemin={0}
+          aria-valuemax={category.maxScore}
         />
       </div>
+
+      {category.description ? (
+        <p className="text-xs text-[#475569] font-sans leading-relaxed">
+          {category.description}
+        </p>
+      ) : null}
     </div>
   );
 }

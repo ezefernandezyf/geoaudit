@@ -24,6 +24,9 @@
   /* Typography — variables injected by next/font/google in the root layout */
   --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-instrument-serif), Georgia, serif;
+  /* DNF-10: `font-serif` alias to the display serif (Gemini verbatim uses
+   * `font-serif` for the wordmark; the theme only exposed `font-display`). */
+  --font-serif: var(--font-display), Georgia, serif;
   --font-mono:
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
@@ -41,4 +44,33 @@ body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-sans), sans-serif;
+}
+
+/* DNF-11: pulse keyframes for the Skeleton primitive (Gemini index.css
+ * verbatim — .skeleton, .animate-pulse-subtle and the reduced-motion guard).
+ * Motion-safe: the pulse is disabled under prefers-reduced-motion. */
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-subtle,
+  .animate-spin,
+  .skeleton {
+    animation: none !important;
+  }
 }
