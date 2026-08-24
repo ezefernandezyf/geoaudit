@@ -3,13 +3,15 @@ import { describe, expect, it } from "vitest";
 import { PricingCards, type PricingPlan } from "@/billing/pricing-cards";
 
 /**
- * U4.1/U4.2 — PricingCards (PRC-1/2/5, design U4).
+ * U3.1/U3.3 — PricingCards (PRC-1/2/5/6, design U3, DNF-9).
  *
  * Presentational card grid: renders the exact monthly plan catalog (Free
  * $0·3/30d, Pro $9/mes·10/mes, Enterprise $49/mes·50/mes) with a per-plan CTA
  * node the server page supplies. Monthly-only (PRC-5): the cards never render
  * an annual toggle or a discounted annual price — the catalog is monthly by
- * design. Pro is highlighted with an emerald border + "Recomendado" badge.
+ * design. Pro is highlighted Gemini-style (PRC-6): emerald border
+ * `border-[#10b981]`, "Recomendado" badge and `lg:-translate-y-2` lift.
+ * Styles are hex directos — no semantic token classes (DNF-9).
  */
 
 const defaultPlans: PricingPlan[] = [
@@ -18,7 +20,8 @@ const defaultPlans: PricingPlan[] = [
     name: "Free",
     price: "$0",
     limit: "3 / 30 días",
-    features: ["1 auditoría GEO por día", "Acceso a la landing"],
+    description: "Para probar la visibilidad de su dominio principal.",
+    features: ["3 auditorías GEO por 30 días", "GEO Score completo 0-100"],
     cta: "Comenzar",
   },
   {
@@ -26,7 +29,12 @@ const defaultPlans: PricingPlan[] = [
     name: "Pro",
     price: "$9/mes",
     limit: "10 / mes",
-    features: ["10 auditorías por mes", "Reporte multi-página", "Exportar PDF"],
+    description: "Para equipos que optimizan visibilidad generativa mensual.",
+    features: [
+      "10 auditorías por mes",
+      "Auditoría multi-página",
+      "Exportar PDF",
+    ],
     featured: true,
     cta: "Mejorar",
   },
@@ -35,6 +43,7 @@ const defaultPlans: PricingPlan[] = [
     name: "Enterprise",
     price: "$49/mes",
     limit: "50 / mes",
+    description: "Para agencias y marcas con volumen de auditorías.",
     features: ["50 auditorías por mes", "Links de compartición"],
     cta: "Hablar con ventas",
   },
@@ -50,6 +59,26 @@ describe("PricingCards (PRC-1)", () => {
     expect(screen.getByText("Free")).toBeInTheDocument();
     expect(screen.getByText("Pro")).toBeInTheDocument();
     expect(screen.getByText("Enterprise")).toBeInTheDocument();
+  });
+
+  it("renders each plan description (Gemini composition)", () => {
+    renderCards();
+    expect(
+      screen.getByText("Para probar la visibilidad de su dominio principal."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Para equipos que optimizan visibilidad generativa mensual.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Para agencias y marcas con volumen de auditorías."),
+    ).toBeInTheDocument();
+  });
+
+  it("labels each feature list with 'Incluye:' (Gemini verbatim)", () => {
+    renderCards();
+    expect(screen.getAllByText("Incluye:")).toHaveLength(3);
   });
 });
 
@@ -84,7 +113,7 @@ describe("PricingCards features (PRC-1)", () => {
   it("renders each plan's feature list", () => {
     renderCards();
     expect(screen.getByText("10 auditorías por mes")).toBeInTheDocument();
-    expect(screen.getByText("Reporte multi-página")).toBeInTheDocument();
+    expect(screen.getByText("Auditoría multi-página")).toBeInTheDocument();
     expect(screen.getByText("Exportar PDF")).toBeInTheDocument();
   });
 });
@@ -100,10 +129,24 @@ describe("PricingCards monthly-only (PRC-5)", () => {
   });
 });
 
-describe("PricingCards highlighted plan (PRC-1)", () => {
-  it("shows the 'Recomendado' badge on the featured plan", () => {
+describe("PricingCards highlighted plan (PRC-6, DNF-9)", () => {
+  it("highlights Pro with emerald border, badge and lift (Gemini hex)", () => {
     renderCards();
-    expect(screen.getByText("Recomendado")).toBeInTheDocument();
+    const proCard = screen.getByText("Pro").closest("div.rounded-2xl");
+    expect(proCard?.className).toContain("border-2");
+    expect(proCard?.className).toContain("border-[#10b981]");
+    expect(proCard?.className).toContain("lg:-translate-y-2");
+
+    const badge = screen.getByText("Recomendado").closest("div");
+    expect(badge?.className).toContain("bg-[#10b981]");
+    expect(badge?.className).toContain("text-white");
+  });
+
+  it("keeps non-featured cards on the muted border hex", () => {
+    renderCards();
+    const freeCard = screen.getByText("Free").closest("div.rounded-2xl");
+    expect(freeCard?.className).toContain("border-[#e2e8f0]");
+    expect(freeCard?.className).not.toContain("border-2");
   });
 
   it("does not render a badge when no plan is featured", () => {
@@ -111,5 +154,12 @@ describe("PricingCards highlighted plan (PRC-1)", () => {
       { id: "PRO", name: "Pro", price: "$9/mes", limit: "10 / mes", cta: "x" },
     ]);
     expect(screen.queryByText("Recomendado")).not.toBeInTheDocument();
+  });
+
+  it("uses hex classes only — no semantic token classes (DNF-9)", () => {
+    const { container } = renderCards();
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|text-text-primary|text-text-secondary|border-border|bg-surface-muted|bg-emerald(?!-)|border-emerald(?!-)/,
+    );
   });
 });
