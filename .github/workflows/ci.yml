@@ -1,12 +1,14 @@
 # CI — GeoAudit (github-ci R1-R5)
-# Triggers on PRs targeting `develop` or `main` (R4). Three parallel jobs
-# (R5 fast failure): lint, typecheck, test. Any failing job blocks merge.
+# Triggers on PRs targeting `develop` or `main` (R4). Four parallel jobs
+# (R5 fast failure): lint, typecheck, test, e2e. Any failing job blocks merge.
 #
-# Threat-matrix note ("PR commands"): no secrets are consumed by any step, so
-# fork PRs run with zero secret exposure. If a future job needs credentials it
-# MUST read them via `${{ secrets.* }}` and follow the skip-if-no-env pattern
-# (see src/lib/__tests__/prisma.test.ts — connectivity suite skips without
-# DATABASE_URL).
+# Threat-matrix note ("PR commands"): no step consumes real secrets — the e2e
+# job only sets throwaway non-secret env values (dummy DATABASE_URL to let the
+# app boot, dev AUTH_SECRET) and the secret-gated Playwright specs
+# (signup/Stripe/PDF, E2E-3/4/5) skip themselves via skip-if-no-env. If a
+# future job needs credentials it MUST read them via `${{ secrets.* }}` and
+# follow the skip-if-no-env pattern (see src/lib/__tests__/prisma.test.ts —
+# connectivity suite skips without DATABASE_URL).
 name: CI
 
 on:
@@ -61,3 +63,38 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
+
+  # E2E (C12/C13, E2E-7): boots `pnpm dev` via the Playwright webServer and
+  # runs the suite. No secrets: the free audit uses a real stable URL
+  # (example.com) with tolerant asserts, and the signup/Stripe/PDF specs skip
+  # without their env vars. RATE_LIMIT_ENABLED=false keeps the fixed-window
+  # limiter (unit-tested) from making retries flaky.
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    env:
+      # src/lib/prisma.ts throws at module load without DATABASE_URL; this
+      # throwaway URL only needs to be present — anonymous E2E flows never
+      # query the DB (TLM-6). Not a secret.
+      DATABASE_URL: postgresql://user:pass@127.0.0.1:1/geoaudit
+      # NextAuth v5 needs AUTH_SECRET; a dev value is enough (no OAuth runs).
+      AUTH_SECRET: ci-e2e-dev-secret-not-a-real-secret
+      RATE_LIMIT_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
