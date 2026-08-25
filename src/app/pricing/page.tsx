@@ -4,18 +4,23 @@ import { prisma } from "@/lib/prisma";
 import { checkoutAction, portalAction } from "@/billing/actions";
 import { CheckoutButton, type CheckoutAction } from "@/billing/checkout-button";
 import { PricingCards, type PricingPlan } from "@/billing/pricing-cards";
+import { PRICING_COPY } from "@/lib/copy";
 import type { Tier } from "@/lib/contracts/billing";
 
 /**
- * Pricing page (PRC-1/2/3/5, design U4).
+ * Pricing page (PRC-1/2/3/5/6/7, design U3).
  *
  * Public route — the middleware only guards /dashboard/*. Server component:
  * `auth()` resolves the visitor's tier (from the DB — the session carries only
  * `user.id`, design decision) and renders the monthly-only plan catalog with a
  * CTA adapted to auth state (PRC-3): anonymous → sign-in; FREE → checkout
- * ("Mejorar"); PRO/Enterprise → portal ("Gestionar suscripción") or a "Plan
- * activo" label on the current plan. No annual toggle / discounted price
- * (PRC-5).
+ * ("Mejorar"); paid → portal ("Gestionar suscripción", slot Free card) or
+ * "Plan activo" on the current plan; a paid user upgrading to Enterprise gets
+ * the real checkout CTA. No annual toggle / discounted price (PRC-5).
+ *
+ * Header + FAQ are driven by `PRICING_COPY` (copy.ts source-of-truth): the
+ * Gemini verbatim intro (PRC-5) and the billing FAQ (PRC-7). Styles are hex
+ * directos — no semantic token classes (DNF-9).
  *
  * `PricingCards` is presentational; this page supplies each card's CTA node
  * and real feature list.
@@ -25,7 +30,7 @@ export const runtime = "nodejs";
 
 function currentPlanCta(): React.ReactNode {
   return (
-    <p className="text-center text-sm font-medium text-text-secondary">
+    <p className="text-center text-sm font-medium text-[#475569]">
       Plan activo
     </p>
   );
@@ -35,7 +40,7 @@ function signInCta(label = "Iniciar sesión"): React.ReactNode {
   return (
     <Link
       href="/login"
-      className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+      className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
     >
       {label}
     </Link>
@@ -117,36 +122,49 @@ export default async function PricingPage() {
       cta:
         tier === null ? (
           signInCta()
-        ) : tier === "FREE" ? (
+        ) : tier === "FREE" || tier === "PRO" ? (
           <CheckoutButton
             action={checkoutAction}
             plan="ENTERPRISE"
             label="Mejorar"
           />
-        ) : tier === "ENTERPRISE" ? (
-          currentPlanCta()
         ) : (
-          paidPlanCta(portalAction)
+          currentPlanCta()
         ),
     },
   ];
 
   return (
-    <main className="min-h-dvh bg-surface">
+    <main className="min-h-dvh bg-white">
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-12 px-6 py-20">
         <header className="flex flex-col items-center gap-3 text-center">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-text-secondary">
-            Planes transparentes
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {PRICING_COPY.header.eyebrow}
           </span>
-          <h1 className="font-display text-4xl tracking-tight text-navy sm:text-5xl">
-            Optimizá la citabilidad de tu producto en la era de la IA
+          <h1 className="font-serif text-4xl font-normal tracking-tight text-[#0f172a] sm:text-5xl">
+            {PRICING_COPY.header.title}
           </h1>
-          <p className="max-w-xl text-text-secondary">
-            Auditorías GEO y reportes de visibilidad en IA para cada etapa.
-            Precios simples, sin sorpresas.
+          <p className="max-w-xl font-sans text-base text-[#475569]">
+            {PRICING_COPY.header.subtitle}
           </p>
         </header>
         <PricingCards plans={plans} />
+        <section className="w-full max-w-4xl" aria-labelledby="faq-heading">
+          <h2
+            id="faq-heading"
+            className="text-center font-serif text-3xl font-normal text-[#0f172a]"
+          >
+            {PRICING_COPY.faq.title}
+          </h2>
+          <div className="mt-10 grid grid-cols-1 gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:p-8 md:grid-cols-2">
+            {PRICING_COPY.faq.items.map((item) => (
+              <div key={item.q} className="font-sans text-xs">
+                <p className="mb-1 font-semibold text-[#0f172a]">{item.q}</p>
+                <p className="leading-relaxed text-[#475569]">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );
