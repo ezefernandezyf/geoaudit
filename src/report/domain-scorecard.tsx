@@ -32,7 +32,15 @@ export function DomainScorecard({ view }: { view: GeminiView }) {
 
       <div className="space-y-3 pt-2">
         {view.categoryScores.map((category) => (
-          <ScoreBar key={category.id} category={category} />
+          <ScoreBar
+            key={category.id}
+            category={{
+              ...category,
+              // The view model is honest-nullable (APT-10); ScoreBar's category
+              // treats absent metrics as undefined.
+              keyMetric: category.keyMetric ?? undefined,
+            }}
+          />
         ))}
       </div>
     </section>
