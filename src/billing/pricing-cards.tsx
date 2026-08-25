@@ -73,9 +73,11 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 
       <div>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h3 className="font-serif text-2xl font-normal text-[#0f172a]">
+          {/* h2: each plan is a top-level section under the page h1 — keeps the
+              heading order valid (axe heading-order, A11Y-2/C14). */}
+          <h2 className="font-serif text-2xl font-normal text-[#0f172a]">
             {name}
-          </h3>
+          </h2>
         </div>
 
         {description ? (

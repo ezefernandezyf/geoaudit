@@ -6,6 +6,7 @@ import { DashboardEmptyState } from "@/dashboard/dashboard-empty-state";
 import { DashboardRunnerBar } from "@/dashboard/runner-bar";
 import { ScoreTrend } from "@/dashboard/score-trend";
 import type { DashboardAudit } from "@/dashboard/types";
+import { DASHBOARD_COPY } from "@/lib/copy";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { auditAction } from "@/lib/audit/actions";
@@ -87,6 +88,10 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-dvh bg-white">
+      {/* C14 (A11Y-4/5): sr-only page heading — the dashboard is a landmark
+          page without a visible h1; the hidden heading gives screen readers a
+          stable page title without altering the Gemini visual design. */}
+      <h1 className="sr-only">{DASHBOARD_COPY.pageTitle}</h1>
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
         {/* U4.1 (DSH-8): runner bar — URL input + "Run Audit" inside + user chip. */}
         <DashboardRunnerBar action={auditAction} user={runnerUser} />

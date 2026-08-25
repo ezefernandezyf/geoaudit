@@ -66,7 +66,7 @@ export function AuditHistoryTable({
             onClick={() => router.refresh()}
             aria-label="Refrescar historial"
             title="Refrescar historial"
-            className="rounded p-1 text-[#94a3b8] transition-colors hover:bg-[#e2e8f0] hover:text-[#0f172a]"
+            className="rounded p-1 text-[#94a3b8] transition-colors hover:bg-[#e2e8f0] hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
@@ -151,7 +151,7 @@ export function AuditHistoryTable({
                   <td className="px-6 py-4 text-right">
                     <a
                       href={`/report?url=${encodeURIComponent(audit.url)}`}
-                      className="inline-flex items-center gap-1.5 rounded p-1 text-[#94a3b8] transition-colors hover:text-[#0f172a]"
+                      className="inline-flex items-center gap-1.5 rounded p-1 text-[#94a3b8] transition-colors hover:text-[#0f172a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
                       title="Re-auditar"
                     >
                       <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />

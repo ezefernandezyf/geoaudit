@@ -225,6 +225,7 @@ export const LANDING_COPY = {
  * wording, neutral Spanish.
  */
 export const DASHBOARD_COPY = {
+  pageTitle: "Panel de auditorías",
   runner: {
     placeholder: "https://tudominio.com",
     submitLabel: "Run Audit",

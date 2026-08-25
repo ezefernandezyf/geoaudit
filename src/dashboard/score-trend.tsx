@@ -91,6 +91,7 @@ export function ScoreTrend({ audits }: ScoreTrendProps) {
               <div
                 key={monthKey(month)}
                 title={`${MONTH_LABEL.format(month)}: sin datos`}
+                role="img"
                 className="w-full rounded-t-sm bg-[#f1f5f9] transition-colors hover:bg-[#cbd5e1]"
                 style={{ height: "8%" }}
                 aria-label={`${MONTH_LABEL.format(month)}: sin auditorías`}
@@ -104,6 +105,7 @@ export function ScoreTrend({ audits }: ScoreTrendProps) {
             <div
               key={monthKey(month)}
               title={`${MONTH_LABEL.format(month)}: ${avg} pts`}
+              role="img"
               className={`w-full rounded-t-sm transition-colors ${
                 isLatest
                   ? "bg-[#10b981] hover:bg-[#059669]"

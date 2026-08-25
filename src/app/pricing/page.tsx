@@ -149,7 +149,10 @@ export default async function PricingPage() {
   return (
     <main className="min-h-dvh bg-white">
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-12 px-6 py-20">
-        <header className="flex flex-col items-center gap-3 text-center">
+        {/* C14 (A11Y-4): page intro — a plain block, NOT a <header>: a
+            <header> inside <main> would be computed as a second banner
+            landmark by RTL and confuse the shell landmark assertion. */}
+        <div className="flex flex-col items-center gap-3 text-center">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
             {PRICING_COPY.header.eyebrow}
           </span>
@@ -159,7 +162,7 @@ export default async function PricingPage() {
           <p className="max-w-xl font-sans text-base text-[#475569]">
             {PRICING_COPY.header.subtitle}
           </p>
-        </header>
+        </div>
         <PricingCards plans={plans} />
         <section className="w-full max-w-4xl" aria-labelledby="faq-heading">
           <h2
