@@ -89,11 +89,11 @@ Chain strategy: feature-branch-chain
 
 ## U6 — Multi-page UI (Dep: U5)
 
-- [ ] U6.1 `report/multi-page-form.tsx`: `useActionState` + `multiPageAuditAction` real, gate PRO con CTA (MPU-1,2), error codes neutros (MPU-3) + test
-- [ ] U6.2 `app/multipage/page.tsx`: selector rutas + inspector Gemini, datos reales, omitir schemaFound/crawlTimeMs/status (MPU-4,5; MPA-10,11) + test
-- [ ] U6.3 `report/multi-page-report.tsx`: presenter de `MultiPageResult` (MPA-10,11) + test
-- [ ] U6.4 navbar link multi-page (MPU-6) + test
-- [ ] U6.5 Reescribir tests multipage (token→hex)
+- [x] U6.1 `report/multi-page-form.tsx`: `useActionState` + `multiPageAuditAction` real, gate PRO con CTA (MPU-1,2), error codes neutros (MPU-3) + test
+- [x] U6.2 `app/multipage/page.tsx`: selector rutas + inspector Gemini, datos REALES, omitir schemaFound/crawlTimeMs/status (MPU-4,5; MPA-10,11) + test
+- [x] U6.3 `report/multi-page-report.tsx`: presenter de `MultiPageResult` (MPA-10,11) + test
+- [x] U6.4 navbar link multi-page (MPU-6) + test
+- [x] U6.5 Reescribir tests multipage (token→hex)
 
 ## Notas
 
