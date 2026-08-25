@@ -101,6 +101,56 @@ export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
   },
 };
 
+/**
+ * Pricing page copy (PRC-5/7, design U3) — Gemini wording, neutral Spanish.
+ *
+ * `header` is the Gemini verbatim intro ("Planes Transparentes" eyebrow +
+ * serif H1 + subtitle with "Sin sorpresas"); `faq` answers the billing
+ * questions (cycle, cancellation, plan changes) plus real product questions
+ * (GEO Score, platforms, multi-page, PDF).
+ */
+export const PRICING_COPY = {
+  header: {
+    eyebrow: "Planes Transparentes",
+    title: "Optimiza la citabilidad de tu producto en la era de la IA",
+    subtitle:
+      "Auditorías técnicas diseñadas para equipos de producto, fundadores y agencias SEO. Sin sorpresas.",
+  },
+  faq: {
+    title: "Preguntas Frecuentes",
+    items: [
+      {
+        q: "¿Cómo funciona la facturación?",
+        a: "Los planes Pro y Enterprise se facturan mensualmente y se renuevan de forma automática hasta que los cancele. Sin cargos ocultos.",
+      },
+      {
+        q: "¿Puedo cancelar en cualquier momento?",
+        a: "Sí. Puede cancelar cuando quiera desde su cuenta y el acceso se mantiene hasta el final del período pagado, sin penalizaciones ni cláusulas de permanencia.",
+      },
+      {
+        q: "¿Puedo cambiar de plan?",
+        a: "Sí. Puede cambiar de plan en cualquier momento; los cambios se aplican con prorrateo automático sobre el período en curso.",
+      },
+      {
+        q: "¿Qué es el GEO Score?",
+        a: "El GEO Score es una métrica de 0 a 100 que resume qué tan visible y citable es su sitio en los motores de búsqueda con IA.",
+      },
+      {
+        q: "¿Qué plataformas analiza?",
+        a: "Analizamos ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.",
+      },
+      {
+        q: "¿Puedo auditar varias páginas?",
+        a: "Sí. Los planes Pro y Enterprise incluyen auditorías multi-página para monitorear varias URLs en cada ciclo.",
+      },
+      {
+        q: "¿Cómo funciona el PDF?",
+        a: "Cada auditoría puede exportarse a un reporte PDF listo para compartir con clientes o equipos.",
+      },
+    ],
+  },
+} as const;
+
 /** Landing page copy (LND-1..5) — Gemini wording, neutral Spanish. */
 export const LANDING_COPY = {
   hero: {
@@ -149,4 +199,5 @@ export const COPY = {
   shareModalErrors: SHARE_MODAL_ERROR_COPY,
   auth: AUTH_COPY,
   landing: LANDING_COPY,
+  pricing: PRICING_COPY,
 } as const;

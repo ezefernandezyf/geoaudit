@@ -6,6 +6,7 @@ import {
   FETCH_ERROR_COPY,
   GENERIC_AUDIT_ERROR_COPY,
   LANDING_COPY,
+  PRICING_COPY,
   SHARE_MODAL_ERROR_COPY,
 } from "@/lib/copy";
 // U2.2 source-of-truth: the legacy modules must re-export the SAME objects.
@@ -109,6 +110,39 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
 
   it("contains no voseo anywhere in COPY", () => {
     expect(JSON.stringify(COPY)).not.toMatch(VOSEO_PATTERN);
+  });
+});
+
+describe("PRICING_COPY (U3.2, PRC-5/7)", () => {
+  it("keeps the Gemini pricing header neutral", () => {
+    expect(PRICING_COPY.header.eyebrow).toBe("Planes Transparentes");
+    expect(PRICING_COPY.header.title).toBe(
+      "Optimiza la citabilidad de tu producto en la era de la IA",
+    );
+    expect(PRICING_COPY.header.subtitle).toContain("Sin sorpresas");
+  });
+
+  it("answers billing cycle, cancellation and plan changes (PRC-7)", () => {
+    const faq = PRICING_COPY.faq.items.map((item) => item.q);
+    expect(faq).toContain("¿Cómo funciona la facturación?");
+    expect(faq).toContain("¿Puedo cancelar en cualquier momento?");
+    expect(faq).toContain("¿Puedo cambiar de plan?");
+    const answers = PRICING_COPY.faq.items.map((item) => item.a).join(" ");
+    expect(answers).toMatch(/se facturan mensualmente/);
+    expect(answers).toMatch(/sin penalizaciones/);
+    expect(answers).toMatch(/prorrateo automático/);
+  });
+
+  it("answers real product questions with neutral copy", () => {
+    const faq = PRICING_COPY.faq.items.map((item) => item.q);
+    expect(faq).toContain("¿Qué es el GEO Score?");
+    expect(faq).toContain("¿Qué plataformas analiza?");
+    expect(faq).toContain("¿Puedo auditar varias páginas?");
+    expect(faq).toContain("¿Cómo funciona el PDF?");
+  });
+
+  it("exposes PRICING_COPY on the grouped COPY object", () => {
+    expect(COPY.pricing).toBe(PRICING_COPY);
   });
 });
 
