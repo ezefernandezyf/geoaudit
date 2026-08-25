@@ -49,3 +49,7 @@ next-env.d.ts
 
 # lighthouse raw reports (evidence lives in docs/performance.md)
 /.lighthouse/
+
+# playwright e2e artifacts (HTML report + traces/screenshots)
+/playwright-report/
+/test-results/
