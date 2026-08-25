@@ -2,6 +2,9 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Session } from "next-auth";
 import Page from "@/app/page";
+import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
+import { severityForScore } from "@/scoring/calculator";
+import type { GeminiBand } from "@/ui/severity-badge";
 
 // The landing page wires AuditForm to auditAction, which calls auth() for the
 // tier pre-check (TLM-3). next-auth/lib/env.js imports next/server
@@ -22,6 +25,15 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 const SESSION: Session = {
   expires: new Date(Date.now() + 60_000).toISOString(),
   user: { id: "user-1", name: "Ada Lovelace", email: "ada@example.com" },
+};
+
+/** Spanish label of a lowercase Gemini band (severity-badge BAND_LABELS). */
+const BAND_LABELS: Record<GeminiBand, string> = {
+  excellent: "Excelente",
+  good: "Bueno",
+  fair: "Regular",
+  poor: "Deficiente",
+  critical: "Crítico",
 };
 
 /** Home is an async server component (awaits auth()) — render the resolved JSX. */
@@ -136,7 +148,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
-  it("renders a demo ScoreHero with the real severity band (LND-3)", async () => {
+  it("renders a ScoreHero with the documented real evidence (LND-3/LND-7)", async () => {
     await renderPage();
     const section = screen.getByText("Scorecard Unificado").closest("section");
     expect(section).not.toBeNull();
@@ -144,41 +156,70 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       .getByText("GEO Score")
       .closest("div.overflow-hidden");
     expect(scorebox).not.toBeNull();
-    expect(within(scorebox as HTMLElement).getByText("92")).toBeInTheDocument();
+    // The score is the DOCUMENTED evidence constant — never a hardcoded fake.
+    expect(
+      within(scorebox as HTMLElement).getByText(
+        String(SCOREHERO_EVIDENCE.totalScore),
+      ),
+    ).toBeInTheDocument();
     expect(
       within(scorebox as HTMLElement).getByText("/100"),
     ).toBeInTheDocument();
-    // 92 falls in the REAL excellent band (≥90), not Gemini's 80+.
+    // Domain appears in the mono chip AND as the serif title (the adapter
+    // sets title = domain) — assert at least one, never a hardcoded value.
     expect(
-      within(scorebox as HTMLElement).getByText("Excelente"),
+      within(scorebox as HTMLElement).getAllByText(SCOREHERO_EVIDENCE.domain)
+        .length,
+    ).toBeGreaterThan(0);
+    // The band chip derives from the REAL thresholds (90/75/60/40) — the demo
+    // can never claim "Excelente" for a score that is not ≥90.
+    const expectedBand = severityForScore(
+      SCOREHERO_EVIDENCE.totalScore,
+    ).toLowerCase() as GeminiBand;
+    expect(
+      within(scorebox as HTMLElement).getByText(BAND_LABELS[expectedBand]),
     ).toBeInTheDocument();
+    // The summary line is the honest one from the evidence — real score + band.
     expect(
-      within(section as HTMLElement).getByText("linear.app"),
+      within(scorebox as HTMLElement).getByText(SCOREHERO_EVIDENCE.summary),
     ).toBeInTheDocument();
   });
 
-  it("shows the five demo categories with score, real band and weight (LND-3)", async () => {
+  it("renders the category breakdown only from real evidence (LND-7)", async () => {
     await renderPage();
-    const table = screen
-      .getByText("Desglose de ejemplo por categoría")
-      .closest("div.overflow-hidden");
+    const header = screen.queryByText("Desglose por categoría");
+    if (SCOREHERO_EVIDENCE.categoryScores.length === 0) {
+      // A3.2: evidence pending — no invented per-dimension numbers are shown.
+      expect(header).toBeNull();
+      return;
+    }
+    // Evidence fixed: the breakdown mirrors the verified GeminiView categories.
+    expect(header).not.toBeNull();
+    const table = header?.closest("div.overflow-hidden");
     expect(table).not.toBeNull();
+    for (const category of SCOREHERO_EVIDENCE.categoryScores) {
+      expect(
+        within(table as HTMLElement).getByText(category.name),
+      ).toBeInTheDocument();
+      expect(
+        within(table as HTMLElement).getByText(String(category.score)),
+      ).toBeInTheDocument();
+      expect(
+        within(table as HTMLElement).getByText(category.weight),
+      ).toBeInTheDocument();
+    }
+  });
+
+  it("never shows invented demo data (old 92/linear 'excelente' demo, LND-7)", async () => {
+    await renderPage();
+    // The fabricated 92 and its invented marketing copy are gone.
+    expect(screen.queryByText("92")).toBeNull();
     expect(
-      within(table as HTMLElement).getByText("AI Crawlers & robots.txt"),
-    ).toBeInTheDocument();
-    expect(
-      within(table as HTMLElement).getByText("Alcance Multi-Modelo"),
-    ).toBeInTheDocument();
-    // weights from the Gemini demo (25/25/20/15/15).
-    expect(
-      within(table as HTMLElement).getAllByText(/25%|20%|15%/),
-    ).toHaveLength(5);
-    // Bands come from severityForScore (real thresholds): 95 → excellent,
-    // 88/82/86/81 → good (75-89), so "Bueno" shows once per good category.
-    expect(
-      within(table as HTMLElement).getByText("Excelente"),
-    ).toBeInTheDocument();
-    expect(within(table as HTMLElement).getAllByText("Bueno")).toHaveLength(4);
+      screen.queryByText(
+        /Excelente visibilidad e indexación en modelos generativos/,
+      ),
+    ).toBeNull();
+    expect(screen.queryByText("Desglose de ejemplo por categoría")).toBeNull();
   });
 
   it("names the six supported AI platforms (LND-4)", async () => {

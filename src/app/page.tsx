@@ -5,19 +5,25 @@ import { auth } from "@/lib/auth";
 import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
-import { severityForScore } from "@/scoring/calculator";
+import { ScoreHero } from "@/report/score-hero";
+import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
 
 /**
- * Root landing page (U2, LND-1..6, ADF-1/8): Gemini composition verbatim
+ * Root landing page (U2, LND-1..7, ADF-1/8): Gemini composition verbatim
  * (hex directos, font-serif, surfaces contrastadas) sobre el flujo REAL:
  * hero con AuditForm (botón dentro del input + sample URLs, LND-1), cards
- * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero demo + bandas
- * reales 90/75/60/40 (LND-3), seis plataformas (LND-4) y CTA pricing
- * (LND-5). El copy de usuario viene de src/lib/copy.ts (neutro, ATH-9).
+ * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero con evidencia
+ * REAL del motor + bandas reales 90/75/60/40 (LND-3/LND-7), seis plataformas
+ * (LND-4) y CTA pricing (LND-5). El copy de usuario viene de src/lib/copy.ts
+ * (neutro, ATH-9).
  *
  * LND-6 (sprint 8): la página resuelve auth() y adapta el CTA secundario —
  * con sesión muestra "Ir al dashboard" (/dashboard), sin sesión mantiene
  * "Crear cuenta gratis" (/signup). La Home pasa a dinámica (costo aceptado).
+ *
+ * LND-7 (sprint 8): el ScoreHero muestra la evidencia REAL de
+ * src/app/score-hero-evidence.ts (mejor URL verificada por runAudit con su
+ * band honesta) — nunca un número inventado.
  */
 
 export const dynamic = "force-dynamic";
@@ -54,99 +60,6 @@ const BAND_ROWS: {
     range: "0 - 39",
     description:
       "Problemas de acceso o contenido que bloquean a los motores de IA.",
-  },
-];
-
-/** Benchmark bars of the demo ScoreHero — REAL thresholds (LND-3). */
-const BENCHMARK_ROWS: {
-  range: string;
-  label: string;
-  className: string;
-}[] = [
-  {
-    range: "90 - 100",
-    label: "Excelente (Top 10%)",
-    className: "font-semibold text-[#10b981]",
-  },
-  {
-    range: "75 - 89",
-    label: "Bueno (Promedio B2B)",
-    className: "font-medium text-[#10b981]",
-  },
-  {
-    range: "60 - 74",
-    label: "Regular (Riesgo omisión)",
-    className: "font-medium text-[#f59e0b]",
-  },
-  {
-    range: "40 - 59",
-    label: "Deficiente",
-    className: "font-medium text-[#ef4444]",
-  },
-  {
-    range: "0 - 39",
-    label: "Crítico",
-    className: "font-medium text-[#ef4444]",
-  },
-];
-
-/**
- * Demo category breakdown (Gemini mockAudits linear.app verbatim) with bands
- * derived from the REAL severityForScore thresholds (90/75/60/40) — the
- * landing never invents bands (LND-3, design U2).
- */
-const DEMO_CATEGORIES: {
-  id: string;
-  name: string;
-  score: number;
-  weight: string;
-  band: GeminiBand;
-  description: string;
-}[] = [
-  {
-    id: "crawlers",
-    name: "AI Crawlers & robots.txt",
-    score: 95,
-    weight: "25%",
-    band: severityForScore(95).toLowerCase() as GeminiBand,
-    description:
-      "Directivas abiertas y óptimas para GPTBot, ClaudeBot, PerplexityBot y Google-Extended.",
-  },
-  {
-    id: "citability",
-    name: "Citabilidad & E-E-A-T",
-    score: 88,
-    weight: "25%",
-    band: severityForScore(88).toLowerCase() as GeminiBand,
-    description:
-      "Documentación técnica con alta densidad factual y firma de ingenieros verificados.",
-  },
-  {
-    id: "schema",
-    name: "Structured Data & JSON-LD",
-    score: 82,
-    weight: "20%",
-    band: severityForScore(82).toLowerCase() as GeminiBand,
-    description:
-      "Schema SoftwareApplication con featureList y precios explícitos.",
-  },
-  {
-    id: "density",
-    name: "Densidad de Información & Contexto",
-    score: 86,
-    weight: "15%",
-    band: severityForScore(86).toLowerCase() as GeminiBand,
-    description:
-      "Textos directos sin jerga publicitaria vacía; definiciones concisas en hero.",
-  },
-  {
-    id: "platforms",
-    name: "Alcance Multi-Modelo",
-    score: 81,
-    weight: "15%",
-    band: severityForScore(81).toLowerCase() as GeminiBand,
-    description:
-      "Aparición constante como recomendación líder en queries de issue tracking.",
   },
 ];
 
@@ -343,7 +256,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 3. SCORECARD — demo ScoreHero + bandas reales 90/75/60/40 (LND-3) */}
+      {/* 3. SCORECARD — ScoreHero con evidencia REAL (LND-7) + bandas reales 90/75/60/40 (LND-3) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
@@ -357,109 +270,59 @@ export default async function Home() {
           </p>
         </div>
 
-        {/* Demo ScoreHero (Gemini composition, real thresholds) */}
-        <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-6 sm:p-8">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-            <div className="flex items-start gap-6 sm:items-center">
-              <div className="flex min-w-[130px] flex-col justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 sm:min-w-[160px]">
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[#475569]">
-                  GEO Score
-                </p>
-                <div className="flex items-baseline gap-2">
-                  <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
-                    92
-                  </span>
-                  <span className="font-mono text-xl font-bold text-[#10b981]">
-                    /100
-                  </span>
-                </div>
-                <div className="mt-3">
-                  <SeverityBadge band="excellent" size="sm" />
-                </div>
-              </div>
+        {/*
+          ScoreHero (LND-7): la mejor URL REAL verificada por runAudit, con su
+          band honesta — nunca un número inventado. La evidencia vive en
+          score-hero-evidence.ts y se fija con `pnpm verify:scorehero`.
+        */}
+        <div className="mb-10">
+          <ScoreHero view={SCOREHERO_EVIDENCE} />
+        </div>
 
-              <div className="flex max-w-xl flex-col justify-center space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded border border-[#e2e8f0] bg-[#f1f5f9] px-2.5 py-1 font-mono text-xs font-semibold text-[#0f172a]">
-                    linear.app
-                  </span>
-                  <span className="text-xs text-[#475569]">
-                    Auditoría en{" "}
-                    <strong className="font-mono font-medium text-[#0f172a]">
-                      14s
-                    </strong>
-                  </span>
-                </div>
-                <h2 className="font-serif text-lg italic leading-snug text-[#0f172a] sm:text-xl">
-                  Excelente visibilidad e indexación en modelos generativos
-                </h2>
-                <p className="text-xs leading-relaxed text-[#475569]">
-                  linear.app tiene una citabilidad sobresaliente en ChatGPT,
-                  Claude y Perplexity. Su marcado JSON-LD SoftwareApplication y
-                  directivas de robots.txt están en el percentil superior.
-                </p>
-              </div>
+        {/*
+          Desglose por categoría — solo cuando la evidencia REAL está fijada
+          (categoryScores del GeminiView verificado). Mientras la evidencia
+          está pendiente (A3.2) no se renderiza nada: no se inventan números
+          por dimensión.
+        */}
+        {SCOREHERO_EVIDENCE.categoryScores.length > 0 ? (
+          <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+            <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
+                {LANDING_COPY.sections.scorecardCategoryTitle}
+              </h3>
             </div>
-
-            {/* Benchmark — umbrales reales 90/75/60/40 */}
-            <div className="flex shrink-0 flex-col justify-center gap-3 text-left md:min-w-[210px] md:border-l md:border-[#e2e8f0] md:pl-6">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
-                Baremos de Referencia
-              </div>
-              <div className="space-y-1.5 text-xs">
-                {BENCHMARK_ROWS.map((row) => (
-                  <div
-                    key={row.range}
-                    className="flex items-center justify-between gap-4"
-                  >
-                    <span className="font-mono text-[#64748b]">
-                      {row.range}
+            <div className="divide-y divide-[#e2e8f0]">
+              {SCOREHERO_EVIDENCE.categoryScores.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex flex-col justify-between gap-2 p-4 transition-colors hover:bg-[#f8fafc] sm:flex-row sm:items-center sm:px-6 sm:py-3.5"
+                >
+                  <div className="flex min-w-[200px] items-center gap-3">
+                    <span className="w-10 font-mono text-xs font-bold text-[#0f172a]">
+                      {c.score}
                     </span>
-                    <span className={row.className}>{row.label}</span>
+                    <span className="text-sm font-medium text-[#0f172a]">
+                      {c.name}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <div className="flex items-center gap-3">
+                    <SeverityBadge band={c.status} size="sm" />
+                    <span className="w-12 text-right font-mono text-xs text-[#64748b]">
+                      {c.weight}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-
-        {/* Tabla de categorías demo — score, band real y weight */}
-        <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
-          <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
-              Desglose de ejemplo por categoría
-            </h3>
-          </div>
-          <div className="divide-y divide-[#e2e8f0]">
-            {DEMO_CATEGORIES.map((c) => (
-              <div
-                key={c.id}
-                className="flex flex-col justify-between gap-2 p-4 transition-colors hover:bg-[#f8fafc] sm:flex-row sm:items-center sm:px-6 sm:py-3.5"
-              >
-                <div className="flex min-w-[200px] items-center gap-3">
-                  <span className="w-10 font-mono text-xs font-bold text-[#0f172a]">
-                    {c.score}
-                  </span>
-                  <span className="text-sm font-medium text-[#0f172a]">
-                    {c.name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <SeverityBadge band={c.band} size="sm" />
-                  <span className="w-12 text-right font-mono text-xs text-[#64748b]">
-                    {c.weight}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ) : null}
 
         {/* Tabla de bandas — thresholds reales 90/75/60/40 */}
         <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
           <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
-              Escala de Bandas y Criterios Técnicos
+              {LANDING_COPY.sections.scorecardBandsTitle}
             </h3>
           </div>
           <div className="divide-y divide-[#e2e8f0]">
