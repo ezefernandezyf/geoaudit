@@ -95,6 +95,40 @@ describe("Navbar (SHL-2/3/4)", () => {
   });
 });
 
+describe("Navbar multi-page link (MPU-6)", () => {
+  it("exposes the multi-page trigger link to paid users", () => {
+    render(
+      <Navbar
+        session={PRO_SESSION}
+        plan={{ tier: "PRO", used: 2, limit: 10 }}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Multi-página" })).toHaveAttribute(
+      "href",
+      "/multipage",
+    );
+  });
+
+  it("hides the multi-page link for FREE users", () => {
+    render(
+      <Navbar
+        session={PRO_SESSION}
+        plan={{ tier: "FREE", used: 1, limit: 3 }}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: "Multi-página" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides the multi-page link for anonymous visitors", () => {
+    render(<Navbar session={null} />);
+    expect(
+      screen.queryByRole("link", { name: "Multi-página" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("LogoutButton (SHL-3)", () => {
   it("renders a logout action labeled Cierra sesión", () => {
     render(<LogoutButton />);

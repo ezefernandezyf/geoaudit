@@ -4,6 +4,7 @@ import { Sparkles } from "lucide-react";
 import { LogoutButton } from "@/ui/logout-button";
 import { Logo } from "@/ui/logo";
 import { NavLinks } from "@/ui/nav-links";
+import { isPaidTier } from "@/lib/audit/tier";
 import type { NavPlan } from "@/lib/nav-plan";
 
 type NavbarProps = {
@@ -49,7 +50,7 @@ export function Navbar({ session, plan }: NavbarProps) {
             <Logo size={32} />
           </Link>
 
-          <NavLinks />
+          <NavLinks showMultiPage={isPaidTier(plan?.tier ?? "FREE")} />
         </div>
 
         <div className="flex items-center gap-3">
