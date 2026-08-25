@@ -62,8 +62,8 @@ Chain strategy: feature-branch-chain
 
 ## WU-C1 — SEO/OG (C16)
 
-- [ ] C1.1 `src/lib/og.ts`: `buildOgMetadata()` (LND-8/PRC-8); assert campos
-- [ ] C1.2 `layout.tsx` `metadataBase` + `public/og.png` (1200×630); `landing` + `pricing` `export const metadata` (LND-8/PRC-8)
+- [x] C1.1 `src/lib/og.ts`: `buildOgMetadata()` (LND-8/PRC-8); assert campos
+- [x] C1.2 `layout.tsx` `metadataBase` + `public/og.png` (1200×630); `landing` + `pricing` `export const metadata` (LND-8/PRC-8)
 
 ## WU-C2 — Accesibilidad (C14)
 
