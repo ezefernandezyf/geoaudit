@@ -9,6 +9,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "verify:scorehero": "vitest run --config vitest.verify.config.ts",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
