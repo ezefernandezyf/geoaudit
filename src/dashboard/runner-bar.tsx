@@ -41,7 +41,7 @@ export function DashboardRunnerBar({ action, user }: RunnerBarProps) {
     INITIAL_STATE,
   );
   const [clientError, setClientError] = useState<string | null>(null);
-  const [url, setUrl] = useState("https://linear.app");
+  const [url, setUrl] = useState("");
   const error = clientError ?? serverState.error;
   const { placeholder, submitLabel, inputLabel, formAriaLabel } =
     DASHBOARD_COPY.runner;

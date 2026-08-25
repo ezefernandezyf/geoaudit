@@ -46,7 +46,7 @@ export function AuditForm({ action, defaultValue }: AuditFormProps) {
     INITIAL_STATE,
   );
   const [clientError, setClientError] = useState<string | null>(null);
-  const [url, setUrl] = useState(defaultValue ?? "https://linear.app");
+  const [url, setUrl] = useState(defaultValue ?? "");
   const error = clientError ?? serverState.error;
   const { inputLabel, placeholder, submitLabel, formAriaLabel } =
     LANDING_COPY.auditForm;

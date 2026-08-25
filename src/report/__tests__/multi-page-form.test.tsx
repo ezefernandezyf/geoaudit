@@ -43,6 +43,16 @@ describe("MultiPageForm (MPU-1)", () => {
     expect(container.querySelectorAll("input")).toHaveLength(1);
   });
 
+  it("starts empty and shows the copy.ts placeholder instead of a fixed value (A4)", () => {
+    render(<MultiPageForm action={okAction} />);
+    const input = screen.getByLabelText("URL del sitio");
+    expect(input).toHaveValue("");
+    expect(input).toHaveAttribute(
+      "placeholder",
+      MULTIPAGE_COPY.form.placeholder,
+    );
+  });
+
   it("passes the submitted URL to the action as FormData", async () => {
     const action = vi.fn(okAction);
     submitValidUrl(action);

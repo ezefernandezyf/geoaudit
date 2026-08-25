@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { DashboardRunnerBar } from "@/dashboard/runner-bar";
+import { DASHBOARD_COPY } from "@/lib/copy";
 import type { AuditAction } from "@/lib/audit/actions";
 
 /**
@@ -31,6 +32,16 @@ describe("DashboardRunnerBar (DSH-8)", () => {
       wrapper?.querySelector('button[name=""]') ??
         wrapper?.querySelector("button"),
     ).toBeTruthy();
+  });
+
+  it("starts empty and shows the copy.ts placeholder instead of a fixed value (A4)", () => {
+    render(<DashboardRunnerBar action={okAction} user={USER} />);
+    const input = screen.getByRole("textbox", { name: "URL del sitio" });
+    expect(input).toHaveValue("");
+    expect(input).toHaveAttribute(
+      "placeholder",
+      DASHBOARD_COPY.runner.placeholder,
+    );
   });
 
   it("renders the user chip with name, plan pill and initials", () => {

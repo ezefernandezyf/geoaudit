@@ -43,7 +43,7 @@ export function MultiPageForm({ action }: MultiPageFormProps) {
     INITIAL_STATE,
   );
   const [clientError, setClientError] = useState<string | null>(null);
-  const [url, setUrl] = useState("https://linear.app");
+  const [url, setUrl] = useState("");
   const serverError = serverState.error ? ERROR_COPY[serverState.error] : null;
   const error = clientError ?? serverError;
   const { inputLabel, placeholder, submitLabel, formAriaLabel } =

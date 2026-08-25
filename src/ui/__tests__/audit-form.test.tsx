@@ -8,6 +8,7 @@ import {
 import { describe, expect, it, vi } from "vitest";
 import { AuditForm } from "@/ui/audit-form";
 import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
+import { LANDING_COPY } from "@/lib/copy";
 import type { AuditAction, AuditFormState } from "@/lib/audit/actions";
 
 /**
@@ -48,6 +49,16 @@ describe("AuditForm (ADF-1)", () => {
     expect(container.querySelectorAll('button[type="submit"]')).toHaveLength(1);
     expect(container.querySelectorAll("input, select, textarea")).toHaveLength(
       1,
+    );
+  });
+
+  it("starts empty and shows the copy.ts placeholder instead of a fixed value (A4)", () => {
+    render(<AuditForm action={okAction} />);
+    const input = screen.getByLabelText("URL del sitio");
+    expect(input).toHaveValue("");
+    expect(input).toHaveAttribute(
+      "placeholder",
+      LANDING_COPY.auditForm.placeholder,
     );
   });
 });
