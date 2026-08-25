@@ -67,10 +67,10 @@ Chain strategy: feature-branch-chain
 - [x] U4.2 grid 12-col: Aggregate `col-4` + Trend `col-8` misma fila, 12 barras CSS puras (DSH-9) + test
 - [x] U4.3 `src/dashboard/audit-history-table.tsx`: header bar + chip Multi-Page + refresh + fila "SCANNING..." (DSH-10,11) + test
 - [x] U4.4 restyle Gemini de `src/dashboard/*` (aggregate-hero, score-trend, share-modal, billing-cta, empty-state) + test
-- [ ] U4.5 `app/dashboard/profile`: nombre/email/tier/uso "4/10", portal PRO o CTA upgrade, soporte (PRF-1..6) + test
-- [ ] U4.6 `app/terms` RSC estático, shell Gemini, copy neutro (LGL-1,3,4) + test
-- [ ] U4.7 `app/privacy` RSC estático (LGL-2,3,4) + test
-- [ ] U4.8 Reescribir tests dashboard/profile/legal (token→hex, voseo→neutro)
+- [x] U4.5 `app/dashboard/profile`: nombre/email/tier/uso "4/10", portal PRO o CTA upgrade, soporte (PRF-1..6) + test
+- [x] U4.6 `app/terms` RSC estático, shell Gemini, copy neutro (LGL-1,3,4) + test
+- [x] U4.7 `app/privacy` RSC estático (LGL-2,3,4) + test
+- [x] U4.8 Reescribir tests dashboard/profile/legal (token→hex, voseo→neutro)
 
 ## U5 — Report/detail/share/live + adapter (Dep: U1–U4) — EL CORAZÓN
 
