@@ -81,31 +81,39 @@ describe("AuditRunner report render (U4.T1)", () => {
     expect(runAuditMock).toHaveBeenCalledWith("https://example.com/");
   });
 
-  it("renders the full MVP report: hero, scorecard, findings and meta", async () => {
+  it("renders the full Gemini report: hero, scorecard, findings and meta", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     render(await AuditRunner({ url: "https://example.com/" }));
 
-    // ScoreHero: score + URL + band chip.
+    // ScoreHero (view model): score + benchmark + hostname domain + band chip.
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
-    expect(screen.getByText("Regular")).toBeInTheDocument();
+    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Regular").length).toBeGreaterThanOrEqual(1);
 
-    // DomainScorecard rows.
-    expect(screen.getByText("Acceso de bots")).toBeInTheDocument();
-    expect(screen.getByText("Citabilidad")).toBeInTheDocument();
+    // DomainScorecard rows (view-model categoryScores).
+    expect(screen.getAllByText("Acceso de bots").length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(screen.getAllByText("Citabilidad").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("E-E-A-T")).toBeInTheDocument();
-    expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
-    // "Plataforma" appears twice: scorecard row + matrix column header.
-    expect(screen.getAllByText("Plataforma").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Datos estructurados").length,
+    ).toBeGreaterThanOrEqual(1);
 
-    // Platform matrix is part of the shared report (ADP-4).
+    // Platform matrix is part of the shared report (ARU-12).
     expect(
       screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("No medido")).toBeInTheDocument();
 
-    // TopFindings: blocked bot + schema issue.
-    expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
-    expect(screen.getByText("Organization missing sameAs")).toBeInTheDocument();
+    // TopFindings: blocked bot + schema issue (derived from real data).
+    expect(
+      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Advertencia de datos estructurados"),
+    ).toBeInTheDocument();
   });
 
   it("no longer renders the U3 placeholder note", async () => {
@@ -117,23 +125,35 @@ describe("AuditRunner report render (U4.T1)", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders degraded results honestly: chips + meta.errors (ARU-7)", async () => {
+  it("renders degraded results honestly: failed engine scores 0, findings stay real (ARU-10)", async () => {
     runAuditMock.mockResolvedValue(degradedCitabilityResult);
     render(await AuditRunner({ url: "https://example.com/" }));
 
-    expect(screen.getByText("No disponible")).toBeInTheDocument();
-    expect(screen.getByText("citability: boom")).toBeInTheDocument();
-    // The remaining engines still score.
+    // The failed citability engine maps to an honest 0 bar (critical band),
+    // never a fake number; the remaining engines still score.
+    const bars = screen.getAllByRole("progressbar");
+    expect(
+      bars.find((b) => b.getAttribute("aria-valuenow") === "0"),
+    ).toBeInTheDocument();
     expect(screen.getByText("71")).toBeInTheDocument();
+    // Derived findings still come from the real surviving engines.
+    expect(
+      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
+    ).toBeInTheDocument();
   });
 
   it("renders the RAO-13 non-HTML report with crawler data only", async () => {
     runAuditMock.mockResolvedValue(unsupportedPageResult);
     render(await AuditRunner({ url: "https://cdn.example.com/file.pdf" }));
 
-    expect(screen.getAllByText("No disponible")).toHaveLength(4);
+    // Four unsupported engines score 0 honestly; the crawler keeps 71.
+    const bars = screen.getAllByRole("progressbar");
+    expect(bars).toHaveLength(5);
+    expect(
+      bars.filter((b) => b.getAttribute("aria-valuenow") === "0"),
+    ).toHaveLength(4);
     expect(screen.getByText("71")).toBeInTheDocument();
-    expect(screen.getByText("Crítico")).toBeInTheDocument();
+    expect(screen.getAllByText("Crítico").length).toBeGreaterThanOrEqual(1);
   });
 });
 
