@@ -77,22 +77,40 @@ describe("deriveFindings (APT-7)", () => {
     }
   });
 
-  it("derives schema issues with the real schema band and a code snippet (APT-7)", () => {
+  it("collapses ALL schema issues into ONE finding with details (ARU-13)", () => {
     const findings = deriveFindings(
       citability,
       schemaWithGenerated,
       crawlersWithBlocked,
     );
-    const schema = findings.filter((f) => f.id.startsWith("schema-issue-"));
-    expect(schema).toHaveLength(2);
-    for (const f of schema) {
-      expect(f.category).toBe("Datos estructurados");
-      // 2 detected, 2 issues → deriveSchemaScore = 100 - 20 = 80 → "good".
-      expect(f.severity).toBe("good");
-      expect(f.impactScore).toBeNull();
-      expect(f.codeSnippet).toContain('"@type"');
-      expect(f.codeLanguage).toBe("json");
-    }
+    const schema = findings.filter((f) => f.category === "Datos estructurados");
+    expect(schema).toHaveLength(1);
+    const [finding] = schema;
+    expect(finding.id).toBe("schema-issues");
+    expect(finding.title).toBe("Datos estructurados: faltan estas propiedades");
+    // The missing properties travel as the details list.
+    expect(finding.details).toEqual([
+      "Organization missing sameAs",
+      "Missing url",
+    ]);
+    // 2 detected, 2 issues → deriveSchemaScore = 100 - 20 = 80 → "good".
+    expect(finding.severity).toBe("good");
+    expect(finding.impactScore).toBeNull();
+    // The JSON-LD snippet appears exactly once (one finding, one snippet).
+    expect(finding.codeSnippet).toContain('"@type"');
+    expect(finding.codeLanguage).toBe("json");
+  });
+
+  it("omits the structured-data finding when there are no issues (ARU-13)", () => {
+    const cleanSchema: SchemaResult = { ...schemaWithGenerated, issues: [] };
+    const findings = deriveFindings(
+      citability,
+      cleanSchema,
+      crawlersWithBlocked,
+    );
+    expect(
+      findings.filter((f) => f.category === "Datos estructurados"),
+    ).toHaveLength(0);
   });
 
   it("derives one finding per blocked bot (APT-7)", () => {
@@ -122,7 +140,7 @@ describe("deriveFindings (APT-7)", () => {
       schemaWithoutGenerated,
       crawlersWithBlocked,
     );
-    const schema = findings.filter((f) => f.id.startsWith("schema-issue-"));
+    const schema = findings.filter((f) => f.category === "Datos estructurados");
     expect(schema.length).toBeGreaterThan(0);
     for (const f of schema) {
       expect(f.codeSnippet).toBeUndefined();

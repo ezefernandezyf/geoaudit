@@ -47,6 +47,12 @@ export interface Finding {
   category: "Crawlers" | "Citabilidad" | "Datos estructurados";
   /** Detail text. */
   description: string;
+  /**
+   * Optional grouped items (ARU-13/14, design sprint 8 A1/A2): when a finding
+   * aggregates a category (structured-data issues, blocked bots), the raw
+   * items travel here and the UI renders them as a list under the description.
+   */
+  details?: string[];
   /** Always null — the engine does not compute an impact score (APT-7/10). */
   impactScore: null;
   /** Only present when a real source exists (e.g. generated JSON-LD). */

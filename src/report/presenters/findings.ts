@@ -66,13 +66,18 @@ export function deriveFindings(
       ? JSON.stringify(schema.generated, null, 2)
       : undefined;
 
-  for (const [index, issue] of schema.issues.entries()) {
+  // ARU-13 (sprint 8): ALL schema issues collapse into ONE finding. The
+  // missing properties travel as `details` and the JSON-LD snippet is emitted
+  // exactly once instead of once per issue.
+  if (schema.issues.length > 0) {
     findings.push({
-      id: `schema-issue-${index}`,
-      title: "Advertencia de datos estructurados",
+      id: "schema-issues",
+      title: "Datos estructurados: faltan estas propiedades",
       severity: schemaBand,
       category: "Datos estructurados",
-      description: issue,
+      description:
+        "El marcado JSON-LD detectado omite propiedades que los asistentes de IA usan para corroborar entidades y hechos.",
+      details: schema.issues,
       impactScore: null,
       ...(codeSnippet !== undefined
         ? { codeSnippet, codeLanguage: "json" as const }

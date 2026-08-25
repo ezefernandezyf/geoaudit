@@ -74,11 +74,12 @@ describe("GeminiView shape (APT-1)", () => {
       description: "Acceso de los crawlers de IA al sitio.",
     };
     const finding: Finding = {
-      id: "schema-issue-0",
-      title: "Advertencia de datos estructurados",
+      id: "schema-issues",
+      title: "Datos estructurados: faltan estas propiedades",
       severity: "excellent",
       category: "Datos estructurados",
-      description: "Organization missing sameAs",
+      description: "El marcado JSON-LD detectado omite propiedades.",
+      details: ["Organization missing sameAs"],
       impactScore: null,
       codeSnippet: "{ }",
       codeLanguage: "json",

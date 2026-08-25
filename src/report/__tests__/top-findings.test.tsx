@@ -20,7 +20,7 @@ describe("TopFindings valid audit (ARU-10)", () => {
     expect(screen.getAllByText("Pasaje a mejorar")).toHaveLength(2);
     expect(screen.getAllByText("Pasaje altamente citable")).toHaveLength(3);
     expect(
-      screen.getByText("Advertencia de datos estructurados"),
+      screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
@@ -119,7 +119,7 @@ describe("TopFindings honesty edge cases (APT-10)", () => {
     render(<TopFindings view={toGeminiViewModel(noSchemaSource)} />);
 
     expect(
-      screen.getByText("Advertencia de datos estructurados"),
+      screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Copiar código" }),

@@ -112,7 +112,7 @@ describe("AuditRunner report render (U4.T1)", () => {
       screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Advertencia de datos estructurados"),
+      screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();
   });
 
