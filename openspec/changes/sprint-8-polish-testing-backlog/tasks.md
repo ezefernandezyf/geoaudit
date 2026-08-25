@@ -42,9 +42,9 @@ Chain strategy: feature-branch-chain
 
 ## WU-A2 — Drill-down multipágina (A3)
 
-- [ ] A2.1 TDD: `page.test.tsx` — reporte completo por página + empty state (MPU-7/8/9) [RED]
-- [ ] A2.2 `dashboard/audits/[id]/page.tsx`: `auditPage.findMany({auditId, orderBy position})` → `toGeminiViewModel`; empty state (MPU-8)
-- [ ] A2.3 `multi-page-report.tsx`: prop `pageViews?: {url;view}[]`; modo full render por selección (MPU-7/9); assert NO enriquece light shape
+- [x] A2.1 TDD: `page.test.tsx` — reporte completo por página + empty state (MPU-7/8/9) [RED]
+- [x] A2.2 `dashboard/audits/[id]/page.tsx`: `auditPage.findMany({auditId, orderBy position})` → `toGeminiViewModel`; empty state (MPU-8)
+- [x] A2.3 `multi-page-report.tsx`: prop `pageViews?: {url;view}[]`; modo full render por selección (MPU-7/9); assert NO enriquece light shape
 
 ## WU-A3 — ScoreHero verídico (A6)
 
