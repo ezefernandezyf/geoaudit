@@ -57,9 +57,9 @@ Chain strategy: feature-branch-chain
 
 ## U3 — Pricing + FAQ (Dep: U1, U2)
 
-- [ ] U3.1 `src/billing/pricing-cards.tsx`: Pro destacada (borde emerald + badge "Recomendado" + scale), SOLO mensual sin toggle (PRC-5,6) + test
-- [ ] U3.2 `app/pricing/page.tsx`: cards + FAQ facturación (ciclo/cancelación/cambios) (PRC-7); `checkoutAction`/`portalAction` intactos + test
-- [ ] U3.3 Reescribir tests pricing (token→hex)
+- [x] U3.1 `src/billing/pricing-cards.tsx`: Pro destacada (borde emerald + badge "Recomendado" + scale), SOLO mensual sin toggle (PRC-5,6) + test
+- [x] U3.2 `app/pricing/page.tsx`: cards + FAQ facturación (ciclo/cancelación/cambios) (PRC-7); `checkoutAction`/`portalAction` intactos + test
+- [x] U3.3 Reescribir tests pricing (token→hex)
 
 ## U4 — Dashboard + perfil + términos (Dep: U1–U3)
 
