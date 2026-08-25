@@ -1,19 +1,22 @@
 # Pricing Specification
 
-> **Change**: `sprint-4-stripe-integration` · **Type**: New capability (ADDED)
+> **Change**: `sprint-4-stripe-integration` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The `/pricing` page presenting the three plans (Free $0, Pro $9/mes, Enterprise $49/mes) with their limits, plus a call-to-action that adapts to auth state and tier. This sprint does NOT add a global nav link — the page is reachable from the dashboard CTA.
+The `/pricing` page presenting the three plans (Free $0, Pro $9/mes, Enterprise $49/mes) with their limits, plus a call-to-action that adapts to auth state and tier. This sprint does NOT add a global nav link — the page is reachable from the dashboard CTA. Since Sprint 7, the pricing page is restyled to Gemini's composition while keeping the real billing logic intact: monthly-only (no annual toggle), Pro highlighted (emerald border + "Recomendado" badge + scale), and a billing FAQ. Checkout and portal actions (`checkoutAction`/`portalAction`) are unchanged.
 
 ## Requirements
 
-| # | Requirement | Status | Strength | Summary |
-|---|-------------|--------|----------|---------|
-| PRC-1 | Pricing page route | New | MUST | `/pricing` renders the three plans with price, limits, and a CTA |
-| PRC-2 | Plan catalog | New | MUST | Free $0·3/30d, Pro $9/mes·10/mes, Enterprise $49/mes·50/mes |
-| PRC-3 | CTA by auth state | New | MUST | Anonymous→sign-in; FREE→"Upgrade" (checkout); PRO/Enterprise→"Gestionar suscripción" (portal) |
-| PRC-4 | Action UX states | New | MUST | Checkout/portal actions expose loading, success, error, and empty states |
+| # | Requirement | Strength | Summary |
+|---|-------------|----------|---------|
+| PRC-1 | Pricing page route | MUST | `/pricing` renders the three plans with price, limits, and a CTA |
+| PRC-2 | Plan catalog | MUST | Free $0·3/30d, Pro $9/mes·10/mes, Enterprise $49/mes·50/mes |
+| PRC-3 | CTA by auth state | MUST | Anonymous→sign-in; FREE→"Upgrade" (checkout); PRO/Enterprise→"Gestionar suscripción" (portal) |
+| PRC-4 | Action UX states | MUST | Checkout/portal actions expose loading, success, error, and empty states |
+| PRC-5 | Monthly-only | MUST | Catalog stays monthly; no annual toggle and no discounted annual price (unchanged) |
+| PRC-6 | Pro highlighted | MUST | Pro MUST be highlighted (emerald border + "Recomendado" badge + scale) in Gemini style |
+| PRC-7 | Billing FAQ | MUST | A billing FAQ section MUST answer common billing questions |
 
 ### Requirement: Pricing Page Route (PRC-1)
 
@@ -66,3 +69,45 @@ When a Checkout or Portal action runs, then the UI MUST expose loading, success 
 - GIVEN a checkout/portal action is pending
 - WHEN the user is waiting
 - THEN a loading state is displayed until the redirect resolves
+
+### Requirement: Monthly-Only (PRC-5)
+
+When the pricing page renders, then it MUST present monthly plans only — no annual/monthly toggle and no discounted annual price (this behavior is unchanged).
+
+#### Scenario: No annual toggle
+
+- GIVEN the pricing page
+- WHEN it renders
+- THEN only monthly pricing appears and no annual toggle is present
+
+### Requirement: Pro Highlighted (PRC-6)
+
+When the pricing cards render, then the Pro plan MUST be visually highlighted in Gemini style — emerald border, "Recomendado" badge, and a subtle lift/scale relative to the other cards.
+
+#### Scenario: Pro stands out
+
+- GIVEN the three plan cards
+- WHEN they render
+- THEN Pro has an emerald border, a "Recomendado" badge, and a lift/scale effect
+
+### Requirement: Billing FAQ (PRC-7)
+
+When the pricing page renders, then it MUST include a billing FAQ section answering common questions (billing cycle, cancellation, plan changes).
+
+#### Scenario: FAQ answers billing questions
+
+- GIVEN the pricing page
+- WHEN a visitor expands an FAQ item
+- THEN the answer addresses billing cycle/cancellation/plan changes
+
+## Compliance Matrix
+
+| Requirement | Scenarios | Coverage |
+|-------------|-----------|----------|
+| PRC-1 | Page lists three plans | Covered |
+| PRC-2 | Limits match tiers | Covered |
+| PRC-3 | Free user sees upgrade, Pro user sees portal | Covered |
+| PRC-4 | Error is surfaced, In-flight shows loading | Covered |
+| PRC-5 | No annual toggle | Covered |
+| PRC-6 | Pro stands out | Covered |
+| PRC-7 | FAQ answers billing questions | Covered |

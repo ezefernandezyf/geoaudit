@@ -1,24 +1,26 @@
 # Multi-Page Audit Specification
 
-> **Change**: `sprint-5-pro-features` · **Type**: New capability (ADDED)
+> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Audit up to 5 pages of a site in one run, driven by sitemap discovery, and persist the result as one master `Audit` plus N `AuditPage` rows. Multi-page reuses the single-page `runAudit` per URL, bounds concurrency to 2–3, and relaxes the fetch layer's content-type gate (`RFL-8`) to accept `application/xml` for sitemap probes only. One multi-page audit counts as exactly one audit toward the tier limit, and the feature is gated to PRO/Enterprise.
+Audit up to 5 pages of a site in one run, driven by sitemap discovery, and persist the result as one master `Audit` plus N `AuditPage` rows. Multi-page reuses the single-page `runAudit` per URL, bounds concurrency to 2–3, and relaxes the fetch layer's content-type gate (`RFL-8`) to accept `application/xml` for sitemap probes only. One multi-page audit counts as exactly one audit toward the tier limit, and the feature is gated to PRO/Enterprise. Since Sprint 7, the multi-page report presentation is a Gemini-styled presenter of the real `MultiPageResult`. The orchestration, persistence, tier counting, and PRO gate (MPA-1..MPA-9) are unchanged; the delta only covers the report page rendering (aggregate + per-page list) with honest data derivation.
 
 ## Requirements
 
-| # | Requirement | Status | Strength | Summary |
-|---|-------------|--------|----------|---------|
-| MPA-1 | Multi-page orchestration | New | MUST | `runMultiPageAudit` MUST audit a set of pages by reusing `runAudit` per URL and return one composite result |
-| MPA-2 | Page cap (5) | New | MUST | A multi-page audit MUST audit at most 5 pages; excess URLs are ignored |
-| MPA-3 | Bounded concurrency | New | MUST | Page fetches MUST run with bounded concurrency of 2–3, never unbounded |
-| MPA-4 | Sitemap discovery | New | MUST | URLs MUST be discovered from `RobotsTxt.sitemaps` and/or `/sitemap.xml` |
-| MPA-5 | Sitemap content-type gate | New | MUST | Relax `RFL-8` to accept `application/xml` for sitemap probes only |
-| MPA-6 | AuditPage 1:N persistence | New | MUST | Persist one master `Audit` + N `AuditPage` rows (1:N) |
-| MPA-7 | One audit toward tier | New | MUST | One multi-page audit MUST count as exactly one audit toward the tier limit |
-| MPA-8 | PRO feature gate | New | MUST | Multi-page MUST be gated to PRO/Enterprise; FREE sees an upgrade CTA |
-| MPA-9 | Single-page preservation | New | MUST | Single-page `runAudit` behavior MUST remain unchanged |
+| # | Requirement | Strength | Summary |
+|---|-------------|----------|---------|
+| MPA-1 | Multi-page orchestration | MUST | `runMultiPageAudit` MUST audit a set of pages by reusing `runAudit` per URL and return one composite result |
+| MPA-2 | Page cap (5) | MUST | A multi-page audit MUST audit at most 5 pages; excess URLs are ignored |
+| MPA-3 | Bounded concurrency | MUST | Page fetches MUST run with bounded concurrency of 2–3, never unbounded |
+| MPA-4 | Sitemap discovery | MUST | URLs MUST be discovered from `RobotsTxt.sitemaps` and/or `/sitemap.xml` |
+| MPA-5 | Sitemap content-type gate | MUST | Relax `RFL-8` to accept `application/xml` for sitemap probes only |
+| MPA-6 | AuditPage 1:N persistence | MUST | Persist one master `Audit` + N `AuditPage` rows (1:N) |
+| MPA-7 | One audit toward tier | MUST | One multi-page audit MUST count as exactly one audit toward the tier limit |
+| MPA-8 | PRO feature gate | MUST | Multi-page MUST be gated to PRO/Enterprise; FREE sees an upgrade CTA |
+| MPA-9 | Single-page preservation | MUST | Single-page `runAudit` behavior MUST remain unchanged |
+| MPA-10 | Multi-page report presenter | MUST | The multi-page report MUST render from the real `MultiPageResult` in Gemini style |
+| MPA-11 | Per-page data honesty | MUST | Per-page rows MUST derive citability + durationMs; omit non-existent metrics |
 
 ### Requirement: Multi-page Orchestration (MPA-1)
 
@@ -130,3 +132,39 @@ When the single-page flow runs, then the system MUST keep existing single-page `
 - GIVEN the single-page audit flow
 - WHEN `runAudit` is invoked directly
 - THEN its behavior is unchanged and no multi-page coupling is introduced
+
+### Requirement: Multi-Page Report Presenter (MPA-10)
+
+When a multi-page audit is viewed, then the report component MUST be a presenter of the persisted `MultiPageResult` (aggregate + pages) styled to Gemini, without re-running any audit.
+
+#### Scenario: Aggregate + pages rendered
+
+- GIVEN a persisted multi-page result with 3 pages
+- WHEN the page renders
+- THEN the aggregate score and the 3 per-page entries render from persisted data
+
+### Requirement: Per-Page Data Honesty (MPA-11)
+
+When per-page rows render, then they MUST derive their values from real fields (`citability.pageScore`, `summary.durationMs`) and MUST omit any metric the engine does not produce (e.g. `schemaFound`, `crawlTimeMs`, `status`).
+
+#### Scenario: Non-existent metrics omitted
+
+- GIVEN a per-page result without `crawlTimeMs`
+- WHEN the row renders
+- THEN no fabricated `crawlTimeMs` value appears
+
+## Compliance Matrix
+
+| Requirement | Scenarios | Coverage |
+|-------------|-----------|----------|
+| MPA-1 | Composite result assembled, Per-page isolation | Covered |
+| MPA-2 | More than five URLs discovered | Covered |
+| MPA-3 | Concurrency stays bounded | Covered |
+| MPA-4 | Sitemaps from robots.txt, Fallback to /sitemap.xml | Covered |
+| MPA-5 | XML sitemap accepted | Covered |
+| MPA-6 | Rows persisted 1:N | Covered |
+| MPA-7 | Multi-page counts once | Covered |
+| MPA-8 | FREE user is blocked, PRO user is allowed | Covered |
+| MPA-9 | Existing single-page tests stay green | Covered |
+| MPA-10 | Aggregate + pages rendered | Covered |
+| MPA-11 | Non-existent metrics omitted | Covered |

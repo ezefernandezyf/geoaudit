@@ -1,10 +1,10 @@
 # Dashboard Specification
 
-> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, an empty state, and a tier-adaptive billing CTA. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library. The billing CTA shows "Upgrade" for `FREE` users (→ `/pricing`) and "Gestionar suscripción" for PRO/Enterprise users (→ Customer Portal). No global nav link is introduced. Since Sprint 5, each history row also links to its audit detail page (`/dashboard/audits/[id]`).
+Authenticated dashboard listing the user's audit history with a score trend, a re-audit entry point, an empty state, and a tier-adaptive billing CTA. It reads persisted `Audit` rows and never re-runs audits. The trend uses pure CSS bars — no chart library. The billing CTA shows "Upgrade" for `FREE` users (→ `/pricing`) and "Gestionar suscripción" for PRO/Enterprise users (→ Customer Portal). No global nav link is introduced. Since Sprint 5, each history row also links to its audit detail page (`/dashboard/audits/[id]`). Since Sprint 7, the dashboard is restyled to Gemini's composition: a runner bar (input + "Run Audit" + user chip), a 12-column grid with Aggregate + Trend on the same row, and a history table with a header bar, a "Multi-Page" chip, and a refresh action with a "SCANNING..." row.
 
 ## Requirements
 
@@ -17,6 +17,10 @@ Authenticated dashboard listing the user's audit history with a score trend, a r
 | DSH-5 | Read-only source | MUST | Dashboard MUST read `Audit` rows without re-running audits |
 | DSH-6 | Billing CTA | MUST | Dashboard shows "Upgrade" (FREE→/pricing) or "Gestionar suscripción" (PRO/Enterprise→portal) |
 | DSH-7 | Detail navigation | MUST | Each history row MUST link to `/dashboard/audits/[id]` |
+| DSH-8 | Runner bar | MUST | A runner bar MUST place the URL input + "Run Audit" + user chip at the top |
+| DSH-9 | 12-col grid | MUST | Aggregate (col-4) + Trend (col-8, 12 CSS bars) MUST share one row |
+| DSH-10 | Table + Multi-Page chip | MUST | History table MUST have a header bar and a "Multi-Page" chip on multi-page rows |
+| DSH-11 | Refresh + scanning row | MUST | A refresh action MUST exist and a "SCANNING..." row MUST show during an in-flight audit |
 
 ### Requirement: History Table (DSH-1)
 
@@ -101,3 +105,59 @@ When a history row renders, then it MUST provide a link to `/dashboard/audits/[i
 - GIVEN a dashboard with persisted audits
 - WHEN the history table renders
 - THEN every row links to its own detail page
+
+### Requirement: Runner Bar (DSH-8)
+
+When the dashboard renders, then a runner bar MUST appear at the top containing the URL input with the "Run Audit" button inside it and the user chip.
+
+#### Scenario: Runner bar present
+
+- GIVEN the dashboard
+- WHEN it renders
+- THEN the input + "Run Audit" + user chip appear in one bar
+
+### Requirement: 12-Column Grid (DSH-9)
+
+When the dashboard renders, then the aggregate summary and the score trend MUST share a 12-column grid row (Aggregate `col-4`, Trend `col-8`), and the trend MUST render 12 pure-CSS bars with no chart library.
+
+#### Scenario: Aggregate and trend same row
+
+- GIVEN the dashboard
+- WHEN it renders
+- THEN Aggregate (4 cols) and Trend (8 cols) sit on the same row with 12 CSS bars
+
+### Requirement: Table + Multi-Page Chip (DSH-10)
+
+When the history table renders, then it MUST include a header bar and MUST show a "Multi-Page" chip on rows that are multi-page audits (reusing the persisted `MultiPageResult` shape).
+
+#### Scenario: Multi-page chip shown
+
+- GIVEN a persisted multi-page audit in history
+- WHEN the table renders
+- THEN that row shows a "Multi-Page" chip
+
+### Requirement: Refresh + Scanning Row (DSH-11)
+
+When the dashboard is viewed, then a refresh action MUST be available, and while an audit is in flight a "SCANNING..." row MUST be displayed.
+
+#### Scenario: Scanning row during flight
+
+- GIVEN an audit is running
+- WHEN the dashboard renders
+- THEN a "SCANNING..." row appears
+
+## Compliance Matrix
+
+| Requirement | Scenarios | Coverage |
+|-------------|-----------|----------|
+| DSH-1 | User with history sees audits, Row links to detail | Covered |
+| DSH-2 | Trend reflects score history | Covered |
+| DSH-3 | User re-runs a past audit | Covered |
+| DSH-4 | New user sees an empty state | Covered |
+| DSH-5 | History loads without re-running | Covered |
+| DSH-6 | Free user sees upgrade, Pro user sees manage | Covered |
+| DSH-7 | Detail link present on every row | Covered |
+| DSH-8 | Runner bar present | Covered |
+| DSH-9 | Aggregate and trend same row | Covered |
+| DSH-10 | Multi-page chip shown | Covered |
+| DSH-11 | Scanning row during flight | Covered |
