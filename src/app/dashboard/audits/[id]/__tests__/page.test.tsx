@@ -149,12 +149,12 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
 
     render(await AuditDetailPage({ params }));
 
+    // U6.3: the Gemini MultiPageReport renders a route-selector region
+    // ("Rutas y URLs Analizadas") + the aggregate "Desglose por Ruta" header.
     expect(
-      screen.getByRole("region", {
-        name: "Reporte de auditoría multi-página",
-      }),
+      screen.getByRole("region", { name: "Rutas y URLs Analizadas" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Páginas analizadas")).toBeInTheDocument();
+    expect(screen.getByText(/Desglose por Ruta/)).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
     expect(screen.getByText("80/100")).toBeInTheDocument();
     expect(
