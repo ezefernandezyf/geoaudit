@@ -74,10 +74,10 @@ Chain strategy: feature-branch-chain
 
 ## U5 — Report/detail/share/live + adapter (Dep: U1–U4) — EL CORAZÓN
 
-- [ ] U5.1 `src/report/presenters/types.ts`: GeminiBand/CategoryScore/Finding/PlatformRow/GeminiView (APT-1) + test shape
-- [ ] U5.2 `toGeminiViewModel.ts`: score+band lowercase real, title fallback, summary real, durationSeconds, categoryScores[5]=rowScore+weights, shareToken (APT-2..6,9,10) + test fixtures
-- [ ] U5.3 `findings.ts`: deriveFindings citability top3/bottom3 + schema.issues + perBot bloqueados; codeSnippet solo `schema.generated`; impactScore null (APT-7,10) + test
-- [ ] U5.4 `platforms.ts`: 6 filas, Claude `readiness:null` + access `Claude-Web` (APT-8) + test
+- [x] U5.1 `src/report/presenters/types.ts`: GeminiBand/CategoryScore/Finding/PlatformRow/GeminiView (APT-1) + test shape
+- [x] U5.2 `toGeminiViewModel.ts`: score+band lowercase real (via severityForScore 90/75/60/40, NO 80/65/45/25 de Gemini), title fallback, summary REAL (objeto → string), durationSeconds, categoryScores[5] = rowScore+weights, shareToken (APT-2..6,9,10) + test fixtures
+- [x] U5.3 `findings.ts`: deriveFindings citability top3/bottom3 + schema.issues + perBot bloqueados; codeSnippet solo `schema.generated`; impactScore null (APT-7,10) + test
+- [x] U5.4 `platforms.ts`: 6 filas, Claude `readiness:null` + access `Claude-Web` (APT-8) + test
 - [ ] U5.5 `report/score-hero.tsx`: hero completo + benchmark bar umbrales reales (ARU-11) + test
 - [ ] U5.6 `domain-scorecard` + `top-findings` + `report-meta`: presentadores puros del view model (ARU-10) + test
 - [ ] U5.7 `report/platform-matrix.tsx`: 6 plataformas, Claude "No medido" (ARU-12) + test
