@@ -293,7 +293,7 @@ describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
   it("shows the upgrade CTA for a FREE user — no share modal, no export link", async () => {
     userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
 
-    render(await AuditDetailPage({ params }));
+    const { container } = render(await AuditDetailPage({ params }));
 
     const cta = screen.getByRole("link", { name: "Mejorar a PRO" });
     expect(cta).toHaveAttribute("href", "/pricing");
@@ -303,6 +303,10 @@ describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
     expect(
       screen.queryByRole("link", { name: "Exportar PDF" }),
     ).not.toBeInTheDocument();
+    // B9: the PRO-gate card uses direct hex classes, never semantic tokens.
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
+    );
   });
 
   it("PRO user: share trigger opens the Gemini modal with the real create action (ADP-7)", async () => {

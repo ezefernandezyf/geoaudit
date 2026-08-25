@@ -8,9 +8,15 @@ import ReportError from "@/app/report/error";
  */
 describe("ReportError (ARU-4)", () => {
   it("renders a friendly message with role=alert", () => {
-    render(<ReportError error={new Error("boom")} reset={() => {}} />);
+    const { container } = render(
+      <ReportError error={new Error("boom")} reset={() => {}} />,
+    );
     expect(screen.getByRole("alert")).toHaveTextContent(
       "No pudimos generar el reporte",
+    );
+    // B9: the boundary uses direct hex classes, never semantic tokens.
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
     );
   });
 

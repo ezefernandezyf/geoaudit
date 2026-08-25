@@ -75,7 +75,7 @@ beforeEach(() => {
 describe("MultiPagePage PRO gate (MPU-2)", () => {
   it("shows the upgrade CTA and NO form for a FREE user", async () => {
     userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
-    render(await MultiPagePage());
+    const { container } = render(await MultiPagePage());
 
     expect(
       screen.getByRole("heading", { name: MULTIPAGE_COPY.gate.title }),
@@ -89,6 +89,10 @@ describe("MultiPagePage PRO gate (MPU-2)", () => {
         name: MULTIPAGE_COPY.form.submitLabel,
       }),
     ).not.toBeInTheDocument();
+    // B9: the gate uses direct hex classes, never semantic tokens.
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
+    );
   });
 
   it("renders the real trigger form for a PRO user (MPU-1)", async () => {

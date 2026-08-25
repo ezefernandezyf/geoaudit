@@ -164,7 +164,9 @@ describe("AuditRunner fetch failure (ARU-6)", () => {
         "audit page fetch failed for https://lento.com/: TIMEOUT: aborted",
       ),
     );
-    render(await AuditRunner({ url: "https://lento.com/" }));
+    const { container } = render(
+      await AuditRunner({ url: "https://lento.com/" }),
+    );
 
     expect(
       screen.getByText(
@@ -175,6 +177,10 @@ describe("AuditRunner fetch failure (ARU-6)", () => {
     expect(retry).toHaveAttribute(
       "href",
       "/report?url=https%3A%2F%2Flento.com%2F",
+    );
+    // B9: the error state uses direct hex classes, never semantic tokens.
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
     );
   });
 

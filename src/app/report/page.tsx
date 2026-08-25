@@ -31,12 +31,12 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
 
   if (resolved.status === "empty") {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-surface px-6">
+      <main className="flex min-h-dvh items-center justify-center bg-white px-6">
         <section className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 py-24 text-center">
-          <h1 className="font-display text-4xl tracking-tight text-navy">
+          <h1 className="font-serif text-4xl tracking-tight text-[#0f172a]">
             {REPORT_COPY.emptyState.title}
           </h1>
-          <p className="max-w-lg text-text-secondary">
+          <p className="max-w-lg text-[#475569]">
             {REPORT_COPY.emptyState.body}
           </p>
           <div className="w-full max-w-xl">
@@ -48,7 +48,7 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
   }
 
   return (
-    <main className="min-h-dvh bg-surface">
+    <main className="min-h-dvh bg-white">
       <Suspense fallback={<ReportSkeleton url={resolved.url} />}>
         <AuditRunner url={resolved.url} />
       </Suspense>

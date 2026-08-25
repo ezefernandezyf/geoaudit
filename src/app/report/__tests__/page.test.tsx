@@ -28,7 +28,7 @@ async function renderPage(params: Record<string, string>) {
  */
 describe("ReportPage empty state (ARU-5)", () => {
   it("renders the inline form when no url param is present", async () => {
-    await renderPage({});
+    const { container } = await renderPage({});
     expect(
       screen.getByText("Ingrese una URL para comenzar el análisis"),
     ).toBeInTheDocument();
@@ -37,6 +37,10 @@ describe("ReportPage empty state (ARU-5)", () => {
       "url",
     );
     expect(screen.queryByText(/^AuditRunner:/)).not.toBeInTheDocument();
+    // B9: the empty state uses direct hex classes, never semantic tokens.
+    expect(container.innerHTML).not.toMatch(
+      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
+    );
   });
 
   it("pre-fills the input with the invalid value for correction", async () => {

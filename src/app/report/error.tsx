@@ -20,10 +20,10 @@ export default function ReportError({ reset }: ReportErrorProps) {
       role="alert"
       className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center"
     >
-      <h1 className="font-display text-3xl tracking-tight text-navy">
+      <h1 className="font-serif text-3xl tracking-tight text-[#0f172a]">
         No pudimos generar el reporte
       </h1>
-      <p className="max-w-md text-text-secondary">
+      <p className="max-w-md text-[#475569]">
         Ocurrió un error inesperado mientras analizábamos el sitio. Pruebe
         nuevamente.
       </p>

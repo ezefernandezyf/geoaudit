@@ -90,11 +90,11 @@ export default async function MultiPagePage() {
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
                 <Lock className="h-4 w-4 text-[#10b981]" aria-hidden="true" />
-                <h2 className="font-display text-xl tracking-tight text-navy">
+                <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
                   {MULTIPAGE_COPY.gate.title}
                 </h2>
               </div>
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-[#475569]">
                 {MULTIPAGE_COPY.gate.body}
               </p>
               <div>
@@ -120,10 +120,10 @@ export default async function MultiPagePage() {
             ) : (
               <div className="flex flex-col items-start gap-3 rounded-xl border border-[#e2e8f0] bg-white p-6">
                 <Layers className="h-5 w-5 text-[#94a3b8]" aria-hidden="true" />
-                <h2 className="font-display text-xl tracking-tight text-navy">
+                <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
                   {MULTIPAGE_COPY.results.emptyTitle}
                 </h2>
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-[#475569]">
                   {MULTIPAGE_COPY.results.emptyBody}
                 </p>
               </div>

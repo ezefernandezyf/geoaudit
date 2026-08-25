@@ -174,7 +174,7 @@ export default async function AuditDetailPage({
                     <h2 className="font-serif text-xl font-normal text-[#0f172a]">
                       {MULTIPAGE_COPY.results.detailEmptyTitle}
                     </h2>
-                    <p className="mt-2 text-sm text-text-secondary">
+                    <p className="mt-2 text-sm text-[#475569]">
                       {MULTIPAGE_COPY.results.detailEmptyBody}
                     </p>
                   </div>
@@ -197,11 +197,11 @@ export default async function AuditDetailPage({
         {!gate.allowed ? (
           <div className="mx-auto w-full max-w-5xl pb-16">
             <Card>
-              <h2 className="font-display text-xl tracking-tight text-navy">
+              <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
                 Compartir y exportar son funciones PRO
               </h2>
               <div className="mt-4 flex flex-col gap-4">
-                <p className="text-sm text-text-secondary">
+                <p className="text-sm text-[#475569]">
                   Los links de share y la exportación a PDF son funciones PRO.
                   Mejore su plan para compartir reportes con su equipo o sus
                   clientes y exportarlos a PDF.

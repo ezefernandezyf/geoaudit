@@ -118,10 +118,10 @@ function TierLimitState() {
       role="alert"
       className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center"
     >
-      <h2 className="font-display text-3xl tracking-tight text-navy">
+      <h2 className="font-serif text-3xl tracking-tight text-[#0f172a]">
         Llegaste al límite de auditorías gratuitas
       </h2>
-      <p className="max-w-md text-text-secondary">
+      <p className="max-w-md text-[#475569]">
         {AUDIT_FORM_ERRORS.limitReached}
       </p>
     </section>
@@ -134,13 +134,13 @@ function FetchErrorState({ url, copy }: { url: string; copy: string }) {
       role="alert"
       className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center"
     >
-      <h2 className="font-display text-3xl tracking-tight text-navy">
+      <h2 className="font-serif text-3xl tracking-tight text-[#0f172a]">
         No pudimos analizar el sitio
       </h2>
-      <p className="max-w-md text-text-secondary">{copy}</p>
+      <p className="max-w-md text-[#475569]">{copy}</p>
       <a
         href={`/report?url=${encodeURIComponent(url)}`}
-        className="inline-flex items-center justify-center gap-2 rounded-md bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+        className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
       >
         Reintentar
       </a>
