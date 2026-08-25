@@ -30,7 +30,7 @@ describe("ReportPage empty state (ARU-5)", () => {
   it("renders the inline form when no url param is present", async () => {
     await renderPage({});
     expect(
-      screen.getByText("Ingresá una URL para comenzar el análisis"),
+      screen.getByText("Ingrese una URL para comenzar el análisis"),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("URL del sitio")).toHaveAttribute(
       "type",
@@ -57,7 +57,7 @@ describe("ReportPage valid URL (ARU-1/ARU-2)", () => {
       screen.getByText("AuditRunner:https://ejemplo.com"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("Ingresá una URL para comenzar el análisis"),
+      screen.queryByText("Ingrese una URL para comenzar el análisis"),
     ).not.toBeInTheDocument();
   });
 });

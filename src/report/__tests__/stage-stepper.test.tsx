@@ -1,13 +1,18 @@
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getStageStatus, StageStepper } from "@/report/stage-stepper";
+import {
+  getStageProgress,
+  getStageStatus,
+  StageStepper,
+} from "@/report/stage-stepper";
 
 /**
- * U3.3 — StageStepper (ARU-10, design StageStepper): time-based visual pacing
- * over the atomic audit run. The engine has NO per-stage progress, so the
- * stepper only advances on a timer — it never claims a real engine state. The
- * pure `getStageStatus` derives per-stage status from elapsed ms; the client
- * component runs the timer and renders it.
+ * U5.11 — StageStepper (ARU-10, design U5): Gemini stepper — progress bar +
+ * numbered circles — as time-based visual pacing over the atomic audit run.
+ * The engine has NO per-stage progress, so the stepper only advances on a
+ * timer — it never claims a real engine state ("sin simulación": the real
+ * report arrives via the Suspense stream). The pure helpers derive status and
+ * progress from elapsed ms; the client component runs the timer and renders.
  */
 
 const stages = [
@@ -41,7 +46,16 @@ describe("getStageStatus (ARU-10)", () => {
   });
 });
 
-describe("StageStepper (ARU-10)", () => {
+describe("getStageProgress (U5.11)", () => {
+  it("derives the progress width from the done stages", () => {
+    expect(getStageProgress(stages, 0)).toBe(0);
+    expect(getStageProgress(stages, 8000)).toBeCloseTo(33.33);
+    expect(getStageProgress(stages, 16000)).toBeCloseTo(66.67);
+    expect(getStageProgress(stages, 24000)).toBe(100);
+  });
+});
+
+describe("StageStepper (ARU-10 + U5.11)", () => {
   it("renders all stages with the first current and the rest pending", () => {
     vi.useFakeTimers();
     render(<StageStepper stages={stages} />);
@@ -54,7 +68,17 @@ describe("StageStepper (ARU-10)", () => {
     expect(screen.queryByText("Completado")).not.toBeInTheDocument();
   });
 
-  it("advances to the next stage after the first estimate elapses", () => {
+  it("renders the Gemini progress bar at 0% before any stage completes", () => {
+    vi.useFakeTimers();
+    render(<StageStepper stages={stages} />);
+
+    const bar = screen.getByRole("progressbar", {
+      name: "Progreso de la auditoría",
+    });
+    expect(bar).toHaveStyle({ width: "0%" });
+  });
+
+  it("advances the progress bar and circles after the first estimate elapses", () => {
     vi.useFakeTimers();
     render(<StageStepper stages={stages} />);
 
@@ -65,6 +89,27 @@ describe("StageStepper (ARU-10)", () => {
     expect(screen.getAllByText("Completado")).toHaveLength(1);
     expect(screen.getByText("Analizando…")).toBeInTheDocument();
     expect(screen.getAllByText("En cola")).toHaveLength(1);
+    const bar = screen.getByRole("progressbar", {
+      name: "Progreso de la auditoría",
+    });
+    expect(bar).toHaveStyle({ width: "33.33333333333333%" });
+  });
+
+  it("renders numbered circles and swaps the completed stage for a check", () => {
+    vi.useFakeTimers();
+    render(<StageStepper stages={stages} />);
+
+    // Pending/current circles show their 1-based number.
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(8000);
+    });
+    // Stage 1 completed → circle replaced by a check icon (no "1" circle).
+    expect(screen.queryByText("1")).not.toBeInTheDocument();
+    expect(screen.getByText("2")).toBeInTheDocument();
   });
 
   it("does not mark a stage done before its window passes (no engine claim)", () => {

@@ -4,6 +4,7 @@ import { AuditForm } from "@/ui/audit-form";
 import { AuditRunner } from "@/report/audit-runner";
 import { resolveReportUrl, type ReportSearchParams } from "./resolve";
 import { ReportSkeleton } from "./report-skeleton";
+import { REPORT_COPY } from "@/lib/copy";
 
 /**
  * Report shell (U3.T1, ARU-1/ARU-2/ARU-5).
@@ -33,10 +34,10 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
       <main className="flex min-h-dvh items-center justify-center bg-surface px-6">
         <section className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 py-24 text-center">
           <h1 className="font-display text-4xl tracking-tight text-navy">
-            Auditoría GEO
+            {REPORT_COPY.emptyState.title}
           </h1>
           <p className="max-w-lg text-text-secondary">
-            Ingresá una URL para comenzar el análisis
+            {REPORT_COPY.emptyState.body}
           </p>
           <div className="w-full max-w-xl">
             <AuditForm action={auditAction} defaultValue={resolved.input} />
@@ -48,7 +49,7 @@ export default async function ReportPage({ searchParams }: ReportPageProps) {
 
   return (
     <main className="min-h-dvh bg-surface">
-      <Suspense fallback={<ReportSkeleton />}>
+      <Suspense fallback={<ReportSkeleton url={resolved.url} />}>
         <AuditRunner url={resolved.url} />
       </Suspense>
     </main>

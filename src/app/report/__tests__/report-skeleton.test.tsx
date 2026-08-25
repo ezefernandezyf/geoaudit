@@ -3,30 +3,45 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ReportSkeleton } from "@/app/report/report-skeleton";
 
 /**
- * U3.7 — Report loading skeleton (ARU-3): a single `role="status"` live
- * region announcing "Cargando reporte" plus the live StageStepper (ARU-10)
- * and the honest wait hint. The stepper is a client timer component but the
- * labels render immediately, so they are asserted without advancing time.
+ * U5.11 — Report loading skeleton (ARU-3 + ARU-10, design U5): Gemini
+ * LiveReportPage scanning card — spinner + "Auditoría en Progreso" + serif
+ * "Analizando <url>" + the animated StageStepper (progress bar + numbered
+ * circles) + the AuditReportSkeleton preview. NO simulation: stages pace on
+ * the honest timer only; the real report arrives via the Suspense stream.
+ * The single `role="status"` live region is the nested AuditReportSkeleton.
  */
 
 afterEach(() => vi.useRealTimers());
 
-describe("ReportSkeleton (ARU-3)", () => {
-  it("renders exactly one status region labelled 'Cargando reporte'", () => {
+describe("ReportSkeleton (ARU-3 + U5.11)", () => {
+  it("announces the pending report through the outer AuditReportSkeleton region", () => {
     vi.useFakeTimers();
     render(<ReportSkeleton />);
-    const status = screen.getByRole("status", { name: "Cargando reporte" });
-    expect(status).toBeInTheDocument();
-    // One live region only — composing the Skeleton primitive would nest N.
-    expect(screen.getAllByRole("status")).toHaveLength(1);
+    // The shell's single OUTER announcement is the AuditReportSkeleton region
+    // (U1.7 convention: each Skeleton block carries its own status role).
+    expect(
+      screen.getByRole("status", { name: "Cargando auditoría GEO..." }),
+    ).toBeInTheDocument();
   });
 
-  it("renders the wait helper text", () => {
+  it("renders the Gemini scanning header: spinner, eyebrow and analyzing title", () => {
+    vi.useFakeTimers();
+    render(<ReportSkeleton url="https://ejemplo.com" />);
+
+    expect(screen.getByText("Auditoría en Progreso")).toBeInTheDocument();
+    expect(screen.getByText("Analizando")).toBeInTheDocument();
+    expect(screen.getByText("https://ejemplo.com")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "El motor GEO está ejecutando inspecciones en tiempo real. Duración estimada: 15-30s.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("falls back to 'el sitio' when no url is available (loading.tsx path)", () => {
     vi.useFakeTimers();
     render(<ReportSkeleton />);
-    expect(
-      screen.getByText("Puede tardar hasta 60 segundos."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("el sitio")).toBeInTheDocument();
   });
 
   it("renders the live stage stepper with its six stages (ARU-10)", () => {
@@ -49,5 +64,14 @@ describe("ReportSkeleton (ARU-3)", () => {
     expect(
       screen.getByText("Computando readiness de plataformas"),
     ).toBeInTheDocument();
+  });
+
+  it("renders the progress bar and the skeleton preview label", () => {
+    vi.useFakeTimers();
+    render(<ReportSkeleton />);
+    expect(
+      screen.getByRole("progressbar", { name: "Progreso de la auditoría" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Preparando Scorecard...")).toBeInTheDocument();
   });
 });

@@ -24,7 +24,7 @@ export default function ReportError({ reset }: ReportErrorProps) {
         No pudimos generar el reporte
       </h1>
       <p className="max-w-md text-text-secondary">
-        Ocurrió un error inesperado mientras analizábamos el sitio. Probá
+        Ocurrió un error inesperado mientras analizábamos el sitio. Pruebe
         nuevamente.
       </p>
       <Button onClick={reset}>Reintentar</Button>
