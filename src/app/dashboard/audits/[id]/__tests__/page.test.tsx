@@ -4,11 +4,13 @@ import { notFound, redirect } from "next/navigation";
 import AuditDetailPage from "@/app/dashboard/audits/[id]/page";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
-const { authMock, findFirstMock, userFindUniqueMock } = vi.hoisted(() => ({
-  authMock: vi.fn(),
-  findFirstMock: vi.fn(),
-  userFindUniqueMock: vi.fn(),
-}));
+const { authMock, findFirstMock, userFindUniqueMock, auditPageFindManyMock } =
+  vi.hoisted(() => ({
+    authMock: vi.fn(),
+    findFirstMock: vi.fn(),
+    userFindUniqueMock: vi.fn(),
+    auditPageFindManyMock: vi.fn(),
+  }));
 
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 // Read-only page (ADP-3): the mocked audit delegate exposes ONLY findFirst, so
@@ -17,6 +19,7 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findFirst: findFirstMock },
     user: { findUnique: userFindUniqueMock },
+    auditPage: { findMany: auditPageFindManyMock },
   },
 }));
 vi.mock("next/navigation", () => ({
@@ -50,6 +53,9 @@ beforeEach(() => {
   userFindUniqueMock.mockReset();
   // Default: PRO — the share + export actions render (ADP-7/8); FREE tests override.
   userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
+  auditPageFindManyMock.mockReset();
+  // Default: no AuditPage rows (single-page audit path is unaffected).
+  auditPageFindManyMock.mockResolvedValue([]);
   vi.mocked(notFound).mockClear();
   vi.mocked(redirect).mockClear();
 });
@@ -146,6 +152,20 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
       ],
     };
     findFirstMock.mockResolvedValue({ ...auditRow, result: multiPageResult });
+    // A3: the drill-down reads the persisted AuditPage rows (full results).
+    auditPageFindManyMock.mockResolvedValue([
+      {
+        id: "page-1",
+        auditId: "audit-1",
+        url: "https://example.com/",
+        position: 0,
+        geoScore: 68,
+        severityBand: "Fair",
+        durationMs: 900,
+        result: auditResultFixture,
+        createdAt: new Date("2026-08-10T12:00:00.000Z"),
+      },
+    ]);
 
     render(await AuditDetailPage({ params }));
 
@@ -159,6 +179,112 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
     expect(screen.getByText("80/100")).toBeInTheDocument();
     expect(
       screen.queryByRole("region", { name: "Reporte de auditoría" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("AuditDetailPage multi-page drill-down (A3, MPU-7/8)", () => {
+  const multiPageResult = {
+    aggregate: {
+      url: "https://example.com/",
+      geoScore: 74,
+      severityBand: "Fair",
+      durationMs: 2400,
+    },
+    pages: [
+      {
+        url: "https://example.com/",
+        geoScore: 68,
+        severityBand: "Fair",
+        durationMs: 900,
+      },
+      {
+        url: "https://example.com/blog",
+        geoScore: 80,
+        severityBand: "Good",
+        durationMs: 1100,
+      },
+    ],
+  };
+
+  /** AuditPage rows as Prisma returns them: `result` is the raw JSON. */
+  const auditPageRows = [
+    {
+      id: "page-1",
+      auditId: "audit-1",
+      url: "https://example.com/",
+      position: 0,
+      geoScore: 68,
+      severityBand: "Fair",
+      durationMs: 900,
+      result: auditResultFixture,
+      createdAt: new Date("2026-08-10T12:00:00.000Z"),
+    },
+    {
+      id: "page-2",
+      auditId: "audit-1",
+      url: "https://example.com/blog",
+      position: 1,
+      geoScore: 68,
+      severityBand: "Fair",
+      durationMs: 900,
+      result: {
+        ...auditResultFixture,
+        summary: {
+          ...auditResultFixture.summary,
+          url: "https://example.com/blog",
+        },
+      },
+      createdAt: new Date("2026-08-10T12:00:00.000Z"),
+    },
+  ];
+
+  it("queries AuditPage rows ordered by position for the multi-page audit (A3)", async () => {
+    findFirstMock.mockResolvedValue({ ...auditRow, result: multiPageResult });
+    auditPageFindManyMock.mockResolvedValue(auditPageRows);
+
+    await AuditDetailPage({ params });
+
+    expect(auditPageFindManyMock).toHaveBeenCalledWith({
+      where: { auditId: "audit-1" },
+      orderBy: { position: "asc" },
+    });
+  });
+
+  it("renders the FULL per-page report from AuditPage rows via the Gemini view model (MPU-7)", async () => {
+    findFirstMock.mockResolvedValue({ ...auditRow, result: multiPageResult });
+    auditPageFindManyMock.mockResolvedValue(auditPageRows);
+
+    render(await AuditDetailPage({ params }));
+
+    // The full report composes the shared presenters: scorecard, matrix, findings.
+    expect(
+      screen.getByRole("region", { name: "Scorecard por categoría" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Hallazgos técnicos" }),
+    ).toBeInTheDocument();
+    // Real per-page data flows through the adapter (fixture findings).
+    expect(
+      screen.getAllByText(/Pasaje altamente citable/).length,
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("renders an honest empty state when no AuditPage rows exist (MPU-8)", async () => {
+    findFirstMock.mockResolvedValue({ ...auditRow, result: multiPageResult });
+    auditPageFindManyMock.mockResolvedValue([]);
+
+    render(await AuditDetailPage({ params }));
+
+    expect(
+      screen.getByText(/No hay detalle disponible para esta auditoría/),
+    ).toBeInTheDocument();
+    // No fabricated page or metric appears.
+    expect(
+      screen.queryByRole("region", { name: "Scorecard por categoría" }),
     ).not.toBeInTheDocument();
   });
 });

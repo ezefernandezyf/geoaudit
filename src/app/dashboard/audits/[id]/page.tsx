@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, FileQuestion } from "lucide-react";
 import type {
   AuditResult,
   MultiPageResult,
@@ -9,10 +9,13 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { AuditReport } from "@/report/audit-report";
 import { MultiPageReport } from "@/report/multi-page-report";
+import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
+import type { GeminiView } from "@/report/presenters/types";
 import { ShareModal } from "@/dashboard/share-modal";
 import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { createShareToken, revokeShareToken } from "@/lib/audit/share-actions";
 import { Card } from "@/ui/card";
+import { MULTIPAGE_COPY } from "@/lib/copy";
 
 /**
  * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
@@ -28,6 +31,23 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
     "aggregate" in value &&
     Array.isArray((value as { pages?: unknown }).pages)
   );
+}
+
+/**
+ * A3 drill-down (MPU-7, design sprint 8 A3): maps the persisted `AuditPage`
+ * rows (1:N under the multi-page master audit, `result: Json`) to per-page
+ * `GeminiView`s. Each row's `result` is cast to `AuditResult` with the SAME
+ * convention the write side uses (`result: Json`, contract-shaped by
+ * construction) and run through the pure adapter `toGeminiViewModel`. Pure
+ * mapping — no I/O; the caller owns the query.
+ */
+function pageViewsFromRows(
+  rows: Array<{ url: string; result: unknown }>,
+): { url: string; view: GeminiView }[] {
+  return rows.map((row) => ({
+    url: row.url,
+    view: toGeminiViewModel(row.result as unknown as AuditResult),
+  }));
 }
 
 /**
@@ -86,6 +106,24 @@ export default async function AuditDetailPage({
   const gate = requirePaidTier(user?.tier ?? "FREE");
   const auditDate = audit.createdAt.toISOString();
 
+  // A3 drill-down (MPU-7/8): multi-page audits resolve their per-page FULL
+  // reports server-side from the persisted `AuditPage` rows (light master
+  // shape stays unenriched). Legacy audits without rows → honest empty state.
+  let multiPage = null as {
+    result: MultiPageResult;
+    pageViews: { url: string; view: GeminiView }[];
+  } | null;
+  if (isMultiPageResult(audit.result)) {
+    const rows = await prisma.auditPage.findMany({
+      where: { auditId: audit.id },
+      orderBy: { position: "asc" },
+    });
+    multiPage = {
+      result: audit.result,
+      pageViews: pageViewsFromRows(rows),
+    };
+  }
+
   return (
     <main className="min-h-dvh bg-[#f8fafc]">
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
@@ -119,8 +157,36 @@ export default async function AuditDetailPage({
           ) : null}
         </div>
 
-        {isMultiPageResult(audit.result) ? (
-          <MultiPageReport result={audit.result} />
+        {multiPage ? (
+          multiPage.pageViews.length === 0 ? (
+            /* Honest empty state (MPU-8): legacy multi-page audit with no
+               persisted AuditPage rows — no fabricated pages or metrics. */
+            <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+              <Card>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#f8fafc]">
+                    <FileQuestion
+                      className="h-5 w-5 text-[#64748b]"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="font-serif text-xl font-normal text-[#0f172a]">
+                      {MULTIPAGE_COPY.results.detailEmptyTitle}
+                    </h2>
+                    <p className="mt-2 text-sm text-text-secondary">
+                      {MULTIPAGE_COPY.results.detailEmptyBody}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </main>
+          ) : (
+            <MultiPageReport
+              result={multiPage.result}
+              pageViews={multiPage.pageViews}
+            />
+          )
         ) : (
           <AuditReport
             result={audit.result as unknown as AuditResult}

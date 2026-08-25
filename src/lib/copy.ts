@@ -466,6 +466,10 @@ export const MULTIPAGE_COPY = {
     inspectorLabel: "Detalle de Ruta",
     scoreLabel: "GEO Score",
     durationLabel: "Duración",
+    /** Honest empty state for legacy multi-page audits without AuditPage rows (MPU-8). */
+    detailEmptyTitle: "No hay detalle disponible para esta auditoría",
+    detailEmptyBody:
+      "Esta auditoría se generó antes de que se persistiera el detalle por página, por lo que no es posible mostrar el reporte completo de cada ruta.",
   },
 } as const;
 
