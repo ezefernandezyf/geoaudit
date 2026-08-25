@@ -7,6 +7,8 @@ import {
   GENERIC_AUDIT_ERROR_COPY,
   LANDING_COPY,
   PRICING_COPY,
+  REPORT_COPY,
+  SHARE_COPY,
   SHARE_MODAL_ERROR_COPY,
 } from "@/lib/copy";
 // U2.2 source-of-truth: the legacy modules must re-export the SAME objects.
@@ -143,6 +145,34 @@ describe("PRICING_COPY (U3.2, PRC-5/7)", () => {
 
   it("exposes PRICING_COPY on the grouped COPY object", () => {
     expect(COPY.pricing).toBe(PRICING_COPY);
+  });
+});
+
+describe("REPORT_COPY / SHARE_COPY (U5, neutral Spanish)", () => {
+  it("keeps the report copy neutral and Gemini-verbatim", () => {
+    expect(REPORT_COPY.hero.scoreLabel).toBe("GEO Score");
+    expect(REPORT_COPY.hero.benchmarkTitle).toBe("Baremos de Referencia");
+    expect(REPORT_COPY.scorecard.title).toBe("Scorecard por Categoría");
+    expect(REPORT_COPY.matrix.notMeasured).toBe("No medido");
+    expect(REPORT_COPY.findings.title).toBe("Hallazgos Técnicos Priorizados");
+    expect(REPORT_COPY.live.inProgress).toBe("Auditoría en Progreso");
+    expect(REPORT_COPY.emptyState.body).toBe(
+      "Ingrese una URL para comenzar el análisis",
+    );
+  });
+
+  it("keeps the share page copy neutral (SHR-7..9)", () => {
+    expect(SHARE_COPY.header.verified).toBe("Verificado");
+    expect(SHARE_COPY.header.cta).toBe("Auditar mi URL gratis");
+    expect(SHARE_COPY.footer.title).toBe(
+      "¿Quiere saber cómo citan los motores de IA su sitio?",
+    );
+    expect(SHARE_COPY.footer.cta).toBe("Comenzar auditoría gratuita");
+  });
+
+  it("exposes report and share copy on the grouped COPY object", () => {
+    expect(COPY.report).toBe(REPORT_COPY);
+    expect(COPY.share).toBe(SHARE_COPY);
   });
 });
 

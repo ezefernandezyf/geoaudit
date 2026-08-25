@@ -337,6 +337,86 @@ export const LEGAL_COPY = {
   },
 } as const;
 
+/**
+ * Report copy (U5, ARU-10/11/12, design U5) — Gemini verbatim section
+ * wording, neutral Spanish. Consumed by the pure report presenters
+ * (ScoreHero, DomainScorecard, PlatformMatrix, TopFindings) and the live
+ * report skeleton.
+ */
+export const REPORT_COPY = {
+  emptyState: {
+    title: "Auditoría GEO",
+    body: "Ingrese una URL para comenzar el análisis",
+  },
+  hero: {
+    scoreLabel: "GEO Score",
+    auditLabel: "Auditoría en",
+    benchmarkTitle: "Baremos de Referencia",
+  },
+  scorecard: {
+    title: "Scorecard por Categoría",
+    subtitle: "Evaluación detallada en las 5 dimensiones del algoritmo GEO",
+    chip: "5 categorías analizadas",
+  },
+  matrix: {
+    title: "Matriz de Visibilidad por Plataforma de IA",
+    subtitle:
+      "Directivas de rastreo e índice de citabilidad detectado en los 6 principales motores generativos",
+    notMeasured: "No medido",
+    access: {
+      allowed: "Permitido",
+      blocked: "Bloqueado",
+      unknown: "Desconocido",
+    },
+  },
+  findings: {
+    title: "Hallazgos Técnicos Priorizados",
+    subtitle:
+      "Acciones de remediación con snippets de código listos para producción",
+    points: "puntos de acción",
+    emptyTitle: "Configuración técnica sin observaciones críticas",
+    emptyBody:
+      "Su dominio cumple los estándares óptimos de citabilidad generativa.",
+    recommendation: "Recomendación GEO:",
+    copyCode: "Copiar",
+    copiedCode: "Copiado",
+  },
+  live: {
+    inProgress: "Auditoría en Progreso",
+    analyzing: "Analizando",
+    subtitle:
+      "El motor GEO está ejecutando inspecciones en tiempo real. Duración estimada: 15-30s.",
+    preparing: "Preparando Scorecard...",
+    wait: "Puede tardar hasta 60 segundos.",
+    statuses: {
+      done: "Completado",
+      current: "Analizando…",
+      pending: "En cola",
+    },
+  },
+} as const;
+
+/**
+ * Public share page copy (U5.10, SHR-7..9, design U5) — Gemini SharePage
+ * verbatim, neutral Spanish (usted).
+ */
+export const SHARE_COPY = {
+  header: {
+    sub: "Reporte de Visibilidad de IA",
+    verified: "Verificado",
+    cta: "Auditar mi URL gratis",
+  },
+  banner: {
+    prefix: "Reporte público generado para",
+    idLabel: "ID:",
+  },
+  footer: {
+    title: "¿Quiere saber cómo citan los motores de IA su sitio?",
+    body: "Genere un informe idéntico para su dominio en menos de 30 segundos, sin costo.",
+    cta: "Comenzar auditoría gratuita",
+  },
+} as const;
+
 /** Typed grouping of every copy domain (design U2). */
 export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
@@ -349,4 +429,6 @@ export const COPY = {
   dashboard: DASHBOARD_COPY,
   profile: PROFILE_COPY,
   legal: LEGAL_COPY,
+  report: REPORT_COPY,
+  share: SHARE_COPY,
 } as const;
