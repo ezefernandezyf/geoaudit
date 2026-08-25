@@ -1,14 +1,19 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
 import { formatAuditDate } from "@/report/format";
-import { auditFixtures } from "./fixtures";
+import { auditFixtures, multiPageFixture } from "./fixtures";
+
+// The table uses useRouter().refresh() for the refresh action (DSH-11).
+const refreshMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: refreshMock }),
+}));
 
 /**
- * U4 — Dashboard history table (DSH-1/DSH-3). Pure presentation: renders the
- * rows in the order received (the RSC owns the newest→oldest ordering via the
- * Prisma query) and maps every severity band to its Spanish label through the
- * shared SeverityBadge.
+ * U4.3 — Dashboard history table (DSH-1/3/7/10/11, design U4). Gemini verbatim
+ * header bar + rows with a "Multi-Page" chip, a refresh action and a
+ * "SCANNING..." skeleton row during an in-flight audit.
  */
 describe("AuditHistoryTable (DSH-1)", () => {
   it("renders audits newest→oldest in the order received", () => {
@@ -138,5 +143,52 @@ describe("AuditHistoryTable search (DSH-9)", () => {
     fireEvent.change(input, { target: { value: "" } });
     expect(screen.getByText("https://example.com")).toBeInTheDocument();
     expect(screen.getAllByRole("row")).toHaveLength(auditFixtures.length + 1);
+  });
+});
+
+/**
+ * U4.3 — Multi-Page chip (DSH-10): a persisted multi-page audit row shows the
+ * "Multi-Page" chip.
+ */
+describe("AuditHistoryTable Multi-Page chip (DSH-10)", () => {
+  it("renders a 'Multi-Page' chip on multi-page rows", () => {
+    render(<AuditHistoryTable audits={[...auditFixtures, multiPageFixture]} />);
+    expect(screen.getByText("Multi-Page")).toBeInTheDocument();
+  });
+
+  it("does not render the chip on single-page rows", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    expect(screen.queryByText("Multi-Page")).not.toBeInTheDocument();
+  });
+});
+
+/**
+ * U4.3 — Refresh + scanning row (DSH-11): a refresh action exists in the
+ * header bar, and a "SCANNING..." row appears while an audit is in flight.
+ */
+describe("AuditHistoryTable refresh + scanning (DSH-11)", () => {
+  it("renders a header-bar refresh button that calls router.refresh", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    const refresh = screen.getByRole("button", { name: "Refrescar historial" });
+    fireEvent.click(refresh);
+    expect(refreshMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders a 'SCANNING...' row when isScanning is true", () => {
+    render(
+      <AuditHistoryTable
+        audits={auditFixtures}
+        isScanning
+        scanningUrl="https://acme.io/pricing"
+      />,
+    );
+    expect(screen.getByText("SCANNING...")).toBeInTheDocument();
+    expect(screen.getByText("En Proceso")).toBeInTheDocument();
+    expect(screen.getByText("https://acme.io/pricing")).toBeInTheDocument();
+  });
+
+  it("does not render the scanning row when not scanning", () => {
+    render(<AuditHistoryTable audits={auditFixtures} />);
+    expect(screen.queryByText("SCANNING...")).not.toBeInTheDocument();
   });
 });

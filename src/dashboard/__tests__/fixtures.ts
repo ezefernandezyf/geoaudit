@@ -43,6 +43,16 @@ export const auditFixtures: DashboardAudit[] = [
   },
 ];
 
+/** A multi-page audit row (DSH-10) to prove the "Multi-Page" chip renders. */
+export const multiPageFixture: DashboardAudit = {
+  id: "a6",
+  url: "https://acme-store.io",
+  geoScore: 54,
+  severityBand: "Fair",
+  isMultiPage: true,
+  createdAt: new Date("2026-06-20T12:00:00.000Z"),
+};
+
 /** 12 audits (newest first) to prove the trend renders at most 10 bars. */
 export const manyAuditFixtures: DashboardAudit[] = Array.from(
   { length: 12 },
