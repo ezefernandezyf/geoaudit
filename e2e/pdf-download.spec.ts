@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { GITHUB_SKIP_MSG, hasGithubCreds, signInViaGithub } from "./helpers";
+import { hasGithubCreds, signInViaGithub } from "./helpers";
 
 /**
  * PDF export E2E (E2E-5, sprint 8 C12).
