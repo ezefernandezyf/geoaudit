@@ -74,9 +74,9 @@ Chain strategy: feature-branch-chain
 
 ## WU-C3 — Performance (C15)
 
-- [ ] C3.1 `lighthouse` devDep + script `lighthouse` preset desktop (PERF-1)
-- [ ] C3.2 Medir landing/pricing/report; objetivo 95+ (PERF-2)
-- [ ] C3.3 `docs/performance.md`: resultados + desvíos (report/multipage) (PERF-3)
+- [x] C3.1 `lighthouse` devDep + script `lighthouse` preset desktop (PERF-1)
+- [x] C3.2 Medir landing/pricing/report; objetivo 95+ (PERF-2)
+- [x] C3.3 `docs/performance.md`: resultados + desvíos (report/multipage) (PERF-3)
 
 ## WU-C4 — Playwright E2E + responsive (C12+C13)
 
