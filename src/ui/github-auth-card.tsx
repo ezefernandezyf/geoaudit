@@ -38,7 +38,7 @@ export function GitHubAuthCard({ mode }: { mode: AuthMode }) {
         <div className="flex items-center gap-3 mb-6">
           <Logo size={40} />
           <span className="text-[11px] font-mono text-[#64748b]">
-            Crea tu cuenta de desarrollador / marketer
+            {copy.developerEyebrow}
           </span>
         </div>
       ) : (

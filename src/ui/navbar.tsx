@@ -6,6 +6,7 @@ import { Logo } from "@/ui/logo";
 import { NavLinks } from "@/ui/nav-links";
 import { isPaidTier } from "@/lib/audit/tier";
 import type { NavPlan } from "@/lib/nav-plan";
+import { SHELL_COPY } from "@/lib/copy";
 
 type NavbarProps = {
   /** Auth session resolved by the layout via `auth()` (SHL-3). Optional for anon. */
@@ -96,13 +97,13 @@ export function Navbar({ session, plan }: NavbarProps) {
                 href="/login"
                 className="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
               >
-                Inicia sesión
+                {SHELL_COPY.nav.login}
               </Link>
               <Link
                 href="/signup"
                 className="inline-flex items-center justify-center rounded-md bg-[#0f172a] px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#1e293b]"
               >
-                Crea cuenta
+                {SHELL_COPY.nav.signup}
               </Link>
             </div>
           )}

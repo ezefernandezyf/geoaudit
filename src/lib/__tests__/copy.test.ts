@@ -4,6 +4,7 @@ import {
   AUTH_COPY,
   CHECKOUT_ERROR_COPY,
   COPY,
+  DASHBOARD_COPY,
   FETCH_ERROR_COPY,
   GENERIC_AUDIT_ERROR_COPY,
   LANDING_COPY,
@@ -11,6 +12,7 @@ import {
   REPORT_COPY,
   SHARE_COPY,
   SHARE_MODAL_ERROR_COPY,
+  SHELL_COPY,
 } from "@/lib/copy";
 // U2.2 source-of-truth: the legacy modules must re-export the SAME objects.
 import { AUDIT_FORM_ERRORS as URL_POLICY_ERRORS } from "@/lib/audit/url-policy";
@@ -27,11 +29,16 @@ import {
  * "Mejorá"→"Mejore", "Iniciá sesión"→"Inicie sesión",
  * "Creá tu cuenta"→"Cree su cuenta"). url-policy and fetch-error-copy import
  * from copy.ts so the strings are never duplicated (source-of-truth).
+ * B10 (sprint 8): remaining tuteo in LANDING_COPY/DASHBOARD_COPY also migrated
+ * to usted ("Pega"→"Pegue", "obtén"→"obtenga", "Comienza"→"Comience",
+ * "Ingresa"→"Ingrese", "prueba"→"pruebe", "te citan"→"citan … su producto",
+ * "Inicia sesión"→"Inicie sesión", "Crea cuenta"→"Cree su cuenta",
+ * "Crea tu"→"Cree su").
  */
 
-/** Imperative voseo forms that must NEVER appear in centralized copy. */
+/** Imperative voseo/tuteo forms that must NEVER appear in centralized copy. */
 const VOSEO_PATTERN =
-  /Verificá|Probá|Esperá|Alcanzaste|Necesitás|Mejorá|Iniciá|Creá|Accedé|Auditá|tenés|Comenzá|obtené|Ingresá|Analizá|Copiá|Compartí|Descargá|Podés|Querés|Mirá|Fijate|Registrate|Logueáte/;
+  /Verificá|Probá|Esperá|Alcanzaste|Necesitás|Mejorá|Iniciá|Creá|Accedé|Auditá|tenés|Comenzá|obtené|Ingresá|Analizá|Copiá|Compartí|Descargá|Podés|Querés|Mirá|Fijate|Registrate|Logueáte|Pega|obtén|Comienza|Ingresa|te citan|Inicia sesión|Crea cuenta|Crea tu|prueba/;
 
 describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
   it("keeps AUDIT_FORM_ERRORS neutral", () => {
@@ -113,19 +120,39 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     ]);
   });
 
-  it("keeps the landing copy neutral", () => {
+  it("keeps the landing copy neutral (B10: no voseo, no tuteo)", () => {
     expect(LANDING_COPY.hero.badge).toBe("GEO Engine");
     expect(LANDING_COPY.hero.title).toBe(
-      "¿Cómo te citan los motores de IA cuando los usuarios buscan tu categoría?",
+      "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
     );
-    expect(LANDING_COPY.hero.sampleLabel).toBe("O prueba un ejemplo real:");
+    expect(LANDING_COPY.hero.subtitleLead).toBe(
+      "Pegue su URL y obtenga en segundos un ",
+    );
+    expect(LANDING_COPY.hero.sampleLabel).toBe("O pruebe un ejemplo real:");
     expect(LANDING_COPY.sections.pricingTitle).toBe(
-      "Comienza a monitorear la visibilidad de tu marca en la IA",
+      "Comience a monitorear la visibilidad de su marca en la IA",
     );
     // LND-6 (sprint 8): the authenticated secondary CTA is neutral and links
     // the dashboard, never the signup flow.
     expect(LANDING_COPY.sections.pricingSecondaryCtaLoggedIn).toBe(
       "Ir al dashboard",
+    );
+  });
+
+  it("keeps the dashboard copy neutral (B10)", () => {
+    expect(DASHBOARD_COPY.empty.body).toBe(
+      "Ingrese la URL de su producto o sitio web para generar su primer GEO Score y diagnóstico de visibilidad en IA.",
+    );
+  });
+
+  it("keeps the shell copy neutral (SHL-6, B10)", () => {
+    expect(SHELL_COPY.nav.login).toBe("Inicie sesión");
+    expect(SHELL_COPY.nav.signup).toBe("Cree su cuenta");
+  });
+
+  it("keeps the auth signup developer eyebrow neutral (B10)", () => {
+    expect(AUTH_COPY.signup.developerEyebrow).toBe(
+      "Cree su cuenta de desarrollador / marketer",
     );
   });
 
@@ -212,7 +239,8 @@ describe("COPY — single source of truth (U2.2)", () => {
     expect(Object.keys(COPY.fetchError)).toEqual(Object.keys(FETCH_ERROR_COPY));
   });
 
-  it("exposes checkout copy on the grouped COPY object (B8)", () => {
+  it("exposes checkout and shell copy on the grouped COPY object (B8/B10)", () => {
     expect(COPY.checkoutErrors).toBe(CHECKOUT_ERROR_COPY);
+    expect(COPY.shell).toBe(SHELL_COPY);
   });
 });

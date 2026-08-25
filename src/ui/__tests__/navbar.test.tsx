@@ -5,9 +5,9 @@ import { LogoutButton } from "@/ui/logout-button";
 
 /**
  * U1.9 — Navbar (SHL-1..4): sync server component receiving session + plan by
- * prop. Anonymous → "Inicia sesión"/"Crea cuenta"; authenticated → plan pill +
- * user chip + logout; active route via the client NavLinks island (usePathname
- * mocked here).
+ * prop. Anonymous → "Inicie sesión"/"Cree su cuenta" (SHL-6, neutral shell
+ * copy from copy.ts); authenticated → plan pill + user chip + logout; active
+ * route via the client NavLinks island (usePathname mocked here).
  */
 const nav = vi.hoisted(() => ({ usePathname: vi.fn(() => "/") }));
 vi.mock("next/navigation", () => ({ usePathname: nav.usePathname }));
@@ -42,16 +42,15 @@ describe("Navbar (SHL-2/3/4)", () => {
     );
   });
 
-  it("shows login/signup links to anonymous visitors", () => {
+  it("shows login/signup links to anonymous visitors (SHL-6, neutral)", () => {
     render(<Navbar session={null} />);
-    expect(screen.getByRole("link", { name: "Inicia sesión" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Inicie sesión" })).toHaveAttribute(
       "href",
       "/login",
     );
-    expect(screen.getByRole("link", { name: "Crea cuenta" })).toHaveAttribute(
-      "href",
-      "/signup",
-    );
+    expect(
+      screen.getByRole("link", { name: "Cree su cuenta" }),
+    ).toHaveAttribute("href", "/signup");
   });
 
   it("shows the plan pill with usage for an authenticated PRO user (SHL-2)", () => {
@@ -75,8 +74,8 @@ describe("Navbar (SHL-2/3/4)", () => {
 
   it("shows avatar initials + logout and hides login links to authenticated users (SHL-3)", () => {
     render(<Navbar session={PRO_SESSION} plan={null} />);
-    expect(screen.queryByRole("link", { name: "Inicia sesión" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Crea cuenta" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Inicie sesión" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Cree su cuenta" })).toBeNull();
     expect(screen.getByText("MT")).toBeInTheDocument(); // avatar initials
     expect(screen.getByLabelText("Cierra sesión")).toBeInTheDocument();
   });

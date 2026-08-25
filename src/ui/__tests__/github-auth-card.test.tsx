@@ -104,6 +104,10 @@ describe("GitHubAuthCard signup mode (ATH-2/7/8)", () => {
         "3 auditorías GEO mensuales sin costo con desglose por modelo",
       ),
     ).toBeInTheDocument();
+    // B10: the developer/marketer eyebrow is neutral and comes from copy.ts.
+    expect(
+      screen.getByText("Cree su cuenta de desarrollador / marketer"),
+    ).toBeInTheDocument();
   });
 
   it("starts the same GitHub OAuth flow", () => {

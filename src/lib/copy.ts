@@ -74,6 +74,8 @@ type AuthCopy = {
   termsNote: string;
   /** Signup-only benefits list (ATH-7). */
   benefits?: { label: string; items: string[] };
+  /** Signup-only developer/marketer eyebrow (B10, neutral — no tuteo). */
+  developerEyebrow?: string;
 };
 
 /** GitHub auth card copy (ATH-8, ATH-9) — neutral Spanish, Gemini wording. */
@@ -106,8 +108,21 @@ export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
         "Generación de enlaces públicos compartibles con token seguro",
       ],
     },
+    developerEyebrow: "Cree su cuenta de desarrollador / marketer",
   },
 };
+
+/**
+ * Shell copy (SHL-6, B10) — global navbar/footer strings in NEUTRAL Spanish
+ * (usted), centralized here so the shell never hardcodes tuteo/voseo.
+ */
+export const SHELL_COPY = {
+  /** Anonymous navbar actions (SHL-6). */
+  nav: {
+    login: "Inicie sesión",
+    signup: "Cree su cuenta",
+  },
+} as const;
 
 /**
  * Pricing page copy (PRC-5/7, design U3) — Gemini wording, neutral Spanish.
@@ -166,12 +181,12 @@ export const LANDING_COPY = {
     badgeDivider: "|",
     badgeSuffix: "Auditoría de visibilidad en motores de IA",
     title:
-      "¿Cómo te citan los motores de IA cuando los usuarios buscan tu categoría?",
-    subtitleLead: "Pega tu URL y obtén en segundos un ",
+      "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
+    subtitleLead: "Pegue su URL y obtenga en segundos un ",
     subtitleHighlight: "GEO Score 0-100",
     subtitleTail:
       " con diagnóstico detallado de presencia en ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.",
-    sampleLabel: "O prueba un ejemplo real:",
+    sampleLabel: "O pruebe un ejemplo real:",
   },
   auditForm: {
     inputLabel: "URL del sitio",
@@ -195,7 +210,7 @@ export const LANDING_COPY = {
     platformsLead:
       "Analizamos la interacción de cada crawler y motor de respuesta con el contenido web.",
     pricingEyebrow: "Planes y Acceso",
-    pricingTitle: "Comienza a monitorear la visibilidad de tu marca en la IA",
+    pricingTitle: "Comience a monitorear la visibilidad de su marca en la IA",
     pricingSubtitle:
       "Desde 3 auditorías gratuitas hasta planes profesionales con monitoreo continuo, multi-page y reportes compartibles.",
     pricingCta: "Ver Planes y Precios",
@@ -239,7 +254,7 @@ export const DASHBOARD_COPY = {
   },
   empty: {
     title: "No hay auditorías registradas",
-    body: "Ingresa la URL de tu producto o sitio web para generar tu primer GEO Score y diagnóstico de visibilidad en IA.",
+    body: "Ingrese la URL de su producto o sitio web para generar su primer GEO Score y diagnóstico de visibilidad en IA.",
     cta: "Auditar mi primera URL",
   },
 } as const;
@@ -493,6 +508,7 @@ export const COPY = {
   checkoutErrors: CHECKOUT_ERROR_COPY,
   shareModalErrors: SHARE_MODAL_ERROR_COPY,
   auth: AUTH_COPY,
+  shell: SHELL_COPY,
   landing: LANDING_COPY,
   pricing: PRICING_COPY,
   dashboard: DASHBOARD_COPY,
