@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft, Download } from "lucide-react";
 import type {
   AuditResult,
   MultiPageResult,
@@ -30,30 +31,30 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
 }
 
 /**
- * Audit detail page (ADP-1..ADP-3, design D1/D2). First dynamic route of the
- * app: `/dashboard/audits/[id]` renders the persisted audit's report.
+ * Audit detail page (U5.9, ADP-6/7/8, design U5). `/dashboard/audits/[id]`
+ * renders the persisted audit's report in the Gemini AuditDetailPage
+ * composition: back-to-history bar, the full Gemini report (hero with real
+ * benchmark + 5-category scorecard + 6-platform matrix + findings with real
+ * JSON-LD code), the PRO-gated ShareModal (real actions) and the PRO-gated
+ * Export PDF.
  *
  * force-dynamic: per-user row, never prerenderable. runtime nodejs: reads
  * Prisma through the pg driver adapter (Node-only).
  *
- * Ownership (ADP-2, D2): the query is scoped `findFirst({ id, userId })`, so a
- * non-owner and a missing audit both collapse to `null` → single `notFound()`
- * (404) path — no existence leak. The middleware 307-redirects
- * `/dashboard/*` to /login; the `redirect("/login")` here is the defensive
- * RSC guard mirroring the dashboard page.
+ * Ownership (ADP-2): `findFirst({ id, userId })` → non-owner and missing
+ * audit collapse to `null` → single `notFound()` (404) — no existence leak.
+ * The middleware 307-redirects `/dashboard/*` to /login; the
+ * `redirect("/login")` here is the defensive RSC guard.
  *
- * Render (ADP-3): the persisted `result` JSON is the sole source — the page
- * never re-runs an audit. The cast mirrors the write-side `InputJsonValue`
- * cast in audit-runner.tsx (Prisma types the JSON column as JsonValue, the
- * contract types it as AuditResult; the persisted value is contract-shaped by
- * construction).
+ * Render (ADP-3): the persisted `result` JSON is the sole source — never
+ * re-runs an audit. The persisted date + share token travel through the
+ * adapter `ctx` (APT-9).
  *
- * Share (U3.11, SHR-3/7, TLM-9, design ShareModal): the share feature is
- * PRO-gated. The tier is read from the DB (the session carries only user.id —
- * dashboard pattern) and fed through the SAME `requirePaidTier` the Server
- * Actions use: PRO/ENTERPRISE render the `<ShareModal>` (with the two actions
- * injected, the BillingCta → CheckoutButton pattern); FREE renders the
- * upgrade CTA. The modal replaces the inline panel (ADP-8).
+ * PRO gates (TLM-9, ADP-7/8): the tier is read from the DB and fed through
+ * the SAME `requirePaidTier` the Server Actions and the PDF route use.
+ * PRO/ENTERPRISE render the ShareModal (real create/revoke actions injected)
+ * and the real Export PDF download link (`/api/report/[id]/pdf`, which itself
+ * re-checks ownership + tier, PDF-2/3); FREE renders the upgrade CTA.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -83,43 +84,72 @@ export default async function AuditDetailPage({
     select: { tier: true },
   });
   const gate = requirePaidTier(user?.tier ?? "FREE");
+  const auditDate = audit.createdAt.toISOString();
 
   return (
-    <main className="min-h-dvh bg-surface">
-      {isMultiPageResult(audit.result) ? (
-        <MultiPageReport result={audit.result} />
-      ) : (
-        <AuditReport result={audit.result as unknown as AuditResult} />
-      )}
-      <div className="mx-auto w-full max-w-3xl px-6 pb-16">
-        {gate.allowed ? (
-          <div className="flex justify-end">
-            <ShareModal
-              auditId={audit.id}
-              initialToken={audit.shareToken}
-              createAction={createShareToken}
-              revokeAction={revokeShareToken}
-            />
-          </div>
-        ) : (
-          <Card>
-            <h2 className="font-display text-xl tracking-tight text-navy">
-              Compartir reporte
-            </h2>
-            <div className="mt-4 flex flex-col gap-4">
-              <p className="text-sm text-text-secondary">
-                Los links de share son una función PRO. Mejorá tu plan para
-                compartir reportes con tu equipo o tus clientes.
-              </p>
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+    <main className="min-h-dvh bg-[#f8fafc]">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        {/* Top action header (Gemini AuditDetailPage verbatim) */}
+        <div className="flex flex-col justify-between gap-4 pt-8 sm:flex-row sm:items-center sm:pt-10">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#64748b] transition-colors hover:text-[#0f172a]"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            <span>Volver al historial</span>
+          </Link>
+
+          {gate.allowed ? (
+            <div className="flex flex-wrap items-center gap-2.5">
+              <ShareModal
+                auditId={audit.id}
+                initialToken={audit.shareToken}
+                createAction={createShareToken}
+                revokeAction={revokeShareToken}
+              />
+              {/* Real download: the PDF route re-checks ownership + tier. */}
+              <a
+                href={`/api/report/${audit.id}/pdf`}
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[#0f172a] px-3 text-xs font-medium text-white shadow-xs transition-all duration-150 select-none whitespace-nowrap hover:bg-[#1e293b] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f172a]/20"
               >
-                Mejorar a PRO
-              </Link>
+                <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Exportar PDF</span>
+              </a>
             </div>
-          </Card>
+          ) : null}
+        </div>
+
+        {isMultiPageResult(audit.result) ? (
+          <MultiPageReport result={audit.result} />
+        ) : (
+          <AuditReport
+            result={audit.result as unknown as AuditResult}
+            ctx={{ auditDate, shareToken: audit.shareToken }}
+          />
         )}
+
+        {!gate.allowed ? (
+          <div className="mx-auto w-full max-w-5xl pb-16">
+            <Card>
+              <h2 className="font-display text-xl tracking-tight text-navy">
+                Compartir y exportar son funciones PRO
+              </h2>
+              <div className="mt-4 flex flex-col gap-4">
+                <p className="text-sm text-text-secondary">
+                  Los links de share y la exportación a PDF son funciones PRO.
+                  Mejore su plan para compartir reportes con su equipo o sus
+                  clientes y exportarlos a PDF.
+                </p>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
+                >
+                  Mejorar a PRO
+                </Link>
+              </div>
+            </Card>
+          </div>
+        ) : null}
       </div>
     </main>
   );

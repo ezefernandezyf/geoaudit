@@ -48,17 +48,18 @@ beforeEach(() => {
   findFirstMock.mockReset();
   findFirstMock.mockResolvedValue(auditRow);
   userFindUniqueMock.mockReset();
-  // Default: PRO — the share panel renders (U2.7); FREE tests override.
+  // Default: PRO — the share + export actions render (ADP-7/8); FREE tests override.
   userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
   vi.mocked(notFound).mockClear();
   vi.mocked(redirect).mockClear();
 });
 
 /**
- * U1 — Audit detail page (ADP-1..ADP-3). First dynamic route of the app:
- * `/dashboard/audits/[id]` loads the persisted Audit scoped to the session
- * user (`findFirst { id, userId }`, design D2) and renders the shared
- * `<AuditReport>` from the persisted `result` — never re-runs the audit.
+ * U5.9 — Audit detail page (ADP-6/7/8, design U5). `/dashboard/audits/[id]`
+ * renders the persisted report through the shared `<AuditReport>` (adapter at
+ * the boundary, Gemini composition) plus the Gemini action bar: ShareModal
+ * with the real share actions and the real Export PDF download — both gated
+ * by `requirePaidTier`.
  */
 describe("AuditDetailPage (ADP-1/ADP-2)", () => {
   it("queries the audit by id scoped to the session user", async () => {
@@ -71,7 +72,6 @@ describe("AuditDetailPage (ADP-1/ADP-2)", () => {
 
   it("returns 404 when the audit belongs to another user (ADP-2)", async () => {
     authMock.mockResolvedValue({ user: { id: "user-2" } });
-    // The row belongs to user-1; the scoped query misses it.
     findFirstMock.mockResolvedValue(null);
 
     await expect(AuditDetailPage({ params })).rejects.toThrow("NEXT_NOT_FOUND");
@@ -96,15 +96,25 @@ describe("AuditDetailPage (ADP-1/ADP-2)", () => {
   });
 });
 
-describe("AuditDetailPage (ADP-3)", () => {
-  it("renders the persisted report without re-running the audit", async () => {
+describe("AuditDetailPage (ADP-3 + ADP-6)", () => {
+  it("renders the persisted report through the adapter without re-running the audit", async () => {
     render(await AuditDetailPage({ params }));
 
-    // Report sections come from the persisted result JSON (ADP-3).
+    // Gemini hero: score + benchmark (real thresholds) + hostname domain.
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
-    expect(screen.getByText("Regular")).toBeInTheDocument();
-    expect(screen.getByText("Acceso de bots")).toBeInTheDocument();
+    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
+
+    // Scorecard (5 categories) + matrix (6 platforms, Claude "No medido").
+    expect(screen.getByText("Scorecard por Categoría")).toBeInTheDocument();
+    expect(screen.getByText("ChatGPT")).toBeInTheDocument();
+    expect(screen.getByText("No medido")).toBeInTheDocument();
+
+    // Findings with the real generated JSON-LD code (ADP-6).
+    expect(screen.getByText(/"@type": "Organization"/)).toBeInTheDocument();
+
+    // The persisted date surfaces via the adapter ctx (APT-9).
+    expect(screen.getAllByText(/2026-08-10/).length).toBeGreaterThanOrEqual(1);
 
     // findFirst is the only audit delegate call — no re-run, no writes.
     expect(findFirstMock).toHaveBeenCalledTimes(1);
@@ -139,7 +149,6 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
 
     render(await AuditDetailPage({ params }));
 
-    // Aggregate hero + per-page rows (NOT the single-page AuditReport).
     expect(
       screen.getByRole("region", {
         name: "Reporte de auditoría multi-página",
@@ -148,15 +157,14 @@ describe("AuditDetailPage multi-page report (U3.10, D3)", () => {
     expect(screen.getByText("Páginas analizadas")).toBeInTheDocument();
     expect(screen.getByText("https://example.com/blog")).toBeInTheDocument();
     expect(screen.getByText("80/100")).toBeInTheDocument();
-    expect(screen.getByText("Bueno")).toBeInTheDocument();
     expect(
       screen.queryByRole("region", { name: "Reporte de auditoría" }),
     ).not.toBeInTheDocument();
   });
 });
 
-describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
-  it("shows the upgrade CTA for a FREE user — never the share panel", async () => {
+describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
+  it("shows the upgrade CTA for a FREE user — no share modal, no export link", async () => {
     userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
 
     render(await AuditDetailPage({ params }));
@@ -164,11 +172,14 @@ describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
     const cta = screen.getByRole("link", { name: "Mejorar a PRO" });
     expect(cta).toHaveAttribute("href", "/pricing");
     expect(
-      screen.queryByRole("button", { name: "Crear link" }),
+      screen.queryByRole("button", { name: "Compartir reporte" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Exportar PDF" }),
     ).not.toBeInTheDocument();
   });
 
-  it("shows the 'Compartir reporte' trigger that opens the modal with 'Crear link' for a PRO user (SHR-7)", async () => {
+  it("PRO user: share trigger opens the Gemini modal with the real create action (ADP-7)", async () => {
     render(await AuditDetailPage({ params }));
 
     expect(
@@ -178,14 +189,14 @@ describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
       screen.queryByRole("link", { name: "Mejorar a PRO" }),
     ).not.toBeInTheDocument();
 
-    // Opening the modal reveals the create action (no token yet).
     fireEvent.click(screen.getByRole("button", { name: "Compartir reporte" }));
     expect(
-      screen.getByRole("button", { name: "Crear link" }),
+      screen.getByRole("button", { name: "Activar enlace" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Compartir Reporte Público")).toBeInTheDocument();
   });
 
-  it("opens the modal showing the existing public link and revoke for a PRO user with a token (SHR-3/4)", async () => {
+  it("PRO user with a token: modal shows the public link, revoke and social intents", async () => {
     findFirstMock.mockResolvedValue({ ...auditRow, shareToken: "tok-9" });
 
     render(await AuditDetailPage({ params }));
@@ -193,8 +204,24 @@ describe("AuditDetailPage share UI (U2.7, SHR-3, TLM-9)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Compartir reporte" }));
 
     expect(
-      screen.getByText(`${window.location.origin}/share/tok-9`),
+      screen.getByDisplayValue(`${window.location.origin}/share/tok-9`),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Revocar" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Revocar enlace" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Compartir en X" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Ver vista pública/ }),
+    ).toHaveAttribute("href", "/share/tok-9");
+  });
+
+  it("PRO user: Export PDF links to the real PRO-gated PDF route (ADP-8)", async () => {
+    render(await AuditDetailPage({ params }));
+
+    const exportLink = screen.getByRole("link", { name: "Exportar PDF" });
+    // The PDF route itself re-checks ownership + tier (PDF-2/3).
+    expect(exportLink).toHaveAttribute("href", "/api/report/audit-1/pdf");
   });
 });
