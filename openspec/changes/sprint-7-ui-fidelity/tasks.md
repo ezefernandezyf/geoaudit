@@ -78,14 +78,14 @@ Chain strategy: feature-branch-chain
 - [x] U5.2 `toGeminiViewModel.ts`: score+band lowercase real (via severityForScore 90/75/60/40, NO 80/65/45/25 de Gemini), title fallback, summary REAL (objeto → string), durationSeconds, categoryScores[5] = rowScore+weights, shareToken (APT-2..6,9,10) + test fixtures
 - [x] U5.3 `findings.ts`: deriveFindings citability top3/bottom3 + schema.issues + perBot bloqueados; codeSnippet solo `schema.generated`; impactScore null (APT-7,10) + test
 - [x] U5.4 `platforms.ts`: 6 filas, Claude `readiness:null` + access `Claude-Web` (APT-8) + test
-- [ ] U5.5 `report/score-hero.tsx`: hero completo + benchmark bar umbrales reales (ARU-11) + test
-- [ ] U5.6 `domain-scorecard` + `top-findings` + `report-meta`: presentadores puros del view model (ARU-10) + test
-- [ ] U5.7 `report/platform-matrix.tsx`: 6 plataformas, Claude "No medido" (ARU-12) + test
-- [ ] U5.8 `report/audit-report.tsx`: consume `toGeminiViewModel`, RSC/Suspense/error intactos (ARU-10) + test
-- [ ] U5.9 `app/dashboard/audits/[id]`: hero + scorecard 5 + matriz 6 col + findings con código real (ADP-6) + ShareModal Gemini con acciones reales (ADP-7) + Export PDF gated PRO (ADP-8) + test
-- [ ] U5.10 `app/share/[token]`: pill "Verificado" + token ID + footer CTA (SHR-7..9) + test
-- [ ] U5.11 `app/report` live: `StageStepper` animado (spinner + progress + círculos numerados) + `AuditReportSkeleton`, sin simulación + test
-- [ ] U5.12 Reescribir tests report/detail/share (view model, token→hex, voseo→neutro)
+- [x] U5.5 `report/score-hero.tsx`: hero completo + benchmark bar umbrales reales (ARU-11) + test
+- [x] U5.6 `domain-scorecard` + `top-findings` + `report-meta`: presentadores puros del view model (ARU-10) + test
+- [x] U5.7 `report/platform-matrix.tsx`: 6 plataformas, Claude "No medido" (ARU-12) + test
+- [x] U5.8 `report/audit-report.tsx`: consume `toGeminiViewModel`, RSC/Suspense/error intactos (ARU-10) + test
+- [x] U5.9 `app/dashboard/audits/[id]`: hero + scorecard 5 + matriz 6 col + findings con código real (ADP-6) + ShareModal Gemini con acciones reales (ADP-7) + Export PDF gated PRO (ADP-8) + test
+- [x] U5.10 `app/share/[token]`: pill "Verificado" + token ID + footer CTA (SHR-7..9) + test
+- [x] U5.11 `app/report` live: `StageStepper` animado (spinner + progress + círculos numerados) + `AuditReportSkeleton`, sin simulación + test
+- [x] U5.12 Reescribir tests report/detail/share (view model, token→hex, voseo→neutro)
 
 ## U6 — Multi-page UI (Dep: U5)
 
