@@ -36,7 +36,8 @@ describe("TextField (DNF-8)", () => {
     );
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent("Ingrese una URL válida");
-    expect(alert.className).toContain("text-[#ef4444]");
+    // C14 (A11Y-3): red-600 #dc2626 passes WCAG 2.2 AA (4.5:1) on white.
+    expect(alert.className).toContain("text-[#dc2626]");
   });
 
   it("marks the input invalid and describes the error", () => {

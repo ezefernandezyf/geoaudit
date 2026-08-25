@@ -31,21 +31,23 @@ export type ScoreHeroProps = {
   view: ScoreHeroView;
 };
 
-/** Real threshold rows (severityForScore: 90/75/60/40). */
+/** Real threshold rows (severityForScore: 90/75/60/40). Text hexes are the
+ * darkest-nearest that pass WCAG 2.2 AA (4.5:1) on white (A11Y-3/C14):
+ * emerald-700 #047857, amber-700 #b45309, red-600 #dc2626. */
 const BENCHMARK_ROWS = [
-  { range: "90 - 100", label: "Excelente (Top 10%)", color: "text-[#10b981]" },
-  { range: "75 - 89", label: "Bueno (Promedio B2B)", color: "text-[#10b981]" },
+  { range: "90 - 100", label: "Excelente (Top 10%)", color: "text-[#047857]" },
+  { range: "75 - 89", label: "Bueno (Promedio B2B)", color: "text-[#047857]" },
   {
     range: "60 - 74",
     label: "Regular (Riesgo omisión)",
-    color: "text-[#f59e0b]",
+    color: "text-[#b45309]",
   },
   {
     range: "40 - 59",
     label: "Deficiente (Riesgo crítico)",
-    color: "text-[#ef4444]",
+    color: "text-[#dc2626]",
   },
-  { range: "< 40", label: "Crítico", color: "text-[#ef4444]" },
+  { range: "< 40", label: "Crítico", color: "text-[#dc2626]" },
 ] as const;
 
 /** Benchmark bar segments (left→right), real band widths on the 0-100 scale. */
@@ -88,7 +90,7 @@ export function ScoreHero({ view }: ScoreHeroProps) {
               <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
                 {totalScore}
               </span>
-              <span className="font-mono text-xl font-bold text-[#10b981]">
+              <span className="font-mono text-xl font-bold text-[#047857]">
                 /100
               </span>
             </div>

@@ -60,7 +60,7 @@ export function Navbar({ session, plan }: NavbarProps) {
               {plan ? (
                 <Link
                   href="/pricing"
-                  className="hidden items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#10b981] transition-colors hover:bg-[#10b981]/20 sm:inline-flex"
+                  className="hidden items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857] transition-colors hover:bg-[#10b981]/20 sm:inline-flex"
                   title={`Plan ${TIER_LABEL[plan.tier]}: ${plan.used}/${plan.limit} auditorías usadas`}
                 >
                   <Sparkles

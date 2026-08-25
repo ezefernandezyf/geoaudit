@@ -30,7 +30,7 @@ export function AggregateHero({ latestScore, latestBand }: AggregateHeroProps) {
         <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
           {latestScore}
         </span>
-        <span className="font-mono text-xl font-bold text-[#10b981]">/100</span>
+        <span className="font-mono text-xl font-bold text-[#047857]">/100</span>
       </div>
       <div className="mt-4">
         <SeverityBadge band={band} />

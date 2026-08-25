@@ -79,7 +79,7 @@ export function TextField({
           <p
             id={errorId}
             role="alert"
-            className="flex items-center gap-1 text-xs font-medium text-[#ef4444]"
+            className="flex items-center gap-1 text-xs font-medium text-[#dc2626]"
           >
             <span aria-hidden="true">•</span> {error}
           </p>

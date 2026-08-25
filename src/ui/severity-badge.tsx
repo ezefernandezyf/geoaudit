@@ -14,38 +14,41 @@ const BAND_LABELS: Record<GeminiBand, string> = {
   critical: "Crítico",
 };
 
-/** Gemini SeverityBadge colorMap verbatim (hex directos). */
+/** Gemini SeverityBadge colorMap verbatim (hex directos). The TEXT hexes are
+ * the darkest-nearest that pass WCAG 2.2 AA (4.5:1) on their tinted pill
+ * backgrounds (A11Y-3/C14): emerald-700, amber-700, red-700. Backgrounds,
+ * borders and dots keep the brand hues (decorative, aria-hidden). */
 const COLOR_MAP: Record<
   GeminiBand,
   { bg: string; text: string; border: string; dot: string }
 > = {
   excellent: {
     bg: "bg-[#10b981]/10",
-    text: "text-[#10b981]",
+    text: "text-[#047857]",
     border: "border-[#10b981]/20",
     dot: "bg-[#10b981]",
   },
   good: {
     bg: "bg-[#10b981]/10",
-    text: "text-[#10b981]",
+    text: "text-[#047857]",
     border: "border-[#10b981]/20",
     dot: "bg-[#10b981]",
   },
   fair: {
     bg: "bg-[#f59e0b]/10",
-    text: "text-[#d97706]",
+    text: "text-[#b45309]",
     border: "border-[#f59e0b]/20",
     dot: "bg-[#f59e0b]",
   },
   poor: {
     bg: "bg-[#ef4444]/10",
-    text: "text-[#ef4444]",
+    text: "text-[#b91c1c]",
     border: "border-[#ef4444]/20",
     dot: "bg-[#ef4444]",
   },
   critical: {
     bg: "bg-[#ef4444]/10",
-    text: "text-[#dc2626]",
+    text: "text-[#b91c1c]",
     border: "border-[#ef4444]/30",
     dot: "bg-[#dc2626]",
   },
