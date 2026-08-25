@@ -4,6 +4,10 @@ import { useState } from "react";
 import { ChevronRight, Clock } from "lucide-react";
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
 import { ScoreHero, type ScoreHeroView } from "@/report/score-hero";
+import { DomainScorecard } from "@/report/domain-scorecard";
+import { PlatformMatrix } from "@/report/platform-matrix";
+import { TopFindings } from "@/report/top-findings";
+import type { GeminiView } from "@/report/presenters/types";
 import { formatDurationMs } from "@/report/format";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { MULTIPAGE_COPY } from "@/lib/copy";
@@ -20,6 +24,14 @@ import { MULTIPAGE_COPY } from "@/lib/copy";
  * does not produce (`schemaFound`, `crawlTimeMs`, `status`). No fabricated
  * values. Pure presenter — never runs an audit; the `selected` page is client
  * state only.
+ *
+ * Full mode (A3, MPU-7/9): when the caller supplies `pageViews` — the full
+ * `GeminiView` per page, resolved SERVER-side from the persisted `AuditPage`
+ * rows (via `toGeminiViewModel`) — the inspector renders the page's COMPLETE
+ * report (ScoreHero + DomainScorecard + PlatformMatrix + TopFindings) of the
+ * selected view. The selector (MPU-9) alternates between full reports. The
+ * light `MultiPageResult` shape is never enriched: the detail comes from
+ * `pageViews`, not from `result.pages`.
  *
  * Client component (`"use client"`): the route selector + inspector needs
  * selection state (Gemini uses `useState`). Rendered by the audit detail page,
@@ -54,10 +66,24 @@ function aggregateHeroView(
   };
 }
 
-export function MultiPageReport({ result }: { result: MultiPageResult }) {
+export function MultiPageReport({
+  result,
+  pageViews,
+}: {
+  result: MultiPageResult;
+  /**
+   * Full per-page views (A3, MPU-7) — resolved SERVER-side from the persisted
+   * `AuditPage` rows via `toGeminiViewModel`. When present, the inspector
+   * renders the selected page's complete report; when absent, the light-shape
+   * inspector renders (share/multipage pages keep the light view).
+   */
+  pageViews?: { url: string; view: GeminiView }[];
+}) {
   const pages = result.pages;
   const [selectedPath, setSelectedPath] = useState<string>(pages[0]?.url ?? "");
   const selected = pages.find((p) => p.url === selectedPath) ?? pages[0];
+  const selectedView = pageViews?.find((v) => v.url === selected?.url)?.view;
+  const fullMode = pageViews !== undefined;
 
   return (
     <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-10 sm:px-6">
@@ -191,31 +217,43 @@ export function MultiPageReport({ result }: { result: MultiPageResult }) {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-3">
-            <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
-              <span className="text-xs text-[#64748b]">
-                {MULTIPAGE_COPY.results.scoreLabel}
-              </span>
-              <p className="mt-1 font-serif text-3xl text-[#0f172a]">
-                {Math.round(selected.geoScore)}/100
-              </p>
+          {fullMode && selectedView ? (
+            /* Full report of the selected page (A3, MPU-7): the SERVER-resolved
+               GeminiView renders the complete report — the light shape is never
+               enriched. The selector above (MPU-9) alternates between views. */
+            <div className="space-y-8 pt-2">
+              <ScoreHero view={selectedView} />
+              <DomainScorecard view={selectedView} />
+              <PlatformMatrix view={selectedView} />
+              <TopFindings view={selectedView} />
             </div>
-            <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
-              <span className="text-xs text-[#64748b]">
-                {MULTIPAGE_COPY.results.durationLabel}
-              </span>
-              <p className="mt-1 flex items-center gap-1.5 font-mono text-2xl font-bold text-emerald-800">
-                <Clock className="h-5 w-5" aria-hidden="true" />
-                {formatDurationMs(selected.durationMs)}
-              </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-3">
+              <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
+                <span className="text-xs text-[#64748b]">
+                  {MULTIPAGE_COPY.results.scoreLabel}
+                </span>
+                <p className="mt-1 font-serif text-3xl text-[#0f172a]">
+                  {Math.round(selected.geoScore)}/100
+                </p>
+              </div>
+              <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
+                <span className="text-xs text-[#64748b]">
+                  {MULTIPAGE_COPY.results.durationLabel}
+                </span>
+                <p className="mt-1 flex items-center gap-1.5 font-mono text-2xl font-bold text-emerald-800">
+                  <Clock className="h-5 w-5" aria-hidden="true" />
+                  {formatDurationMs(selected.durationMs)}
+                </p>
+              </div>
+              <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
+                <span className="text-xs text-[#64748b]">URL</span>
+                <p className="mt-2 break-all font-sans text-sm font-semibold text-[#0f172a]">
+                  {selected.url}
+                </p>
+              </div>
             </div>
-            <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] p-4">
-              <span className="text-xs text-[#64748b]">URL</span>
-              <p className="mt-2 break-all font-sans text-sm font-semibold text-[#0f172a]">
-                {selected.url}
-              </p>
-            </div>
-          </div>
+          )}
         </section>
       ) : null}
     </main>

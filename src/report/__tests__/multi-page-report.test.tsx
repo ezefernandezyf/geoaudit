@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
 import { MultiPageReport } from "@/report/multi-page-report";
 import { MULTIPAGE_COPY } from "@/lib/copy";
+import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
+import type { GeminiView } from "@/report/presenters/types";
 
 /**
  * U6.3 — MultiPageReport (MPA-10/11, design U6). Gemini route-selector +
@@ -93,5 +95,65 @@ describe("MultiPageReport inspector (MPU-4)", () => {
     // Selecting the second page updates the inspector.
     fireEvent.click(screen.getAllByRole("button", { pressed: false })[0]);
     expect(screen.getByRole("heading", { name: "/blog" })).toBeInTheDocument();
+  });
+});
+
+describe("MultiPageReport full mode with pageViews (A3, MPU-7/9)", () => {
+  /** Views built through the REAL adapter from the canonical fixture. */
+  const pageViews: { url: string; view: GeminiView }[] = [
+    { url: "https://example.com/", view: geminiViewFixture },
+    {
+      url: "https://example.com/blog",
+      view: {
+        ...geminiViewFixture,
+        domain: "example.com",
+        totalScore: 80,
+        band: "good",
+        summary: "example.com — GEO Score 80 (good) en ~3s",
+      },
+    },
+  ];
+
+  it("renders the FULL report of the selected page when pageViews is provided (MPU-7)", () => {
+    render(<MultiPageReport result={multiPageResult} pageViews={pageViews} />);
+
+    // Full mode composes the shared report presenters for the selected view.
+    expect(
+      screen.getByRole("region", { name: "Scorecard por categoría" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Hallazgos técnicos" }),
+    ).toBeInTheDocument();
+    // The fixture view's findings surface (adapter-derived, not light-shape).
+    expect(
+      screen.getAllByText(/Pasaje altamente citable/).length,
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("switches the full report when navigating the selector (MPU-9)", () => {
+    render(<MultiPageReport result={multiPageResult} pageViews={pageViews} />);
+
+    // First page selected by default — fixture view hero (score 68).
+    expect(screen.getByText(/GEO Score 68/)).toBeInTheDocument();
+
+    // Select page 2 (blog) → its view (score 80) renders.
+    fireEvent.click(screen.getAllByRole("button", { pressed: false })[0]);
+    expect(screen.getAllByText("80").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/GEO Score 80/)).toBeInTheDocument();
+  });
+
+  it("does NOT enrich the light MultiPageResult shape (MPU-7)", () => {
+    render(<MultiPageReport result={multiPageResult} pageViews={pageViews} />);
+
+    // The light shape still carries only url/score/band/duration per page —
+    // no full-report fields were injected into result.pages.
+    expect(multiPageResult.pages[0]).not.toHaveProperty("findings");
+    expect(multiPageResult.pages[0]).not.toHaveProperty("categoryScores");
+    expect(multiPageResult.pages[0]).not.toHaveProperty("platforms");
+    // The route rows keep deriving from the light shape.
+    expect(screen.getByText("80/100")).toBeInTheDocument();
   });
 });
