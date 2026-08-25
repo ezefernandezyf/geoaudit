@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ShareModal } from "@/dashboard/share-modal";
+import { SHARE_MODAL_ERROR_COPY } from "@/lib/copy";
 import type { ShareLinkAction } from "@/lib/audit/share-actions";
 
 /**
@@ -142,7 +143,7 @@ describe("ShareModal error + close (SHR-7)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Crear link" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Compartir es una función PRO. Mejorá tu plan para activarla.",
+      SHARE_MODAL_ERROR_COPY.upgrade,
     );
   });
 

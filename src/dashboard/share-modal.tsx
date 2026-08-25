@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Button } from "@/ui/button";
+import { SHARE_MODAL_ERROR_COPY } from "@/lib/copy";
 import type {
   ShareLinkAction,
   ShareLinkState,
@@ -19,14 +20,12 @@ import type {
  * travels in hidden inputs; the USER id always comes from the session inside
  * the actions. The page only renders this modal when `requirePaidTier` allows
  * it — FREE users see the upgrade CTA instead (TLM-9).
+ *
+ * Error copy (U4.8): single source of truth from copy.ts
+ * (`SHARE_MODAL_ERROR_COPY`, neutral Spanish) — no local voseo strings.
  */
 
-const ERROR_COPY: Record<string, string> = {
-  auth: "Necesitás iniciar sesión para compartir.",
-  "not-found": "No encontramos la auditoría.",
-  upgrade: "Compartir es una función PRO. Mejorá tu plan para activarla.",
-  failed: "No pudimos generar el link. Probá de nuevo en unos minutos.",
-};
+const ERROR_COPY = SHARE_MODAL_ERROR_COPY;
 
 function shareUrlFor(token: string): string {
   return `${window.location.origin}/share/${token}`;
