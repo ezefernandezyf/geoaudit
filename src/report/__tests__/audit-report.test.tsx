@@ -35,9 +35,7 @@ describe("AuditReport (ARU-10)", () => {
     ).toBeGreaterThanOrEqual(1);
 
     // TopFindings: blocked bot + schema issue (derived, real engine data).
-    expect(
-      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Bots de IA bloqueados")).toBeInTheDocument();
     expect(
       screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();

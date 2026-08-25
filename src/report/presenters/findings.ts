@@ -87,17 +87,23 @@ export function deriveFindings(
     });
   }
 
-  for (const [bot, status] of Object.entries(crawlers.perBot)) {
-    if (status !== "blocked") continue;
+  // ARU-14 (sprint 8): ALL blocked bots collapse into ONE finding. The bot
+  // names travel as `details`; no per-bot card is emitted.
+  const blockedBots = Object.entries(crawlers.perBot)
+    .filter(([, status]) => status === "blocked")
+    .map(([bot]) => bot);
+  if (blockedBots.length > 0) {
     findings.push({
-      id: `bot-${bot}`,
-      title: `Bot de IA bloqueado: ${bot}`,
+      id: "blocked-bots",
+      title: "Bots de IA bloqueados",
       severity: "critical",
       category: "Crawlers",
-      description: `El crawler ${bot} no puede acceder al sitio, lo que limita la citabilidad en los asistentes que dependen de él.`,
+      description:
+        "Estos crawlers no pueden acceder al sitio, lo que limita la citabilidad en los asistentes que dependen de ellos.",
+      details: blockedBots,
       impactScore: null,
       recommendation:
-        "Revise las reglas de robots.txt y permita el acceso a este crawler para maximizar la visibilidad en IA.",
+        "Revise las reglas de robots.txt y permita el acceso a estos crawlers para maximizar la visibilidad en IA.",
     });
   }
 

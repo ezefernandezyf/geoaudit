@@ -113,21 +113,35 @@ describe("deriveFindings (APT-7)", () => {
     ).toHaveLength(0);
   });
 
-  it("derives one finding per blocked bot (APT-7)", () => {
+  it("collapses ALL blocked bots into ONE finding listing the bots (ARU-14)", () => {
     const findings = deriveFindings(
       citability,
       schemaWithGenerated,
       crawlersWithBlocked,
     );
-    const bots = findings.filter((f) => f.id.startsWith("bot-"));
-    expect(bots).toHaveLength(2);
-    for (const f of bots) {
-      expect(f.category).toBe("Crawlers");
-      expect(f.severity).toBe("critical");
-      expect(f.impactScore).toBeNull();
-      // No invented code snippet on bot findings.
-      expect(f.codeSnippet).toBeUndefined();
-    }
+    const bots = findings.filter((f) => f.category === "Crawlers");
+    expect(bots).toHaveLength(1);
+    const [finding] = bots;
+    expect(finding.id).toBe("blocked-bots");
+    expect(finding.title).toBe("Bots de IA bloqueados");
+    expect(finding.severity).toBe("critical");
+    expect(finding.impactScore).toBeNull();
+    expect(finding.details).toEqual(["PerplexityBot", "Claude-Web"]);
+    // No invented code snippet on bot findings.
+    expect(finding.codeSnippet).toBeUndefined();
+  });
+
+  it("omits the blocked-bots finding when no bot is blocked (ARU-14)", () => {
+    const openCrawlers: CrawlerResult = {
+      compositeScore: 71,
+      perBot: { GPTBot: "allowed", ClaudeBot: "allowed" },
+    };
+    const findings = deriveFindings(
+      citability,
+      schemaWithGenerated,
+      openCrawlers,
+    );
+    expect(findings.filter((f) => f.category === "Crawlers")).toHaveLength(0);
   });
 
   it("omits the code snippet when schema.generated is null (APT-10)", () => {

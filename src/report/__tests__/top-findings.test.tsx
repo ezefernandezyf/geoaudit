@@ -22,9 +22,27 @@ describe("TopFindings valid audit (ARU-10)", () => {
     expect(
       screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();
+    expect(screen.getByText("Bots de IA bloqueados")).toBeInTheDocument();
+  });
+
+  it("renders a single card per collapsed group listing its details (ARU-13/14)", () => {
+    const { container } = render(<TopFindings view={geminiViewFixture} />);
+
+    // ONE blocked-bots card (not one per bot) listing the blocked bot names.
+    expect(screen.getAllByText("Bots de IA bloqueados")).toHaveLength(1);
+    const botList = Array.from(container.querySelectorAll("ul")).find((ul) =>
+      ul.textContent?.includes("OAI-SearchBot"),
+    );
+    expect(botList).not.toBeNull();
+
+    // ONE structured-data card listing every missing property.
     expect(
-      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
-    ).toBeInTheDocument();
+      screen.getAllByText("Datos estructurados: faltan estas propiedades"),
+    ).toHaveLength(1);
+    const schemaList = Array.from(container.querySelectorAll("ul")).find((ul) =>
+      ul.textContent?.includes("Organization missing sameAs"),
+    );
+    expect(schemaList).not.toBeNull();
   });
 
   it("shows the findings count chip (7 points of action)", () => {

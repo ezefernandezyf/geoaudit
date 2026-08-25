@@ -74,6 +74,25 @@ export function TopFindings({ view }: { view: GeminiView }) {
                 {finding.description}
               </p>
 
+              {/* Grouped details (ARU-13/14, sprint 8): the aggregated items of
+                  a collapsed finding (missing JSON-LD properties, blocked bots). */}
+              {finding.details && finding.details.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {finding.details.map((detail) => (
+                    <li
+                      key={detail}
+                      className="flex items-start gap-2 font-mono text-xs text-[#475569]"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#10b981]"
+                      />
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+
               {/* Recommendation block */}
               <div className="flex items-start gap-2 rounded-lg border border-[#e2e8f0] bg-white p-3 font-sans text-xs text-[#0f172a]">
                 <Sparkles

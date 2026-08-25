@@ -108,9 +108,7 @@ describe("AuditRunner report render (U4.T1)", () => {
     expect(screen.getByText("No medido")).toBeInTheDocument();
 
     // TopFindings: blocked bot + schema issue (derived from real data).
-    expect(
-      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Bots de IA bloqueados")).toBeInTheDocument();
     expect(
       screen.getByText("Datos estructurados: faltan estas propiedades"),
     ).toBeInTheDocument();
@@ -137,9 +135,7 @@ describe("AuditRunner report render (U4.T1)", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("71")).toBeInTheDocument();
     // Derived findings still come from the real surviving engines.
-    expect(
-      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Bots de IA bloqueados")).toBeInTheDocument();
   });
 
   it("renders the RAO-13 non-HTML report with crawler data only", async () => {
