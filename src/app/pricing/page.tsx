@@ -5,6 +5,7 @@ import { checkoutAction, portalAction } from "@/billing/actions";
 import { CheckoutButton, type CheckoutAction } from "@/billing/checkout-button";
 import { PricingCards, type PricingPlan } from "@/billing/pricing-cards";
 import { PRICING_COPY } from "@/lib/copy";
+import { buildOgMetadata } from "@/lib/og";
 import type { Tier } from "@/lib/contracts/billing";
 
 /**
@@ -27,6 +28,17 @@ import type { Tier } from "@/lib/contracts/billing";
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+/**
+ * PRC-8 (sprint 8, C16): pricing OpenGraph/Twitter metadata via the shared
+ * helper — reuses the page title/description and the shared 1200×630 og.png.
+ */
+export const metadata = buildOgMetadata({
+  title: "Planes y precios",
+  description:
+    "Desde 3 auditorías gratuitas hasta planes profesionales con monitoreo continuo, auditorías multi-página y reportes PDF compartibles.",
+  path: "/pricing",
+});
 
 function currentPlanCta(): React.ReactNode {
   return (

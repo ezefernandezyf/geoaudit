@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
+import { buildOgMetadata } from "@/lib/og";
 import { ScoreHero } from "@/report/score-hero";
 import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
 
@@ -27,6 +28,17 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
  */
 
 export const dynamic = "force-dynamic";
+
+/**
+ * LND-8 (sprint 8, C16): landing OpenGraph/Twitter metadata via the shared
+ * helper — reuses the page title/description and the shared 1200×630 og.png.
+ */
+export const metadata = buildOgMetadata({
+  title: "Auditoría de visibilidad en motores de IA",
+  description:
+    "Audite su sitio y obtenga un GEO Score de 0 a 100 con diagnóstico de presencia en ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.",
+  path: "/",
+});
 
 /** Real severity bands 90/75/60/40 (LND-3) — Gemini table composition. */
 const BAND_ROWS: {

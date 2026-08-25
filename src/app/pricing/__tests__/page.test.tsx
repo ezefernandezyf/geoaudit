@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import PricingPage from "@/app/pricing/page";
+import PricingPage, { metadata as pricingMetadata } from "@/app/pricing/page";
 
 const { authMock, userFindUniqueMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
@@ -142,5 +142,27 @@ describe("pricing page hex classes (DNF-9, U3.3)", () => {
     expect(container.innerHTML).not.toMatch(
       /text-navy|bg-navy|bg-surface(?!-)|text-text-primary|text-text-secondary|border-border|bg-surface-muted/,
     );
+  });
+});
+
+describe("pricing page metadata (PRC-8)", () => {
+  it("emits OpenGraph metadata with title, description, url and the shared og.png", () => {
+    expect(pricingMetadata.openGraph).toMatchObject({
+      title: "Planes y precios",
+      url: "/pricing",
+      siteName: "GeoAudit",
+      type: "website",
+      images: [{ url: "/og.png", width: 1200, height: 630 }],
+    });
+    expect(pricingMetadata.openGraph?.description).toContain(
+      "auditorías gratuitas",
+    );
+  });
+
+  it("emits a summary_large_image Twitter card referencing og.png", () => {
+    expect(pricingMetadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["/og.png"],
+    });
   });
 });

@@ -37,6 +37,12 @@ export const metadata: Metadata = {
   },
   description:
     "GEO/SEO audit platform: URL in, GEO Score 0-100 and a full AI visibility report out.",
+  // C16 (LND-8/PRC-8): base URL for the relative OG/Twitter/canonical URLs
+  // emitted by the public pages (og.png + page paths). Fallback chain matches
+  // billing/actions.ts: NEXT_PUBLIC_APP_URL → localhost (dev).
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  ),
 };
 
 export default async function RootLayout({

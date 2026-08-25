@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { buildOgMetadata } from "@/lib/og";
 
@@ -50,5 +52,18 @@ describe("buildOgMetadata (C1.1, LND-8/PRC-8)", () => {
 
   it("sets the canonical URL to the page path", () => {
     expect(meta.alternates?.canonical).toBe("/pricing");
+  });
+});
+
+/** C16 — the shared OG asset the metadata references (C1.2). */
+describe("OG asset (C1.2)", () => {
+  it("ships public/og.png at the standard 1200×630 size", () => {
+    const file = join(process.cwd(), "public", "og.png");
+    expect(existsSync(file)).toBe(true);
+    // PNG signature + IHDR: width/height are big-endian uint32 at bytes 16..24.
+    const buf = readFileSync(file);
+    expect(buf.subarray(1, 4).toString("ascii")).toBe("PNG");
+    expect(buf.readUInt32BE(16)).toBe(1200);
+    expect(buf.readUInt32BE(20)).toBe(630);
   });
 });

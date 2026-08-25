@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Session } from "next-auth";
-import Page from "@/app/page";
+import Page, { metadata as landingMetadata } from "@/app/page";
 import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
 import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand } from "@/ui/severity-badge";
@@ -283,6 +283,26 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
   it("exposes no link to /dashboard for anonymous visitors (ADF-8)", async () => {
     await renderPage();
     expect(screen.queryByRole("link", { name: /dashboard/i })).toBeNull();
+  });
+});
+
+describe("landing page metadata (LND-8)", () => {
+  it("emits OpenGraph metadata with title, description, url and the shared og.png", () => {
+    expect(landingMetadata.openGraph).toMatchObject({
+      title: "Auditoría de visibilidad en motores de IA",
+      url: "/",
+      siteName: "GeoAudit",
+      type: "website",
+      images: [{ url: "/og.png", width: 1200, height: 630 }],
+    });
+    expect(landingMetadata.openGraph?.description).toContain("GEO Score");
+  });
+
+  it("emits a summary_large_image Twitter card referencing og.png", () => {
+    expect(landingMetadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["/og.png"],
+    });
   });
 });
 
