@@ -191,6 +191,45 @@ export const LANDING_COPY = {
   },
 } as const;
 
+/**
+ * Dashboard copy (DSH-8..DSH-11, design U4) — Gemini runner bar + history
+ * wording, neutral Spanish.
+ */
+export const DASHBOARD_COPY = {
+  runner: {
+    placeholder: "https://tudominio.com",
+    submitLabel: "Run Audit",
+    inputLabel: "URL del sitio",
+    formAriaLabel: "Auditoría GEO",
+  },
+  history: {
+    header: "Historial Reciente de Análisis",
+    showingCount: "Mostrando",
+    records: "registros",
+    columns: {
+      resource: "Resource URL / Dominio",
+      score: "Score",
+      severity: "Severidad",
+      timestamp: "Timestamp",
+    },
+    reAudit: "Re-auditar",
+    scanning: "SCANNING...",
+    inProgress: "En Proceso",
+    emptySearch: "No se encontraron auditorías que coincidan con",
+  },
+  trend: {
+    title: "Tendencia de Visibilidad",
+    subtitle: "Últimos 12 ciclos de auditoría e inspección",
+    aiOverviews: "AI OVERVIEWS",
+    aggregateLabel: "Aggregate GEO Score",
+  },
+  empty: {
+    title: "No hay auditorías registradas",
+    body: "Ingresa la URL de tu producto o sitio web para generar tu primer GEO Score y diagnóstico de visibilidad en IA.",
+    cta: "Auditar mi primera URL",
+  },
+} as const;
+
 /** Typed grouping of every copy domain (design U2). */
 export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
@@ -200,4 +239,5 @@ export const COPY = {
   auth: AUTH_COPY,
   landing: LANDING_COPY,
   pricing: PRICING_COPY,
+  dashboard: DASHBOARD_COPY,
 } as const;
