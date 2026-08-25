@@ -55,10 +55,10 @@ Chain strategy: feature-branch-chain
 
 ## WU-B — Deudas de limpieza
 
-- [ ] B.1 `copy.ts`: `CHECKOUT_ERROR_COPY`, `SHELL_COPY`, tuteo→usted en `LANDING_COPY`/`DASHBOARD_COPY` (SHL-6/B8/B10); assert neutro
-- [ ] B.2 `navbar.tsx` + `github-auth-card.tsx`: strings desde `copy.ts`, usted (SHL-6/B10)
-- [ ] B.3 `button.tsx`: `loadingLabel?` + eliminar alias `loading`; `checkout-button.tsx` → `isLoading` + copy neutro (B11/B8)
-- [ ] B.4 5 archivos tokens→hex: `report/{page,error}.tsx`, `multipage/page.tsx`, `[id]/page.tsx`, `audit-runner.tsx` (B9); assert class/tokens
+- [x] B.1 `copy.ts`: `CHECKOUT_ERROR_COPY`, `SHELL_COPY`, tuteo→usted en `LANDING_COPY`/`DASHBOARD_COPY` (SHL-6/B8/B10); assert neutro
+- [x] B.2 `navbar.tsx` + `github-auth-card.tsx`: strings desde `copy.ts`, usted (SHL-6/B10)
+- [x] B.3 `button.tsx`: `loadingLabel?` + eliminar alias `loading`; `checkout-button.tsx` → `isLoading` + copy neutro (B11/B8)
+- [x] B.4 5 archivos tokens→hex: `report/{page,error}.tsx`, `multipage/page.tsx`, `[id]/page.tsx`, `audit-runner.tsx` (B9); assert class/tokens
 
 ## WU-C1 — SEO/OG (C16)
 
