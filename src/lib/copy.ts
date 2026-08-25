@@ -178,6 +178,10 @@ export const LANDING_COPY = {
     scorecardTitle: "El GEO Score: un estándar de 0 a 100",
     scorecardLead:
       "Cada puntuación se traduce en una banda de severidad con impacto directo en la visibilidad.",
+    // LND-7 (sprint 8): the ScoreHero shows a REAL verified audit — the
+    // category breakdown renders only from the evidence (score-hero-evidence.ts).
+    scorecardCategoryTitle: "Desglose por categoría",
+    scorecardBandsTitle: "Escala de Bandas y Criterios Técnicos",
     platformsEyebrow: "Ecosistema de Búsqueda de IA",
     platformsTitle: "6 plataformas de búsqueda generativa auditadas",
     platformsLead:
