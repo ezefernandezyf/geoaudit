@@ -42,8 +42,11 @@ describe("MultiPageReport (D3)", () => {
     expect(screen.getByText("74")).toBeInTheDocument();
     // "Regular" (Fair) appears twice: the hero band and page 1's band.
     expect(screen.getAllByText("Regular")).toHaveLength(2);
-    // The site URL appears twice: in the hero (aggregate) and in its page row.
-    expect(screen.getAllByText("https://example.com/")).toHaveLength(2);
+    // U5.8: the hero shows the hostname (view model domain — chip + title
+    // fallback), the page rows show the full URLs → the aggregate URL appears
+    // once (its page row).
+    expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("https://example.com/")).toHaveLength(1);
   });
 
   it("renders one row per audited page with url, score and band", () => {

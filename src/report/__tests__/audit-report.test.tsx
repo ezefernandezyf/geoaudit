@@ -4,32 +4,43 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { AuditReport } from "@/report/audit-report";
 
 /**
- * U3.6 — Shared report component (ADP-4/ADP-5/ADP-7). `<AuditReport result>`
- * renders the full MVP report from a persisted result object — ScoreHero +
- * DomainScorecard + PlatformMatrix + TopFindings + ReportMeta. The platform
- * matrix and mono-formatted code findings are part of the shared component
- * (not duplicated per page), so /report and the detail page match.
+ * U5.8 — AuditReport (ARU-10): consumes `toGeminiViewModel(result, ctx)` at
+ * the boundary and renders the full Gemini report — ScoreHero (real
+ * benchmark) + DomainScorecard + PlatformMatrix + TopFindings + ReportMeta —
+ * so every child is a pure presenter of the view model.
  */
-describe("AuditReport (ADP-4)", () => {
-  it("renders the report sections from a result object", () => {
+describe("AuditReport (ARU-10)", () => {
+  it("renders the report sections from a result through the adapter", () => {
     render(<AuditReport result={auditResultFixture} />);
 
-    // ScoreHero: score + URL + band chip.
+    // ScoreHero: score + band chip + hostname domain. "Regular" appears in the
+    // hero AND the two bottom-passage finding badges (same real band).
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("https://example.com/")).toBeInTheDocument();
-    expect(screen.getByText("Regular")).toBeInTheDocument();
+    expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Regular").length).toBeGreaterThanOrEqual(1);
 
-    // DomainScorecard rows.
-    expect(screen.getByText("Acceso de bots")).toBeInTheDocument();
-    expect(screen.getByText("Citabilidad")).toBeInTheDocument();
+    // Benchmark with the REAL thresholds (ARU-11).
+    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getByText("60 - 74")).toBeInTheDocument();
+
+    // DomainScorecard rows (view-model categoryScores). The names also appear
+    // as findings category chips → assert presence, not uniqueness.
+    expect(screen.getAllByText("Acceso de bots").length).toBeGreaterThanOrEqual(
+      1,
+    );
+    expect(screen.getAllByText("Citabilidad").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("E-E-A-T")).toBeInTheDocument();
-    expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
-    // "Plataforma" appears twice: scorecard row + matrix column header.
-    expect(screen.getAllByText("Plataforma").length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText("Datos estructurados").length,
+    ).toBeGreaterThanOrEqual(1);
 
-    // TopFindings: blocked bot + schema issue.
-    expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
-    expect(screen.getByText("Organization missing sameAs")).toBeInTheDocument();
+    // TopFindings: blocked bot + schema issue (derived, real engine data).
+    expect(
+      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Advertencia de datos estructurados"),
+    ).toBeInTheDocument();
   });
 
   it("exposes the aria label of the report section", () => {
@@ -39,25 +50,33 @@ describe("AuditReport (ADP-4)", () => {
     ).toBeInTheDocument();
   });
 
-  it("includes the platform matrix in the shared report (ADP-4/ADP-6)", () => {
+  it("includes the six-platform matrix with Claude 'No medido' (ARU-12)", () => {
     render(<AuditReport result={auditResultFixture} />);
     expect(
       screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
     ).toBeInTheDocument();
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
+    expect(screen.getByText("Claude")).toBeInTheDocument();
     // Claude has no perPlatform measurement → "No medido".
     expect(screen.getByText("No medido")).toBeInTheDocument();
   });
 
-  it("renders code findings in monospace (ADP-7)", () => {
+  it("renders the real generated JSON-LD code snippet (ADP-6)", () => {
     render(<AuditReport result={auditResultFixture} />);
+    // schema.generated exists in the fixture → the REAL snippet, not invented.
+    expect(screen.getByText(/"@type": "Organization"/)).toBeInTheDocument();
+    // The snippet is a real JSON string (not a placeholder like "const x = 1").
+    expect(screen.queryByText(/const x = 1/)).not.toBeInTheDocument();
+  });
 
-    // Schema issues render as code (mono).
-    const schemaIssue = screen.getByText("Organization missing sameAs");
-    expect(schemaIssue.className).toContain("font-mono");
-
-    // Suggestion keys render as code (mono).
-    const suggestionKey = screen.getByText("define_core_concept");
-    expect(suggestionKey.className).toContain("font-mono");
+  it("passes the caller context through to the view model (APT-9)", () => {
+    render(
+      <AuditReport
+        result={auditResultFixture}
+        ctx={{ auditDate: "2026-08-10", shareToken: "tok-1" }}
+      />,
+    );
+    // The persisted date surfaces in the hero + the meta strip.
+    expect(screen.getAllByText(/2026-08-10/).length).toBeGreaterThanOrEqual(1);
   });
 });
