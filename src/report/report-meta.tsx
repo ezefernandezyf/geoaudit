@@ -1,48 +1,26 @@
-import type { AuditResult } from "@/lib/contracts/audit-result";
-import { formatAuditDate, formatDurationMs } from "@/report/format";
-
-export type ReportMetaProps = {
-  /** Audit summary — duration used for the meta strip. */
-  summary: AuditResult["summary"];
-  /** Audit meta — completedAt for the date, errors for the honest avisos. */
-  meta: AuditResult["meta"];
-};
+import type { GeminiView } from "@/report/presenters/types";
 
 /**
- * ReportMeta (ARU-7): the report metadata strip — localized audit date — plus
- * the honest `meta.errors` avisos. A degraded audit is never presented as
- * success: every engine failure recorded by RAO-12/RAO-13 stays visible.
+ * ReportMeta (U5.6, ARU-10, design U5): pure presenter of the view model —
+ * the honest metadata strip (audit date + duration). The view model only
+ * carries metrics the engine actually measured (APT-10); the caller supplies
+ * the persisted date via the adapter `ctx`. Pure SSR Server Component.
  */
-export function ReportMeta({ summary, meta }: ReportMetaProps) {
+export function ReportMeta({ view }: { view: GeminiView }) {
   return (
     <section aria-label="Metadatos del análisis" className="w-full">
-      <dl className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-text-secondary">
-        <div>
-          <dt className="sr-only">Fecha de la auditoría</dt>
-          <dd>{formatAuditDate(meta.completedAt)}</dd>
-        </div>
+      <dl className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-xs text-[#64748b]">
+        {view.auditDate ? (
+          <div>
+            <dt className="sr-only">Fecha de la auditoría</dt>
+            <dd>{view.auditDate}</dd>
+          </div>
+        ) : null}
         <div>
           <dt className="sr-only">Duración del análisis</dt>
-          <dd>{formatDurationMs(summary.durationMs)}</dd>
+          <dd>{view.durationSeconds}s</dd>
         </div>
       </dl>
-      {meta.errors.length > 0 ? (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-text-primary">
-            Avisos del análisis
-          </h3>
-          <ul className="mt-2 flex flex-col gap-2">
-            {meta.errors.map((error) => (
-              <li
-                key={error}
-                className="rounded-md border border-border bg-surface-muted px-3 py-2 text-sm text-text-secondary"
-              >
-                {error}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
     </section>
   );
 }

@@ -1,43 +1,34 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import { ReportMeta } from "@/report/report-meta";
-import { degradedCitabilityResult } from "@/report/__tests__/variants";
+import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
 
 /**
- * U4.T5 — ReportMeta (ARU-7): the audit metadata strip — localized audit date
- * plus the honest `meta.errors` avisos when the audit was degraded. Never
- * hides a degraded result behind a clean score.
+ * U5.6 — ReportMeta (ARU-10): pure presenter of the view model — the honest
+ * metadata strip (duration from the adapter, persisted date via ctx). The
+ * view model carries only measured metrics (APT-10): no fabricated avisos.
  */
 describe("ReportMeta", () => {
-  it("renders the audit date from the completed timestamp", () => {
-    render(
-      <ReportMeta
-        summary={auditResultFixture.summary}
-        meta={auditResultFixture.meta}
-      />,
-    );
-    expect(screen.getByText(/2023/)).toBeInTheDocument();
+  it("renders the audit duration from the view model", () => {
+    render(<ReportMeta view={geminiViewFixture} />);
+    // Fixture durationMs 3214 → 3s (whole seconds, min 1).
+    expect(screen.getByText("3s")).toBeInTheDocument();
   });
 
-  it("renders no avisos when the audit has no errors", () => {
-    render(
-      <ReportMeta
-        summary={auditResultFixture.summary}
-        meta={auditResultFixture.meta}
-      />,
-    );
-    expect(screen.queryByText("Avisos del análisis")).not.toBeInTheDocument();
+  it("renders the persisted audit date when the caller provides it (ctx)", () => {
+    const dated = toGeminiViewModel(auditResultFixture, {
+      auditDate: "2026-08-10",
+    });
+    render(<ReportMeta view={dated} />);
+    expect(screen.getByText("2026-08-10")).toBeInTheDocument();
   });
 
-  it("lists meta.errors honestly when the audit is degraded (ARU-7)", () => {
-    render(
-      <ReportMeta
-        summary={degradedCitabilityResult.summary}
-        meta={degradedCitabilityResult.meta}
-      />,
-    );
-    expect(screen.getByText("Avisos del análisis")).toBeInTheDocument();
-    expect(screen.getByText("citability: boom")).toBeInTheDocument();
+  it("omits the date row when no date is available (honesty, APT-10)", () => {
+    render(<ReportMeta view={geminiViewFixture} />);
+    // Default ctx → auditDate null → only the duration row renders.
+    expect(screen.getByText("3s")).toBeInTheDocument();
+    expect(screen.getAllByRole("term")).toHaveLength(1);
   });
 });

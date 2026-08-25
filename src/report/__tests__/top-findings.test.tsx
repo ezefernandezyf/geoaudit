@@ -1,86 +1,132 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import { TopFindings } from "@/report/top-findings";
-import { emptyCitability, emptySchema } from "@/report/__tests__/variants";
-
-const fixtureProps = {
-  citability: auditResultFixture.citability,
-  schema: auditResultFixture.schema,
-  crawlers: auditResultFixture.crawlers,
-};
+import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
 
 /**
- * U4.T4 — TopFindings (ARU-8): the most actionable findings — citability
- * top3/bottom3 passages + suggestions, schema issues and blocked bots.
- * Degraded sections have empty lists and render nothing fake.
+ * U5.6 — TopFindings (ARU-10): pure presenter of the view model. Gemini
+ * "Hallazgos Técnicos Priorizados" section rendering `view.findings`
+ * (deriveFindings over real engine data). Honesty (APT-10): NO impact-score
+ * chip (always null) and a code snippet ONLY from a real source
+ * (schema.generated JSON-LD).
  */
-describe("TopFindings valid audit (ARU-8)", () => {
-  it("renders the top and bottom citability passages", () => {
-    render(<TopFindings {...fixtureProps} />);
+describe("TopFindings valid audit (ARU-10)", () => {
+  it("renders the derived findings: citability, schema and blocked bots", () => {
+    render(<TopFindings view={geminiViewFixture} />);
 
+    // 2 bottom3 passages → 2 "Pasaje a mejorar"; 3 top3 → 3 "altamente citable".
+    expect(screen.getAllByText("Pasaje a mejorar")).toHaveLength(2);
+    expect(screen.getAllByText("Pasaje altamente citable")).toHaveLength(3);
     expect(
-      screen.getByText(
-        "GEO is the practice of optimizing content for AI assistants.",
-      ),
+      screen.getByText("Advertencia de datos estructurados"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("Bot de IA bloqueado: OAI-SearchBot"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows the findings count chip (7 points of action)", () => {
+    render(<TopFindings view={geminiViewFixture} />);
+    // 2 bottom + 3 top + 1 schema issue + 1 blocked bot (fixture).
+    expect(screen.getByText("7 puntos de acción")).toBeInTheDocument();
+  });
+
+  it("renders the description and the neutral recommendation for each finding", () => {
+    render(<TopFindings view={geminiViewFixture} />);
     expect(
       screen.getByText("Vague filler paragraphs dilute the passage."),
     ).toBeInTheDocument();
+    expect(screen.getAllByText(/Recomendación GEO:/).length).toBeGreaterThan(0);
   });
 
-  it("renders citability suggestions as actionable items (block + key)", () => {
-    render(<TopFindings {...fixtureProps} />);
-
-    expect(screen.getByText("Introduction")).toBeInTheDocument();
-    expect(screen.getByText("Statistics")).toBeInTheDocument();
-    expect(screen.getByText(/define_core_concept/)).toBeInTheDocument();
-  });
-
-  it("renders schema issues", () => {
-    render(<TopFindings {...fixtureProps} />);
-    expect(screen.getByText("Organization missing sameAs")).toBeInTheDocument();
-  });
-
-  it("renders blocked bots", () => {
-    render(<TopFindings {...fixtureProps} />);
-    expect(screen.getByText("OAI-SearchBot")).toBeInTheDocument();
-    expect(screen.getByText("bloqueado")).toBeInTheDocument();
+  it("never renders an impact-score chip (impactScore is null, APT-10)", () => {
+    render(<TopFindings view={geminiViewFixture} />);
+    expect(screen.queryByText(/pts de impacto/)).not.toBeInTheDocument();
   });
 });
 
-describe("TopFindings edge cases", () => {
-  it("shows an honest empty state when there are no findings", () => {
-    render(
-      <TopFindings
-        citability={emptyCitability}
-        schema={emptySchema}
-        crawlers={{ compositeScore: 0, perBot: {} }}
-      />,
-    );
-    expect(screen.getByText("Sin hallazgos destacados.")).toBeInTheDocument();
-    expect(screen.queryByText("bloqueado")).not.toBeInTheDocument();
+describe("TopFindings code snippets (ADP-6)", () => {
+  it("renders the real generated JSON-LD snippet with a copy island", () => {
+    render(<TopFindings view={geminiViewFixture} />);
+
+    // schema.generated is present in the fixture → the real JSON-LD renders.
+    expect(screen.getByText(/"@type": "Organization"/)).toBeInTheDocument();
+    const copyButtons = screen.getAllByRole("button", {
+      name: "Copiar código",
+    });
+    expect(copyButtons.length).toBeGreaterThan(0);
   });
 
-  it("renders no bots section when no bot is blocked", () => {
-    render(
-      <TopFindings
-        {...fixtureProps}
-        crawlers={{ ...fixtureProps.crawlers, perBot: { GPTBot: "allowed" } }}
-      />,
+  it("copies the snippet to the clipboard from the code island", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+
+    render(<TopFindings view={geminiViewFixture} />);
+    fireEvent.click(
+      screen.getAllByRole("button", { name: "Copiar código" })[0],
     );
-    expect(screen.queryByText(/bloqueado/)).not.toBeInTheDocument();
+
+    await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+    expect(writeText.mock.calls[0][0]).toContain('"@type": "Organization"');
+    expect(
+      await screen.findByRole("button", { name: "Copiar código" }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("TopFindings honesty edge cases (APT-10)", () => {
+  it("shows the empty state when there are no findings", () => {
+    const noFindings = {
+      ...auditResultFixture,
+      citability: {
+        pageScore: 0,
+        coverage: 0,
+        top3: [],
+        bottom3: [],
+        suggestions: [],
+      },
+      schema: {
+        detected: [],
+        issues: [],
+        generated: null,
+        businessType: "hybrid" as const,
+      },
+      crawlers: { compositeScore: 0, perBot: { GPTBot: "allowed" as const } },
+    };
+    render(<TopFindings view={toGeminiViewModel(noFindings)} />);
+
+    expect(
+      screen.getByText("Configuración técnica sin observaciones críticas"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("0 puntos de acción")).toBeInTheDocument();
   });
 
-  it("renders no citability section when the engine is degraded (empty lists)", () => {
-    render(
-      <TopFindings
-        citability={emptyCitability}
-        schema={fixtureProps.schema}
-        crawlers={fixtureProps.crawlers}
-      />,
-    );
-    expect(screen.queryByText("Pasajes más citables")).not.toBeInTheDocument();
-    expect(screen.getByText("Organization missing sameAs")).toBeInTheDocument();
+  it("renders no code snippet when no real source exists", () => {
+    const noSchemaSource = {
+      ...auditResultFixture,
+      schema: {
+        detected: [{ "@type": "Organization" }],
+        issues: ["Organization missing sameAs"],
+        generated: null,
+        businessType: "saas" as const,
+      },
+    };
+    render(<TopFindings view={toGeminiViewModel(noSchemaSource)} />);
+
+    expect(
+      screen.getByText("Advertencia de datos estructurados"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Copiar código" }),
+    ).not.toBeInTheDocument();
   });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
