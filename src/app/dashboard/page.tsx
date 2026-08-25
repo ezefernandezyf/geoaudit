@@ -3,13 +3,32 @@ import { AggregateHero } from "@/dashboard/aggregate-hero";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
 import { BillingCta } from "@/dashboard/billing-cta";
 import { DashboardEmptyState } from "@/dashboard/dashboard-empty-state";
+import { DashboardRunnerBar } from "@/dashboard/runner-bar";
 import { ScoreTrend } from "@/dashboard/score-trend";
 import type { DashboardAudit } from "@/dashboard/types";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { SeverityBand } from "@/lib/contracts/audit-result";
+import { auditAction } from "@/lib/audit/actions";
+import type {
+  MultiPageResult,
+  SeverityBand,
+} from "@/lib/contracts/audit-result";
 import { portalAction } from "@/billing/actions";
-import { Card } from "@/ui/card";
+
+/**
+ * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
+ * audit persists the light `{ aggregate, pages }` shape while single-page
+ * audits keep the full `AuditResult`. Structural check — same convention as
+ * the audit detail page.
+ */
+function isMultiPageResult(value: unknown): value is MultiPageResult {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "aggregate" in value &&
+    Array.isArray((value as { pages?: unknown }).pages)
+  );
+}
 
 /**
  * Authenticated dashboard (DSH-1..DSH-5, design U4).
@@ -55,48 +74,50 @@ export default async function DashboardPage() {
     // the shared SeverityBadge maps to its Spanish label.
     severityBand: row.severityBand as SeverityBand,
     createdAt: row.createdAt,
+    // DSH-10: flag multi-page rows by the persisted result shape.
+    isMultiPage: isMultiPageResult(row.result),
   }));
 
+  const runnerUser = {
+    name: session.user.name ?? session.user.email ?? null,
+    email: session.user.email ?? null,
+    // Lowercase plan pill, Gemini style ("pro Plan").
+    plan: tier.toLowerCase(),
+  };
+
   return (
-    <main className="min-h-dvh bg-surface">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-6 py-16">
-        <header className="flex flex-col gap-2">
-          <h1 className="font-display text-4xl tracking-tight text-navy">
-            Tu historial de auditorías
-          </h1>
-          <p className="max-w-lg text-text-secondary">
-            Los resultados de tus auditorías GEO y la evolución de tu score.
-          </p>
-          <div className="mt-2">
-            <BillingCta tier={tier} portalAction={portalAction} />
-          </div>
-        </header>
+    <main className="min-h-dvh bg-white">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
+        {/* U4.1 (DSH-8): runner bar — URL input + "Run Audit" inside + user chip. */}
+        <DashboardRunnerBar action={auditAction} user={runnerUser} />
+
+        {/* DSH-6: tier-adaptive billing CTA (Upgrade → /pricing; PRO/Enterprise
+            → portal). Restyled Gemini in U4.4. */}
+        <div className="flex justify-end">
+          <BillingCta tier={tier} portalAction={portalAction} />
+        </div>
 
         {audits.length === 0 ? (
           <DashboardEmptyState />
         ) : (
           <>
-            {/* DSH-8: aggregate hero from the most recent persisted audit. */}
-            <AggregateHero
-              latestScore={audits[0].geoScore}
-              latestBand={audits[0].severityBand}
-            />
-            <Card>
-              <h2 className="font-display text-xl tracking-tight text-navy">
-                Tendencia de GEO Score
-              </h2>
-              <div className="mt-4">
+            {/* U4.2 (DSH-9): 12-column grid — Aggregate (col-4) + Trend (col-8)
+                share one row; the trend renders 12 pure-CSS bars. */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              <div className="lg:col-span-4">
+                <AggregateHero
+                  latestScore={audits[0].geoScore}
+                  latestBand={audits[0].severityBand}
+                />
+              </div>
+              <div className="lg:col-span-8">
                 <ScoreTrend audits={audits} />
               </div>
-            </Card>
-            <Card>
-              <h2 className="font-display text-xl tracking-tight text-navy">
-                Historial
-              </h2>
-              <div className="mt-4">
-                <AuditHistoryTable audits={audits} />
-              </div>
-            </Card>
+            </div>
+
+            {/* U4.3 (DSH-10/11): history table with header bar + Multi-Page
+                chip + refresh + scanning row. */}
+            <AuditHistoryTable audits={audits} />
           </>
         )}
       </div>

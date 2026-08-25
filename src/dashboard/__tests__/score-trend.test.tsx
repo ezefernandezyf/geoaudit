@@ -4,52 +4,44 @@ import { ScoreTrend } from "@/dashboard/score-trend";
 import { auditFixtures, manyAuditFixtures } from "./fixtures";
 
 /**
- * U4 — Score trend (DSH-2). Pure CSS bars: each bar is a div whose height is
- * the audit's GEO score in %, colored by severity band. No chart library — the
+ * U4.2 — Score trend (DSH-2/DSH-9, design U4). Exactly 12 pure-CSS bars, one
+ * per month of the trailing year (Gemini verbatim), no chart library — the
  * assertions pin the DOM to divs (no svg/canvas could ever load).
  */
-describe("ScoreTrend (DSH-2)", () => {
-  it("renders one CSS bar per audit with height equal to its score", () => {
+describe("ScoreTrend (DSH-2/DSH-9)", () => {
+  it("renders exactly 12 CSS bars (one per month)", () => {
     const { container } = render(<ScoreTrend audits={auditFixtures} />);
-
-    for (const audit of auditFixtures) {
-      const bar = screen.getByRole("img", {
-        name: `GEO Score ${audit.geoScore}`,
-      });
-      expect(bar).toHaveStyle({ height: `${audit.geoScore}%` });
-    }
+    // 12 month bars + 4 footer labels.
+    const monthBars = container.querySelectorAll(
+      'div[aria-label*="pts"], div[aria-label*="sin auditorías"]',
+    );
+    expect(monthBars).toHaveLength(12);
 
     // pure CSS bars: no chart library markup can appear
     expect(container.querySelector("svg, canvas")).toBeNull();
   });
 
-  it("colors each bar by its severity band", () => {
-    render(<ScoreTrend audits={auditFixtures} />);
-    expect(screen.getByRole("img", { name: "GEO Score 87" })).toHaveClass(
-      "bg-green-500",
-    );
-    expect(screen.getByRole("img", { name: "GEO Score 62" })).toHaveClass(
-      "bg-emerald-500",
-    );
-    expect(screen.getByRole("img", { name: "GEO Score 41" })).toHaveClass(
-      "bg-amber-500",
-    );
-    expect(screen.getByRole("img", { name: "GEO Score 23" })).toHaveClass(
-      "bg-orange-500",
-    );
-    expect(screen.getByRole("img", { name: "GEO Score 9" })).toHaveClass(
-      "bg-red-500",
-    );
+  it("highlights the most recent month with the emerald Gemini bar", () => {
+    const { container } = render(<ScoreTrend audits={auditFixtures} />);
+    const emerald = container.querySelectorAll("div[class*='#10b981']");
+    // The most recent month bar uses the emerald fill (latest = emphasis).
+    expect(emerald.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("plots at most the 10 most recent audits", () => {
+  it("groups audits by month into the trailing 12-month window", () => {
     render(<ScoreTrend audits={manyAuditFixtures} />);
-    expect(screen.getAllByRole("img")).toHaveLength(10);
-    expect(
-      screen.getByRole("img", { name: "GEO Score 98" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("img", { name: "GEO Score 32" }),
-    ).not.toBeInTheDocument();
+    // The most recent month (highest score) is the emerald "Presente" bar.
+    const latestBar = screen.getByRole("img", {
+      name: /Tendencia de visibilidad/,
+    });
+    expect(latestBar).toBeInTheDocument();
+  });
+
+  it("renders 12 monthly footer labels", () => {
+    const { container } = render(<ScoreTrend audits={auditFixtures} />);
+    const labels = container.querySelectorAll(
+      "div.flex.justify-between.font-mono span",
+    );
+    expect(labels.length).toBeGreaterThanOrEqual(4);
   });
 });

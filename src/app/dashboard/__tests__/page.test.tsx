@@ -30,6 +30,8 @@ vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");
   }),
+  // The history table refresh action (DSH-11) calls router.refresh().
+  useRouter: vi.fn(() => ({ refresh: vi.fn() })),
 }));
 
 const prismaRows = [
@@ -92,19 +94,22 @@ describe("DashboardPage (DSH-1)", () => {
 });
 
 describe("DashboardPage (DSH-2/DSH-3)", () => {
-  it("renders the score trend bars", async () => {
+  it("renders the 12-month CSS score trend", async () => {
     render(await DashboardPage());
-    expect(screen.getByRole("img", { name: "GEO Score 87" })).toHaveStyle({
-      height: "87%",
+
+    // The trend container is an accessible 12-month visualization (DSH-2/9).
+    const trend = screen.getByRole("img", {
+      name: /Tendencia de visibilidad: 12 meses/,
     });
-    expect(screen.getByRole("img", { name: "GEO Score 62" })).toHaveStyle({
-      height: "62%",
-    });
+    expect(trend).toBeInTheDocument();
+    // Both fixtures land in Aug 2026 → one emerald bar with the monthly avg.
+    const augBar = trend.querySelector('div[aria-label^="Aug: 75 pts"]');
+    expect(augBar).not.toBeNull();
   });
 
   it("offers a re-audit link per row", async () => {
     render(await DashboardPage());
-    const links = screen.getAllByRole("link", { name: "Re-auditar" });
+    const links = screen.getAllByRole("link", { name: /Re-auditar/ });
     expect(links).toHaveLength(2);
     expect(links[0]).toHaveAttribute(
       "href",
@@ -138,5 +143,36 @@ describe("DashboardPage guard", () => {
     authMock.mockResolvedValueOnce(null);
     await expect(DashboardPage()).rejects.toThrow("NEXT_REDIRECT");
     expect(redirect).toHaveBeenCalledWith("/login");
+  });
+});
+
+/**
+ * U4.1/U4.2 — Runner bar (DSH-8) + 12-column grid (DSH-9): the dashboard page
+ * composes the Gemini runner bar (input + "Run Audit" inside + user chip) and
+ * the Aggregate (col-4) + Trend (col-8) grid on one row.
+ */
+describe("DashboardPage (DSH-8/DSH-9)", () => {
+  it("renders the runner bar with URL input, Run Audit and user chip", async () => {
+    authMock.mockResolvedValue({
+      user: { id: "user-1", name: "Marcos", email: "m@x.com" },
+    });
+    render(await DashboardPage());
+
+    expect(
+      screen.getByRole("textbox", { name: "URL del sitio" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Run Audit/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Marcos")).toBeInTheDocument();
+    expect(screen.getByText("free Plan")).toBeInTheDocument();
+  });
+
+  it("places Aggregate (col-4) and Trend (col-8) on the same 12-col row", async () => {
+    render(await DashboardPage());
+
+    const grid = screen.getByText("Aggregate GEO Score").closest("div.grid");
+    expect(grid).not.toBeNull();
+    expect(grid?.className).toContain("lg:grid-cols-12");
   });
 });

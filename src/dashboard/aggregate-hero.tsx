@@ -1,5 +1,6 @@
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
+import { DASHBOARD_COPY } from "@/lib/copy";
 
 type AggregateHeroProps = {
   /** Latest audit's GEO score (0-100), from the persisted rows. */
@@ -9,26 +10,35 @@ type AggregateHeroProps = {
 };
 
 /**
- * Aggregate hero (DSH-8, design U3): a summary card of the user's most recent
- * GEO Score and its band. Values arrive as props from the persisted Audit rows
- * (the page reads `audits[0]`) — never a recomputation. Pure presentation.
+ * Aggregate hero (DSH-8, design U4). Gemini verbatim: a bordered white card
+ * holding the "Aggregate GEO Score" label, the serif score (emerald /100) and
+ * the severity band badge. Values arrive as props from the persisted Audit
+ * rows (the page reads `audits[0]`) — never a recomputation. Pure presentation.
  */
 export function AggregateHero({ latestScore, latestBand }: AggregateHeroProps) {
+  const band = latestBand.toLowerCase() as GeminiBand;
+
   return (
     <section
       aria-label="Resumen del GEO Score"
-      className="flex flex-col items-start gap-4 rounded-xl border border-border bg-surface p-6"
+      className="flex flex-col justify-center rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-xs sm:p-8"
     >
-      <p className="text-xs font-medium uppercase tracking-wide text-text-secondary">
-        GEO Score más reciente
+      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#475569]">
+        {DASHBOARD_COPY.trend.aggregateLabel}
       </p>
-      <div className="flex items-baseline gap-2">
-        <span className="font-display text-6xl leading-none tracking-tight text-navy">
+      <div className="flex items-baseline gap-3">
+        <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
           {latestScore}
         </span>
-        <span className="font-mono text-sm text-text-secondary">/100</span>
+        <span className="font-mono text-xl font-bold text-[#10b981]">/100</span>
       </div>
-      <SeverityBadge band={latestBand.toLowerCase() as GeminiBand} />
+      <div className="mt-4">
+        <SeverityBadge band={band} />
+      </div>
+      <p className="mt-4 text-xs leading-relaxed text-[#475569]">
+        La visibilidad en redes de citación de LLMs supera el benchmark del
+        sector B2B y SaaS.
+      </p>
     </section>
   );
 }

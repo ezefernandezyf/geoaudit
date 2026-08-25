@@ -23,8 +23,8 @@ describe("AggregateHero (DSH-8)", () => {
     expect(screen.queryByText("87")).not.toBeInTheDocument();
   });
 
-  it("labels the hero as the most recent GEO Score", () => {
+  it("labels the hero as Aggregate GEO Score", () => {
     render(<AggregateHero latestScore={62} latestBand="Good" />);
-    expect(screen.getByText("GEO Score más reciente")).toBeInTheDocument();
+    expect(screen.getByText("Aggregate GEO Score")).toBeInTheDocument();
   });
 });

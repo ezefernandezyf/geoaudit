@@ -11,4 +11,6 @@ export type DashboardAudit = {
   geoScore: number;
   severityBand: SeverityBand;
   createdAt: Date;
+  /** True when the persisted `result` is the multi-page shape (DSH-10). */
+  isMultiPage?: boolean;
 };
