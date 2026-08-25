@@ -417,6 +417,56 @@ export const SHARE_COPY = {
   },
 } as const;
 
+/**
+ * Multi-page audit copy (U6, MPU-1/2/3, design U6) — Gemini trigger page
+ * wording, neutral Spanish (usted). `MultiPageErrorCode` → neutral copy for
+ * the `useActionState` trigger form (MPU-3).
+ */
+export const MULTIPAGE_COPY = {
+  header: {
+    eyebrow: "Auditoría Multi-Página (Pro)",
+    title: "Auditoría Multi-Página",
+    description:
+      "Analice varias rutas de su sitio en una sola auditoría para obtener una vista agregada de su visibilidad de IA.",
+  },
+  form: {
+    inputLabel: "URL del sitio",
+    placeholder: "https://ejemplo.com",
+    submitLabel: "Iniciar auditoría",
+    formAriaLabel: "Auditoría multi-página",
+  },
+  /** MultiPageErrorCode → neutral Spanish copy (MPU-3). */
+  errors: {
+    "rate-limited": "Demasiadas solicitudes. Espere un momento.",
+    invalid:
+      "Formato de URL inválido. Verifique que la URL sea correcta y vuelva a intentarlo.",
+    auth: "Necesita iniciar sesión para ejecutar una auditoría multi-página.",
+    upgrade:
+      "La auditoría multi-página es una función PRO. Mejore su plan para activarla.",
+    limit:
+      "Alcanzó el límite de auditorías de su plan. Espere al próximo ciclo para continuar.",
+    failed:
+      "No pudimos completar la auditoría multi-página. Pruebe nuevamente en unos minutos.",
+  },
+  gate: {
+    title: "La auditoría multi-página es una función PRO",
+    body: "Analice múltiples rutas de su sitio en una sola auditoría y obtenga un reporte agregado de visibilidad de IA.",
+    cta: "Mejorar a PRO",
+  },
+  results: {
+    emptyTitle: "Sin auditorías multi-página todavía",
+    emptyBody:
+      "Ejecute su primera auditoría multi-página para ver el desglose por ruta.",
+    selectorTitle: "Rutas y URLs Analizadas",
+    selectorSubtitle:
+      "Seleccione una URL para inspeccionar su diagnóstico individual",
+    totalLabel: "páginas",
+    inspectorLabel: "Detalle de Ruta",
+    scoreLabel: "GEO Score",
+    durationLabel: "Duración",
+  },
+} as const;
+
 /** Typed grouping of every copy domain (design U2). */
 export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
@@ -431,4 +481,5 @@ export const COPY = {
   legal: LEGAL_COPY,
   report: REPORT_COPY,
   share: SHARE_COPY,
+  multipage: MULTIPAGE_COPY,
 } as const;
