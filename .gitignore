@@ -46,3 +46,6 @@ next-env.d.ts
 
 # codegraph index (local, regenerable)
 /.codegraph/
+
+# lighthouse raw reports (evidence lives in docs/performance.md)
+/.lighthouse/
