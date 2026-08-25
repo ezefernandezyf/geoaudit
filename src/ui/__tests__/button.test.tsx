@@ -6,7 +6,9 @@ import { Button } from "@/ui/button";
  * U1.2 — Button primitive (DNF-7): Gemini verbatim classes (hex directos),
  * variants (primary/secondary/ghost/emerald/danger), sizes (sm/md/lg) and a
  * loading state that prevents double-submit (isLoading → Loader2 spin +
- * disabled + aria-busy, label "Analizando…").
+ * disabled + aria-busy, label from `loadingLabel`, default "Analizando…").
+ * B11: the deprecated `loading` alias was removed — `isLoading` is the only
+ * pending prop and the loading label is parametrizable.
  */
 describe("Button (DNF-7)", () => {
   it("renders children by default", () => {
@@ -97,13 +99,31 @@ describe("Button (DNF-7)", () => {
     });
   });
 
-  describe("loading alias (deprecated `loading`)", () => {
-    it("maps the deprecated loading prop to the same pending state", () => {
-      render(<Button loading>Analizar</Button>);
-      const button = screen.getByRole("button");
-      expect(button).toBeDisabled();
-      expect(button).toHaveAttribute("aria-busy", "true");
+  describe("loading label (loadingLabel, B11)", () => {
+    it("defaults to the Analizando… label", () => {
+      render(
+        <Button variant="primary" isLoading>
+          Analizar
+        </Button>,
+      );
       expect(screen.getByText("Analizando…")).toBeInTheDocument();
+      expect(screen.queryByText("Analizar")).not.toBeInTheDocument();
+    });
+
+    it("uses a custom loadingLabel when provided", () => {
+      render(
+        <Button variant="primary" isLoading loadingLabel="Procesando pago…">
+          Mejorar
+        </Button>,
+      );
+      expect(screen.getByText("Procesando pago…")).toBeInTheDocument();
+      expect(screen.queryByText("Mejorar")).not.toBeInTheDocument();
+    });
+
+    it("accepts loadingLabel without isLoading (no pending state)", () => {
+      render(<Button loadingLabel="Procesando…">Auditar</Button>);
+      expect(screen.getByText("Auditar")).toBeInTheDocument();
+      expect(screen.queryByText("Procesando…")).not.toBeInTheDocument();
     });
   });
 

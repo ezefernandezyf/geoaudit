@@ -10,11 +10,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: ButtonSize;
   /** Pending state: disables the button, sets aria-busy and swaps in a Loader2 spinner (DNF-7). */
   isLoading?: boolean;
-  /**
-   * @deprecated Renamed to `isLoading` (Gemini verbatim). Kept as an alias so
-   * existing callers (audit form, checkout) compile until their units migrate.
-   */
-  loading?: boolean;
+  /** Label shown while loading (default "Analizando…" — B11, parametrizable). */
+  loadingLabel?: string;
   /** Optional icon rendered before the label (Gemini). Hidden while loading. */
   leftIcon?: ReactNode;
   /** Optional icon rendered after the label (Gemini). Hidden while loading. */
@@ -49,15 +46,15 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 /**
  * Button primitive (spec DNF-7) — Gemini verbatim (hex classes, sizes,
  * variants, Loader2 spinner). While loading the button is disabled, announces
- * `aria-busy="true"` and swaps the label for "Analizando…" (the app's
- * established pending copy, ADF-6); icon slots hide so the spinner is the only
- * indicator.
+ * `aria-busy="true"` and swaps the label for `loadingLabel` (default
+ * "Analizando…", the app's established pending copy, ADF-6; B11 makes it
+ * parametrizable); icon slots hide so the spinner is the only indicator.
  */
 export function Button({
   variant = "primary",
   size = "md",
   isLoading = false,
-  loading = false,
+  loadingLabel = "Analizando…",
   leftIcon,
   rightIcon,
   className = "",
@@ -65,7 +62,7 @@ export function Button({
   children,
   ...rest
 }: ButtonProps) {
-  const busy = isLoading || loading;
+  const busy = isLoading;
   return (
     <button
       type={type}
@@ -80,7 +77,7 @@ export function Button({
             className="h-4 w-4 shrink-0 animate-spin text-current"
             aria-hidden="true"
           />
-          Analizando…
+          {loadingLabel}
         </>
       ) : (
         <>

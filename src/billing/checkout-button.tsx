@@ -55,7 +55,7 @@ export function CheckoutButton({
   return (
     <form action={formAction} aria-busy={isPending || undefined}>
       <input type="hidden" name="plan" value={plan} />
-      <Button type="submit" loading={isPending} className="w-full">
+      <Button type="submit" isLoading={isPending} className="w-full">
         {label}
       </Button>
       {error ? (
