@@ -1,12 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import { PlatformMatrix } from "@/report/platform-matrix";
+import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
 /**
- * U3.2 — PlatformMatrix component (ADP-6): renders the six rows derived from
- * the real perPlatform + perBot contract shapes. Claude (no perPlatform
- * measurement) shows "No medido"; access states render their Spanish label.
+ * U5.7 — PlatformMatrix (ARU-12): pure presenter of `view.platforms`. The
+ * view model delivers the six rows (built by `buildPlatformRows` inside the
+ * adapter); Claude (no perPlatform measurement) shows "No medido". The pure
+ * `buildPlatformRows` derivation keeps its own unit tests (platform-matrix
+ * .test.ts).
  */
 
 const matrixResult = {
@@ -24,19 +27,19 @@ const matrixResult = {
   crawlers: {
     compositeScore: 71,
     perBot: {
-      GPTBot: "allowed",
-      "Claude-Web": "allowed",
-      PerplexityBot: "blocked",
-      "Google-Extended": "allowed",
-      Googlebot: "allowed",
-      Bingbot: "unknown",
+      GPTBot: "allowed" as const,
+      "Claude-Web": "allowed" as const,
+      PerplexityBot: "blocked" as const,
+      "Google-Extended": "allowed" as const,
+      Googlebot: "allowed" as const,
+      Bingbot: "unknown" as const,
     },
   },
 };
 
-describe("PlatformMatrix (ADP-6)", () => {
-  it("renders six platform rows with their readiness scores", () => {
-    render(<PlatformMatrix result={matrixResult} />);
+describe("PlatformMatrix (ARU-12)", () => {
+  it("renders six platform rows with their readiness scores from the view", () => {
+    render(<PlatformMatrix view={toGeminiViewModel(matrixResult)} />);
 
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
     expect(screen.getByText("Claude")).toBeInTheDocument();
@@ -50,18 +53,35 @@ describe("PlatformMatrix (ADP-6)", () => {
   });
 
   it("renders Claude readiness as 'No medido' with its bot access", () => {
-    render(<PlatformMatrix result={matrixResult} />);
+    render(<PlatformMatrix view={toGeminiViewModel(matrixResult)} />);
 
     expect(screen.getByText("No medido")).toBeInTheDocument();
     expect(screen.getByText("Claude-Web")).toBeInTheDocument();
   });
 
   it("renders Spanish access labels for each bot state", () => {
-    render(<PlatformMatrix result={matrixResult} />);
+    render(<PlatformMatrix view={toGeminiViewModel(matrixResult)} />);
 
     // ChatGPT, Claude, Gemini, AI Overviews allowed → 4 "Permitido" chips.
     expect(screen.getAllByText("Permitido")).toHaveLength(4);
     expect(screen.getByText("Bloqueado")).toBeInTheDocument(); // Perplexity
     expect(screen.getByText("Desconocido")).toBeInTheDocument(); // Bing Copilot
+  });
+
+  it("renders the Gemini section header (ARU-12 matrix title)", () => {
+    render(<PlatformMatrix view={toGeminiViewModel(matrixResult)} />);
+    expect(
+      screen.getByText("Matriz de Visibilidad por Plataforma de IA"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
+    ).toBeInTheDocument();
+  });
+
+  it("never renders fabricated columns (no citation rate / last crawled)", () => {
+    render(<PlatformMatrix view={toGeminiViewModel(matrixResult)} />);
+    expect(screen.queryByText("Tasa de Citación")).not.toBeInTheDocument();
+    expect(screen.queryByText("Último Rastreo")).not.toBeInTheDocument();
+    expect(screen.queryByText("%")).not.toBeInTheDocument();
   });
 });
