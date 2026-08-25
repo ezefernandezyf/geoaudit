@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/ui/button";
+import { CHECKOUT_ERROR_COPY } from "@/lib/copy";
 import type { BillingActionState } from "@/billing/actions";
 
 /**
@@ -23,13 +24,8 @@ export type CheckoutAction = (
   formData: FormData,
 ) => Promise<BillingActionState>;
 
-/** Maps action error codes to friendly Spanish copy (PRC-4). */
-const ERROR_COPY: Record<string, string> = {
-  auth: "Necesitás iniciar sesión para gestionar tu plan.",
-  "invalid-plan": "Plan no válido.",
-  config: "No pudimos iniciar el pago. Probá de nuevo en unos minutos.",
-  "no-subscription": "No tenés una suscripción activa.",
-};
+/** Maps action error codes to friendly Spanish copy (PRC-4, B8 — centralized). */
+const ERROR_COPY = CHECKOUT_ERROR_COPY;
 
 /** Resolve an action error code to user-facing copy (falls back to the code). */
 export function billingErrorMessage(code: string | null): string | null {

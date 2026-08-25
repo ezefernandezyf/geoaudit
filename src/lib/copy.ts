@@ -44,6 +44,14 @@ export const FETCH_ERROR_COPY: Record<FetchFailureCode, string> = {
 export const GENERIC_AUDIT_ERROR_COPY =
   "No pudimos analizar el sitio. Pruebe nuevamente.";
 
+/** Checkout/Portal action error codes → neutral Spanish copy (PRC-4, B8). */
+export const CHECKOUT_ERROR_COPY: Record<string, string> = {
+  auth: "Necesita iniciar sesión para gestionar su plan.",
+  "invalid-plan": "Plan no válido.",
+  config: "No pudimos iniciar el pago. Pruebe de nuevo en unos minutos.",
+  "no-subscription": "No tiene una suscripción activa.",
+};
+
 /** ShareModal error codes → neutral Spanish copy (SHR-3, design ShareModal). */
 export const SHARE_MODAL_ERROR_COPY: Record<string, string> = {
   auth: "Necesita iniciar sesión para compartir.",
@@ -482,6 +490,7 @@ export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
   fetchError: FETCH_ERROR_COPY,
   genericAuditError: GENERIC_AUDIT_ERROR_COPY,
+  checkoutErrors: CHECKOUT_ERROR_COPY,
   shareModalErrors: SHARE_MODAL_ERROR_COPY,
   auth: AUTH_COPY,
   landing: LANDING_COPY,

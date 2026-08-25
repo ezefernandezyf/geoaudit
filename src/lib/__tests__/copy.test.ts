@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   AUDIT_FORM_ERRORS,
   AUTH_COPY,
+  CHECKOUT_ERROR_COPY,
   COPY,
   FETCH_ERROR_COPY,
   GENERIC_AUDIT_ERROR_COPY,
@@ -68,6 +69,19 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     );
     expect(SHARE_MODAL_ERROR_COPY.failed).toBe(
       "No pudimos generar el link. Pruebe de nuevo en unos minutos.",
+    );
+  });
+
+  it("keeps the checkout error copy neutral (B8)", () => {
+    expect(CHECKOUT_ERROR_COPY.auth).toBe(
+      "Necesita iniciar sesión para gestionar su plan.",
+    );
+    expect(CHECKOUT_ERROR_COPY["invalid-plan"]).toBe("Plan no válido.");
+    expect(CHECKOUT_ERROR_COPY.config).toBe(
+      "No pudimos iniciar el pago. Pruebe de nuevo en unos minutos.",
+    );
+    expect(CHECKOUT_ERROR_COPY["no-subscription"]).toBe(
+      "No tiene una suscripción activa.",
     );
   });
 
@@ -196,5 +210,9 @@ describe("COPY — single source of truth (U2.2)", () => {
       Object.keys(AUDIT_FORM_ERRORS),
     );
     expect(Object.keys(COPY.fetchError)).toEqual(Object.keys(FETCH_ERROR_COPY));
+  });
+
+  it("exposes checkout copy on the grouped COPY object (B8)", () => {
+    expect(COPY.checkoutErrors).toBe(CHECKOUT_ERROR_COPY);
   });
 });
