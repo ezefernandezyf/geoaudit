@@ -80,13 +80,13 @@ Chain strategy: feature-branch-chain
 
 ## WU-C4 — Playwright E2E + responsive (C12+C13)
 
-- [ ] C4.1 `@playwright/test` + `playwright.config.ts` (webServer, projects desktop+mobile 390×844, retries) + script `e2e`/`e2e:install` (E2E-1/6)
-- [ ] C4.2 `e2e/free-audit.spec.ts`: URL real → "GEO Score" (E2E-2)
-- [ ] C4.3 `e2e/signup.spec.ts`: GitHub → `/dashboard` (E2E-3)
-- [ ] C4.4 `e2e/stripe-checkout.spec.ts`: test secrets + `test.skip(!env)` (E2E-4)
-- [ ] C4.5 `e2e/pdf-download.spec.ts`: generación + download (E2E-5)
-- [ ] C4.6 Mobile viewports en free-audit/report/multipage (E2E-6)
-- [ ] C4.7 CI job `e2e` (instala browsers, corre, sube report, secretos `${{ secrets.* }}`) (E2E-7)
+- [x] C4.1 `@playwright/test` + `playwright.config.ts` (webServer, projects desktop+mobile 390×844, retries) + script `e2e`/`e2e:install` (E2E-1/6)
+- [x] C4.2 `e2e/free-audit.spec.ts`: URL real → "GEO Score" (E2E-2)
+- [x] C4.3 `e2e/signup.spec.ts`: GitHub → `/dashboard` (E2E-3)
+- [x] C4.4 `e2e/stripe-checkout.spec.ts`: test secrets + `test.skip(!env)` (E2E-4)
+- [x] C4.5 `e2e/pdf-download.spec.ts`: generación + download (E2E-5)
+- [x] C4.6 Mobile viewports en free-audit/report/multipage (E2E-6)
+- [x] C4.7 CI job `e2e` (instala browsers, corre, sube report, secretos `${{ secrets.* }}`) (E2E-7)
 
 ## Notas
 
