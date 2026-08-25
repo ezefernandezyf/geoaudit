@@ -1,7 +1,9 @@
 /**
- * GeoAudit logo (DNF-12, U1.8): SVG inline mark — serif "G" in a navy tile,
- * an emerald wave, and a globe — plus the "GeoAudit" wordmark. Two variants:
- * full (navbar/login/footer) and mark-only (favicon / compact spots).
+ * GeoAudit logo (DNF-12, U1.8, A7 sprint 8): SVG inline mark — serif "G" in a
+ * navy tile with the emerald glyph — plus the "GeoAudit" wordmark. Two
+ * variants: full (navbar/login/footer) and mark-only (favicon / compact
+ * spots). The fine wave and globe details were removed (A7) so the mark stays
+ * legible at favicon sizes (16x16/32x32).
  */
 export function Logo({
   size = 32,
@@ -25,7 +27,7 @@ export function Logo({
       >
         {/* Navy tile */}
         <rect width="40" height="40" rx="10" fill="#0f172a" />
-        {/* Serif G */}
+        {/* Serif G in brand emerald */}
         <text
           x="20"
           y="26"
@@ -33,27 +35,10 @@ export function Logo({
           fontFamily="Georgia, 'Times New Roman', serif"
           fontSize="20"
           fontWeight="700"
-          fill="#ffffff"
+          fill="#10b981"
         >
           G
         </text>
-        {/* Emerald wave */}
-        <path
-          d="M8 30c5-4 10-4 15 0s10 4 15 0"
-          stroke="#10b981"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        {/* Globe */}
-        <circle cx="30" cy="12" r="5" stroke="#10b981" strokeWidth="1.6" />
-        <ellipse
-          cx="30"
-          cy="12"
-          rx="2.2"
-          ry="5"
-          stroke="#10b981"
-          strokeWidth="1.2"
-        />
       </svg>
       {showWordmark ? (
         <span className="flex flex-col leading-none">

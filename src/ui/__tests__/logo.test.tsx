@@ -35,4 +35,14 @@ describe("Logo (DNF-12)", () => {
     expect(svg).toHaveAttribute("width", "48");
     expect(svg).toHaveAttribute("height", "48");
   });
+
+  it("keeps the mark minimal for small sizes (A7): navy tile + emerald serif G", () => {
+    const { container } = render(<Logo showWordmark={false} />);
+    const svg = container.querySelector("svg");
+    expect(svg?.querySelector("rect")).toHaveAttribute("fill", "#0f172a");
+    expect(svg?.querySelector("text")).toHaveAttribute("fill", "#10b981");
+    // The fine wave path and globe were removed for 16x16/32x32 readability.
+    expect(svg?.querySelector("path")).toBeNull();
+    expect(svg?.querySelector("circle")).toBeNull();
+  });
 });
