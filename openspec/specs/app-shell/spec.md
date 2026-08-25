@@ -1,10 +1,10 @@
 # App Shell Specification
 
-> **Change**: `sprint-7-ui-fidelity` · **Type**: New capability (ADDED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page.
+The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page. Since Sprint 8, the shell copy (navbar links, user actions, footer text) is neutral Spanish (usted), centralized in `copy.ts`, and free of voseo/tuteo forms (SHL-6).
 
 ## Requirements
 
@@ -15,6 +15,7 @@ The shared app shell (navbar + footer) restyled to Gemini: active-state nav link
 | SHL-3 | User chip | New | MUST | Navbar MUST show a user chip with identity/logout |
 | SHL-4 | Logo | New | MUST | Navbar MUST render the new logo + wordmark |
 | SHL-5 | Footer links | New | MUST | Footer MUST link to terms/privacy |
+| SHL-6 | Neutral shell copy | New | MUST | Navbar/footer copy MUST be neutral Spanish (usted), sourced from `copy.ts` |
 
 ### Requirement: Active Nav States (SHL-1)
 
@@ -66,6 +67,16 @@ When the footer renders, then it MUST link to `/terms` and `/privacy` (and other
 - WHEN it renders
 - THEN `/terms` and `/privacy` are linked
 
+### Requirement: Neutral Shell Copy (SHL-6)
+
+When the app shell renders, then its copy (navbar links, user actions, footer text) MUST be neutral Spanish using "usted", MUST be centralized in `copy.ts`, and MUST NOT contain voseo or tuteo forms.
+
+#### Scenario: Navbar copy is neutral
+
+- GIVEN the navbar
+- WHEN its copy is inspected
+- THEN no voseo/tuteo forms appear and the strings come from `copy.ts`
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -75,3 +86,4 @@ When the footer renders, then it MUST link to `/terms` and `/privacy` (and other
 | SHL-3 | User chip with logout | Covered |
 | SHL-4 | Logo + wordmark | Covered |
 | SHL-5 | Legal links present | Covered |
+| SHL-6 | Navbar copy is neutral | Covered |

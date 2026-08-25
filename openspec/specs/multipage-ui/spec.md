@@ -1,10 +1,10 @@
 # Multi-Page UI Specification
 
-> **Change**: `sprint-7-ui-fidelity` · **Type**: New capability (ADDED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The UI surface that exposes the (already existing) multi-page audit flow: a trigger form that calls the real `multiPageAuditAction` Server Action with the PRO gate, plus a multi-page results page styled like Gemini (route selector + inspector) driven entirely by real `MultiPageResult` data. The engine, orchestration, and persistence are unchanged (see `multi-page-audit`); this spec only covers the presentation and wiring of that capability into the UI.
+The UI surface that exposes the (already existing) multi-page audit flow: a trigger form that calls the real `multiPageAuditAction` Server Action with the PRO gate, plus a multi-page results page styled like Gemini (route selector + inspector) driven entirely by real `MultiPageResult` data. The engine, orchestration, and persistence are unchanged (see `multi-page-audit`); this spec only covers the presentation and wiring of that capability into the UI. Since Sprint 8, selecting a page opens that page's FULL report (GEO score, 5-domain scorecard, findings, platform matrix) derived from the persisted `AuditPage` rows — not from the light `MultiPageResult` shape — with an honest empty state for legacy audits without page rows (MPU-7/MPU-8/MPU-9).
 
 ## Requirements
 
@@ -16,6 +16,9 @@ The UI surface that exposes the (already existing) multi-page audit flow: a trig
 | MPU-4 | Results page (Gemini) | New | MUST | Multi-page page MUST render a route selector + inspector in Gemini style |
 | MPU-5 | Real data only | New | MUST | Per-page rows MUST derive from real citability + durationMs; omit non-existent metrics |
 | MPU-6 | Navbar entry | New | MUST | A navbar link MUST expose the multi-page trigger |
+| MPU-7 | Per-page full report drill-down | New | MUST | Detail MUST render the FULL report per selected page from `AuditPage` (url→AuditResult via deriveFindings/toGeminiViewModel) |
+| MPU-8 | Honest empty state | New | MUST | Zero `AuditPage` rows (legacy) MUST render an honest empty state, no crash |
+| MPU-9 | Per-page navigation | New | MUST | User MUST be able to switch the selected page in the selector |
 
 ### Requirement: Trigger Form (MPU-1)
 
@@ -83,6 +86,44 @@ When the authenticated shell renders, then a navbar link MUST expose the multi-p
 - WHEN the navbar renders
 - THEN a multi-page link is present
 
+### Requirement: Per-Page Full Report Drill-Down (MPU-7)
+
+When a page is selected in a multi-page audit, then the detail MUST render that page's complete report — GEO score, 5-domain scorecard, findings, and platform matrix — derived from the persisted `AuditPage` row (mapping its `url` to the full `AuditResult` and reusing `deriveFindings`/`toGeminiViewModel`). The system MUST NOT enrich the light `MultiPageResult` shape to satisfy this view.
+
+#### Scenario: Full report for the selected page
+
+- GIVEN a multi-page audit with `AuditPage` rows for 3 URLs
+- WHEN the user selects page 2
+- THEN the full report renders from page 2's `AuditResult`
+- AND the report is produced via `deriveFindings`/`toGeminiViewModel`
+
+#### Scenario: Light shape not enriched
+
+- GIVEN the persisted `MultiPageResult` (light shape)
+- WHEN the drill-down detail renders
+- THEN the full per-page result is read from `AuditPage`, not added to the light shape
+
+### Requirement: Honest Empty State (MPU-8)
+
+When a multi-page audit has no `AuditPage` rows (legacy audits persisted before page rows existed), then the detail MUST render an honest empty state instead of crashing or fabricating pages.
+
+#### Scenario: Legacy audit without page rows
+
+- GIVEN a multi-page audit with zero `AuditPage` rows
+- WHEN the detail renders
+- THEN an honest empty state is shown
+- AND no fabricated page or metric appears
+
+### Requirement: Per-Page Navigation (MPU-9)
+
+When the multi-page results page renders, then the user MUST be able to navigate between discovered pages in the selector, switching which page's full report is displayed.
+
+#### Scenario: Navigate between pages
+
+- GIVEN a selector listing 3 pages
+- WHEN the user activates a different page
+- THEN the full report switches to that page
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -93,3 +134,6 @@ When the authenticated shell renders, then a navbar link MUST expose the multi-p
 | MPU-4 | Selector + inspector | Covered |
 | MPU-5 | Non-existent metrics omitted | Covered |
 | MPU-6 | Navbar link | Covered |
+| MPU-7 | Full report for the selected page, Light shape not enriched | Covered |
+| MPU-8 | Legacy audit without page rows | Covered |
+| MPU-9 | Navigate between pages | Covered |

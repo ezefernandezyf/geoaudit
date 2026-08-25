@@ -1,10 +1,10 @@
 # Pricing Specification
 
-> **Change**: `sprint-4-stripe-integration` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-4-stripe-integration` + `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The `/pricing` page presenting the three plans (Free $0, Pro $9/mes, Enterprise $49/mes) with their limits, plus a call-to-action that adapts to auth state and tier. This sprint does NOT add a global nav link — the page is reachable from the dashboard CTA. Since Sprint 7, the pricing page is restyled to Gemini's composition while keeping the real billing logic intact: monthly-only (no annual toggle), Pro highlighted (emerald border + "Recomendado" badge + scale), and a billing FAQ. Checkout and portal actions (`checkoutAction`/`portalAction`) are unchanged.
+The `/pricing` page presenting the three plans (Free $0, Pro $9/mes, Enterprise $49/mes) with their limits, plus a call-to-action that adapts to auth state and tier. This sprint does NOT add a global nav link — the page is reachable from the dashboard CTA. Since Sprint 7, the pricing page is restyled to Gemini's composition while keeping the real billing logic intact: monthly-only (no annual toggle), Pro highlighted (emerald border + "Recomendado" badge + scale), and a billing FAQ. Checkout and portal actions (`checkoutAction`/`portalAction`) are unchanged. Since Sprint 8, the page emits OpenGraph/Twitter metadata via the shared OG helper (PRC-8).
 
 ## Requirements
 
@@ -17,6 +17,7 @@ The `/pricing` page presenting the three plans (Free $0, Pro $9/mes, Enterprise 
 | PRC-5 | Monthly-only | MUST | Catalog stays monthly; no annual toggle and no discounted annual price (unchanged) |
 | PRC-6 | Pro highlighted | MUST | Pro MUST be highlighted (emerald border + "Recomendado" badge + scale) in Gemini style |
 | PRC-7 | Billing FAQ | MUST | A billing FAQ section MUST answer common billing questions |
+| PRC-8 | OG/SEO tags | MUST | `/pricing` MUST emit OpenGraph + Twitter metadata |
 
 ### Requirement: Pricing Page Route (PRC-1)
 
@@ -100,6 +101,16 @@ When the pricing page renders, then it MUST include a billing FAQ section answer
 - WHEN a visitor expands an FAQ item
 - THEN the answer addresses billing cycle/cancellation/plan changes
 
+### Requirement: OG/SEO Tags (PRC-8)
+
+When the pricing page renders, then it MUST emit OpenGraph and Twitter card metadata via the shared OG helper (reusing the default metadata with OG fields added).
+
+#### Scenario: OG + Twitter tags present on pricing
+
+- GIVEN the `/pricing` page
+- WHEN it renders
+- THEN `og:title`, `og:description`, `og:image`, and Twitter card tags are present
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -111,3 +122,4 @@ When the pricing page renders, then it MUST include a billing FAQ section answer
 | PRC-5 | No annual toggle | Covered |
 | PRC-6 | Pro stands out | Covered |
 | PRC-7 | FAQ answers billing questions | Covered |
+| PRC-8 | OG + Twitter tags present on pricing | Covered |

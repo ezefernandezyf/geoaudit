@@ -1,10 +1,10 @@
 # Audit Report UI Specification
 
-> **Change**: `sprint-2-free-audit-flow` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-2-free-audit-flow` + `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-`/report?url=` page renders the GEO audit result as an async Server Component (Node runtime, `force-dynamic`). Handles four mandatory states: Loading (Suspense + `loading.tsx` skeleton pulse), Success (MVP report: ScoreHero + DomainScorecard + TopFindings + ReportMeta), Error (`error.tsx` boundary + retry), and Empty (URL absent/invalid → inline form). Maps every `FetchErrorCode` to user-friendly Spanish copy. Renders degraded results honestly with "no disponible" chips. Since Sprint 7, the report page components are presenters of the Gemini view model: `<AuditReport>` consumes `toGeminiViewModel(result)` (not `AuditResult` directly), the ScoreHero becomes the complete Gemini hero with a benchmark bar, and the platform matrix renders six platforms in Gemini style. The RSC async behavior (ARU-1..ARU-9) is unchanged.
+`/report?url=` page renders the GEO audit result as an async Server Component (Node runtime, `force-dynamic`). Handles four mandatory states: Loading (Suspense + `loading.tsx` skeleton pulse), Success (MVP report: ScoreHero + DomainScorecard + TopFindings + ReportMeta), Error (`error.tsx` boundary + retry), and Empty (URL absent/invalid → inline form). Maps every `FetchErrorCode` to user-friendly Spanish copy. Renders degraded results honestly with "no disponible" chips. Since Sprint 7, the report page components are presenters of the Gemini view model: `<AuditReport>` consumes `toGeminiViewModel(result)` (not `AuditResult` directly), the ScoreHero becomes the complete Gemini hero with a benchmark bar, and the platform matrix renders six platforms in Gemini style. The RSC async behavior (ARU-1..ARU-9) is unchanged. Since Sprint 8, structured-data issues collapse into ONE finding listing the missing properties (JSON-LD rendered exactly once) and blocked AI bots collapse into ONE "blocked bots" card listing the bots (ARU-13/ARU-14), grouped in `deriveFindings` before emission.
 
 ## Requirements
 
@@ -22,6 +22,8 @@
 | ARU-10 | Presenter of view model | MUST | `<AuditReport>` MUST render from `toGeminiViewModel(result)`, not `AuditResult` |
 | ARU-11 | Complete ScoreHero + benchmark | MUST | ScoreHero MUST render the full Gemini hero including a benchmark bar with real thresholds |
 | ARU-12 | Six-platform matrix | MUST | The platform matrix MUST render six platforms (Claude "No medido") in Gemini style |
+| ARU-13 | Structured-data dedup | MUST | Collapse `schema.issues` into ONE finding listing missing properties; JSON-LD shown once |
+| ARU-14 | Crawler dedup | MUST | Emit ONE "blocked AI bots" finding with the list of bots |
 
 ### ARU-1: Async RSC page with Node runtime
 
@@ -141,6 +143,40 @@ When the platform matrix renders, then it MUST show the six platforms (ChatGPT, 
 - WHEN the matrix renders
 - THEN Claude shows "No medido" while the other five show real readiness values
 
+### Requirement: Structured-Data Dedup (ARU-13)
+
+When structured-data findings are derived, then the system MUST collapse all `schema.issues` (missing properties) into a single finding titled "datos estructurados" that lists every missing property, and MUST render the page's JSON-LD exactly once rather than once per issue.
+
+#### Scenario: Missing properties grouped into one finding
+
+- GIVEN schema detection reports 4 missing properties on a page
+- WHEN `deriveFindings` groups the issues
+- THEN one finding lists all 4 missing properties
+- AND the JSON-LD code snippet appears exactly once in the report
+
+#### Scenario: No missing properties
+
+- GIVEN schema detection reports no missing properties
+- WHEN findings are derived
+- THEN no structured-data finding is emitted
+
+### Requirement: Crawler Dedup (ARU-14)
+
+When crawler-access findings are derived, then the system MUST emit a single "blocked AI bots" finding whose content is the list of blocked bots, instead of one finding per blocked bot.
+
+#### Scenario: Blocked bots grouped into one card
+
+- GIVEN the crawler access map reports 3 blocked AI bots
+- WHEN `deriveFindings` groups the crawlers
+- THEN one finding lists the 3 blocked bots
+- AND `TopFindings` renders a single card for it
+
+#### Scenario: No blocked bots
+
+- GIVEN the crawler access map reports no blocked bots
+- WHEN findings are derived
+- THEN no blocked-bot finding is emitted
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -157,3 +193,5 @@ When the platform matrix renders, then it MUST show the six platforms (ChatGPT, 
 | ARU-10 | Components consume the view model | Covered |
 | ARU-11 | Benchmark uses real thresholds | Covered |
 | ARU-12 | Claude not measured | Covered |
+| ARU-13 | Missing properties grouped into one finding, No missing properties | Covered |
+| ARU-14 | Blocked bots grouped into one card, No blocked bots | Covered |
