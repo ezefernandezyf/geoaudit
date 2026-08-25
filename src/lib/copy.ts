@@ -230,6 +230,113 @@ export const DASHBOARD_COPY = {
   },
 } as const;
 
+/**
+ * Profile page copy (PRF-1..6, design U4) — account surface on
+ * /dashboard/profile, neutral Spanish, Gemini shell wording.
+ */
+export const PROFILE_COPY = {
+  eyebrow: "Cuenta",
+  title: "Perfil de usuario",
+  subtitle:
+    "Administre su cuenta, plan y datos de uso de auditoría en un solo lugar.",
+  identity: {
+    tierLabel: "Plan actual",
+    usageTitle: "Auditorías usadas",
+    usageCaption: "del límite de su plan",
+  },
+  manage: {
+    upgradeCta: "Mejorar a Pro",
+    upgradeBlurb:
+      "Obtenga más auditorías, multi-página, PDF y links de compartición.",
+    portalCta: "Gestionar suscripción",
+    portalBlurb:
+      "Administre su método de pago, facturas o cancele su plan desde el portal.",
+  },
+  support: {
+    title: "Soporte",
+    blurb:
+      "¿Problemas con su cuenta o facturación? Escríbanos y lo ayudamos a la brevedad.",
+    emailLabel: "Correo de soporte",
+    email: "soporte@geoaudit.app",
+    pricingLink: "Ver planes y precios",
+    pricingHref: "/pricing",
+  },
+} as const;
+
+/**
+ * Legal page copy (LGL-1..4, design U4) — /terms + /privacy static content,
+ * neutral Spanish (no voseo, LGL-4). Keyed by page; each entry carries the
+ * Gemini header block and the body sections rendered as heading + paragraph.
+ */
+export const LEGAL_COPY = {
+  terms: {
+    eyebrow: "Legal",
+    title: "Términos de Servicio",
+    updated: "Última actualización: agosto de 2026",
+    intro:
+      "Al utilizar GeoAudit acepta estos términos. Le recomendamos leerlos detenidamente antes de usar el servicio.",
+    sections: [
+      {
+        heading: "1. Uso del servicio",
+        body: "GeoAudit ofrece auditorías de visibilidad en motores de búsqueda con IA. El usuario se compromete a utilizarlo de forma lícita y a no abusar del servicio ni intentar vulnerar su seguridad.",
+      },
+      {
+        heading: "2. Cuenta y responsabilidad",
+        body: "El usuario es responsable de mantener la confidencialidad de su cuenta y de todas las actividades que ocurran bajo ella. Debe notificar de inmediato cualquier uso no autorizado.",
+      },
+      {
+        heading: "3. Planes y facturación",
+        body: "Los planes de pago se facturan mensualmente y se renuevan de forma automática. El usuario puede cancelar en cualquier momento y conservará el acceso hasta el final del período pagado.",
+      },
+      {
+        heading: "4. Propiedad intelectual",
+        body: "El servicio y su contenido son propiedad de GeoAudit. El usuario conserva los derechos sobre el contenido de sus propios sitios y sobre los reportes generados para sus dominios.",
+      },
+      {
+        heading: "5. Limitación de responsabilidad",
+        body: "El servicio se ofrece 'tal cual'. GeoAudit no garantiza resultados específicos de posicionamiento ni se hace responsable por decisiones tomadas en base a los reportes.",
+      },
+      {
+        heading: "6. Modificaciones",
+        body: "Podemos actualizar estos términos periódicamente. Los cambios se publicarán en esta página y entrarán en vigencia al momento de su publicación.",
+      },
+    ],
+  },
+  privacy: {
+    eyebrow: "Legal",
+    title: "Política de Privacidad",
+    updated: "Última actualización: agosto de 2026",
+    intro:
+      "Esta política describe cómo GeoAudit recopila, utiliza y protege su información personal al usar el servicio.",
+    sections: [
+      {
+        heading: "1. Datos que recopilamos",
+        body: "Recopilamos los datos de cuenta (nombre, correo) y la información técnica de las URLs que audita, incluidos los reportes generados a partir de su análisis.",
+      },
+      {
+        heading: "2. Uso de los datos",
+        body: "Utilizamos sus datos para proveer el servicio, procesar pagos, mejorar nuestros análisis y enviarle comunicaciones relacionadas con su cuenta.",
+      },
+      {
+        heading: "3. Compartición de datos",
+        body: "Los enlaces públicos de compartición que usted genera exponen el reporte correspondiente a quien reciba el enlace. No vendemos sus datos personales a terceros.",
+      },
+      {
+        heading: "4. Seguridad",
+        body: "Implementamos medidas técnicas y organizativas razonables para proteger su información frente a accesos no autorizados, pérdida o alteración.",
+      },
+      {
+        heading: "5. Sus derechos",
+        body: "Puede solicitar acceso, corrección o eliminación de sus datos personales en cualquier momento escribiéndonos al correo de soporte.",
+      },
+      {
+        heading: "6. Contacto",
+        body: "Ante cualquier consulta sobre esta política, escríbanos a soporte@geoaudit.app y responderemos a la brevedad.",
+      },
+    ],
+  },
+} as const;
+
 /** Typed grouping of every copy domain (design U2). */
 export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
@@ -240,4 +347,6 @@ export const COPY = {
   landing: LANDING_COPY,
   pricing: PRICING_COPY,
   dashboard: DASHBOARD_COPY,
+  profile: PROFILE_COPY,
+  legal: LEGAL_COPY,
 } as const;
