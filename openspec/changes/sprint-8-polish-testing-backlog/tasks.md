@@ -48,10 +48,10 @@ Chain strategy: feature-branch-chain
 
 ## WU-A3 — ScoreHero verídico (A6)
 
-- [ ] A3.1 `scripts/scorehero-verify.test.ts`: corre `runAudit` sobre 3-4 URLs reales, imprime score+band (LND-7)
-- [ ] A3.2 EJECUTAR el script (red real); registrar mejor score/band real + evidencia
-- [ ] A3.3 `src/app/score-hero-evidence.ts`: hardcode `GeminiView` real + comentario (URL, fecha, comando) (LND-7)
-- [ ] A3.4 `app/page.tsx`: render ScoreHero desde evidencia; band honesta si <90 (LND-7); assert copy veraz
+- [x] A3.1 `scripts/scorehero-verify.test.ts`: corre `runAudit` sobre 3-4 URLs reales, imprime score+band (LND-7)
+- [ ] A3.2 EJECUTAR el script (red real); registrar mejor score/band real + evidencia — **pendiente del orquestador** (`pnpm verify:scorehero`; config dedicada `vitest.verify.config.ts`, fuera del include de CI)
+- [x] A3.3 `src/app/score-hero-evidence.ts`: `SCOREHERO_EVIDENCE` con placeholder honesto (band derivada de severityForScore, categoryScores vacío) + TODO(A3.2) (LND-7)
+- [x] A3.4 `app/page.tsx`: render ScoreHero desde evidencia; band honesta si <90 (LND-7); assert copy veraz
 
 ## WU-B — Deudas de limpieza
 
