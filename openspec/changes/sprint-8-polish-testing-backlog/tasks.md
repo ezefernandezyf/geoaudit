@@ -67,10 +67,10 @@ Chain strategy: feature-branch-chain
 
 ## WU-C2 — Accesibilidad (C14)
 
-- [ ] C2.1 `jest-axe` + `src/test/setup.ts` `expect.extend(toHaveNoViolations)` (A11Y-1)
-- [ ] C2.2 Tests axe por página (landing/report/dashboard/pricing/auth): `render(await Page())`, sin violations (A11Y-2)
-- [ ] C2.3 Asserts landmarks `main`/`nav`/`footer` (A11Y-4) + foco visible/orden (A11Y-5)
-- [ ] C2.4 Test `@axe-core/playwright` contraste landing; excepciones en `docs/performance.md` (A11Y-3)
+- [x] C2.1 `jest-axe` + `src/test/setup.ts` `expect.extend(toHaveNoViolations)` (A11Y-1)
+- [x] C2.2 Tests axe por página (landing/report/dashboard/pricing/auth): `render(await Page())`, sin violations (A11Y-2)
+- [x] C2.3 Asserts landmarks `main`/`nav`/`footer` (A11Y-4) + foco visible/orden (A11Y-5)
+- [x] C2.4 Test `@axe-core/playwright` contraste landing; excepciones en `docs/performance.md` (A11Y-3)
 
 ## WU-C3 — Performance (C15)
 
