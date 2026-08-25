@@ -188,6 +188,8 @@ export const LANDING_COPY = {
       "Desde 3 auditorías gratuitas hasta planes profesionales con monitoreo continuo, multi-page y reportes compartibles.",
     pricingCta: "Ver Planes y Precios",
     pricingSecondaryCta: "Crear cuenta gratis",
+    // LND-6 (sprint 8): the secondary CTA for an authenticated visitor.
+    pricingSecondaryCtaLoggedIn: "Ir al dashboard",
   },
 } as const;
 

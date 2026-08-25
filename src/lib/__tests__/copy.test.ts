@@ -108,6 +108,11 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     expect(LANDING_COPY.sections.pricingTitle).toBe(
       "Comienza a monitorear la visibilidad de tu marca en la IA",
     );
+    // LND-6 (sprint 8): the authenticated secondary CTA is neutral and links
+    // the dashboard, never the signup flow.
+    expect(LANDING_COPY.sections.pricingSecondaryCtaLoggedIn).toBe(
+      "Ir al dashboard",
+    );
   });
 
   it("contains no voseo anywhere in COPY", () => {

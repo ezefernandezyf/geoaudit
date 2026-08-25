@@ -1,19 +1,26 @@
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { auditAction } from "@/lib/audit/actions";
+import { auth } from "@/lib/auth";
 import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
 import { severityForScore } from "@/scoring/calculator";
 
 /**
- * Root landing page (U2, LND-1..5, ADF-1/8): Gemini composition verbatim
+ * Root landing page (U2, LND-1..6, ADF-1/8): Gemini composition verbatim
  * (hex directos, font-serif, surfaces contrastadas) sobre el flujo REAL:
  * hero con AuditForm (botón dentro del input + sample URLs, LND-1), cards
  * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero demo + bandas
  * reales 90/75/60/40 (LND-3), seis plataformas (LND-4) y CTA pricing
  * (LND-5). El copy de usuario viene de src/lib/copy.ts (neutro, ATH-9).
+ *
+ * LND-6 (sprint 8): la página resuelve auth() y adapta el CTA secundario —
+ * con sesión muestra "Ir al dashboard" (/dashboard), sin sesión mantiene
+ * "Crear cuenta gratis" (/signup). La Home pasa a dinámica (costo aceptado).
  */
+
+export const dynamic = "force-dynamic";
 
 /** Real severity bands 90/75/60/40 (LND-3) — Gemini table composition. */
 const BAND_ROWS: {
@@ -183,7 +190,10 @@ const PLATFORMS = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  const isAuthenticated = Boolean(session?.user);
+
   return (
     <main className="w-full bg-[#f8fafc]">
       {/* 1. HERO — badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
@@ -534,12 +544,21 @@ export default function Home() {
               {LANDING_COPY.sections.pricingCta}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link
-              href="/signup"
-              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
-            >
-              {LANDING_COPY.sections.pricingSecondaryCta}
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/dashboard"
+                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
+              >
+                {LANDING_COPY.sections.pricingSecondaryCtaLoggedIn}
+              </Link>
+            ) : (
+              <Link
+                href="/signup"
+                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
+              >
+                {LANDING_COPY.sections.pricingSecondaryCta}
+              </Link>
+            )}
           </div>
         </div>
       </section>
