@@ -2,7 +2,7 @@ import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand, GeminiView } from "@/report/presenters/types";
 
 /**
- * ScoreHero evidence for the landing page (LND-7, design sprint 8 §A6).
+ * ScoreHero evidence for the landing page (LND-7, design sprint 8 §A6 + A3.2).
  *
  * The landing ScoreHero MUST show a REAL GEO Score produced by the engine
  * (`runAudit`) against candidate URLs — never an invented number. The real
@@ -14,38 +14,101 @@ import type { GeminiBand, GeminiView } from "@/report/presenters/types";
  * score + band per URL. The best REAL result is copied below as a `GeminiView`
  * (the exact shape `toGeminiViewModel` produces), with its provenance.
  *
- * TODO(A3.2): evidence PENDING — the script has not been run against the real
- * network yet (the orchestrator runs it). Replace the placeholder values below
- * with the BEST real `GeminiView` from the script output, and record here:
- *   - URL verificada
- *   - Fecha de la auditoría
- *   - Comando ejecutado (`pnpm verify:scorehero`)
- *   - GEO Score + band reales
- * Do NOT invent values: if no candidate reaches 90+, keep the best real score
- * with its honest band (e.g. 85 "good") — the UI derives band and copy from
- * this constant, so it can never overclaim "excelente" for a <90 score.
+ * A3.2 (sprint 9): evidence VERIFIED on 2026-08-26 with the real script
+ * against the real network. Best real candidate: stripe.com — GEO Score 46
+ * (poor). The old placeholder (linear.app 85 "good") was NEVER verified and is
+ * gone. Category scores below are the REAL `toGeminiViewModel` output of that
+ * run, copied verbatim (crawler 95, citability 29.3, E-E-A-T 39, schema 10,
+ * platform 36).
  *
- * Placeholder (unverified, pending the real run): linear.app a 85 (good).
+ * TODO(A3.2, post-deploy): the landing itself (geoaudit-tau.vercel.app) is
+ * the dogfooding target. The live deploy audits at GEO Score 20 (critical)
+ * because it still runs the PRE-fix build (no robots.txt/sitemap/llms.txt,
+ * no JSON-LD, old copy). After deploying this branch (WU-1), re-run:
+ *
+ *   pnpm verify:scorehero
+ *
+ * against the landing URL (add it to CANDIDATE_URLS in
+ * scripts/scorehero-verify.test.ts) and replace this evidence with the
+ * landing's REAL post-fix GeminiView — score, band, auditDate and
+ * categoryScores. Do NOT invent values: if the post-fix score is e.g. 58
+ * (fair), show 58 with its honest band and real category breakdown.
  */
-const PENDING_TOTAL_SCORE = 85;
-const PENDING_DOMAIN = "linear.app";
+const VERIFIED_TOTAL_SCORE = 46;
+const VERIFIED_DOMAIN = "stripe.com";
+const VERIFIED_DATE = "2026-08-26";
 
 export const SCOREHERO_EVIDENCE: GeminiView = {
-  totalScore: PENDING_TOTAL_SCORE,
+  totalScore: VERIFIED_TOTAL_SCORE,
   // Band derived from the REAL thresholds (90/75/60/40) — never hand-written,
   // so the chip can not claim a band the score does not deserve.
-  band: severityForScore(PENDING_TOTAL_SCORE).toLowerCase() as GeminiBand,
-  domain: PENDING_DOMAIN,
-  title: PENDING_DOMAIN,
-  summary: `${PENDING_DOMAIN} — GEO Score ${PENDING_TOTAL_SCORE} (${severityForScore(
-    PENDING_TOTAL_SCORE,
-  ).toLowerCase()}) en ~15s`,
-  durationSeconds: 15,
-  auditDate: null,
-  // TODO(A3.2): complete with the real category scores of the verified
-  // GeminiView. Empty until then — the landing hides the breakdown rather
-  // than invent dimension numbers.
-  categoryScores: [],
+  band: severityForScore(VERIFIED_TOTAL_SCORE).toLowerCase() as GeminiBand,
+  domain: VERIFIED_DOMAIN,
+  title: VERIFIED_DOMAIN,
+  summary: `${VERIFIED_DOMAIN} — GEO Score ${VERIFIED_TOTAL_SCORE} (${severityForScore(
+    VERIFIED_TOTAL_SCORE,
+  ).toLowerCase()}) en ~2s`,
+  durationSeconds: 2,
+  // Real audit date of the verified run (A3.2) — no longer null.
+  auditDate: VERIFIED_DATE,
+  // Real categoryScores from `pnpm verify:scorehero` (2026-08-26) — the exact
+  // `toGeminiViewModel` output for stripe.com, copied verbatim.
+  categoryScores: [
+    {
+      id: "crawler",
+      name: "Acceso de bots",
+      score: 95,
+      maxScore: 100,
+      weight: "18.75%",
+      status: "excellent",
+      keyMetric: null,
+      description: "Acceso de los crawlers de IA al sitio.",
+    },
+    {
+      id: "citability",
+      name: "Citabilidad",
+      score: 29.3,
+      maxScore: 100,
+      weight: "31.25%",
+      status: "critical",
+      keyMetric: null,
+      description: "Probabilidad de que los asistentes citen los pasajes.",
+    },
+    {
+      id: "content",
+      name: "E-E-A-T",
+      score: 39,
+      maxScore: 100,
+      weight: "25%",
+      status: "critical",
+      keyMetric: null,
+      description: "Calidad del contenido según E-E-A-T.",
+    },
+    {
+      id: "schema",
+      name: "Datos estructurados",
+      score: 10,
+      maxScore: 100,
+      weight: "12.5%",
+      status: "critical",
+      keyMetric: null,
+      description: "Marcado de datos estructurados.",
+    },
+    {
+      id: "platform",
+      name: "Plataforma",
+      score: 36,
+      maxScore: 100,
+      weight: "12.5%",
+      status: "critical",
+      keyMetric: null,
+      description: "Preparación de la plataforma para IA.",
+    },
+  ],
+  // The landing renders only the headline + categoryScores (page.tsx gates the
+  // breakdown on categoryScores.length > 0). Findings/platforms are not
+  // displayed by the landing ScoreHero, so they stay empty here — the evidence
+  // contract is satisfied without fabricating rows that the UI does not show.
   findings: [],
   platforms: [],
   shareToken: null,

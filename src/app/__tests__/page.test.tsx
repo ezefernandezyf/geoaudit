@@ -204,9 +204,10 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       expect(
         within(table as HTMLElement).getByText(String(category.score)),
       ).toBeInTheDocument();
+      // Two dimensions share the 12.5% weight — use the AllBy variant.
       expect(
-        within(table as HTMLElement).getByText(category.weight),
-      ).toBeInTheDocument();
+        within(table as HTMLElement).getAllByText(category.weight).length,
+      ).toBeGreaterThan(0);
     }
   });
 

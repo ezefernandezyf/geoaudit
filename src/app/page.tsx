@@ -411,9 +411,10 @@ export default async function Home() {
 
         {/*
           Desglose por categoría — solo cuando la evidencia REAL está fijada
-          (categoryScores del GeminiView verificado). Mientras la evidencia
-          está pendiente (A3.2) no se renderiza nada: no se inventan números
-          por dimensión.
+          (categoryScores del GeminiView verificado). A3.2 (sprint 9): la
+          evidencia real de `pnpm verify:scorehero` está fijada (stripe.com,
+          2026-08-26) — se renderiza el desglose verificado, nunca números
+          inventados por dimensión.
         */}
         {SCOREHERO_EVIDENCE.categoryScores.length > 0 ? (
           <div className="mb-10 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
