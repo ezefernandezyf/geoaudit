@@ -30,6 +30,18 @@ describe("ScoreBar (DNF-9)", () => {
     expect(bar).toHaveAttribute("aria-valuemax", "100");
   });
 
+  it("gives the progressbar an accessible name (A11Y-6, PERF-3)", () => {
+    render(<ScoreBar category={category({ score: 72, maxScore: 100 })} />);
+    expect(
+      screen.getByRole("progressbar", { name: "Score 72/100" }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders the /100 label with the AA contrast hex (PERF-3)", () => {
+    render(<ScoreBar category={category()} />);
+    expect(screen.getByText("/100")).toHaveClass("text-[#64748b]");
+  });
+
   it("sets the fill width to the score percent", () => {
     const { container } = render(<ScoreBar category={category()} />);
     const fill = container.querySelector("[data-score-fill]");

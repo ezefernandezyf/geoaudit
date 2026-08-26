@@ -84,7 +84,8 @@ export function ScoreBar({
             <span className="text-base font-bold text-[#0f172a]">
               {category.score}
             </span>
-            <span className="text-xs text-[#94a3b8]">/100</span>
+            {/* PERF-3: #64748b (4.76:1) cumple AA 4.5:1 — #94a3b8 (2.56:1) fallaba. */}
+            <span className="text-xs text-[#64748b]">/100</span>
           </div>
         </div>
       </div>
@@ -96,6 +97,7 @@ export function ScoreBar({
           className={`h-full ${STATUS_FILL[category.status]} transition-all duration-500 rounded-full`}
           style={{ width: `${percentage}%` }}
           role="progressbar"
+          aria-label={`Score ${category.score}/${category.maxScore}`}
           aria-valuenow={category.score}
           aria-valuemin={0}
           aria-valuemax={category.maxScore}
