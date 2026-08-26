@@ -20,14 +20,16 @@ const PRO_SESSION = {
 describe("Navbar (SHL-2/3/4)", () => {
   it("links the logo to home", () => {
     render(<Navbar />);
-    const logo = screen.getByLabelText("GeoAudit — AI Visibility Audit");
+    const logo = screen.getByLabelText("GeoAudit AI Visibility Audit");
     expect(logo).toHaveAttribute("href", "/");
   });
 
   it("shows the new logo and wordmark", () => {
     render(<Navbar />);
-    expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
+    // The SVG mark is decorative inside the brand link (the link owns the
+    // accessible name, WU-4) — assert the visible wordmark + tagline.
     expect(screen.getByText("GeoAudit")).toBeInTheDocument();
+    expect(screen.getByText("AI Visibility Audit")).toBeInTheDocument();
   });
 
   it("links Producto to / and Precios to /pricing", () => {

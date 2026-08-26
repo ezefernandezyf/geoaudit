@@ -45,13 +45,17 @@ export function Navbar({ session, plan }: NavbarProps) {
         <div className="flex items-center gap-6">
           <Link
             href="/"
-            // PERF-3: el nombre accesible debe contener el texto visible del
-            // logo ("GeoAudit" + tagline "AI Visibility Audit") — antes
-            // "GeoAudit Inicio" disparaba label-content-name-mismatch.
-            aria-label="GeoAudit — AI Visibility Audit"
+            // PERF-3: label-content-name-mismatch (WCAG 2.5.3). axe 4.x compara
+            // el nombre accesible contra el textContent del link como substring
+            // EXACTO (case-insensitive, sin normalizar espacios) — el em dash
+            // o un espacio extra rompe el match. El Logo emite el wordmark con
+            // un espacio real entre "GeoAudit" y "AI Visibility Audit", así que
+            // el aria-label debe replicarlo EXACTO (y el mark SVG es
+            // decorative: su texto no debe filtrarse al textContent del link).
+            aria-label="GeoAudit AI Visibility Audit"
             className="flex items-center text-left transition-colors hover:text-emerald-700"
           >
-            <Logo size={32} />
+            <Logo size={32} decorative />
           </Link>
 
           <NavLinks showMultiPage={isPaidTier(plan?.tier ?? "FREE")} />

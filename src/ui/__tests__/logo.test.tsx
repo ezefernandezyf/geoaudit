@@ -40,9 +40,13 @@ describe("Logo (DNF-12)", () => {
     const { container } = render(<Logo showWordmark={false} />);
     const svg = container.querySelector("svg");
     expect(svg?.querySelector("rect")).toHaveAttribute("fill", "#0f172a");
-    expect(svg?.querySelector("text")).toHaveAttribute("fill", "#10b981");
+    // The G is a vector PATH (not <text>): text nodes leak into a parent
+    // link's textContent and break axe label-content-name-mismatch (WU-4).
+    const g = svg?.querySelector("path");
+    expect(g).not.toBeNull();
+    expect(g).toHaveAttribute("fill", "#10b981");
     // The fine wave path and globe were removed for 16x16/32x32 readability.
-    expect(svg?.querySelector("path")).toBeNull();
+    expect(svg?.querySelectorAll("path").length).toBe(1);
     expect(svg?.querySelector("circle")).toBeNull();
   });
 });
