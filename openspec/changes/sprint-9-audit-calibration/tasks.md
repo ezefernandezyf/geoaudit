@@ -38,9 +38,9 @@ Chain strategy: feature-branch-chain
 
 ## WU-2 — Calibration diagnostic
 
-- [ ] 2.1 Port `diag/scorehero-breakdown` (13 URLs + `categories` + per-category print) into `scripts/scorehero-verify.test.ts`
-- [ ] 2.2 Run `pnpm verify:scorehero` → consolidar tabla por categoría (crawler/citability/content/schema/platform)
-- [ ] 2.3 Presentar tabla + decisión de calibración al usuario (default design: b+c, pesos 28/24/20/14/14); NO recalibrar sin evidencia
+- [x] 2.1 Port `diag/scorehero-breakdown` (13 URLs + `categories` + per-category print) into `scripts/scorehero-verify.test.ts`
+- [x] 2.2 Run `pnpm verify:scorehero` → consolidar tabla por categoría (crawler/citability/content/schema/platform)
+- [x] 2.3 Presentar tabla + decisión de calibración al usuario (default design: b+c, pesos 28/24/20/14/14); NO recalibrar sin evidencia
 
 ## WU-3 — Calibration v2.0.0 (según decisión de WU-2; default 28/24/20/14/14)
 
