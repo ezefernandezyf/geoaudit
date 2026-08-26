@@ -45,7 +45,10 @@ export function Navbar({ session, plan }: NavbarProps) {
         <div className="flex items-center gap-6">
           <Link
             href="/"
-            aria-label="GeoAudit Inicio"
+            // PERF-3: el nombre accesible debe contener el texto visible del
+            // logo ("GeoAudit" + tagline "AI Visibility Audit") — antes
+            // "GeoAudit Inicio" disparaba label-content-name-mismatch.
+            aria-label="GeoAudit — AI Visibility Audit"
             className="flex items-center text-left transition-colors hover:text-emerald-700"
           >
             <Logo size={32} />
