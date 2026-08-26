@@ -139,10 +139,12 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     );
   });
 
-  it("keeps the dashboard copy neutral (B10)", () => {
+  it("keeps the dashboard copy neutral (B10, DSH-4)", () => {
+    expect(DASHBOARD_COPY.empty.title).toBe("No hay auditorías registradas");
     expect(DASHBOARD_COPY.empty.body).toBe(
       "Ingrese la URL de su producto o sitio web para generar su primer GEO Score y diagnóstico de visibilidad en IA.",
     );
+    expect(DASHBOARD_COPY.empty.cta).toBe("Auditar mi primera URL");
   });
 
   it("keeps the shell copy neutral (SHL-6, B10)", () => {
