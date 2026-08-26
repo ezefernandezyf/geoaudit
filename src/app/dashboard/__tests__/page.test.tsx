@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { redirect } from "next/navigation";
 import DashboardPage from "@/app/dashboard/page";
 import { formatAuditDate } from "@/report/format";
+import { DASHBOARD_COPY } from "@/lib/copy";
 
 const { authMock, findManyMock, userFindUniqueMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
@@ -124,7 +125,7 @@ describe("DashboardPage (DSH-4/DSH-5)", () => {
     render(await DashboardPage());
 
     expect(
-      screen.getByRole("heading", { name: "Aún no hiciste auditorías" }),
+      screen.getByRole("heading", { name: DASHBOARD_COPY.empty.title }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Re-auditar" }),

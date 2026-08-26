@@ -60,7 +60,9 @@ describe("root layout shell (SHL-1, U2.1)", () => {
     expect(
       screen.getAllByRole("link", { name: "Precios" }).length,
     ).toBeGreaterThan(0);
-    expect(screen.getByLabelText("GeoAudit Inicio")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("GeoAudit AI Visibility Audit"),
+    ).toBeInTheDocument();
     // Navbar + Footer both render the brand.
     expect(screen.getAllByText("GeoAudit").length).toBeGreaterThan(0);
     expect(screen.getByText("contenido")).toBeInTheDocument();
