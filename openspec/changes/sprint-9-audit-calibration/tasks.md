@@ -44,19 +44,19 @@ Chain strategy: feature-branch-chain
 
 ## WU-3 — Calibration v2.0.0 (según decisión de WU-2; default 28/24/20/14/14)
 
-- [ ] 3.1 RED: contract test `audit-result.test.ts` rechaza `1.0.0`/`0.9.0`, acepta `2.0.0` (RGS-7)
-- [ ] 3.2 Modify `src/lib/contracts/audit-result.ts:88` `z.literal("2.0.0")` + casts `audit/index.ts:205/366/474` + fixture `__fixtures__/audit-result.ts:92` (RGS-7)
-- [ ] 3.3 RED: citability partial-credit tiers → update/add `citability` tests (RCI-3/5/6)
-- [ ] 3.4 Modify `src/citability/scorer.ts`+`constants.ts`: crédito parcial answer/structure/stats (RCI-3/5/6)
-- [ ] 3.5 RED: eeat partial authority → `eeat/authoritativeness.ts` tests (REE-3)
-- [ ] 3.6 Modify `src/eeat/authoritativeness.ts`: crédito parcial citations/sameAs (REE-3)
-- [ ] 3.7 RED: schema intermediate points → `schema` tests (RSC-13)
-- [ ] 3.8 Modify `src/schema/index.ts`: criterios con puntos intermedios (RSC-13)
-- [ ] 3.9 Modify `src/scoring/weights.ts`: add `GEO_SCORE_V2_WEIGHTS` (28/24/20/14/14); keep `SPRINT_1_WEIGHTS` (RGS-1)
-- [ ] 3.10 Modify `src/report/presenters/toGeminiViewModel.ts` `ENGINE_WEIGHT` → V2 (RGS-1)
-- [ ] 3.11 RED/update: `calculator.test.ts` + `run-audit.test.ts` — invariantes "all 80→80", "sum=100", citability dominant, version `2.0.0` (RGS-1/5/7)
-- [ ] 3.12 Modify `openspec/specs/geo-score-calculator/spec.md` delta RGS-1/5/7 v2.0.0
-- [ ] 3.13 Gate: `pnpm verify:scorehero` re-run → mejores reales 60-75+; full `pnpm test` verde
+- [x] 3.1 RED: contract test `audit-result.test.ts` rechaza `1.0.0`/`0.9.0`, acepta `2.0.0` (RGS-7)
+- [x] 3.2 Modify `src/lib/contracts/audit-result.ts:88` `z.literal("2.0.0")` + casts `audit/index.ts:205/366/474` + fixture `__fixtures__/audit-result.ts:92` (RGS-7)
+- [x] 3.3 RED: citability partial-credit tiers → update/add `citability` tests (RCI-3/5/6)
+- [x] 3.4 Modify `src/citability/scorer.ts`+`constants.ts`: crédito parcial answer/structure/stats (RCI-3/5/6)
+- [x] 3.5 RED: eeat partial authority → `eeat/authoritativeness.ts` tests (REE-3)
+- [x] 3.6 Modify `src/eeat/authoritativeness.ts`: crédito parcial citations/sameAs (REE-3)
+- [x] 3.7 RED: schema intermediate points → `schema` tests (RSC-13)
+- [x] 3.8 Modify `src/schema/index.ts`: criterios con puntos intermedios (RSC-13)
+- [x] 3.9 Modify `src/scoring/weights.ts`: add `GEO_SCORE_V2_WEIGHTS` (28/24/20/14/14); keep `SPRINT_1_WEIGHTS` (RGS-1)
+- [x] 3.10 Modify `src/report/presenters/toGeminiViewModel.ts` `ENGINE_WEIGHT` → V2 (RGS-1)
+- [x] 3.11 RED/update: `calculator.test.ts` + `run-audit.test.ts` — invariantes "all 80→80", "sum=100", citability dominant, version `2.0.0` (RGS-1/5/7)
+- [x] 3.12 Modify `openspec/specs/geo-score-calculator/spec.md` delta RGS-1/5/7 v2.0.0
+- [x] 3.13 Gate: `pnpm verify:scorehero` re-run → mejores reales 60-75+; full `pnpm test` verde (la suite completa la corre el gatekeeper al cerrar WU-3)
 
 ## WU-4 — Code audit fixes
 

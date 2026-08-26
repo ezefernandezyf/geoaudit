@@ -75,3 +75,63 @@ weights)** → `GEO_SCORE_V2_WEIGHTS` 28/24/20/14/14, `scoringModelVersion` 2.0.
 The evidence above supports it: schema and citability need partial credit (b),
 and the two healthiest dimensions (crawler 18.75% → 14%, content 25% → 20%)
 should yield weight to the dimensions that currently crush the total.
+
+---
+
+# Post-calibration — Sprint 9 WU-3 (applied 2026-08-26)
+
+> **Artifact**: re-run of `pnpm verify:scorehero` AFTER the WU-3 calibration
+> shipped (v2.0.0: partial-credit rubrics in citability/eeat/schema + weights
+> 28/24/20/14/14). Same 14 candidate URLs; openai.com and notion.so still
+> return HTTP 403, so 12 URLs are compared.
+
+## Raw results (v2.0.0)
+
+| URL | v1 total | **v2 total** | Band | crawler | citability | content | schema | platform |
+|-----|----------|--------------|------|---------|------------|---------|--------|----------|
+| moz.com | 48 | **53** | poor | 95 | 36.9 (32.1) | 54 (44) | 0 | 44 |
+| llmstxt.org | 41 | **42** | poor | 95 | 51.3 (46.2) | 45 | 0 | 25 |
+| react.dev | 18 | **18** | critical | 15 | 27.3 (23.6) | 36 | 0 | 0 |
+| nextjs.org | 37 | **39** | critical | 95 | 18.5 (15.5) | 42 | 0 | 13 |
+| supabase.com | 44 | **46** | poor | 95 | 31.8 (25.9) | 60 | 0 | 15 |
+| tailwindcss.com | 31 | **32** | critical | 90 | 35.1 (29.3) | 33 | 0 | 15 |
+| developer.apple.com | 28 | **29** | critical | 90 | 29.4 (26.4) | 26 | 0 | 18 |
+| docs.anthropic.com | 25 | **25** | critical | 95 | 0 | 44 | 0 | 15 |
+| aws.amazon.com | 35 | **37** | critical | 95 | 23.8 (20.8) | 29 | 80 | 36 |
+| smashingmagazine.com | 37 | **39** | critical | 95 | 44.6 (39.6) | 32 (27) | 0 | 35 |
+| webflow.com | 41 | **46** | poor | 95 | 41.5 (34.5) | 44 (34) | 10 | 15 |
+| geoaudit-tau.vercel.app (landing, pre-fix deploy) | 20 | **21** | critical | 90 | 22.9 (19.9) | 12 | 0 | 5 |
+| **Average (12 URLs)** | **33.8** | **35.6** | **critical** | **87.1** | **30.3** | **38.1** | **7.5** | **19.7** |
+
+(parenthesized citability/content values = the v1 score from the WU-2 run)
+
+## What moved and what did not
+
+1. **Citability tiers delivered (+4.1 avg on the dimension)**: the answer-floor
+   raise (10→20) + intermediate structure tiers lifted every site that had
+   extractable content: moz 32.1→36.9, llmstxt 46.2→51.3, webflow 34.5→41.5,
+   smashing 39.6→44.6. docs.anthropic.com stays 0 (no extractable blocks).
+2. **Every best-site gain came from citability + weights rebalance, not
+   schema**: moz 48→53 (+5), webflow 41→46 (+5), supabase 44→46 (+2). The
+   v1 estimate assumed "schema 0→partial" would add points for moz/supabase/
+   llmstxt — **those sites ship NO JSON-LD at all**, so the RSC-13 partial
+   rubric cannot fire (no blocks → the 12 criteria stay 0). Schema avg stays
+   7.5; only aws (80) and webflow (10) have any structured data.
+3. **The 60-75+ target was NOT reached** (best: moz 53, poor). The remaining
+   crush is structural, not rubric-shaped: 10/12 sites have zero JSON-LD
+   (schema 0 with weight 14%), content avg 38.1 (only supabase 60 clears
+   fair), platform avg 19.7. No rubric softening can credit structured data
+   that is absent.
+4. **Bands stayed honest** (RGS-5): no re-mapping; every band above derives
+   from the same 90/75/60/40 thresholds.
+
+## Evidence-backed next levers (for a future calibration decision)
+
+- Content E-E-A-T rubrics (REE-1..4) are the heaviest un-softened dimension
+  (24% weight, avg 38.1): experience/expertise floors on real docs sites are
+  the analog of what citability was in v1.
+- Schema "no structured data" is a data-absence problem: only detectable via
+  deeper discovery (llms.txt/sitemap presence already probed in platform) —
+  out of scope for a rubric change.
+- The landing (21) still audits the PRE-fix live deploy; re-audit after WU-1
+  ships to production for the real A3.2 number.
