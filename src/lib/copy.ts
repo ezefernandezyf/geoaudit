@@ -206,27 +206,27 @@ export const LANDING_COPY = {
     {
       number: "01",
       title: "Acceso de bots",
-      body: "GeoAudit verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 18.75 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.",
+      body: "GeoAudit verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 20 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.",
     },
     {
       number: "02",
       title: "Citabilidad",
-      body: "La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. GeoAudit analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 31.25 % del GEO Score, la dimensión con mayor peso del engine.",
+      body: "La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. GeoAudit analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 28 % del GEO Score, la dimensión con mayor peso del engine.",
     },
     {
       number: "03",
       title: "E-E-A-T",
-      body: "GeoAudit evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 25 puntos por dimensión. E-E-A-T pondera el 25 % del GEO Score y favorece al contenido con señales de confianza explícitas.",
+      body: "GeoAudit evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 24 puntos por dimensión. E-E-A-T pondera el 24 % del GEO Score y favorece al contenido con señales de confianza explícitas.",
     },
     {
       number: "04",
       title: "Datos estructurados",
-      body: "GeoAudit detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 12.5 % del GEO Score y aportan precisión a las citas de entidades.",
+      body: "GeoAudit detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 14 % del GEO Score y aportan precisión a las citas de entidades.",
     },
     {
       number: "05",
       title: "Plataforma",
-      body: "GeoAudit evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 12.5 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.",
+      body: "GeoAudit evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 14 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.",
     },
   ],
   sections: {
