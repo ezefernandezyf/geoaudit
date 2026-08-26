@@ -152,6 +152,9 @@ interface RubricInput {
  * 5 WebSite+SearchAction (5) · 6 BreadcrumbList (5) · 7 JSON-LD format (5) ·
  * 8 Server-rendered (10) · 9 speakable (5) · 10 Valid JSON+types (10) ·
  * 11 knowsAbout 3+ (5) · 12 No deprecated (5).
+ *
+ * WU-3 (RSC-13): criteria 1/5/10/11 award intermediate points for partial
+ * compliance instead of only the discrete 0/5/10/15 steps.
  */
 export function scoreRubric(input: RubricInput): SchemaRubric {
   const { blocks, warnings, nodes, businessType } = input;
@@ -160,15 +163,34 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
 
   const orgPerson = nodes.filter(isOrgOrPerson);
 
-  // 1. Organization/Person present and complete.
-  const orgPersonComplete =
-    orgPerson.length > 0 &&
-    orgPerson.some((node) => !hasIssue(node, "missing_required"));
+  // 1. Organization/Person present and complete — partial-credit tiers
+  // (RSC-13): all nodes clean → 15; complete but with minor issues or a
+  // mix of clean/incomplete nodes → 13; missing ONE required property →
+  // 10; missing 2+ required properties → 7; absent → 0.
+  const allOrgPersonClean =
+    orgPerson.length > 0 && orgPerson.every((node) => node.issues.length === 0);
+  const anyOrgPersonClean = orgPerson.some((node) => node.issues.length === 0);
+  const maxMissingRequired = orgPerson.reduce((max, node) => {
+    const count = node.issues.filter(
+      (issue) => issue.key === "missing_required",
+    ).length;
+    return Math.max(max, count);
+  }, 0);
+  const orgPersonPoints =
+    orgPerson.length === 0
+      ? 0
+      : allOrgPersonClean
+        ? 15
+        : anyOrgPersonClean || maxMissingRequired === 0
+          ? 13
+          : maxMissingRequired === 1
+            ? 10
+            : 7;
   criteria.push(
     criterion(
       "organization_person",
       "Organization/Person schema present and complete",
-      orgPerson.length === 0 ? 0 : orgPersonComplete ? 15 : 10,
+      orgPersonPoints,
       15,
     ),
   );
@@ -213,13 +235,20 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
     ),
   );
 
-  // 5. WebSite + SearchAction.
+  // 5. WebSite + SearchAction — partial credit for a WebSite node without
+  // the SearchAction (RSC-13): 2 points, full 5 with potentialAction.
   const website = nodes.find((node) => node.type === "WebSite");
+  const websitePoints =
+    website === undefined
+      ? 0
+      : hasValue(website.raw, "potentialAction")
+        ? 5
+        : 2;
   criteria.push(
     criterion(
       "website_search_action",
       "WebSite + SearchAction",
-      website !== undefined && hasValue(website.raw, "potentialAction") ? 5 : 0,
+      websitePoints,
       5,
     ),
   );
@@ -267,7 +296,8 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
   );
 
   // 10. Valid JSON + valid Schema.org types: no credit without blocks; major
-  // error when every block failed to parse; full credit with zero issues.
+  // error when every block failed to parse; full credit with zero issues;
+  // intermediate 7 when warnings or unknown types are present (RSC-13).
   const unknownCount = nodes.filter((node) => !node.known).length;
   const allBlocksFailed = hasBlocks && nodes.length === 0;
   const validity =
@@ -275,7 +305,7 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
       ? 0
       : warnings.length === 0 && unknownCount === 0
         ? 10
-        : 5;
+        : 7;
   criteria.push(
     criterion(
       "valid_json_types",
@@ -285,12 +315,17 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
     ),
   );
 
-  // 11. knowsAbout with 3+ topics on Organization/Person.
+  // 11. knowsAbout with 3+ topics on Organization/Person — partial credit
+  // for 1-2 topics (RSC-13).
+  const maxKnowsAbout = orgPerson.reduce(
+    (max, node) => Math.max(max, knowsAboutCount(node.raw)),
+    0,
+  );
   criteria.push(
     criterion(
       "knows_about",
       "knowsAbout with 3+ topics on Organization/Person",
-      orgPerson.some((node) => knowsAboutCount(node.raw) >= 3) ? 5 : 0,
+      maxKnowsAbout >= 3 ? 5 : maxKnowsAbout > 0 ? 2 : 0,
       5,
     ),
   );

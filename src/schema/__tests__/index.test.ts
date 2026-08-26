@@ -111,21 +111,48 @@ describe("scoreSchema (RSC-9, RSC-11)", () => {
 });
 
 describe("scoreSchema rubric (12 criteria, RSC-9)", () => {
-  it("scores a full @graph page 100 with 12 criteria", () => {
+  it("scores a full @graph page 98 with 12 criteria (minor recommended gaps)", () => {
     const result = scoreSchema(page("ld-rubric-rich.html"));
     expect(result.rubric.criteria).toHaveLength(12);
-    expect(result.rubric.score).toBe(100);
-    expect(result.score).toBe(100);
+    // RSC-13: the Organization node is complete (no missing_required) but
+    // misses recommended properties (logo/description/...) → 13, not 15.
+    expect(result.rubric.score).toBe(98);
+    expect(result.score).toBe(98);
     expect(result.rubric.criteria.reduce((sum, c) => sum + c.points, 0)).toBe(
       result.rubric.score,
     );
   });
 
-  it("scores a basic Organization page 66 (sameAs 2 links, no article/website/breadcrumbs)", () => {
+  it("scores a basic Organization page 64 (sameAs 2 links, no article/website/breadcrumbs)", () => {
     const result = scoreSchema(page("ld-organization.html"));
-    expect(result.rubric.score).toBe(66);
+    // RSC-13: complete Organization with missing recommended → 13 (was 15).
+    expect(result.rubric.score).toBe(64);
     const sameAs = result.rubric.criteria.find((c) => c.key === "same_as");
     expect(sameAs?.points).toBe(6);
+  });
+
+  it("awards intermediate credit for a complete node with recommended gaps (RSC-13)", () => {
+    const result = scoreSchema(page("ld-organization.html"));
+    const org = result.rubric.criteria.find(
+      (c) => c.key === "organization_person",
+    );
+    expect(org?.points).toBe(13);
+  });
+
+  it("docks a node missing 2+ required properties to 7 (RSC-13)", () => {
+    const result = scoreSchema(page("ld-org-bare.html"));
+    const org = result.rubric.criteria.find(
+      (c) => c.key === "organization_person",
+    );
+    expect(org?.points).toBe(7);
+  });
+
+  it("awards partial credit for a WebSite node without SearchAction (RSC-13)", () => {
+    const result = scoreSchema(page("ld-website-no-action.html"));
+    const website = result.rubric.criteria.find(
+      (c) => c.key === "website_search_action",
+    );
+    expect(website?.points).toBe(2);
   });
 });
 
