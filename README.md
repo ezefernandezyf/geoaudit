@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GeoAudit
 
-## Getting Started
+Micro-SaaS de auditoría GEO (Generative Engine Optimization) y SEO para visibilidad en motores de búsqueda con IA. Ingrese una URL y obtenga un GEO Score de 0 a 100 con un reporte completo de AI visibility en ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.
 
-First, run the development server:
+## Qué hace
+
+GeoAudit analiza un sitio web en cinco dimensiones y entrega un score compuesto ponderado:
+
+| Dimensión | Peso (v2.0.0) | Qué evalúa |
+| --------- | ------------- | ---------- |
+| Citabilidad | 28 % | Probabilidad de que los motores de IA citen pasajes de la página como fuente |
+| E-E-A-T | 24 % | Experiencia, experticia, autoridad y confiabilidad del contenido |
+| Técnico | 20 % | Acceso de crawlers de IA (robots.txt, headers, metaetiquetas) |
+| Schema | 14 % | JSON-LD / Schema.org para corroboración de entidades |
+| Plataforma | 14 % | Readiness, SSR, OpenGraph y headers por motor generativo |
+
+Cada auditoría genera un reporte con hallazgos priorizados, desglose por categoría, exportación PDF y links de compartición. El plan Free incluye 3 auditorías mensuales; los planes Pro y Enterprise suman multi-página, PDF y monitoreo continuo.
+
+## Stack
+
+- **Framework**: Next.js 15 (App Router) + TypeScript strict
+- **Styling**: Tailwind CSS 4 + design system propio (sin librerías de componentes)
+- **Base de datos**: PostgreSQL (Supabase) + Prisma ORM (driver adapters)
+- **Auth**: NextAuth.js v5 (Auth.js) — GitHub OAuth
+- **Pagos**: Stripe (Checkout + Customer Portal + Webhooks)
+- **Email**: Resend — **PDF**: Puppeteer + HTML template con print CSS
+- **Validación**: Zod 4 (contracts compartidos en `src/lib/contracts/`)
+- **Testing**: Vitest + React Testing Library + Playwright E2E + @axe-core/playwright
+- **Deploy**: Vercel + GitHub Actions (lint + typecheck + test) + Sentry
+
+## Requisitos
+
+- Node.js 20+ y pnpm
+- Una instancia de PostgreSQL (Supabase) para `DATABASE_URL`
+- (Opcional) Apps de OAuth GitHub, Stripe y Resend para los flujos completos
+
+## Cómo correr
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install              # instala dependencias
+cp .env.example .env      # completa las variables (ver .env.example)
+pnpm run prisma:generate  # genera el cliente Prisma
+pnpm run prisma:migrate   # corre las migraciones
+pnpm dev                  # Next dev server (server + client) en :3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Cómo testear
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm test                          # suite completa (Vitest)
+pnpm test <ruta>                   # tests acotados a un archivo/carpeta
+pnpm verify:scorehero              # diagnóstico de calibración sobre 13 URLs reales
+pnpm run lint && pnpm run typecheck
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Los tests E2E de a11y y contraste (`src/app/__tests__/a11y-contrast.test.ts`) requieren el dev server arriba y se saltan en CI sin server (convención skip-if-no-env):
 
-## Learn More
+```bash
+pnpm dev   # terminal 1
+A11Y_CONTRAST_URL=http://localhost:3000 pnpm test src/app/__tests__/a11y-contrast.test.ts
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Estructura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Screaming Architecture: los dominios de negocio son carpetas top-level en `src/`, y `app/` es solo routing (Server Components que importan desde los dominios).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── crawlers/      # AI crawler access map (robots.txt + header checker)
+├── citability/    # análisis de citabilidad + scoring
+├── schema/        # detección de schema + validación/generación JSON-LD
+├── eeat/          # evaluación de contenido E-E-A-T
+├── platform/      # readiness por plataforma (SSR, OpenGraph, headers)
+├── scoring/       # calculadora del GEO Score compuesto
+├── report/        # presentadores y componentes del reporte
+├── dashboard/     # dashboard de historial de auditorías
+├── billing/       # planes, checkout y webhooks de Stripe
+├── ui/            # componentes UI propios (design system)
+└── lib/           # contracts (Zod), copy centralizada, rate limiting, fetch
+```
 
-## Deploy on Vercel
+La copia de UI está centralizada en `src/lib/copy.ts` en español neutro (usted, sin voseo).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## SDD
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El proyecto se desarrolla con SDD (Spec-Driven Development): cada sprint es un *change* con proposal, spec, design, tasks, apply y verify. Los artefactos viven en `openspec/`:
+
+- `openspec/changes/` — changes activos (proposal, spec, design, tasks por sprint)
+- `openspec/specs/` — specs de capacidades (delta por change)
+
+## Convenciones
+
+- Conventional Commits: `feat(scope):`, `fix(scope):`, `chore:`, `docs:` — título en inglés, descripción en español
+- TypeScript strict, nunca `any`
+- Sin librerías de componentes prefabricadas: componentes propios con Tailwind + tokens
+- Cero sobreingeniería. Cero complejidad sin justificación explícita
+- Git: `develop` es la rama de integración; `main` solo releases estables (ver AGENTS.md)
