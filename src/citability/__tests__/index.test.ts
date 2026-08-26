@@ -15,8 +15,9 @@ function page(name: string) {
 describe("scorePage aggregate (RCI-9, RCI-10, RCI-11)", () => {
   it("computes page score as the mean of block composites (RCI-9)", () => {
     const result = scorePage(page("page-five-blocks.html"));
-    // 85 + 73 + 77.5 + 17.5 + 27.5 + 54.5 = 335 / 6 = 55.83 -> 55.8
-    expect(result.pageScore).toBe(55.8);
+    // v2.0.0 partial-credit tiers (WU-3): answer base 20 + intermediate
+    // structure tiers lift the composites → 344 / 6 = 57.3
+    expect(result.pageScore).toBe(57.3);
   });
 
   it("returns the exact top 3 and bottom 3 blocks (RCI-10)", () => {
@@ -80,7 +81,7 @@ describe("toContractResult (shared CitabilityResult shape)", () => {
   it("maps the engine output to the AuditResult contract and Zod-validates", () => {
     const result = scorePage(page("page-five-blocks.html"));
     const contract = toContractResult(result);
-    expect(contract.pageScore).toBe(55.8);
+    expect(contract.pageScore).toBe(57.3);
     expect(contract.coverage).toBe(50);
     expect(contract.top3).toEqual([
       "What is the audit process?",

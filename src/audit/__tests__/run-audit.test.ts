@@ -90,7 +90,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11)", () => {
     expect(auditResultSchema.safeParse(result).success).toBe(true);
 
     expect(result.summary.url).toBe("https://example.com/");
-    expect(result.summary.geoScore).toBe(43);
+    expect(result.summary.geoScore).toBe(45);
     expect(result.summary.severityBand).toBe("Poor");
     expect(result.summary.durationMs).toBe(0);
     expect(result.scoringModelVersion).toBe("2.0.0");
@@ -103,7 +103,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11)", () => {
     // All five engine sections carry real, deterministic output.
     expect(result.crawlers.compositeScore).toBe(80);
     expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
-    expect(result.citability.pageScore).toBe(33);
+    expect(result.citability.pageScore).toBe(40);
     expect(result.content.composite).toBe(5);
     expect(result.schema.detected.length).toBeGreaterThan(0);
     expect(result.platform.perPlatform["aio"]).toBeDefined();

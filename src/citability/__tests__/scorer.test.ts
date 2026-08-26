@@ -30,8 +30,22 @@ describe("Answer Block Quality (RCI-3, 30%)", () => {
 
   it("scores a narrative block with no definition or immediate answer < 40", () => {
     const { scores } = scoreFirstBlock("page-no-answer.html");
-    expect(scores.answer).toBe(10);
+    expect(scores.answer).toBe(20);
     expect(scores.answer).toBeLessThan(40);
+  });
+
+  it("awards intermediate credit for a definition whose answer is buried (RCI-3)", () => {
+    const { scores } = scoreFirstBlock("page-answer-buried.html");
+    // Base 20 + definition 40 = 60: > 0 and below full (100), not 0.
+    expect(scores.answer).toBe(60);
+    expect(scores.answer).toBeGreaterThan(0);
+    expect(scores.answer).toBeLessThan(100);
+  });
+
+  it("awards partial first-sentence credit for a declarative lead over 60 words (RCI-3)", () => {
+    const { scores } = scoreFirstBlock("page-answer-long-lead.html");
+    // Base 20 + partial first-sentence 25 = 45 (answer exists, not standalone).
+    expect(scores.answer).toBe(45);
   });
 });
 
@@ -64,6 +78,12 @@ describe("Structural Readability (RCI-5, 20%)", () => {
     // H2 "Setup steps" + list, but the paragraph is a single sentence
     expect(scoreBlock(blocks[1]).scores.structure).toBe(40);
   });
+
+  it("awards intermediate credit when only some paragraphs are in the band (RCI-5)", () => {
+    const { scores } = scoreFirstBlock("page-structure-partial.html");
+    // H2 20 + partial paragraph band 20 = 40: clean hierarchy, mixed paragraphs.
+    expect(scores.structure).toBe(40);
+  });
 });
 
 describe("Statistical Density (RCI-6, 15%)", () => {
@@ -77,6 +97,13 @@ describe("Statistical Density (RCI-6, 15%)", () => {
     const { scores } = scoreFirstBlock("page-stats-poor.html");
     expect(scores.stats).toBe(0);
     expect(scores.stats).toBeLessThanOrEqual(10);
+  });
+
+  it("awards intermediate credit to a partial-stat block (RCI-6)", () => {
+    const { scores } = scoreFirstBlock("page-stats-partial.html");
+    // One bare percentage across a long block: between 10 and full, not 0.
+    expect(scores.stats).toBeGreaterThan(10);
+    expect(scores.stats).toBeLessThan(100);
   });
 });
 

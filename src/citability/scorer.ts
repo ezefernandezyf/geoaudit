@@ -4,6 +4,7 @@ import {
   ANSWER_COPULA,
   ANSWER_DEFINITION_BONUS,
   ANSWER_FIRST_SENTENCE_BONUS,
+  ANSWER_FIRST_SENTENCE_PARTIAL_BONUS,
   CITABILITY_WEIGHTS,
   CONJUNCTION_LEAD,
   DEFINITION_PATTERN,
@@ -21,6 +22,7 @@ import {
   STRUCTURE_HEADING_BONUS,
   STRUCTURE_LIST_TABLE_BONUS,
   STRUCTURE_PARAGRAPH_BONUS,
+  STRUCTURE_PARTIAL_PARAGRAPH_BONUS,
   STRUCTURE_QUESTION_BONUS,
   UNIQUENESS_PER_HIT,
   UNIQUENESS_PHRASES,
@@ -54,29 +56,33 @@ function round1(value: number): number {
 }
 
 /**
- * RCI-3 — Answer Block Quality (30%).
- * Step 1: start from a small structural base.
+ * RCI-3 — Answer Block Quality (30%) — partial-credit tiers (WU-3).
+ * Step 1: start from a small structural base (softened floor).
  * Step 2: add the definition-pattern bonus when the content contains
- *         "X is a/an ..." (regex from design).
+ *         "X is a/an ..." (regex from design) — a definition earns credit
+ *         even when the answer is buried, not all-or-nothing.
  * Step 3: add the answer-first bonus when the FIRST sentence is a complete
- *         sentence (ends in .!?), fits in the first 60 words (the
- *         "first-60-words standalone" check) and contains a copula
- *         (is/are/was/were) — i.e. the answer is stated up front.
+ *         sentence (ends in .!?) and contains a copula (is/are/was/were):
+ *         full bonus inside the first 60 words (standalone answer), half
+ *         bonus when the answer exists but is not standalone.
  */
 export function scoreAnswer(block: ContentBlock): number {
   const lead = block.paragraphs.join(" ").trim();
   let score = ANSWER_BASE_SCORE;
   if (DEFINITION_PATTERN.test(lead)) score += ANSWER_DEFINITION_BONUS;
-  if (isFirstSentenceAnswer(lead)) score += ANSWER_FIRST_SENTENCE_BONUS;
-  return score;
+  score += firstSentenceAnswerBonus(lead);
+  return Math.min(100, score);
 }
 
-function isFirstSentenceAnswer(lead: string): boolean {
+function firstSentenceAnswerBonus(lead: string): number {
   const first = firstSentence(lead);
   const complete = /[.!?]$/.test(first);
-  const withinFirst60Words = countWords(first) <= FIRST_SENTENCE_MAX_WORDS;
+  if (!complete) return 0;
   const declarative = ANSWER_COPULA.test(first);
-  return complete && withinFirst60Words && declarative;
+  if (!declarative) return 0;
+  return countWords(first) <= FIRST_SENTENCE_MAX_WORDS
+    ? ANSWER_FIRST_SENTENCE_BONUS
+    : ANSWER_FIRST_SENTENCE_PARTIAL_BONUS;
 }
 
 /**
@@ -100,17 +106,22 @@ export function scoreSelfContainment(block: ContentBlock): number {
 }
 
 /**
- * RCI-5 — Structural Readability (20%).
+ * RCI-5 — Structural Readability (20%) — partial-credit tiers (WU-3).
  * Step 1: a block that has a heading (H2/H3) is structured (+heading bonus).
- * Step 2: every paragraph with 2-4 sentences earns the paragraph bonus
- *         (wall-of-text paragraphs fail this step).
+ * Step 2: every paragraph with 2-4 sentences earns the full paragraph bonus;
+ *         SOME paragraphs in the band earn the partial bonus (wall-of-text
+ *         blocks with a readable paragraph are no longer all-or-nothing).
  * Step 3: tables or lists earn their bonus (AI extraction targets).
  * Step 4: question-form headings earn their bonus (query-matchable).
  */
 export function scoreStructure(block: ContentBlock): number {
   let score = 0;
   if (block.headingLevel !== 0) score += STRUCTURE_HEADING_BONUS;
-  if (hasParagraphsInSentenceBand(block)) score += STRUCTURE_PARAGRAPH_BONUS;
+  if (hasParagraphsInSentenceBand(block)) {
+    score += STRUCTURE_PARAGRAPH_BONUS;
+  } else if (hasPartialParagraphBand(block)) {
+    score += STRUCTURE_PARTIAL_PARAGRAPH_BONUS;
+  }
   if (block.hasTable || block.hasList) score += STRUCTURE_LIST_TABLE_BONUS;
   if (block.hasQuestionHeading) score += STRUCTURE_QUESTION_BONUS;
   return score;
@@ -124,6 +135,18 @@ function hasParagraphsInSentenceBand(block: ContentBlock): boolean {
       sentences >= PARAGRAPH_SENTENCE_MIN && sentences <= PARAGRAPH_SENTENCE_MAX
     );
   });
+}
+
+/** Some (but not all) paragraphs sit in the 2-4 sentence band. */
+function hasPartialParagraphBand(block: ContentBlock): boolean {
+  if (block.paragraphs.length === 0) return false;
+  const inBand = block.paragraphs.filter((paragraph) => {
+    const sentences = countSentences(paragraph);
+    return (
+      sentences >= PARAGRAPH_SENTENCE_MIN && sentences <= PARAGRAPH_SENTENCE_MAX
+    );
+  }).length;
+  return inBand > 0 && inBand < block.paragraphs.length;
 }
 
 /**

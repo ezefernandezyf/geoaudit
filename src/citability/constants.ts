@@ -16,12 +16,15 @@ export const CITABILITY_WEIGHTS = {
   uniqueness: 0.1,
 } as const;
 
-// RCI-3 — Answer Block Quality
-export const ANSWER_BASE_SCORE = 10;
+// RCI-3 — Answer Block Quality (partial-credit tiers, WU-3 calibration)
+/** Small structural base every extractable block earns (softened floor). */
+export const ANSWER_BASE_SCORE = 20;
 /** Bonus when the block contains a definition pattern "X is a/an ...". */
 export const ANSWER_DEFINITION_BONUS = 40;
-/** Bonus when the first sentence is a complete answer inside the first 60 words. */
+/** Full bonus when the first sentence is a complete answer inside the first 60 words. */
 export const ANSWER_FIRST_SENTENCE_BONUS = 50;
+/** Half bonus when the answer exists (copula + complete sentence) but is not standalone in the first 60 words. */
+export const ANSWER_FIRST_SENTENCE_PARTIAL_BONUS = 25;
 /** A first sentence longer than this is not a "first-60-words standalone" answer. */
 export const FIRST_SENTENCE_MAX_WORDS = 60;
 /** Definition pattern (design: /\bis\s+a(n)?\s+/). */
@@ -48,6 +51,8 @@ export const CONJUNCTION_LEAD = /^(?:but|however|and|also|so|yet)\b/i;
 export const STRUCTURE_HEADING_BONUS = 20;
 /** Bonus when every paragraph is 2-4 sentences long. */
 export const STRUCTURE_PARAGRAPH_BONUS = 40;
+/** Half bonus when SOME (but not all) paragraphs are 2-4 sentences long. */
+export const STRUCTURE_PARTIAL_PARAGRAPH_BONUS = 20;
 export const STRUCTURE_LIST_TABLE_BONUS = 20;
 export const STRUCTURE_QUESTION_BONUS = 20;
 export const PARAGRAPH_SENTENCE_MIN = 2;
