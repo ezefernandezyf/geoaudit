@@ -174,7 +174,7 @@ export const PRICING_COPY = {
   },
 } as const;
 
-/** Landing page copy (LND-1..5) — Gemini wording, neutral Spanish. */
+/** Landing page copy (LND-1..5, LND-11) — Gemini wording, neutral Spanish. */
 export const LANDING_COPY = {
   hero: {
     badge: "GEO Engine",
@@ -182,10 +182,14 @@ export const LANDING_COPY = {
     badgeSuffix: "Auditoría de visibilidad en motores de IA",
     title:
       "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
-    subtitleLead: "Pegue su URL y obtenga en segundos un ",
-    subtitleHighlight: "GEO Score 0-100",
-    subtitleTail:
-      " con diagnóstico detallado de presencia en ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.",
+    // LND-11 (sprint 9): answer-first subtitle with a concrete stat — the
+    // first sentence states the claim so the passage is self-contained. The
+    // stats are REAL product facts (6 engines, 5 dimensions, weights sum 100).
+    subtitleLead:
+      "GeoAudit es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
+    subtitleHighlight:
+      " El GEO Score pondera 5 dimensiones que suman el 100 % del resultado.",
+    subtitleTail: " Entrega un puntaje de 0 a 100 en menos de 30 segundos.",
     sampleLabel: "O pruebe un ejemplo real:",
   },
   auditForm: {
@@ -194,6 +198,37 @@ export const LANDING_COPY = {
     submitLabel: "Auditar URL",
     formAriaLabel: "Auditoría GEO",
   },
+  // LND-11 (sprint 9): feature cards are answer-first passages (claim in the
+  // first sentence) with concrete stats and 50-200 self-contained words — the
+  // extraction band the citability engine rewards. Every figure is a REAL
+  // product fact: engine registry (17 agents), scoring weights, rubric counts.
+  features: [
+    {
+      number: "01",
+      title: "Acceso de bots",
+      body: "GeoAudit verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 18.75 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.",
+    },
+    {
+      number: "02",
+      title: "Citabilidad",
+      body: "La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. GeoAudit analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 31.25 % del GEO Score, la dimensión con mayor peso del engine.",
+    },
+    {
+      number: "03",
+      title: "E-E-A-T",
+      body: "GeoAudit evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 25 puntos por dimensión. E-E-A-T pondera el 25 % del GEO Score y favorece al contenido con señales de confianza explícitas.",
+    },
+    {
+      number: "04",
+      title: "Datos estructurados",
+      body: "GeoAudit detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 12.5 % del GEO Score y aportan precisión a las citas de entidades.",
+    },
+    {
+      number: "05",
+      title: "Plataforma",
+      body: "GeoAudit evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 12.5 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.",
+    },
+  ],
   sections: {
     howItWorksEyebrow: "Metodología de análisis",
     howItWorksTitle: "Cómo analiza GeoAudit tu visibilidad sintética",
@@ -208,7 +243,7 @@ export const LANDING_COPY = {
     platformsEyebrow: "Ecosistema de Búsqueda de IA",
     platformsTitle: "6 plataformas de búsqueda generativa auditadas",
     platformsLead:
-      "Analizamos la interacción de cada crawler y motor de respuesta con el contenido web.",
+      "GeoAudit analiza la interacción de cada crawler y motor de respuesta con el contenido web en las 6 plataformas que concentran la búsqueda asistida por IA en 2026.",
     pricingEyebrow: "Planes y Acceso",
     pricingTitle: "Comience a monitorear la visibilidad de su marca en la IA",
     pricingSubtitle:

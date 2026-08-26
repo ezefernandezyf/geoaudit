@@ -126,7 +126,7 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
       "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
     );
     expect(LANDING_COPY.hero.subtitleLead).toBe(
-      "Pegue su URL y obtenga en segundos un ",
+      "GeoAudit es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
     );
     expect(LANDING_COPY.hero.sampleLabel).toBe("O pruebe un ejemplo real:");
     expect(LANDING_COPY.sections.pricingTitle).toBe(
@@ -242,5 +242,41 @@ describe("COPY — single source of truth (U2.2)", () => {
   it("exposes checkout and shell copy on the grouped COPY object (B8/B10)", () => {
     expect(COPY.checkoutErrors).toBe(CHECKOUT_ERROR_COPY);
     expect(COPY.shell).toBe(SHELL_COPY);
+  });
+});
+
+describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
+  /**
+   * LND-11: the landing hero/features MUST be answer-first with concrete stats
+   * so passages are self-contained and citable by AI systems. Mirrors the
+   * citability engine's stat pattern (percentages, currency, 4-digit years).
+   */
+  const STAT_PATTERN = /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b/;
+  const ANSWER_FIRST_PATTERN =
+    /^(?:GeoAudit|El GEO Score|La citabilidad|La plataforma|El engine|Los motores|Los pasajes)/;
+
+  it("hero subtitle is answer-first and carries at least one concrete stat", () => {
+    const subtitle =
+      `${LANDING_COPY.hero.subtitleLead}${LANDING_COPY.hero.subtitleHighlight}${LANDING_COPY.hero.subtitleTail}`.trim();
+    expect(subtitle).toMatch(ANSWER_FIRST_PATTERN);
+    expect(subtitle).toMatch(STAT_PATTERN);
+    expect(subtitle.length).toBeGreaterThan(80);
+  });
+
+  it("each feature card is answer-first, self-contained and has a stat", () => {
+    for (const feature of LANDING_COPY.features) {
+      expect(feature.title.length).toBeGreaterThan(0);
+      expect(feature.body).toMatch(ANSWER_FIRST_PATTERN);
+      expect(feature.body).toMatch(STAT_PATTERN);
+      // Self-contained extraction band: 50-200 words (RCI-4).
+      const words = feature.body.trim().split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(50);
+      expect(words).toBeLessThanOrEqual(200);
+    }
+  });
+
+  it("the platforms lead names the six audited AI engines with a stat", () => {
+    expect(LANDING_COPY.sections.platformsLead).toMatch(/\b6\b/);
+    expect(LANDING_COPY.sections.platformsLead).toMatch(STAT_PATTERN);
   });
 });

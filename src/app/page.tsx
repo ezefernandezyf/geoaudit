@@ -238,18 +238,13 @@ export default async function Home() {
             <div className="flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-7 lg:col-span-5">
               <div>
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
-                  01
+                  {LANDING_COPY.features[0].number}
                 </div>
                 <h3 className="mb-2 font-serif text-2xl tracking-tight text-[#0f172a]">
-                  Acceso de bots
+                  {LANDING_COPY.features[0].title}
                 </h3>
                 <p className="mb-4 text-sm leading-relaxed text-[#475569]">
-                  Verificamos si{" "}
-                  <code className="rounded border border-[#e2e8f0] bg-white px-1.5 py-0.5 font-mono text-xs text-[#0f172a]">
-                    robots.txt
-                  </code>
-                  , encabezados HTTP y metaetiquetas permiten o bloquean a los
-                  crawlers de IA.
+                  {LANDING_COPY.features[0].body}
                 </p>
               </div>
               <div className="space-y-1 rounded-lg border border-[#e2e8f0] bg-white p-3 font-mono text-xs text-[#475569]">
@@ -268,15 +263,14 @@ export default async function Home() {
             <div className="flex flex-col gap-6 lg:col-span-7">
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
-                  02
+                  {LANDING_COPY.features[1].number}
                 </div>
                 <div>
                   <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
-                    Citabilidad
+                    {LANDING_COPY.features[1].title}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#475569]">
-                    Medimos qué tan probable es que los modelos citen
-                    textualmente pasajes de tu página como fuente canónica.
+                    {LANDING_COPY.features[1].body}
                   </p>
                 </div>
               </div>
@@ -284,45 +278,42 @@ export default async function Home() {
               {/* Card 03 — navy #0f172a + número emerald (LND-2) */}
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#1e293b] bg-[#0f172a] p-6 text-white sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500 font-mono text-sm font-bold text-slate-950">
-                  03
+                  {LANDING_COPY.features[2].number}
                 </div>
                 <div>
                   <h3 className="mb-1 font-serif text-xl text-white">
-                    E-E-A-T
+                    {LANDING_COPY.features[2].title}
                   </h3>
                   <p className="text-sm leading-relaxed text-slate-300">
-                    Evaluamos experiencia, experticia, autoridad y confiabilidad
-                    del contenido para la ponderación de fuentes.
+                    {LANDING_COPY.features[2].body}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
-                  04
+                  {LANDING_COPY.features[3].number}
                 </div>
                 <div>
                   <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
-                    Datos estructurados
+                    {LANDING_COPY.features[3].title}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#475569]">
-                    Detectamos y validamos el JSON-LD y Schema.org que los LLMs
-                    usan para corroborar entidades y hechos.
+                    {LANDING_COPY.features[3].body}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
-                  05
+                  {LANDING_COPY.features[4].number}
                 </div>
                 <div>
                   <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
-                    Plataforma
+                    {LANDING_COPY.features[4].title}
                   </h3>
                   <p className="text-sm leading-relaxed text-[#475569]">
-                    Comprobamos readiness, SSR, OG y headers para cada motor de
-                    búsqueda generativa.
+                    {LANDING_COPY.features[4].body}
                   </p>
                 </div>
               </div>
