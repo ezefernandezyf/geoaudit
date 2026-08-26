@@ -29,4 +29,29 @@ describe("next.config.ts (PDF-8)", () => {
       ]),
     );
   });
+
+  it("applies the SHL-7 security headers to every route", async () => {
+    const routes = await nextConfig.headers?.();
+    const all = routes?.find((route) => route.source === "/(.*)");
+    expect(all).toBeDefined();
+
+    const keys = all?.headers.map((header) => header.key);
+    expect(keys).toEqual(
+      expect.arrayContaining([
+        "Content-Security-Policy-Report-Only",
+        "Strict-Transport-Security",
+        "X-Content-Type-Options",
+        "Referrer-Policy",
+      ]),
+    );
+
+    // Pragmatic CSP per design (SHL-7): 'self' defaults, Tailwind inline
+    // styles allowed, no object/frame embedding.
+    const csp = all?.headers.find(
+      (header) => header.key === "Content-Security-Policy-Report-Only",
+    )?.value;
+    expect(csp).toContain("default-src 'self'");
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+    expect(csp).toContain("object-src 'none'");
+  });
 });
