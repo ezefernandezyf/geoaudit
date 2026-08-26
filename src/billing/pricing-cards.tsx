@@ -18,8 +18,8 @@ import type { Tier } from "@/lib/contracts/billing";
  * Monthly-only (PRC-5): the catalog is monthly by design — no annual/monthly
  * toggle and no discounted annual price are ever rendered (D2). The `featured`
  * flag highlights a plan Gemini-style (PRC-6): emerald border
- * `border-[#10b981]`, "Recomendado" badge `bg-[#10b981]` and `lg:-translate-y-2`
- * lift; `features` render as a checkmark list.
+ * `border-[#10b981]`, "Recomendado" badge `bg-[#047857]` (AA contrast, PERF-3)
+ * and `lg:-translate-y-2` lift; `features` render as a checkmark list.
  */
 export type PricingPlan = {
   id: Tier;
@@ -65,7 +65,8 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
       }`}
     >
       {featured ? (
-        <div className="absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-[#10b981] px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-white shadow-xs">
+        // PERF-3: badge bg #047857 (blanco 5.48:1, AA) — #10b981 (2.53:1) fallaba.
+        <div className="absolute -top-3.5 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full bg-[#047857] px-3 py-0.5 text-xs font-semibold uppercase tracking-wide text-white shadow-xs">
           <Sparkles className="h-3 w-3" aria-hidden="true" />
           <span>Recomendado</span>
         </div>

@@ -138,7 +138,7 @@ describe("PricingCards highlighted plan (PRC-6, DNF-9)", () => {
     expect(proCard?.className).toContain("lg:-translate-y-2");
 
     const badge = screen.getByText("Recomendado").closest("div");
-    expect(badge?.className).toContain("bg-[#10b981]");
+    expect(badge?.className).toContain("bg-[#047857]");
     expect(badge?.className).toContain("text-white");
   });
 
