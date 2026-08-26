@@ -60,12 +60,12 @@ Chain strategy: feature-branch-chain
 
 ## WU-4 — Code audit fixes
 
-- [ ] 4.1 Modify `next.config.ts` `async headers()`: CSP report-only→enforce + HSTS + X-Content-Type-Options + Referrer-Policy (SHL-7)
-- [ ] 4.2 RED: test `DashboardEmptyState` renders `DASHBOARD_COPY.empty`, sin voseo (DSH-4)
-- [ ] 4.3 Modify `src/dashboard/dashboard-empty-state.tsx` → consume `DASHBOARD_COPY.empty` + ampliar `copy.test.ts` (DSH-4)
-- [ ] 4.4 Modify `src/ui/score-bar.tsx` aria-label; `src/billing/pricing-cards.tsx` `#047857`; `src/ui/navbar.tsx` brand label (A11Y-6)
-- [ ] 4.5 E2E: axe (progressbar-name, contrast, label-content-name-mismatch) + headers presentes (A11Y-6, SHL-7)
-- [ ] 4.6 README real; `.env.example`/`AGENTS.md` docs stale (docs)
+- [x] 4.1 Modify `next.config.ts` `async headers()`: CSP report-only→enforce + HSTS + X-Content-Type-Options + Referrer-Policy (SHL-7)
+- [x] 4.2 RED: test `DashboardEmptyState` renders `DASHBOARD_COPY.empty`, sin voseo (DSH-4)
+- [x] 4.3 Modify `src/dashboard/dashboard-empty-state.tsx` → consume `DASHBOARD_COPY.empty` + ampliar `copy.test.ts` (DSH-4)
+- [x] 4.4 Modify `src/ui/score-bar.tsx` aria-label; `src/billing/pricing-cards.tsx` `#047857`; `src/ui/navbar.tsx` brand label (A11Y-6)
+- [x] 4.5 E2E: axe (progressbar-name, contrast, label-content-name-mismatch) + headers presentes (A11Y-6, SHL-7)
+- [x] 4.6 README real; `.env.example`/`AGENTS.md` docs stale (docs)
 - [ ] 4.7 Gate: full `pnpm test` + lint + typecheck + build
 
 ## Notas
