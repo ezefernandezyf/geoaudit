@@ -206,7 +206,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       ).toBeInTheDocument();
       // Two dimensions share the 12.5% weight — use the AllBy variant.
       expect(
-        within(table as HTMLElement).getAllByText(category.weight).length,
+        within(table as HTMLElement).getAllByText(category.weight ?? "").length,
       ).toBeGreaterThan(0);
     }
   });
@@ -321,7 +321,10 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     const external = screen
       .getAllByRole("link")
       .map((link) => link.getAttribute("href"))
-      .filter((href): href is string => /^https?:\/\//.test(href));
+      .filter(
+        (href): href is string =>
+          typeof href === "string" && /^https?:\/\//.test(href),
+      );
     expect(external.length).toBeGreaterThanOrEqual(5);
     const authorityHosts = [
       "w3.org",

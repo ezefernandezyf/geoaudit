@@ -15,9 +15,10 @@ export function focusableElements(root: ParentNode): HTMLElement[] {
 
 /**
  * Asserts the logical focus order contract shared by every page shell:
- * the first tab stop is the brand link, the last is the footer "Privacidad"
- * link, and no element uses a positive tabindex (the axe `tabindex` rule is
- * also covered by the shell axe scan).
+ * the first tab stop is the brand link, the last is the footer "Contacto"
+ * link (LND-12 added the mailto contact after Privacidad), and no element
+ * uses a positive tabindex (the axe `tabindex` rule is also covered by the
+ * shell axe scan).
  */
 export function assertLogicalFocusOrder(focusable: HTMLElement[]): void {
   if (focusable.length <= 5) {
@@ -30,9 +31,9 @@ export function assertLogicalFocusOrder(focusable: HTMLElement[]): void {
       `expected first tab stop to be the brand link, got ${focusable[0].outerHTML}`,
     );
   }
-  if (!focusable[focusable.length - 1].textContent?.includes("Privacidad")) {
+  if (!focusable[focusable.length - 1].textContent?.includes("Contacto")) {
     throw new Error(
-      `expected last tab stop to be the footer Privacidad link, got ${focusable[focusable.length - 1].outerHTML}`,
+      `expected last tab stop to be the footer Contacto link, got ${focusable[focusable.length - 1].outerHTML}`,
     );
   }
   for (const el of focusable) {
