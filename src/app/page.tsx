@@ -142,36 +142,43 @@ const PLATFORMS = [
     bot: "GPTBot / OAI-SearchBot",
     company: "OpenAI",
     desc: "Búsqueda web en vivo para usuarios Plus/Pro y navegación de GPT-4o.",
+    // Official crawler documentation — real external citation (E-E-A-T REE-3).
+    docs: "https://platform.openai.com/docs/gptbot",
   },
   {
     name: "Claude",
     bot: "ClaudeBot / Anthropic-AI",
     company: "Anthropic",
     desc: "Ingesta de documentación técnica y ponderación de fuentes E-E-A-T.",
+    docs: "https://support.anthropic.com/en/articles/8896518",
   },
   {
     name: "Perplexity",
     bot: "PerplexityBot",
     company: "Perplexity AI",
     desc: "Citas directas y enlaces fuente verificados en tiempo real.",
+    docs: "https://docs.perplexity.ai",
   },
   {
     name: "Gemini",
     bot: "Google-Extended",
     company: "Google",
     desc: "Integración en ecosistema Workspace y consultas directas en Gemini Live.",
+    docs: "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers",
   },
   {
     name: "Google AI Overviews",
     bot: "Googlebot Smartphone",
     company: "Google Search",
     desc: "Tarjetas de síntesis y carruseles en la cabecera del buscador tradicional.",
+    docs: "https://developers.google.com/search/docs/appearance/ai-overviews",
   },
   {
     name: "Bing Copilot",
     bot: "Bingbot / IndexNow",
     company: "Microsoft",
     desc: "Búsqueda enriquecida con feeds de productos y documentación en Edge.",
+    docs: "https://www.bing.com/webmasters",
   },
 ];
 
@@ -319,6 +326,63 @@ export default async function Home() {
               </div>
             </div>
           </div>
+          <div className="mt-8 rounded-xl border border-[#e2e8f0] bg-white p-5">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#475569]">
+              Referencias y documentación oficial
+            </h3>
+            <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-[#475569]">
+              <li>
+                <a
+                  href="https://www.w3.org/TR/json-ld11/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-[#0f172a] hover:underline"
+                >
+                  JSON-LD 1.1 — W3C
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-[#0f172a] hover:underline"
+                >
+                  HTML Reference — MDN
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://github.com/ezefernandezyf/geoaudit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-[#0f172a] hover:underline"
+                >
+                  GeoAudit — GitHub
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://platform.openai.com/docs/gptbot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-[#0f172a] hover:underline"
+                >
+                  GPTBot — OpenAI
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://support.anthropic.com/en/articles/8896518"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline-offset-2 hover:text-[#0f172a] hover:underline"
+                >
+                  ClaudeBot — Anthropic
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
 
@@ -442,7 +506,14 @@ export default async function Home() {
                   </span>
                 </div>
                 <div className="mb-2 font-mono text-xs font-semibold text-[#047857]">
-                  {p.bot}
+                  <a
+                    href={p.docs}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline-offset-2 hover:underline"
+                  >
+                    {p.bot}
+                  </a>
                 </div>
                 <p className="text-xs leading-relaxed text-[#475569]">
                   {p.desc}

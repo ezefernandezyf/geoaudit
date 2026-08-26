@@ -51,6 +51,15 @@ export function Footer({ session }: FooterProps = {}) {
           >
             Privacidad
           </Link>
+          {/* LND-12 (sprint 9): contact signal — the E-E-A-T trustworthiness
+              engine awards contact info (mailto/tel/contact/address) +5. The
+              mailto uses the same support address as PROFILE_COPY. */}
+          <a
+            href="mailto:soporte@geoaudit.app"
+            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
+          >
+            Contacto
+          </a>
         </nav>
         <p className="text-xs text-[#475569]">
           © {new Date().getFullYear()} GeoAudit
