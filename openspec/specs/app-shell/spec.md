@@ -1,6 +1,6 @@
 # App Shell Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
@@ -16,6 +16,7 @@ The shared app shell (navbar + footer) restyled to Gemini: active-state nav link
 | SHL-4 | Logo | New | MUST | Navbar MUST render the new logo + wordmark |
 | SHL-5 | Footer links | New | MUST | Footer MUST link to terms/privacy |
 | SHL-6 | Neutral shell copy | New | MUST | Navbar/footer copy MUST be neutral Spanish (usted), sourced from `copy.ts` |
+| SHL-7 | Security headers | New | MUST | Every response MUST send CSP + HSTS (CSP report-only first, then enforced) |
 
 ### Requirement: Active Nav States (SHL-1)
 
@@ -77,6 +78,22 @@ When the app shell renders, then its copy (navbar links, user actions, footer te
 - WHEN its copy is inspected
 - THEN no voseo/tuteo forms appear and the strings come from `copy.ts`
 
+### Requirement: Security Headers (SHL-7)
+
+Every app response MUST send a Content-Security-Policy and Strict-Transport-Security header. CSP MUST start in report-only mode (with reporting) and only move to enforcement after assets/inline/third-party resources are verified unbroken.
+
+#### Scenario: CSP + HSTS emitted
+
+- GIVEN any route response
+- WHEN the response is inspected
+- THEN `Content-Security-Policy` (or `Content-Security-Policy-Report-Only`) and `Strict-Transport-Security` headers are present
+
+#### Scenario: CSP report-only before enforce
+
+- GIVEN CSP is initially rolled out
+- WHEN the landing/report routes render
+- THEN CSP is report-only until no inline/third-party breakage is observed, then it is enforced
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -87,3 +104,4 @@ When the app shell renders, then its copy (navbar links, user actions, footer te
 | SHL-4 | Logo + wordmark | Covered |
 | SHL-5 | Legal links present | Covered |
 | SHL-6 | Navbar copy is neutral | Covered |
+| SHL-7 | CSP + HSTS emitted, CSP report-only before enforce | Covered |

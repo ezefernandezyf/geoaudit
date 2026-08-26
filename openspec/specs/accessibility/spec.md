@@ -1,6 +1,6 @@
 # Accessibility Specification
 
-> **Change**: `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED)
+> **Change**: `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` · **Type**: New capability (ADDED) + Delta (ADDED)
 
 ## Purpose
 
@@ -15,6 +15,7 @@ Automated accessibility coverage with jest-axe asserting WCAG 2.2 AA on the main
 | A11Y-3 | Color contrast | New | MUST | Contrast violations MUST be caught (or documented with justification) |
 | A11Y-4 | Landmarks | New | MUST | Main/landmark regions MUST be asserted per page |
 | A11Y-5 | Focus management | New | MUST | Visible focus + logical order MUST be asserted |
+| A11Y-6 | Audit fixes batch | New | MUST | Fix aria-progressbar-name, contrast, and label-content-name-mismatch (4 one-line fixes) |
 
 ### Requirement: jest-axe Integration (A11Y-1)
 
@@ -66,6 +67,22 @@ When the accessibility suite runs, then it MUST assert a visible focus indicator
 - WHEN the focus rules run
 - THEN focus indicators are visible and tab order is logical
 
+### Requirement: Audit Fixes Batch (A11Y-6)
+
+The codebase MUST apply the four one-line accessibility fixes identified by the audit: an `aria-progressbar-name` on the score bar, contrast corrections on affected UI, and `label-content-name-mismatch` fixes on the navbar/pricing controls.
+
+#### Scenario: Progress bar is named
+
+- GIVEN the score bar with `role="progressbar"`
+- WHEN axe scans it
+- THEN it has an accessible name (no `aria-progressbar-name` violation)
+
+#### Scenario: Contrast and label mismatches resolved
+
+- GIVEN the pricing cards and navbar controls
+- WHEN axe scans them
+- THEN no contrast violation and no `label-content-name-mismatch` violation remain
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -75,3 +92,4 @@ When the accessibility suite runs, then it MUST assert a visible focus indicator
 | A11Y-3 | Contrast violations caught | Covered |
 | A11Y-4 | Landmarks present | Covered |
 | A11Y-5 | Focus visible and ordered | Covered |
+| A11Y-6 | Progress bar is named, Contrast and label mismatches resolved | Covered |

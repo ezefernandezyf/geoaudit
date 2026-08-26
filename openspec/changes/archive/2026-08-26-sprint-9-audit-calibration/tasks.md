@@ -66,7 +66,7 @@ Chain strategy: feature-branch-chain
 - [x] 4.4 Modify `src/ui/score-bar.tsx` aria-label; `src/billing/pricing-cards.tsx` `#047857`; `src/ui/navbar.tsx` brand label (A11Y-6)
 - [x] 4.5 E2E: axe (progressbar-name, contrast, label-content-name-mismatch) + headers presentes (A11Y-6, SHL-7)
 - [x] 4.6 README real; `.env.example`/`AGENTS.md` docs stale (docs)
-- [ ] 4.7 Gate: full `pnpm test` + lint + typecheck + build
+- [x] 4.7 Gate: full `pnpm test` + lint + typecheck + build
 
 ## Notas
 

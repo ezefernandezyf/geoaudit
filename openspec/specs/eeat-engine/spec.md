@@ -10,7 +10,7 @@ Assess a single page's Experience, Expertise, Authoritativeness, and Trustworthi
 |---|-------------|----------|---------|
 | REE-1 | Experience score (0-25) | MUST | Score first-person language, case-study patterns, and hands-on operational indicators |
 | REE-2 | Expertise score (0-25) | MUST | Score author byline/bio presence, author Person schema, and technical-depth proxy (domain terms, code blocks, citation density) |
-| REE-3 | Authoritativeness score (0-25) | MUST | Score external source citations to authority domains and author `sameAs` link presence |
+| REE-3 | Authoritativeness score (0-25) | MUST | Score authority-domain citations and author `sameAs`; award partial credit for partial signals, not binary |
 | REE-4 | Trustworthiness score (0-25) | MUST | Score contact info, privacy/ToS links, HTTPS, and review/testimonial patterns with disclosure |
 | REE-5 | Word count benchmarking | MUST | Compute word count and compare to page-type benchmark thresholds |
 | REE-6 | Heading hierarchy | MUST | Check heading depth and flag skipped levels (e.g., H1 → H3 without H2) |
@@ -59,6 +59,23 @@ The system MUST detect author identity signals and technical depth.
 - GIVEN a page containing domain-specific terms, code blocks (`<code>`/`<pre>`), and ≥3 external citations
 - WHEN the Expertise dimension is evaluated
 - THEN technical-depth proxy contributes ≥ 5 points (partial credit even without explicit author)
+
+### Requirement: Authoritativeness Score (REE-3)
+
+The system MUST score external source citations to authority domains and author `sameAs` link presence, awarding partial credit for partial signals (e.g., some citations but no `sameAs`, or `sameAs` without authority-domain citations) instead of a hard 0 floor. Exact thresholds follow the WU-2 calibration decision.
+(Previously: binary — full credit only with authority-domain citations AND `sameAs`.)
+
+#### Scenario: Partial authority earns intermediate credit
+
+- GIVEN a page with external citations to two non-authority domains and no `sameAs`
+- WHEN Authoritativeness is scored
+- THEN the page earns intermediate credit (between 0 and full), not the minimum
+
+#### Scenario: Full authority signals
+
+- GIVEN a page with ≥3 authority-domain citations and an author `sameAs` link
+- WHEN Authoritativeness is scored
+- THEN the score approaches the 25-point cap
 
 ### Requirement: Trustworthiness Score (REE-4)
 
@@ -130,7 +147,7 @@ The system MUST explicitly report topicalAuthority as "not_measured".
 |-------------|-----------|----------|
 | REE-1 | Rich first-person case-study, Impersonal third-party | Covered |
 | REE-2 | Author with byline and schema, No author signals, Technical depth | Covered |
-| REE-3 | (fixture with external citations → domain-match assertion) | Covered |
+| REE-3 | Partial authority earns intermediate credit, Full authority signals | Covered |
 | REE-4 | Full trust signals, No legal links/contact | Covered |
 | REE-5 | (fixture with known word count → benchmark comparison) | Covered |
 | REE-6 | Clean hierarchy, H1→H3 skip | Covered |

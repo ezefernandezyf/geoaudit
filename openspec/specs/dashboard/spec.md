@@ -13,7 +13,7 @@ Authenticated dashboard listing the user's audit history with a score trend, a r
 | DSH-1 | History table | MUST | Dashboard MUST list persisted audits (URL, GEO score, date) newest→oldest, and each row MUST link to its detail page |
 | DSH-2 | Score trend | MUST | A pure-CSS bar trend MUST visualize scores without a chart library |
 | DSH-3 | Re-audit link | MUST | Each row MUST offer a re-audit link for its URL |
-| DSH-4 | Empty state | MUST | Zero audits MUST render an empty state with a call-to-action |
+| DSH-4 | Empty state | MUST | Zero audits MUST render an empty state with a call-to-action; copy neutral Spanish (usted) from `DASHBOARD_COPY`, no voseo |
 | DSH-5 | Read-only source | MUST | Dashboard MUST read `Audit` rows without re-running audits |
 | DSH-6 | Billing CTA | MUST | Dashboard shows "Upgrade" (FREE→/pricing) or "Gestionar suscripción" (PRO/Enterprise→portal) |
 | DSH-7 | Detail navigation | MUST | Each history row MUST link to `/dashboard/audits/[id]` |
@@ -62,13 +62,21 @@ Each history row MUST provide a re-audit link for its URL.
 
 ### Requirement: Empty State (DSH-4)
 
-The dashboard MUST render an empty state when the user has zero audits.
+The dashboard MUST render an empty state when the user has zero audits, and that empty-state copy MUST be neutral Spanish (usted), sourced from `DASHBOARD_COPY`, with no voseo/tuteo forms.
+(Previously: empty state existed but carried residual voseo.)
 
-#### Scenario: New user sees an empty state
+#### Scenario: New user sees a neutral empty state
 
 - GIVEN an authenticated user with no persisted audits
 - WHEN the dashboard renders
 - THEN an empty state appears with a call-to-action to run the first audit
+- AND its copy is neutral Spanish sourced from `DASHBOARD_COPY`
+
+#### Scenario: No voseo in empty state
+
+- GIVEN the dashboard empty state
+- WHEN its copy is inspected
+- THEN no voseo/tuteo forms appear
 
 ### Requirement: Read-only Source (DSH-5)
 
@@ -153,7 +161,7 @@ When the dashboard is viewed, then a refresh action MUST be available, and while
 | DSH-1 | User with history sees audits, Row links to detail | Covered |
 | DSH-2 | Trend reflects score history | Covered |
 | DSH-3 | User re-runs a past audit | Covered |
-| DSH-4 | New user sees an empty state | Covered |
+| DSH-4 | New user sees a neutral empty state, No voseo in empty state | Covered |
 | DSH-5 | History loads without re-running | Covered |
 | DSH-6 | Free user sees upgrade, Pro user sees manage | Covered |
 | DSH-7 | Detail link present on every row | Covered |

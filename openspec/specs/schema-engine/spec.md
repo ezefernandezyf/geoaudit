@@ -20,6 +20,7 @@ Extract, parse, and validate JSON-LD structured data from a web page against an 
 | RSC-10 | @graph handling | MUST | When JSON-LD uses `@graph`, flatten and validate each node individually |
 | RSC-11 | Empty JSON-LD handling | MUST | Pages with no JSON-LD blocks MUST produce an empty detection result with reason "no_structured_data", not an error |
 | RSC-12 | Invalid JSON handling | MUST | Per-block JSON parse errors MUST be collected as warnings; valid blocks still processed |
+| RSC-13 | Partial-credit schema scoring | New | MUST | Schema criteria MUST award intermediate points, not only 0/5/10/15 |
 
 ### Requirement: JSON-LD Extraction (RSC-1)
 
@@ -133,6 +134,22 @@ Pages with no structured data MUST produce a clean empty result, not an error.
 - THEN the result has `detected: []`, `warnings: []`, `generated` JSON-LD, and `businessType`
 - AND no error or exception is raised
 
+### Requirement: Partial-Credit Schema Scoring (RSC-13)
+
+The schema dimension MUST award intermediate points per criterion (not only the discrete 0/5/10/15 steps), so partial compliance (e.g., an Organization node missing one recommended property, or one valid node among several missing) earns partial credit instead of a hard floor. Exact point tiers follow the WU-2 calibration decision.
+
+#### Scenario: Partial schema earns intermediate credit
+
+- GIVEN a page with a valid Organization node that is missing one recommended property
+- WHEN the schema dimension is scored
+- THEN the criterion earns an intermediate point value between 0 and 15 (not just 0/5/10/15)
+
+#### Scenario: Full schema earns the cap
+
+- GIVEN a page with Organization + WebSite nodes and all required/recommended properties present
+- WHEN the schema dimension is scored
+- THEN the criterion reaches the full point value
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -149,3 +166,4 @@ Pages with no structured data MUST produce a clean empty result, not an error.
 | RSC-10 | (tested via RSC-3 @graph scenario) | Implicit |
 | RSC-11 | Zero ld+json scripts | Covered |
 | RSC-12 | (tested via RSC-2 invalid JSON scenario) | Implicit |
+| RSC-13 | Partial schema earns intermediate credit, Full schema earns the cap | Covered |

@@ -10,10 +10,10 @@ Analyze the main textual content of a page to determine how likely AI systems (C
 |---|-------------|----------|---------|
 | RCI-1 | Main content extraction | MUST | Extract main content via Cheerio, excluding nav, footer, sidebar, and ad elements |
 | RCI-2 | Content segmentation | MUST | Segment extracted text by H2/H3 headings into discrete content blocks |
-| RCI-3 | Answer Block Quality (30%) | MUST | Score each block: definition pattern "X is…", answer in first 1-2 sentences, first-60-words standalone |
+| RCI-3 | Answer Block Quality (30%) | MUST | Score each block for answer-block patterns; award partial credit for partial matches, not binary |
 | RCI-4 | Self-Containment (25%) | MUST | Score each block: explicit subject mention, no pronoun-first lead, 50-200 word length band |
-| RCI-5 | Structural Readability (20%) | MUST | Score each block: clean H1>H2>H3 hierarchy, 2-4 sentence paragraphs, presence of tables/lists, question-as-heading pattern |
-| RCI-6 | Statistical Density (15%) | MUST | Score each block: ≥1 concrete stat per 500 words (percentages, currency, dates, named sources) |
+| RCI-5 | Structural Readability (20%) | MUST | Score structural readability with partial credit for partial compliance, not binary |
+| RCI-6 | Statistical Density (15%) | MUST | Award intermediate points per stat density level (percentages, currency, dates, named sources) |
 | RCI-7 | Uniqueness (10%) | MUST | Score each block: original-data phrases ("we surveyed…", "our data shows…"), first-person voice — proxy signal |
 | RCI-8 | Block composite score | MUST | Compute per-block weighted average of the 5 dimensions (30/25/20/15/10) |
 | RCI-9 | Page aggregate score | MUST | Compute page citability score as mean of all validated block scores |
@@ -61,7 +61,8 @@ The system MUST segment extracted content by H2/H3 headings into blocks.
 
 ### Requirement: Answer Block Quality (RCI-3)
 
-The system MUST score each block for answer-block patterns.
+The system MUST score each block for answer-block patterns, awarding partial credit for partial matches (e.g., a definition without an immediate answer, or an answer without a standalone first-60-words) instead of all-or-nothing. Exact thresholds follow the WU-2 calibration decision.
+(Previously: binary scoring — full credit only for definition + immediate answer + standalone lead.)
 
 #### Scenario: Definition pattern detected
 
@@ -75,6 +76,12 @@ The system MUST score each block for answer-block patterns.
 - GIVEN a block starting with "In this section, we will discuss various features…" (no definition)
 - WHEN Answer Block Quality is scored
 - THEN the score is < 40 (no definition, no immediate answer)
+
+#### Scenario: Partial answer pattern earns intermediate credit
+
+- GIVEN a block with a definition but the answer buried after 3 sentences
+- WHEN Answer Block Quality is scored
+- THEN the block earns partial credit (> 0, below full) rather than 0
 
 ### Requirement: Self-Containment (RCI-4)
 
@@ -92,15 +99,33 @@ The system MUST score blocks for contextual independence.
 - WHEN Self-Containment is scored
 - THEN the score is < 30 (pronoun-first, requires external context)
 
+### Requirement: Structural Readability (RCI-5)
+
+The system MUST score structural readability with partial credit for partial compliance (e.g., clean hierarchy but no lists/tables, or question-as-heading but paragraphs longer than 4 sentences). Exact thresholds follow the WU-2 calibration decision.
+(Previously: full credit only when all sub-checks passed.)
+
+#### Scenario: Partial structure earns intermediate credit
+
+- GIVEN a block with a clean H1>H2>H3 hierarchy but no tables/lists
+- WHEN Structural Readability is scored
+- THEN the block earns partial credit instead of the minimum
+
 ### Requirement: Statistical Density (RCI-6)
 
-The system MUST detect concrete statistics per 500-word window.
+The system MUST award intermediate points by stat-density level (percentages, currency, dates, named sources) rather than a binary rich/poor split. Exact tiers follow the WU-2 calibration decision.
+(Previously: binary — ≥1 stat/500 words full credit, else ≤ 10.)
 
 #### Scenario: Stats-rich block
 
 - GIVEN a 400-word block containing "According to a 2025 McKinsey report, 67% of companies…" and "the average cost is $12,000 per incident"
 - WHEN Statistical Density is scored
 - THEN the score is ≥ 70 (≥1 stat per 500 words with named source + percentage + dollar amount)
+
+#### Scenario: Partial stat block earns intermediate credit
+
+- GIVEN a 400-word block with one bare percentage but no named source
+- WHEN Statistical Density is scored
+- THEN the block earns intermediate credit (between 10 and full), not the minimum
 
 #### Scenario: Stats-poor block
 
@@ -132,10 +157,10 @@ The system MUST handle malformed HTML without throwing exceptions.
 |-------------|-----------|----------|
 | RCI-1 | Standard article page, No semantic containers | Covered |
 | RCI-2 | Multiple H2 sections, H2 with nested H3 | Covered |
-| RCI-3 | Definition pattern detected, No answer pattern | Covered |
+| RCI-3 | Definition pattern detected, No answer pattern, Partial answer pattern earns intermediate credit | Covered |
 | RCI-4 | Self-contained block, Pronoun-led block | Covered |
-| RCI-5 | (tested via RCI-8 composite + fixtures) | Implicit |
-| RCI-6 | Stats-rich block, Stats-poor block | Covered |
+| RCI-5 | Partial structure earns intermediate credit | Covered |
+| RCI-6 | Stats-rich block, Partial stat block earns intermediate credit, Stats-poor block | Covered |
 | RCI-7 | (tested via RCI-8 composite + first-person fixtures) | Implicit |
 | RCI-8 | (tested via all dimension scenarios — composite assertion) | Implicit |
 | RCI-9 | (tested via RCI-10 top/bottom output + score assertion) | Implicit |
