@@ -284,6 +284,56 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     await renderPage();
     expect(screen.queryByRole("link", { name: /dashboard/i })).toBeNull();
   });
+
+  // LND-9 (sprint 9): inline Organization + WebSite JSON-LD in the SSR HTML —
+  // the schema engine only detects blocks in the server-rendered source.
+  it("emits inline Organization and WebSite JSON-LD in the SSR HTML (LND-9)", async () => {
+    const { container } = await renderPage();
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    expect(scripts.length).toBeGreaterThanOrEqual(2);
+    const payloads = [...scripts].map((script) =>
+      JSON.parse(script.textContent ?? ""),
+    );
+    const types = payloads.map((payload) => payload["@type"]).sort();
+    expect(types).toContain("Organization");
+    expect(types).toContain("WebSite");
+    const org = payloads.find((payload) => payload["@type"] === "Organization");
+    expect(org.name).toBe("GeoAudit");
+    expect(org.url).toMatch(/^https?:\/\//);
+    expect(Array.isArray(org.sameAs)).toBe(true);
+    expect(org.sameAs.length).toBeGreaterThan(0);
+    const site = payloads.find((payload) => payload["@type"] === "WebSite");
+    expect(site.potentialAction).toBeDefined();
+  });
+
+  // LND-12 (sprint 9): E-E-A-T trust signals — external citations to authority
+  // domains (the authoritativeness engine rewards absolute http(s) links and
+  // known authority hosts). The contact link lives in the Footer (tested in
+  // src/ui/__tests__/footer.test.tsx — this render covers <main> only).
+  it("surfaces external authority citations (LND-12)", async () => {
+    await renderPage();
+    // Authoritativeness: at least 5 absolute external links, including
+    // known authority domains (w3.org, github.com, openai.com, anthropic.com,
+    // developer.mozilla.org).
+    const external = screen
+      .getAllByRole("link")
+      .map((link) => link.getAttribute("href"))
+      .filter((href): href is string => /^https?:\/\//.test(href));
+    expect(external.length).toBeGreaterThanOrEqual(5);
+    const authorityHosts = [
+      "w3.org",
+      "github.com",
+      "openai.com",
+      "anthropic.com",
+      "developer.mozilla.org",
+    ];
+    const matched = external.filter((href) =>
+      authorityHosts.some((host) => href.includes(host)),
+    );
+    expect(matched.length).toBeGreaterThanOrEqual(5);
+  });
 });
 
 describe("landing page metadata (LND-8)", () => {

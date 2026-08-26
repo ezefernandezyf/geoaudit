@@ -33,6 +33,16 @@ describe("Footer (SHL-5)", () => {
     );
   });
 
+  // LND-12 (sprint 9): the E-E-A-T trustworthiness engine awards contact info
+  // (mailto/tel/contact/address) +5 — the footer surfaces the support mailto.
+  it("links contact info via mailto (LND-12)", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "Contacto" })).toHaveAttribute(
+      "href",
+      "mailto:soporte@geoaudit.app",
+    );
+  });
+
   it("does not link /dashboard for anonymous visitors (D6)", () => {
     render(<Footer session={null} />);
     expect(
