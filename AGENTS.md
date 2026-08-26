@@ -7,7 +7,7 @@
 - **Framework**: Next.js 15 (App Router) + TypeScript strict
 - **Styling**: Tailwind CSS 4 + design system propio con tokens (sin librerías de componentes prefabricadas)
 - **Database**: PostgreSQL (Supabase) + Prisma ORM
-- **Auth**: NextAuth.js v5 (Auth.js) — GitHub + Google OAuth + credenciales
+- **Auth**: NextAuth.js v5 (Auth.js) — GitHub OAuth (único proveedor)
 - **Payments**: Stripe (Checkout + Customer Portal + Webhooks)
 - **Email**: Resend (V1) — **PDF**: Puppeteer + HTML template con print CSS
 - **Validation**: Zod 4 (contracts compartidos en `src/lib/contracts/`)
@@ -81,7 +81,7 @@ pnpm dev                  # UNA sola terminal: Next dev server (server + client)
 
 ## Roadmap
 
-- **Referencia única**: `geo-saas-brief.md` §17 — Sprint 0 (setup) → Sprint 7 (launch). NO duplicar el detalle acá.
+- **Referencia única**: `geo-saas-brief.md` §17 — Sprint 0 (setup) → Sprint 7 (launch). NO duplicar el detalle acá. El avance posterior al Sprint 7 (8, 9, …) vive en los changes SDD de `openspec/changes/`.
 - **STYLE-BRIEF.md** se crea antes del primer sprint de UI (entrada al Sprint 2), no antes.
 - Cada sprint se ejecuta como un change SDD propio; el detalle se define en la fase proposal de ese change, no de antemano.
 
