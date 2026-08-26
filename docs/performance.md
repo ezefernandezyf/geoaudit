@@ -24,6 +24,30 @@ A11Y_CONTRAST_URL=http://localhost:3000 pnpm test src/app/__tests__/a11y-contras
 | ----------- | ---------------------------- | ---------- |
 | Landing `/` | Sin violaciones de contraste | 2026-08-25 |
 
+**Escaneo ampliado (WU-4, 2026-08-26):** el E2E de a11y ahora cubre landing,
+pricing y report con las reglas `color-contrast`, `aria-progressbar-name` y
+`label-content-name-mismatch` (PERF-3), y asevera los security headers (SHL-7).
+Correrlo:
+
+```bash
+pnpm dev   # terminal 1
+A11Y_CONTRAST_URL=http://localhost:3000 pnpm test src/app/__tests__/a11y-contrast.test.ts
+```
+
+Resultado: las tres páginas pasan sin violaciones. Corregido en WU-4 (hex #64748b,
+el mismo del fix del `/100`, PERF-3):
+
+| Componente                           | Antes (FAIL)                   | Después (PASS)     |
+| ------------------------------------ | ------------------------------ | ------------------ |
+| ScoreHero fecha `• 2026-08-26` (blanco) | `#94a3b8` (2.56:1)          | `#64748b` (4.76:1) |
+| Platform matrix "No medido" (blanco) | `#94a3b8` (2.56:1)             | `#64748b` (4.76:1) |
+
+El desvío 3 de PERF-3 (brand link `label-content-name-mismatch`) se resolvió de
+raíz: el mark del logo es ahora un `<path>` vectorial (el `<text>` filtraba la
+"G" al `textContent` del link incluso con `aria-hidden`, rompiendo la regla de
+axe) y el `aria-label` del link replica el texto visible exacto
+("GeoAudit AI Visibility Audit").
+
 **Violaciones encontradas y corregidas (2026-08-25):** el escaneo inicial
 detectó contraste insuficiente en el ScoreHero (`/100` + filas de benchmark) y
 en los textos de los SeverityBadge (emerald/amber/red sobre fondos claros), más

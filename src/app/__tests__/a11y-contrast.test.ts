@@ -1,8 +1,15 @@
 // @vitest-environment node
 /**
- * C14 (A11Y-3) — color-contrast scan of the landing page in a real browser
- * via @axe-core/playwright. jsdom cannot compute contrast (jest-axe disables
- * `cat.color`), so WCAG 2.2 AA contrast is verified here.
+ * C14 (A11Y-3) + WU-4 (A11Y-6, SHL-7): accessibility + security-header scan in
+ * a real browser via @axe-core/playwright. jsdom cannot compute contrast
+ * (jest-axe disables `cat.color`), so WCAG 2.2 AA contrast is verified here.
+ *
+ * WU-4 extends the original landing-only contrast scan to the three measured
+ * pages (landing/pricing/report — PERF-3) and to the rules behind the PERF-3
+ * deviations: `aria-progressbar-name` (ScoreBar fill), `color-contrast`
+ * (ScoreBar /100 + "Recomendado" badge) and `label-content-name-mismatch`
+ * (navbar brand link). It also asserts the SHL-7 security headers are present
+ * on real responses.
  *
  * The test SKIPS when no server is reachable at BASE_URL (the repo convention
  * for env-gated flows): in CI the unit gate stays green without a server, and
@@ -56,40 +63,98 @@ function chromiumExecutable(): string | undefined {
   return existsSync(puppeteerChrome) ? puppeteerChrome : undefined;
 }
 
+/**
+ * WU-4 (A11Y-6): the pages that PERF-3 measured. The report runs a live audit
+ * (example.com, ~2.8s) so its browser timeout is larger than the static pages.
+ */
+const A11Y_PAGES = [
+  { name: "landing", url: `${BASE_URL}/`, waitFor: "heading" as const },
+  { name: "pricing", url: `${BASE_URL}/pricing`, waitFor: "heading" as const },
+  {
+    name: "report",
+    // Full URL with protocol: resolveReportUrl parses searchParams.url with
+    // urlInputSchema (z.url) — a bare hostname falls back to the empty state.
+    url: `${BASE_URL}/report?url=${encodeURIComponent("https://example.com")}`,
+    // The live audit streams under Suspense: wait for the first real
+    // progressbar (ScoreBar fill) before scanning.
+    waitFor: "progressbar" as const,
+  },
+];
+
+/** The axe rules behind every PERF-3 deviation + the original C14 contrast rule. */
+const A11Y_RULES = [
+  "color-contrast",
+  "aria-progressbar-name",
+  "label-content-name-mismatch",
+];
+
 describe.skipIf(!reachable)(
-  `landing color contrast (A11Y-3) against ${BASE_URL}`,
+  `landing/pricing/report a11y (A11Y-3, A11Y-6) against ${BASE_URL}`,
   () => {
-    it("reports no WCAG 2.2 AA color-contrast violations", async () => {
-      // Lazy imports: the browser stack only loads when the server is up.
-      const { chromium } = await import("playwright");
-      const { default: AxeBuilder } = await import("@axe-core/playwright");
+    for (const page of A11Y_PAGES) {
+      it(
+        `reports no WCAG 2.2 AA violations on ${page.name} (${A11Y_RULES.join(", ")})`,
+        async () => {
+          // Lazy imports: the browser stack only loads when the server is up.
+          const { chromium } = await import("playwright");
+          const { default: AxeBuilder } = await import("@axe-core/playwright");
 
-      const browser = await chromium.launch({
-        headless: true,
-        executablePath: chromiumExecutable(),
-      });
-      try {
-        // @axe-core/playwright requires a page from an explicit context
-        // (browser.newContext) — the default newPage context is rejected.
-        const context = await browser.newContext();
-        const page = await context.newPage();
-        await page.goto(BASE_URL, { waitUntil: "networkidle" });
+          const browser = await chromium.launch({
+            headless: true,
+            executablePath: chromiumExecutable(),
+          });
+          try {
+            // @axe-core/playwright requires a page from an explicit context
+            // (browser.newContext) — the default newPage context is rejected.
+            const context = await browser.newContext();
+            const pageHandle = await context.newPage();
+            // Static pages: networkidle guarantees the Tailwind CSS is applied
+            // before the contrast scan. Report: the audit streams under
+            // Suspense, so wait for the first real ScoreBar progressbar.
+            await pageHandle.goto(page.url, {
+              waitUntil:
+                page.name === "report" ? "domcontentloaded" : "networkidle",
+            });
+            if (page.waitFor === "progressbar") {
+              await pageHandle
+                .getByRole("progressbar")
+                .first()
+                .waitFor({ timeout: 45_000 });
+            }
 
-        const results = await new AxeBuilder({ page })
-          .withRules(["color-contrast"])
-          .analyze();
-        await context.close();
+            const results = await new AxeBuilder({ page: pageHandle })
+              .withRules(A11Y_RULES)
+              .analyze();
+            await context.close();
 
-        // A11Y-3: contrast violations MUST be caught — or documented in
-        // docs/performance.md with justification, never silently ignored.
-        const contrastViolations = results.violations.filter(
-          (v) => v.id === "color-contrast",
-        );
-        expect(contrastViolations).toEqual([]);
-      } finally {
-        await browser.close();
-      }
-    }, // especially when the suite runs in a batch with the dev server busy. // Browser launch + navigation + axe scan is slower than the 5s default,
-    60_000);
+            // A11Y-3: violations MUST be caught — or documented in
+            // docs/performance.md with justification, never silently ignored.
+            const violations = results.violations.filter((v) =>
+              A11Y_RULES.includes(v.id),
+            );
+            expect(violations, `${page.name} axe violations`).toEqual([]);
+          } finally {
+            await browser.close();
+          }
+        },
+        page.name === "report" ? 90_000 : 60_000,
+      );
+    }
+
+    it("sends the SHL-7 security headers on every response", async () => {
+      const res = await fetch(`${BASE_URL}/`, { method: "HEAD" });
+
+      // CSP ships report-only (design: report-only before enforce).
+      expect(res.headers.get("content-security-policy-report-only")).toContain(
+        "default-src 'self'",
+      );
+      expect(res.headers.get("strict-transport-security")).toContain(
+        "max-age=",
+      );
+      expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+      expect(res.headers.get("referrer-policy")).toBe(
+        "strict-origin-when-cross-origin",
+      );
+    });
   },
 );
