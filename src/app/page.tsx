@@ -25,9 +25,69 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
  * LND-7 (sprint 8): el ScoreHero muestra la evidencia REAL de
  * src/app/score-hero-evidence.ts (mejor URL verificada por runAudit con su
  * band honesta) — nunca un número inventado.
+ *
+ * LND-9 (sprint 9): JSON-LD inline SSR — Organization + WebSite (+SearchAction)
+ * y sameAs[], inyectados como `<script type="application/ld+json">` DENTRO de
+ * este server component (nunca por JS client-side). El engine de schema
+ * (extractJsonLd) solo detecta bloques en el HTML server-rendered estático, y
+ * el criterio "server_rendered" del rubric exige exactamente eso.
  */
 
 export const dynamic = "force-dynamic";
+
+/**
+ * LND-9 (sprint 9): Organization + WebSite structured data, inline in the SSR
+ * HTML. The site URL is derived from NEXT_PUBLIC_APP_URL so the JSON-LD stays
+ * truthful regardless of environment. SearchAction on WebSite unlocks schema
+ * criterion 5; sameAs feeds both schema criterion 2 and E-E-A-T authority.
+ */
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+/** Real, verifiable org profiles only (never invented sameAs — LND-7 honesty). */
+const ORG_SAME_AS = ["https://github.com/ezefernandezyf/geoaudit"];
+
+function OrganizationJsonLd() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "GeoAudit",
+          url: APP_URL,
+          logo: `${APP_URL}/og.png`,
+          description:
+            "Plataforma de auditoría GEO/SEO que mide la visibilidad y citabilidad de un sitio en los motores de búsqueda con IA.",
+          sameAs: ORG_SAME_AS,
+        }),
+      }}
+    />
+  );
+}
+
+function WebSiteJsonLd() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "GeoAudit",
+          url: APP_URL,
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${APP_URL}/?q={search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      }}
+    />
+  );
+}
 
 /**
  * LND-8 (sprint 8, C16): landing OpenGraph/Twitter metadata via the shared
@@ -121,6 +181,9 @@ export default async function Home() {
 
   return (
     <main className="w-full bg-[#f8fafc]">
+      {/* LND-9 (sprint 9): JSON-LD inline SSR — Organization + WebSite. */}
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
       {/* 1. HERO — badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
       <section className="mx-auto max-w-5xl px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-18">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white px-3 py-1 text-xs text-[#475569] shadow-xs">
