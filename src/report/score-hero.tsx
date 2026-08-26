@@ -111,7 +111,9 @@ export function ScoreHero({ view }: ScoreHeroProps) {
                 </strong>
               </span>
               {auditDate ? (
-                <span className="hidden font-mono text-xs text-[#94a3b8] sm:inline">
+                // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA — #64748b (4.76:1),
+                // el mismo hex del fix del /100 (PERF-3).
+                <span className="hidden font-mono text-xs text-[#64748b] sm:inline">
                   • {auditDate}
                 </span>
               ) : null}

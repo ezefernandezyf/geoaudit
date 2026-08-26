@@ -161,7 +161,9 @@ export function PlatformMatrix({ view }: { view: GeminiView }) {
                 </td>
                 <td className="px-4 py-3 font-mono font-bold text-[#0f172a]">
                   {row.readiness === null ? (
-                    <span className="font-sans font-normal text-[#94a3b8]">
+                    // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA sobre blanco —
+                    // #64748b (4.76:1), el hex del fix del /100 (PERF-3).
+                    <span className="font-sans font-normal text-[#64748b]">
                       {REPORT_COPY.matrix.notMeasured}
                     </span>
                   ) : (
