@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Authoritativeness: authority citations + sameAs</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Acme",
+        "url": "https://acme.example",
+        "sameAs": [
+          "https://www.linkedin.com/company/acme",
+          "https://github.com/acme"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>Research summary</h1>
+        <p>
+          Sources:
+          <a href="https://en.wikipedia.org/wiki/Generative_engine_optimization">Wikipedia overview</a>,
+          <a href="https://www.w3.org/TR/webarch/">W3C architecture</a>,
+          <a href="https://arxiv.org/abs/2401.00000">arXiv paper</a>.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

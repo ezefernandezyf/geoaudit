@@ -12,13 +12,14 @@ function page(name: string) {
 }
 
 describe("scoreEeat composite (REE-9, REE-8)", () => {
-  it("returns the composite as the exact sum of the four dimensions (79)", () => {
+  it("returns the composite as the exact sum of the four dimensions (84)", () => {
     const result = scoreEeat(page("page-eeat-rich.html"));
     expect(result.experience.score).toBe(25);
     expect(result.expertise.score).toBe(22);
-    expect(result.authoritativeness.score).toBe(12);
+    // REE-3 WU-3: the Person JSON-LD sameAs adds 5 → 12 + 5 = 17.
+    expect(result.authoritativeness.score).toBe(17);
     expect(result.trustworthiness.score).toBe(20);
-    expect(result.composite).toBe(79);
+    expect(result.composite).toBe(84);
     expect(result.composite).toBe(
       result.experience.score +
         result.expertise.score +
@@ -49,9 +50,9 @@ describe("scoreEeat composite (REE-9, REE-8)", () => {
     const contract = toContractResult(result);
     expect(contract.experience).toBe(25);
     expect(contract.expertise).toBe(22);
-    expect(contract.authoritativeness).toBe(12);
+    expect(contract.authoritativeness).toBe(17);
     expect(contract.trustworthiness).toBe(20);
-    expect(contract.composite).toBe(79);
+    expect(contract.composite).toBe(84);
     expect(contract.wordCount).toBe(result.wordCount.count);
     expect(contract.headings).toBe(result.headings.count);
     expect(contract.topicalAuthority).toBe("not_measured");

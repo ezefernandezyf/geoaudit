@@ -65,6 +65,49 @@ export function parseJsonLdBlocks($: CheerioAPI): unknown[] {
 }
 
 /**
+ * Author identity `sameAs` URLs (REE-3 partial credit, WU-3): absolute
+ * http(s) hrefs from `<link rel="sameAs">` / `<link rel="me">` / `a[rel="me"]`
+ * plus `sameAs` values found recursively in JSON-LD blocks. Deduplicated.
+ */
+export function sameAsUrls($: CheerioAPI): string[] {
+  const urls: string[] = [];
+  $('link[rel="sameAs"], link[rel="me"], a[rel="me"]').each(
+    (_index, element) => {
+      const href = ($(element).attr("href") ?? "").trim();
+      if (/^https?:\/\//i.test(href)) urls.push(href);
+    },
+  );
+  for (const block of parseJsonLdBlocks($)) {
+    collectSameAsValues(block, urls);
+  }
+  return [...new Set(urls)];
+}
+
+function collectSameAsValues(value: unknown, out: string[]): void {
+  if (Array.isArray(value)) {
+    for (const item of value) collectSameAsValues(item, out);
+    return;
+  }
+  if (value !== null && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const sameAs = record["sameAs"];
+    if (typeof sameAs === "string") {
+      const trimmed = sameAs.trim();
+      if (/^https?:\/\//i.test(trimmed)) out.push(trimmed);
+    } else if (Array.isArray(sameAs)) {
+      for (const entry of sameAs) {
+        if (typeof entry === "string" && /^https?:\/\//i.test(entry.trim())) {
+          out.push(entry.trim());
+        }
+      }
+    }
+    for (const child of Object.values(record)) {
+      collectSameAsValues(child, out);
+    }
+  }
+}
+
+/**
  * Collects every node (recursively, through @graph/arrays) whose `@type`
  * matches `wanted` (case-insensitive; handles string or array @type).
  */

@@ -1,6 +1,6 @@
 import type { CheerioAPI } from "cheerio";
 import type { DimensionResult, EeatFinding } from "./types";
-import { externalLinkUrls } from "./text";
+import { externalLinkUrls, sameAsUrls } from "./text";
 
 /**
  * Authoritativeness dimension (REE-3, 0-25). Proxy signals for third-party
@@ -11,10 +11,14 @@ import { externalLinkUrls } from "./text";
  * - Authority-domain matches: citations whose hostname is a known authority
  *   (`.gov`/`.edu` suffix or the AUTHORITY_DOMAINS list) — 3 points per
  *   match, capped at 15 (5 matches).
+ * - Author identity sameAs links (JSON-LD `sameAs` / `rel="me"`) — 5 points
+ *   per link, capped at 10 (WU-3 partial credit, REE-3): a page with
+ *   identity links but no authority citations, or citations without sameAs,
+ *   earns intermediate credit instead of a hard 0 floor.
  *
  * Hostname matching uses the full hostname (e.g. "en.wikipedia.org" matches
- * the "wikipedia.org" entry). A page with zero external links reports
- * `no_external_citations` and scores 0 (REE-10).
+ * the "wikipedia.org" entry). A page with zero external links AND zero sameAs
+ * reports `no_external_citations` and scores 0 (REE-10).
  */
 
 export const AUTHORITY_DOMAIN_SUFFIXES = [".gov", ".edu"] as const;
@@ -38,6 +42,8 @@ export const AUTHORITY_CITATION_PER_HIT = 2;
 export const AUTHORITY_CITATION_CAP = 10;
 export const AUTHORITY_DOMAIN_PER_HIT = 3;
 export const AUTHORITY_DOMAIN_CAP = 15;
+export const SAMEAS_PER_HIT = 5;
+export const SAMEAS_CAP = 10;
 export const AUTHORITATIVENESS_MAX = 25;
 
 function hostnameOf(url: string): string {
@@ -61,7 +67,8 @@ function isAuthorityDomain(host: string): boolean {
 export function scoreAuthoritativeness($: CheerioAPI): DimensionResult {
   const findings: EeatFinding[] = [];
   const urls = externalLinkUrls($);
-  if (urls.length === 0) {
+  const sameAs = sameAsUrls($);
+  if (urls.length === 0 && sameAs.length === 0) {
     return {
       score: 0,
       findings: [
@@ -74,11 +81,13 @@ export function scoreAuthoritativeness($: CheerioAPI): DimensionResult {
   }
 
   const authorityHits = urls.map(hostnameOf).filter(isAuthorityDomain);
-  findings.push({
-    key: "external_citations",
-    label: "External citations detected",
-    detail: `${urls.length} link(s)`,
-  });
+  if (urls.length > 0) {
+    findings.push({
+      key: "external_citations",
+      label: "External citations detected",
+      detail: `${urls.length} link(s)`,
+    });
+  }
 
   let score = Math.min(
     AUTHORITY_CITATION_CAP,
@@ -93,6 +102,14 @@ export function scoreAuthoritativeness($: CheerioAPI): DimensionResult {
       key: "authority_domains",
       label: "Citations to authority domains",
       detail: authorityHits.join(", "),
+    });
+  }
+  if (sameAs.length > 0) {
+    score += Math.min(SAMEAS_CAP, sameAs.length * SAMEAS_PER_HIT);
+    findings.push({
+      key: "same_as_links",
+      label: "Author sameAs identity links",
+      detail: sameAs.join(", "),
     });
   }
   return { score: Math.min(AUTHORITATIVENESS_MAX, score), findings };

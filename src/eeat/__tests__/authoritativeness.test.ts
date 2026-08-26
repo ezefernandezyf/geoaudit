@@ -36,6 +36,30 @@ describe("scoreAuthoritativeness (REE-3)", () => {
     );
   });
 
+  it("awards sameAs credit without authority citations (REE-3 partial)", () => {
+    const result = scoreAuthoritativeness(
+      page("page-authoritativeness-sameas-only.html"),
+    );
+    // 1 non-authority citation (2) + 1 sameAs link (5) = 7 — intermediate, not 0.
+    expect(result.score).toBe(7);
+    expect(result.findings.map((f) => f.key)).toContain("same_as_links");
+  });
+
+  it("approaches the cap with authority citations and sameAs links (REE-3)", () => {
+    const result = scoreAuthoritativeness(
+      page("page-authoritativeness-sameas-rich.html"),
+    );
+    // 3 authority citations (6 + 9) + 2 sameAs (10) = 25 → cap.
+    expect(result.score).toBe(25);
+    expect(result.findings.map((f) => f.key)).toEqual(
+      expect.arrayContaining([
+        "external_citations",
+        "authority_domains",
+        "same_as_links",
+      ]),
+    );
+  });
+
   it("scores 0 and flags no external citations when none exist (REE-10)", () => {
     const result = scoreAuthoritativeness(
       page("page-authoritativeness-none.html"),
