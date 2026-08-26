@@ -1,6 +1,6 @@
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 import {
-  SPRINT_1_WEIGHTS,
+  GEO_SCORE_V2_WEIGHTS,
   type DimensionKey,
   type GeoScoreWeights,
 } from "./weights";
@@ -69,7 +69,7 @@ export function composeTechnical(
 
 export function computeGeoScore(
   engineScores: EngineScores = {},
-  weights: GeoScoreWeights = SPRINT_1_WEIGHTS,
+  weights: GeoScoreWeights = GEO_SCORE_V2_WEIGHTS,
 ): GeoScoreResult {
   const notes: string[] = [];
 

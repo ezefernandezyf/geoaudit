@@ -51,23 +51,23 @@ describe("toGeminiViewModel", () => {
     ]);
 
     const byId = Object.fromEntries(view.categoryScores.map((c) => [c.id, c]));
-    // crawler.compositeScore 71 → fair
+    // crawler.compositeScore 71 → fair; v2 weight 20%
     expect(byId.crawler.score).toBe(71);
-    expect(byId.crawler.weight).toBe("18.75%");
+    expect(byId.crawler.weight).toBe("20%");
     expect(byId.crawler.status).toBe("fair");
-    // citability.pageScore 62 → fair
+    // citability.pageScore 62 → fair; v2 weight 28%
     expect(byId.citability.score).toBe(62);
-    expect(byId.citability.weight).toBe("31.25%");
-    // content.composite 65 → fair
+    expect(byId.citability.weight).toBe("28%");
+    // content.composite 65 → fair; v2 weight 24%
     expect(byId.content.score).toBe(65);
-    expect(byId.content.weight).toBe("25%");
-    // schema: 1 detected, 1 issue → 90 → excellent
+    expect(byId.content.weight).toBe("24%");
+    // schema: 1 detected, 1 issue → 90 → excellent; v2 weight 14%
     expect(byId.schema.score).toBe(90);
-    expect(byId.schema.weight).toBe("12.5%");
+    expect(byId.schema.weight).toBe("14%");
     expect(byId.schema.status).toBe("excellent");
-    // platform: aio 70 → fair (60-74 real band)
+    // platform: aio 70 → fair (60-74 real band); v2 weight 14%
     expect(byId.platform.score).toBe(70);
-    expect(byId.platform.weight).toBe("12.5%");
+    expect(byId.platform.weight).toBe("14%");
     expect(byId.platform.status).toBe("fair");
   });
 

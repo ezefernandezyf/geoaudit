@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SPRINT_1_WEIGHTS } from "@/scoring/weights";
+import { GEO_SCORE_V2_WEIGHTS, SPRINT_1_WEIGHTS } from "@/scoring/weights";
 import { computeGeoScore, type EngineScores } from "@/scoring/calculator";
 
 /**
@@ -207,23 +207,44 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
     expect(result.geoScore).toBeLessThanOrEqual(100);
   });
 
-  it("RGS-7/RGS-8: version 1.0.0 surfaced + Brand Authority note present", () => {
-    const result = computeGeoScore(FULL, SPRINT_1_WEIGHTS);
-    expect(result.scoringModelVersion).toBe("1.0.0");
-    expect(result.weights.version).toBe("1.0.0");
+  it("RGS-7/RGS-8: version 2.0.0 surfaced + v2 weights + Brand Authority note present", () => {
+    const result = computeGeoScore(FULL, GEO_SCORE_V2_WEIGHTS);
+    expect(result.scoringModelVersion).toBe("2.0.0");
+    expect(result.weights.version).toBe("2.0.0");
     expect(result.weights.weights).toEqual({
+      citability: 28,
+      eeat: 24,
+      technical: 20,
+      schema: 14,
+      platform: 14,
+    });
+    expect(result.weights.renormalizationNote).toContain("Brand Authority");
+  });
+
+  it("RGS-1: v2 weights keep citability dominant and sum to 100", () => {
+    const { weights } = GEO_SCORE_V2_WEIGHTS;
+    const sum = Object.values(weights).reduce((acc, w) => acc + w, 0);
+    expect(sum).toBe(100);
+    const entries = Object.entries(weights);
+    const max = Math.max(...entries.map(([, w]) => w));
+    const dominant = entries.find(([, w]) => w === max)?.[0];
+    expect(dominant).toBe("citability");
+  });
+
+  it("keeps SPRINT_1_WEIGHTS as the historical 1.0.0 config for legacy regression", () => {
+    expect(SPRINT_1_WEIGHTS.version).toBe("1.0.0");
+    expect(SPRINT_1_WEIGHTS.weights).toEqual({
       citability: 31.25,
       eeat: 25,
       technical: 18.75,
       schema: 12.5,
       platform: 12.5,
     });
-    expect(result.weights.renormalizationNote).toContain("Brand Authority");
   });
 
-  it("weights config defaults to SPRINT_1_WEIGHTS when omitted", () => {
+  it("weights config defaults to GEO_SCORE_V2_WEIGHTS when omitted (RGS-1)", () => {
     const result = computeGeoScore(FULL);
-    expect(result.scoringModelVersion).toBe("1.0.0");
+    expect(result.scoringModelVersion).toBe("2.0.0");
     expect(result.geoScore).toBe(80);
   });
 

@@ -4,7 +4,7 @@ import path from "node:path";
 import { load } from "cheerio";
 import { runAudit } from "@/audit/index";
 import { auditResultSchema } from "@/lib/contracts/audit-result";
-import { computeGeoScore, SPRINT_1_WEIGHTS } from "@/scoring/index";
+import { computeGeoScore, GEO_SCORE_V2_WEIGHTS } from "@/scoring/index";
 import { parseRobotsTxt, scoreAccess } from "@/crawlers/index";
 import { scorePage } from "@/citability/index";
 import { scoreEeat } from "@/eeat/index";
@@ -90,10 +90,10 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11)", () => {
     expect(auditResultSchema.safeParse(result).success).toBe(true);
 
     expect(result.summary.url).toBe("https://example.com/");
-    expect(result.summary.geoScore).toBe(41);
+    expect(result.summary.geoScore).toBe(43);
     expect(result.summary.severityBand).toBe("Poor");
     expect(result.summary.durationMs).toBe(0);
-    expect(result.scoringModelVersion).toBe("1.0.0");
+    expect(result.scoringModelVersion).toBe("2.0.0");
 
     expect(result.meta.auditVersion).toBe("0.1.0");
     expect(result.meta.startedAt).toBe(NOW);
@@ -112,7 +112,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11)", () => {
     ).toBe(70);
   });
 
-  it("computes the GEO Score per SPRINT_1_WEIGHTS from the wired engine scores", async () => {
+  it("computes the GEO Score per GEO_SCORE_V2_WEIGHTS from the wired engine scores", async () => {
     const fetcher = mockAuditFetch();
     const result = await runAudit("https://example.com/", {
       fetcher,
@@ -136,7 +136,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11)", () => {
           .compositeScore,
         platform: platform.perPlatform.platforms.aio.score,
       },
-      SPRINT_1_WEIGHTS,
+      GEO_SCORE_V2_WEIGHTS,
     );
 
     expect(result.summary.geoScore).toBe(expected.geoScore);

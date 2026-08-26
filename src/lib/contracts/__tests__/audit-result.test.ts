@@ -39,7 +39,7 @@ describe("auditResultSchema (RAO-10 typed output)", () => {
       expect(data.summary.url).toBe("https://example.com/");
       expect(data.summary.geoScore).toBe(68);
       expect(data.summary.severityBand).toBe("Fair");
-      expect(data.scoringModelVersion).toBe("1.0.0");
+      expect(data.scoringModelVersion).toBe("2.0.0");
       expect(data.meta.errors).toEqual([]);
     }
   });
@@ -80,12 +80,14 @@ describe("auditResultSchema (RAO-10 typed output)", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a scoringModelVersion other than 1.0.0", () => {
-    const result = auditResultSchema.safeParse({
-      ...auditResultFixture,
-      scoringModelVersion: "0.9.0",
-    });
-    expect(result.success).toBe(false);
+  it("rejects a scoringModelVersion other than 2.0.0 (RGS-7)", () => {
+    for (const version of ["1.0.0", "0.9.0"]) {
+      const result = auditResultSchema.safeParse({
+        ...auditResultFixture,
+        scoringModelVersion: version,
+      });
+      expect(result.success).toBe(false);
+    }
   });
 
   it("rejects a non-URL summary.url", () => {

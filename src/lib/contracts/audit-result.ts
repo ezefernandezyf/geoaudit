@@ -85,7 +85,7 @@ export const auditResultSchema = z.object({
   schema: schemaResultSchema,
   platform: platformResultSchema,
   content: contentResultSchema,
-  scoringModelVersion: z.literal("1.0.0"),
+  scoringModelVersion: z.literal("2.0.0"),
   meta: z.object({
     auditVersion: z.string(),
     startedAt: z.number(),

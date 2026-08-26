@@ -41,7 +41,7 @@ import {
 import type { PlatformEngineResult } from "@/platform/types";
 import {
   computeGeoScore,
-  SPRINT_1_WEIGHTS,
+  GEO_SCORE_V2_WEIGHTS,
   type DimensionKey,
 } from "@/scoring/index";
 
@@ -202,7 +202,7 @@ export async function runAudit(
       schema: emptySchemaResult(),
       platform: emptyPlatformResult(),
       content: emptyContentResult(),
-      scoringModelVersion: "1.0.0",
+      scoringModelVersion: "2.0.0",
       meta: {
         auditVersion: AUDIT_VERSION,
         startedAt,
@@ -355,15 +355,15 @@ export async function runAudit(
         : null,
       failures,
     },
-    SPRINT_1_WEIGHTS,
+    GEO_SCORE_V2_WEIGHTS,
   );
 
   const completedAt = clock();
 
   // RAO-10: assemble the fully typed contract shape. `scored.scoringModelVersion`
-  // is the SPRINT_1_WEIGHTS version string, which the contract pins to the
-  // literal "1.0.0" (RAO-10 scenario) — narrowed here for the return type.
-  const scoringModelVersion = scored.scoringModelVersion as "1.0.0";
+  // is the GEO_SCORE_V2_WEIGHTS version string, which the contract pins to the
+  // literal "2.0.0" (RAO-10 scenario) — narrowed here for the return type.
+  const scoringModelVersion = scored.scoringModelVersion as "2.0.0";
 
   return {
     summary: {
@@ -454,7 +454,7 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
         platform: "unsupported_content_type",
       },
     },
-    SPRINT_1_WEIGHTS,
+    GEO_SCORE_V2_WEIGHTS,
   );
 
   const completedAt = clock();
@@ -471,7 +471,7 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
     schema: emptySchemaResult(),
     platform: emptyPlatformResult(),
     content: emptyContentResult(),
-    scoringModelVersion: scored.scoringModelVersion as "1.0.0",
+    scoringModelVersion: scored.scoringModelVersion as "2.0.0",
     meta: {
       auditVersion: AUDIT_VERSION,
       startedAt,

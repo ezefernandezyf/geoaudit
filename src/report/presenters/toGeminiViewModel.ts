@@ -1,7 +1,7 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { DOMAIN_ROWS, rowScore } from "@/report/domain-metrics";
 import { severityForScore } from "@/scoring/calculator";
-import { SPRINT_1_WEIGHTS } from "@/scoring/weights";
+import { GEO_SCORE_V2_WEIGHTS } from "@/scoring/weights";
 import { deriveFindings } from "./findings";
 import { buildPlatformRows } from "./platforms";
 import type { GeminiBand, GeminiView } from "./types";
@@ -44,13 +44,13 @@ function extractHostname(url: string): string {
   }
 }
 
-/** Weight (SPRINT_1_WEIGHTS) for a domain-metrics engine key (design §Adapter). */
+/** Weight (GEO_SCORE_V2_WEIGHTS) for a domain-metrics engine key (design §Adapter). */
 const ENGINE_WEIGHT: Record<string, number> = {
-  crawler: SPRINT_1_WEIGHTS.weights.technical, // 18.75
-  citability: SPRINT_1_WEIGHTS.weights.citability, // 31.25
-  content: SPRINT_1_WEIGHTS.weights.eeat, // 25
-  schema: SPRINT_1_WEIGHTS.weights.schema, // 12.5
-  platform: SPRINT_1_WEIGHTS.weights.platform, // 12.5
+  crawler: GEO_SCORE_V2_WEIGHTS.weights.technical, // 20
+  citability: GEO_SCORE_V2_WEIGHTS.weights.citability, // 28
+  content: GEO_SCORE_V2_WEIGHTS.weights.eeat, // 24
+  schema: GEO_SCORE_V2_WEIGHTS.weights.schema, // 14
+  platform: GEO_SCORE_V2_WEIGHTS.weights.platform, // 14
 };
 
 /** Concise, honest description per category (Spanish UI). */

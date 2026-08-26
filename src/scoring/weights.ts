@@ -1,9 +1,17 @@
 /**
- * Sprint 1 renormalized GEO Score weights (design D4, RGS-1, RGS-7, RGS-8).
+ * GEO Score weights (design D4, RGS-1, RGS-7, RGS-8).
  *
- * Brand Authority (20% in brief §8.1) has no engine in Sprint 1 — per P1 the
- * remaining 80% is renormalized across the five available engines, and the
- * dimension re-enters with a future `scoringModelVersion` bump.
+ * Brand Authority (20% in brief §8.1) has no engine — per P1 the remaining 80%
+ * is renormalized across the five available engines, and the dimension
+ * re-enters with a future `scoringModelVersion` bump.
+ *
+ * Two configurations exist:
+ * - `SPRINT_1_WEIGHTS` (1.0.0): citability 31.25 / eeat 25 / technical 18.75 /
+ *   schema 12.5 / platform 12.5 — kept for historical regression tests.
+ * - `GEO_SCORE_V2_WEIGHTS` (2.0.0): citability 28 / eeat 24 / technical 20 /
+ *   schema 14 / platform 14 — the WU-2 calibration decision (sprint 9):
+ *   citability stays dominant, the two healthiest dimensions (crawler/content)
+ *   yield weight to the dimensions that crushed the total (schema/citability).
  */
 
 export type DimensionKey =
@@ -23,6 +31,24 @@ export const SPRINT_1_WEIGHTS: GeoScoreWeights = {
     technical: 18.75,
     schema: 12.5,
     platform: 12.5,
+  },
+  renormalizationNote:
+    "Brand Authority 20% re-enters with scoringModelVersion bump; weights renormalized per P1",
+};
+
+/**
+ * v2.0.0 calibrated weights (RGS-1, WU-2 decision, sprint 9). Citability stays
+ * the dominant dimension (28%); technical/content yield weight to schema and
+ * platform so partial structured data and platform readiness count more.
+ */
+export const GEO_SCORE_V2_WEIGHTS: GeoScoreWeights = {
+  version: "2.0.0",
+  weights: {
+    citability: 28,
+    eeat: 24,
+    technical: 20,
+    schema: 14,
+    platform: 14,
   },
   renormalizationNote:
     "Brand Authority 20% re-enters with scoringModelVersion bump; weights renormalized per P1",

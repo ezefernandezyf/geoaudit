@@ -89,7 +89,7 @@ export const auditResultFixture: AuditResult = {
     freshness: { daysSinceLastUpdate: 90, dateFound: false },
     topicalAuthority: "not_measured",
   },
-  scoringModelVersion: "1.0.0",
+  scoringModelVersion: "2.0.0",
   meta: {
     auditVersion: "1.0.0",
     startedAt: 1_700_000_000_000,
