@@ -17,13 +17,13 @@ Chain strategy: feature-branch-chain
 
 ## WU-2: Lift PRO Gates - PR 2 - ~700 lines - test: `pnpm test -- src/lib/audit src/ui/__tests__/navbar.test.tsx` - harness: unit suite - rollback: revert rewrites
 
-- [ ] 2.1 `share-actions.ts` + `multi-page-actions.ts` (+tests): remove gate/lookup; drop `"upgrade"` - SHR-3, MPA-8
-- [ ] 2.2 `multi-page-persist.ts` (+test): drop `recordPaidAudit`; tx no `PaidAuditTx` - TLM-10
-- [ ] 2.3 `pdf/route.ts` + `audit-runner.tsx` (+tests): no tier gate; export/create always - PDF-3/9, TLM-4
-- [ ] 2.4 `audits/[id]/page.tsx`, share-modal, `multipage/page.tsx`, `multi-page-form.tsx` (+tests): ungated share/PDF/multi-page - ADP-7/8, MPU-2/3
-- [ ] 2.5 `nav-plan.ts` (+test): `{used,limit}`; navbar/nav-links/footer (+tests): "Free" pill, multi-page link - SHL-2/MPU-6
-- [ ] 2.6 `copy.ts`: drop `upgrade` + PRO wording - TLM-5
-- [ ] 2.7 Gate: `pnpm typecheck` green
+- [x] 2.1 `share-actions.ts` + `multi-page-actions.ts` (+tests): remove gate/lookup; drop `"upgrade"` - SHR-3, MPA-8
+- [x] 2.2 `multi-page-persist.ts` (+test): drop `recordPaidAudit`; tx no `PaidAuditTx` - TLM-10
+- [x] 2.3 `pdf/route.ts` + `audit-runner.tsx` (+tests): no tier gate; export/create always - PDF-3/9, TLM-4
+- [x] 2.4 `audits/[id]/page.tsx`, share-modal, `multipage/page.tsx`, `multi-page-form.tsx` (+tests): ungated share/PDF/multi-page - ADP-7/8, MPU-2/3
+- [x] 2.5 `nav-plan.ts` (+test): `{used,limit}`; navbar/nav-links/footer (+tests): "Free" pill, multi-page link - SHL-2/MPU-6
+- [x] 2.6 `copy.ts`: drop `upgrade` + PRO wording - TLM-5
+- [x] 2.7 Gate: `pnpm typecheck` green
 
 ## WU-3: Collapse Tier Layer - PR 3 - ~350 lines - test: `pnpm test -- src/lib/audit/__tests__/tier.test.ts src/lib/audit/__tests__/enforcement.test.ts` - harness: unit suite - rollback: revert tier files
 
