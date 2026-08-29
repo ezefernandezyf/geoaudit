@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -14,8 +13,8 @@ import { PROFILE_COPY } from "@/lib/copy";
  *
  * Sprint 10 (PRF-3/5): there is ONE plan — the pill is always "Free" (no tier
  * lookup) and subscription management is REMOVED with the billing capability —
- * no portal action, no upgrade CTA. Support entry (PRF-6) via email + pricing
- * links.
+ * no portal action, no upgrade CTA. Support entry (PRF-6) via email (the
+ * /pricing link was removed with the route, WU-1).
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -141,14 +140,6 @@ export default async function ProfilePage() {
           >
             {PROFILE_COPY.support.email}
           </a>
-          <div className="mt-4">
-            <Link
-              href={PROFILE_COPY.support.pricingHref}
-              className="font-sans text-sm font-medium text-[#047857] transition-colors hover:text-[#065f46]"
-            >
-              {PROFILE_COPY.support.pricingLink}
-            </Link>
-          </div>
         </section>
       </div>
     </main>
