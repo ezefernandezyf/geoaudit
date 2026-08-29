@@ -65,15 +65,13 @@ export async function auditAction(
     return { error: AUDIT_FORM_ERRORS.protocol };
   }
 
-  // Tier pre-check (TLM-3, design U4): a signed-in user who reached their
-  // tier's limit is blocked BEFORE the redirect (the report page re-runs the
-  // audit, so this prevents the work). Cheap gate — ONE indexed query per tier
-  // (FREE: COUNT of Audit rows in the window; PRO/ENTERPRISE: the paid counter
-  // on Subscription). The counter is selected by tier (TLM-8) through the
-  // SHARED `checkTierLimit`, so this pre-check and the authoritative re-check
-  // in the report page always agree. Anonymous requests skip the tier entirely
-  // (TLM-6). TOCTOU is accepted and closed by the authoritative re-check in
-  // the report page (TLM-4).
+  // Limit pre-check (TLM-3, design U4): a signed-in user who reached the FREE
+  // limit is blocked BEFORE the redirect (the report page re-runs the audit,
+  // so this prevents the work). Cheap gate — ONE indexed COUNT of Audit rows
+  // in the 30-day window via the SHARED `checkTierLimit`, so this pre-check
+  // and the authoritative re-check in the report page always agree. Anonymous
+  // requests skip the limit entirely (TLM-6). TOCTOU is accepted and closed
+  // by the authoritative re-check in the report page (TLM-4).
   const session = await auth();
   if (session?.user?.id) {
     const { allowed } = await checkTierLimit(

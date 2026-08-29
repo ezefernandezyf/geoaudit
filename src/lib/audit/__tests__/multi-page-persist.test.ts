@@ -173,7 +173,7 @@ describe("persistMultiPageAudit (MPA-7 / TLM-10 one audit toward the window)", (
     });
 
     // The master Audit row is the single count toward the 30-day window; the
-    // paid Subscription counter no longer exists (TLM-10).
+    // paid billing counter no longer exists (TLM-10).
     expect(tx.audit.create).toHaveBeenCalledTimes(1);
     expect(tx.auditPage.createMany).toHaveBeenCalledTimes(1);
     expect("subscription" in tx).toBe(false);

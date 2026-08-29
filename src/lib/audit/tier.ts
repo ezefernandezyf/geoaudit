@@ -8,7 +8,7 @@ import type { Prisma } from "@/generated/prisma/client";
  * pulled into the module (type-only import).
  *
  * Sprint 10 (TLM-1/7/8 removed): the tier layer collapses to a SINGLE FREE
- * limit — 10 audits per 30-day moving window. There is no `Tier` type, no
+ * limit — 10 audits per 30-day moving window. There is no paid-tier type, no
  * paid counter, no `getTierLimit`/`isPaidTier`/`resolvePaidCounter`: every
  * authenticated user is measured by `Audit` rows in the window.
  */
