@@ -2,13 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   AUDIT_FORM_ERRORS,
   AUTH_COPY,
-  CHECKOUT_ERROR_COPY,
   COPY,
   DASHBOARD_COPY,
   FETCH_ERROR_COPY,
   GENERIC_AUDIT_ERROR_COPY,
   LANDING_COPY,
-  PRICING_COPY,
   REPORT_COPY,
   SHARE_COPY,
   SHARE_MODAL_ERROR_COPY,
@@ -47,8 +45,9 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     expect(AUDIT_FORM_ERRORS.rateLimited).toBe(
       "Demasiadas solicitudes. Espere un momento.",
     );
+    // TLM-5 (sprint 10): the single FREE limit is 10 audits per 30-day window.
     expect(AUDIT_FORM_ERRORS.limitReached).toBe(
-      "Alcanzó el límite de 3 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
+      "Alcanzó el límite de 10 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
     );
   });
 
@@ -78,19 +77,6 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     expect(SHARE_MODAL_ERROR_COPY.upgrade).toBeUndefined();
   });
 
-  it("keeps the checkout error copy neutral (B8)", () => {
-    expect(CHECKOUT_ERROR_COPY.auth).toBe(
-      "Necesita iniciar sesión para gestionar su plan.",
-    );
-    expect(CHECKOUT_ERROR_COPY["invalid-plan"]).toBe("Plan no válido.");
-    expect(CHECKOUT_ERROR_COPY.config).toBe(
-      "No pudimos iniciar el pago. Pruebe de nuevo en unos minutos.",
-    );
-    expect(CHECKOUT_ERROR_COPY["no-subscription"]).toBe(
-      "No tiene una suscripción activa.",
-    );
-  });
-
   it("keeps AUTH_COPY neutral (ATH-8/9)", () => {
     expect(AUTH_COPY.login.heading).toBe("Inicie sesión");
     expect(AUTH_COPY.login.description).toBe(
@@ -112,7 +98,7 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
       "Beneficios incluidos en su cuenta:",
     );
     expect(AUTH_COPY.signup.benefits?.items).toEqual([
-      "3 auditorías GEO mensuales sin costo con desglose por modelo",
+      "10 auditorías GEO mensuales sin costo con desglose por modelo",
       "Historial persistente para comparar mejoras de GEO Score",
       "Diagnóstico preventivo de bloqueos en robots.txt y cabeceras",
       "Generación de enlaces públicos compartibles con token seguro",
@@ -128,14 +114,10 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
       "GeoAudit es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
     );
     expect(LANDING_COPY.hero.sampleLabel).toBe("O pruebe un ejemplo real:");
-    expect(LANDING_COPY.sections.pricingTitle).toBe(
-      "Comience a monitorear la visibilidad de su marca en la IA",
-    );
-    // LND-6 (sprint 8): the authenticated secondary CTA is neutral and links
-    // the dashboard, never the signup flow.
-    expect(LANDING_COPY.sections.pricingSecondaryCtaLoggedIn).toBe(
-      "Ir al dashboard",
-    );
+    // LND-6 (sprint 10): the final CTA is "Auditar gratis" (anonymous) or
+    // "Ir al dashboard" (authenticated) — the pricing teaser copy is gone.
+    expect(LANDING_COPY.sections.ctaPrimary).toBe("Auditar gratis");
+    expect(LANDING_COPY.sections.ctaLoggedIn).toBe("Ir al dashboard");
   });
 
   it("keeps the dashboard copy neutral (B10, DSH-4)", () => {
@@ -159,39 +141,6 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
 
   it("contains no voseo anywhere in COPY", () => {
     expect(JSON.stringify(COPY)).not.toMatch(VOSEO_PATTERN);
-  });
-});
-
-describe("PRICING_COPY (U3.2, PRC-5/7)", () => {
-  it("keeps the Gemini pricing header neutral", () => {
-    expect(PRICING_COPY.header.eyebrow).toBe("Planes Transparentes");
-    expect(PRICING_COPY.header.title).toBe(
-      "Optimiza la citabilidad de tu producto en la era de la IA",
-    );
-    expect(PRICING_COPY.header.subtitle).toContain("Sin sorpresas");
-  });
-
-  it("answers billing cycle, cancellation and plan changes (PRC-7)", () => {
-    const faq = PRICING_COPY.faq.items.map((item) => item.q);
-    expect(faq).toContain("¿Cómo funciona la facturación?");
-    expect(faq).toContain("¿Puedo cancelar en cualquier momento?");
-    expect(faq).toContain("¿Puedo cambiar de plan?");
-    const answers = PRICING_COPY.faq.items.map((item) => item.a).join(" ");
-    expect(answers).toMatch(/se facturan mensualmente/);
-    expect(answers).toMatch(/sin penalizaciones/);
-    expect(answers).toMatch(/prorrateo automático/);
-  });
-
-  it("answers real product questions with neutral copy", () => {
-    const faq = PRICING_COPY.faq.items.map((item) => item.q);
-    expect(faq).toContain("¿Qué es el GEO Score?");
-    expect(faq).toContain("¿Qué plataformas analiza?");
-    expect(faq).toContain("¿Puedo auditar varias páginas?");
-    expect(faq).toContain("¿Cómo funciona el PDF?");
-  });
-
-  it("exposes PRICING_COPY on the grouped COPY object", () => {
-    expect(COPY.pricing).toBe(PRICING_COPY);
   });
 });
 
@@ -240,8 +189,7 @@ describe("COPY — single source of truth (U2.2)", () => {
     expect(Object.keys(COPY.fetchError)).toEqual(Object.keys(FETCH_ERROR_COPY));
   });
 
-  it("exposes checkout and shell copy on the grouped COPY object (B8/B10)", () => {
-    expect(COPY.checkoutErrors).toBe(CHECKOUT_ERROR_COPY);
+  it("exposes shell copy on the grouped COPY object (B10)", () => {
     expect(COPY.shell).toBe(SHELL_COPY);
   });
 });

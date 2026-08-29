@@ -101,7 +101,7 @@ describe("GitHubAuthCard signup mode (ATH-2/7/8)", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "3 auditorías GEO mensuales sin costo con desglose por modelo",
+        "10 auditorías GEO mensuales sin costo con desglose por modelo",
       ),
     ).toBeInTheDocument();
     // B10: the developer/marketer eyebrow is neutral and comes from copy.ts.

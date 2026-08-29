@@ -93,7 +93,7 @@ function TierLimitState() {
       className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center"
     >
       <h2 className="font-serif text-3xl tracking-tight text-[#0f172a]">
-        Llegaste al límite de auditorías gratuitas
+        Llegó al límite de auditorías gratuitas
       </h2>
       <p className="max-w-md text-[#475569]">
         {AUDIT_FORM_ERRORS.limitReached}

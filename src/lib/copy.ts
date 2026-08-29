@@ -21,8 +21,9 @@ export const AUDIT_FORM_ERRORS = {
   invalidUrl: "Formato de URL inválido",
   protocol: "Solo URLs http/https",
   rateLimited: "Demasiadas solicitudes. Espere un momento.",
+  // TLM-5 (sprint 10): the single FREE limit is 10 audits per 30-day window.
   limitReached:
-    "Alcanzó el límite de 3 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
+    "Alcanzó el límite de 10 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
 } as const;
 
 /** FetchErrorCode → user-facing Spanish copy (ARU-6) — neutral (LGL-4). */
@@ -43,14 +44,6 @@ export const FETCH_ERROR_COPY: Record<FetchFailureCode, string> = {
 /** Fallback copy for errors that carry no known fetch failure code. */
 export const GENERIC_AUDIT_ERROR_COPY =
   "No pudimos analizar el sitio. Pruebe nuevamente.";
-
-/** Checkout/Portal action error codes → neutral Spanish copy (PRC-4, B8). */
-export const CHECKOUT_ERROR_COPY: Record<string, string> = {
-  auth: "Necesita iniciar sesión para gestionar su plan.",
-  "invalid-plan": "Plan no válido.",
-  config: "No pudimos iniciar el pago. Pruebe de nuevo en unos minutos.",
-  "no-subscription": "No tiene una suscripción activa.",
-};
 
 /** ShareModal error codes → neutral Spanish copy (SHR-3, design ShareModal). */
 export const SHARE_MODAL_ERROR_COPY: Record<string, string> = {
@@ -101,7 +94,8 @@ export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
     benefits: {
       label: "Beneficios incluidos en su cuenta:",
       items: [
-        "3 auditorías GEO mensuales sin costo con desglose por modelo",
+        // TLM-5 (sprint 10): the single FREE limit is 10 audits per 30-day window.
+        "10 auditorías GEO mensuales sin costo con desglose por modelo",
         "Historial persistente para comparar mejoras de GEO Score",
         "Diagnóstico preventivo de bloqueos en robots.txt y cabeceras",
         "Generación de enlaces públicos compartibles con token seguro",
@@ -124,56 +118,8 @@ export const SHELL_COPY = {
 } as const;
 
 /**
- * Pricing page copy (PRC-5/7, design U3) — Gemini wording, neutral Spanish.
- *
- * `header` is the Gemini verbatim intro ("Planes Transparentes" eyebrow +
- * serif H1 + subtitle with "Sin sorpresas"); `faq` answers the billing
- * questions (cycle, cancellation, plan changes) plus real product questions
- * (GEO Score, platforms, multi-page, PDF).
+ * Landing page copy (LND-1..5, LND-11) — Gemini wording, neutral Spanish.
  */
-export const PRICING_COPY = {
-  header: {
-    eyebrow: "Planes Transparentes",
-    title: "Optimiza la citabilidad de tu producto en la era de la IA",
-    subtitle:
-      "Auditorías técnicas diseñadas para equipos de producto, fundadores y agencias SEO. Sin sorpresas.",
-  },
-  faq: {
-    title: "Preguntas Frecuentes",
-    items: [
-      {
-        q: "¿Cómo funciona la facturación?",
-        a: "Los planes Pro y Enterprise se facturan mensualmente y se renuevan de forma automática hasta que los cancele. Sin cargos ocultos.",
-      },
-      {
-        q: "¿Puedo cancelar en cualquier momento?",
-        a: "Sí. Puede cancelar cuando quiera desde su cuenta y el acceso se mantiene hasta el final del período pagado, sin penalizaciones ni cláusulas de permanencia.",
-      },
-      {
-        q: "¿Puedo cambiar de plan?",
-        a: "Sí. Puede cambiar de plan en cualquier momento; los cambios se aplican con prorrateo automático sobre el período en curso.",
-      },
-      {
-        q: "¿Qué es el GEO Score?",
-        a: "El GEO Score es una métrica de 0 a 100 que resume qué tan visible y citable es su sitio en los motores de búsqueda con IA.",
-      },
-      {
-        q: "¿Qué plataformas analiza?",
-        a: "Analizamos ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.",
-      },
-      {
-        q: "¿Puedo auditar varias páginas?",
-        a: "Sí. Los planes Pro y Enterprise incluyen auditorías multi-página para monitorear varias URLs en cada ciclo.",
-      },
-      {
-        q: "¿Cómo funciona el PDF?",
-        a: "Cada auditoría puede exportarse a un reporte PDF listo para compartir con clientes o equipos.",
-      },
-    ],
-  },
-} as const;
-
-/** Landing page copy (LND-1..5, LND-11) — Gemini wording, neutral Spanish. */
 export const LANDING_COPY = {
   hero: {
     badge: "GEO Engine",
@@ -243,14 +189,15 @@ export const LANDING_COPY = {
     platformsTitle: "6 plataformas de búsqueda generativa auditadas",
     platformsLead:
       "GeoAudit analiza la interacción de cada crawler y motor de respuesta con el contenido web en las 6 plataformas que concentran la búsqueda asistida por IA en 2026.",
-    pricingEyebrow: "Planes y Acceso",
-    pricingTitle: "Comience a monitorear la visibilidad de su marca en la IA",
-    pricingSubtitle:
-      "Desde 3 auditorías gratuitas hasta planes profesionales con monitoreo continuo, multi-page y reportes compartibles.",
-    pricingCta: "Ver Planes y Precios",
-    pricingSecondaryCta: "Crear cuenta gratis",
-    // LND-6 (sprint 8): the secondary CTA for an authenticated visitor.
-    pricingSecondaryCtaLoggedIn: "Ir al dashboard",
+    // LND-6 (sprint 10): final CTA — the /pricing teaser is gone (route
+    // deleted). Anonymous → signup/audit ("Auditar gratis"); authenticated →
+    // dashboard ("Ir al dashboard").
+    ctaEyebrow: "Comience gratis",
+    ctaTitle: "Audite su sitio hoy y vea cómo lo citan los motores de IA",
+    ctaSubtitle:
+      "Cree su cuenta y acceda a 10 auditorías GEO gratuitas por ventana de 30 días, con historial, auditoría multi-página y exportación a PDF.",
+    ctaPrimary: "Auditar gratis",
+    ctaLoggedIn: "Ir al dashboard",
   },
 } as const;
 
@@ -308,22 +255,14 @@ export const PROFILE_COPY = {
     usageTitle: "Auditorías usadas",
     usageCaption: "del límite de su plan",
   },
-  manage: {
-    // portalCta/portalBlurb (billing portal) se limpian en WU-5 con el resto
-    // del copy de precios/planes; los textos de upgrade de features (upgradeCta/
-    // upgradeBlurb) ya no aplican — todo es FREE (WU-2, TLM-5).
-    portalCta: "Gestionar suscripción",
-    portalBlurb:
-      "Administre su método de pago, facturas o cancele su plan desde el portal.",
-  },
+  // WU-5 (sprint 10): `manage` (billing portal: portalCta/portalBlurb) and the
+  // upgrade texts (upgradeCta/upgradeBlurb) are gone — everything is FREE.
   support: {
     title: "Soporte",
     blurb:
-      "¿Problemas con su cuenta o facturación? Escríbanos y lo ayudamos a la brevedad.",
+      "¿Problemas con su cuenta o con sus auditorías? Escríbanos y lo ayudamos a la brevedad.",
     emailLabel: "Correo de soporte",
     email: "soporte@geoaudit.app",
-    pricingLink: "Ver planes y precios",
-    pricingHref: "/pricing",
   },
 } as const;
 
@@ -534,12 +473,10 @@ export const COPY = {
   auditFormErrors: AUDIT_FORM_ERRORS,
   fetchError: FETCH_ERROR_COPY,
   genericAuditError: GENERIC_AUDIT_ERROR_COPY,
-  checkoutErrors: CHECKOUT_ERROR_COPY,
   shareModalErrors: SHARE_MODAL_ERROR_COPY,
   auth: AUTH_COPY,
   shell: SHELL_COPY,
   landing: LANDING_COPY,
-  pricing: PRICING_COPY,
   dashboard: DASHBOARD_COPY,
   profile: PROFILE_COPY,
   legal: LEGAL_COPY,

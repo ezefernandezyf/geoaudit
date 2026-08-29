@@ -251,7 +251,7 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
     render(await AuditRunner({ url: "https://example.com/" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "3 auditorías gratuitas",
+      "10 auditorías gratuitas",
     );
     expect(screen.getByRole("alert")).toHaveTextContent(
       "se reinicia 30 días después de cada auditoría",
