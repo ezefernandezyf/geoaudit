@@ -2,37 +2,23 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  countAuditsInWindow,
-  getTierLimit,
-  isPaidTier,
-  resolvePaidCounter,
-} from "@/lib/audit/tier";
+import { countAuditsInWindow, FREE_AUDIT_LIMIT } from "@/lib/audit/tier";
 import { PROFILE_COPY } from "@/lib/copy";
-import type { Tier } from "@/lib/contracts/billing";
 
 /**
  * Profile page (PRF-1..6, design U4).
  *
  * Authenticated account surface (PRF-1: middleware + redirect gate). Reads the
- * real `User` + `Subscription` rows (PRF-2/3) and shows audit usage against
- * the tier limit (PRF-4): FREE counts `Audit` rows in the 30-day moving
- * window; PRO/ENTERPRISE use the Subscription-backed paid counter (lazy
- * period-end reset via `resolvePaidCounter`, same logic as `checkTierLimit`).
+ * real `User` row (PRF-2) and shows audit usage against the single FREE limit
+ * (PRF-4): `Audit` rows in the 30-day moving window, limit `FREE_AUDIT_LIMIT`.
  *
- * Sprint 10 (PRF-5): subscription management is REMOVED with the billing
- * capability — no portal action, no upgrade CTA. Support entry (PRF-6) via
- * email + pricing links.
+ * Sprint 10 (PRF-3/5): there is ONE plan — the pill is always "Free" (no tier
+ * lookup) and subscription management is REMOVED with the billing capability —
+ * no portal action, no upgrade CTA. Support entry (PRF-6) via email + pricing
+ * links.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-/** Lowercase plan pill label, Gemini style (matches runner-bar/nav). */
-const TIER_LABEL: Record<Tier, string> = {
-  FREE: "free",
-  PRO: "pro",
-  ENTERPRISE: "enterprise",
-};
 
 function initialsFor(
   name: string | null | undefined,
@@ -55,32 +41,14 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { subscription: true },
   });
-  const tier: Tier = user?.tier ?? "FREE";
   const name = user?.name ?? session.user.name ?? null;
   const email = user?.email ?? session.user.email ?? null;
 
-  // PRF-4 usage: same counter-selection as the audit gate (TLM-8).
-  let used = 0;
-  if (isPaidTier(tier)) {
-    const sub = user?.subscription;
-    const resolved = resolvePaidCounter(
-      Date.now(),
-      sub?.auditsUsed ?? 0,
-      sub?.auditsResetAt ?? null,
-      sub?.currentPeriodEnd ?? null,
-    );
-    used = resolved.used;
-  } else {
-    used = await countAuditsInWindow(
-      prisma as never,
-      session.user.id,
-      Date.now(),
-    );
-  }
-  const limit = getTierLimit(tier);
-  const pct = limit === 0 ? 0 : Math.min(100, Math.round((used / limit) * 100));
+  // PRF-4 usage: the same 30-day window as the audit gate (TLM-2).
+  const used = await countAuditsInWindow(prisma, session.user.id, Date.now());
+  const limit = FREE_AUDIT_LIMIT;
+  const pct = Math.min(100, Math.round((used / limit) * 100));
 
   return (
     <main className="min-h-dvh bg-white">
@@ -97,7 +65,7 @@ export default async function ProfilePage() {
           </p>
         </header>
 
-        {/* Identity card — PRF-2/3: name, email, tier pill + usage bar (PRF-4). */}
+        {/* Identity card — PRF-2/3: name, email, plan pill + usage bar (PRF-4). */}
         <section
           aria-label="Datos de la cuenta"
           className="rounded-xl border border-[#e2e8f0] bg-white p-6"
@@ -124,7 +92,7 @@ export default async function ProfilePage() {
               {PROFILE_COPY.identity.tierLabel}
             </span>
             <span className="rounded-full border border-[#10b981]/30 bg-[#10b981]/10 px-2.5 py-0.5 font-mono text-xs text-[#047857]">
-              {TIER_LABEL[tier]}
+              free
             </span>
           </div>
 
