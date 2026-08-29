@@ -36,10 +36,10 @@ Chain strategy: feature-branch-chain
 
 ## WU-4: Contracts + Schema - PR 4 - ~250 lines - test: `pnpm run prisma:generate && pnpm typecheck` - harness: `prisma migrate dev` (Supabase) - rollback: re-run `add_subscription_and_billing`
 
-- [ ] 4.1 Delete `contracts/billing.ts` (+test) - BLG-1
-- [ ] 4.2 `schema.prisma`: drop models/enums/`User.tier`; keep `RateLimitEntry` - R4
-- [ ] 4.3 Down-migration `--create-only` review; apply; `prisma generate` - DBC
-- [ ] 4.4 Gate: typecheck + test green
+- [x] 4.1 Delete `contracts/billing.ts` (+test) - BLG-1
+- [x] 4.2 `schema.prisma`: drop models/enums/`User.tier`; keep `RateLimitEntry` - R4
+- [x] 4.3 Down-migration `--create-only` review; apply; `prisma generate` - DBC
+- [x] 4.4 Gate: typecheck + test green
 
 ## WU-5: Landing, Copy, Deploy - PR 5 - ~170 lines - test: `pnpm test && pnpm run lint && pnpm run typecheck && pnpm run build` - harness: live smoke `geoaudit-tau.vercel.app` - rollback: revert config/env
 
