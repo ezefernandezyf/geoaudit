@@ -2,8 +2,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { portalAction } from "@/billing/actions";
-import { CheckoutButton } from "@/billing/checkout-button";
 import {
   countAuditsInWindow,
   getTierLimit,
@@ -22,10 +20,9 @@ import type { Tier } from "@/lib/contracts/billing";
  * window; PRO/ENTERPRISE use the Subscription-backed paid counter (lazy
  * period-end reset via `resolvePaidCounter`, same logic as `checkTierLimit`).
  *
- * Subscription management (PRF-5): paid users get the portal action
- * ("Gestionar suscripción"); FREE users get an upgrade CTA to `/pricing`.
- * Support entry (PRF-6) via email + pricing links. Read-only — no new billing
- * logic; the portal reuses the existing Server Action.
+ * Sprint 10 (PRF-5): subscription management is REMOVED with the billing
+ * capability — no portal action, no upgrade CTA. Support entry (PRF-6) via
+ * email + pricing links.
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -84,8 +81,6 @@ export default async function ProfilePage() {
   }
   const limit = getTierLimit(tier);
   const pct = limit === 0 ? 0 : Math.min(100, Math.round((used / limit) * 100));
-
-  const isPaid = isPaidTier(tier);
 
   return (
     <main className="min-h-dvh bg-white">
@@ -159,39 +154,6 @@ export default async function ProfilePage() {
               {PROFILE_COPY.identity.usageCaption}
             </p>
           </div>
-        </section>
-
-        {/* Subscription management — PRF-5. */}
-        <section
-          aria-label="Suscripción"
-          className="rounded-xl border border-[#e2e8f0] bg-white p-6"
-        >
-          {isPaid ? (
-            <>
-              <p className="font-sans text-sm leading-relaxed text-[#475569]">
-                {PROFILE_COPY.manage.portalBlurb}
-              </p>
-              <div className="mt-4">
-                <CheckoutButton
-                  action={portalAction}
-                  plan={tier === "ENTERPRISE" ? "ENTERPRISE" : "PRO"}
-                  label={PROFILE_COPY.manage.portalCta}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="font-sans text-sm leading-relaxed text-[#475569]">
-                {PROFILE_COPY.manage.upgradeBlurb}
-              </p>
-              <Link
-                href={PROFILE_COPY.support.pricingHref}
-                className="mt-4 inline-flex items-center justify-center gap-2 rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
-              >
-                {PROFILE_COPY.manage.upgradeCta}
-              </Link>
-            </>
-          )}
         </section>
 
         {/* Support entry — PRF-6. */}

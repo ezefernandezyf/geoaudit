@@ -22,11 +22,6 @@ vi.mock("@/lib/prisma", () => ({
     user: { findUnique: userFindUniqueMock },
   },
 }));
-// The billing CTA (DSH-6) receives the portal Server Action; mock the module so
-// the page test doesn't pull in the Stripe stack.
-vi.mock("@/billing/actions", () => ({
-  portalAction: vi.fn(async () => ({ error: null })),
-}));
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");

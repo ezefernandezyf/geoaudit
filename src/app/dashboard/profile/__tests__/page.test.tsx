@@ -16,9 +16,6 @@ vi.mock("@/lib/prisma", () => ({
     audit: { count: vi.fn(async () => 2) },
   },
 }));
-vi.mock("@/billing/actions", () => ({
-  portalAction: vi.fn(async () => ({ error: null })),
-}));
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");
@@ -42,8 +39,9 @@ beforeEach(() => {
 
 /**
  * U4.5 — Profile RSC (PRF-1..6): renders the authenticated user's account
- * data — name/email (PRF-2), tier pill (PRF-3), usage against limit (PRF-4),
- * portal (PRF-5) or upgrade CTA, and a support entry (PRF-6).
+ * data — name/email (PRF-2), tier pill (PRF-3), usage against limit (PRF-4)
+ * and a support entry (PRF-6). Sprint 10 removed the subscription management
+ * surface (PRF-5): no portal action, no upgrade CTA.
  */
 describe("ProfilePage (PRF-1)", () => {
   it("redirects to sign-in when there is no session", async () => {
@@ -82,7 +80,7 @@ describe("ProfilePage (PRF-1)", () => {
     expect(screen.getByText(`4 / ${PAID_TIER_LIMITS.PRO}`)).toBeInTheDocument();
   });
 
-  it("renders the portal action for a paid user (PRF-5)", async () => {
+  it("no longer renders a subscription management section (PRF-5 removed)", async () => {
     authMock.mockResolvedValue({ user: { id: "user-1", name: "Ana" } });
     userFindUniqueMock.mockResolvedValue({
       name: "Ana",
@@ -94,14 +92,14 @@ describe("ProfilePage (PRF-1)", () => {
     render(await ProfilePage());
 
     expect(
-      screen.getByRole("button", { name: "Gestionar suscripción" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: "Gestionar suscripción" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Mejorar a Pro" }),
     ).not.toBeInTheDocument();
   });
 
-  it("renders the upgrade CTA for a FREE user with the 3/30 usage (PRF-4/5)", async () => {
+  it("shows FREE usage without an upgrade CTA (PRF-4, PRF-5 removed)", async () => {
     authMock.mockResolvedValue({ user: { id: "user-1", name: "Ana" } });
     userFindUniqueMock.mockResolvedValue({
       name: "Ana",
@@ -116,8 +114,8 @@ describe("ProfilePage (PRF-1)", () => {
     // audit.count mock returns 2 → "2 / 3".
     expect(screen.getByText(`2 / ${FREE_AUDIT_LIMIT}`)).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: "Mejorar a Pro" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("link", { name: "Mejorar a Pro" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "Gestionar suscripción" }),
     ).not.toBeInTheDocument();

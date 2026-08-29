@@ -25,9 +25,6 @@ vi.mock("@/lib/prisma", () => ({
     user: { findUnique: userFindUniqueMock },
   },
 }));
-vi.mock("@/billing/actions", () => ({
-  portalAction: vi.fn(async () => ({ error: null })),
-}));
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(() => {
     throw new Error("NEXT_REDIRECT");

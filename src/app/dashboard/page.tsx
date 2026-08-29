@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { AggregateHero } from "@/dashboard/aggregate-hero";
 import { AuditHistoryTable } from "@/dashboard/audit-history-table";
-import { BillingCta } from "@/dashboard/billing-cta";
 import { DashboardEmptyState } from "@/dashboard/dashboard-empty-state";
 import { DashboardRunnerBar } from "@/dashboard/runner-bar";
 import { ScoreTrend } from "@/dashboard/score-trend";
@@ -14,7 +13,6 @@ import type {
   MultiPageResult,
   SeverityBand,
 } from "@/lib/contracts/audit-result";
-import { portalAction } from "@/billing/actions";
 
 /**
  * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
@@ -58,9 +56,9 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // U4 (DSH-6): the billing CTA adapts to tier — read from the DB (the session
-  // carries only user.id). FREE → "Upgrade" to /pricing; PRO/Enterprise →
-  // portal action.
+  // The runner bar shows the plan label; sprint 10 removed the billing CTA
+  // (DSH-6) so this read only feeds runnerUser.plan until the tier column is
+  // dropped (WU-4).
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: { tier: true },
@@ -95,12 +93,6 @@ export default async function DashboardPage() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6">
         {/* U4.1 (DSH-8): runner bar — URL input + "Run Audit" inside + user chip. */}
         <DashboardRunnerBar action={auditAction} user={runnerUser} />
-
-        {/* DSH-6: tier-adaptive billing CTA (Upgrade → /pricing; PRO/Enterprise
-            → portal). Restyled Gemini in U4.4. */}
-        <div className="flex justify-end">
-          <BillingCta tier={tier} portalAction={portalAction} />
-        </div>
 
         {audits.length === 0 ? (
           <DashboardEmptyState />
