@@ -27,12 +27,12 @@ Chain strategy: feature-branch-chain
 
 ## WU-3: Collapse Tier Layer - PR 3 - ~350 lines - test: `pnpm test -- src/lib/audit/__tests__/tier.test.ts src/lib/audit/__tests__/enforcement.test.ts` - harness: unit suite - rollback: revert tier files
 
-- [ ] 3.1 RED `tier.test.ts`: limit 10, 9 ok / 10 blocked - TLM-2
-- [ ] 3.2 GREEN `tier.ts`: limit/window/count/hasLeft; delete paid helpers
-- [ ] 3.3 RED `enforcement.test.ts`: blocks at 10 - TLM-3
-- [ ] 3.4 GREEN `enforcement.ts`: FREE-only `checkTierLimit`; delete paid tx
-- [ ] 3.5 Delete `feature-gate.ts` (+test) - TLM-9
-- [ ] 3.6 Gate: typecheck + test green
+- [x] 3.1 RED `tier.test.ts`: limit 10, 9 ok / 10 blocked - TLM-2
+- [x] 3.2 GREEN `tier.ts`: limit/window/count/hasLeft; delete paid helpers
+- [x] 3.3 RED `enforcement.test.ts`: blocks at 10 - TLM-3
+- [x] 3.4 GREEN `enforcement.ts`: FREE-only `checkTierLimit`; delete paid tx
+- [x] 3.5 Delete `feature-gate.ts` (+test) - TLM-9
+- [x] 3.6 Gate: typecheck + test green
 
 ## WU-4: Contracts + Schema - PR 4 - ~250 lines - test: `pnpm run prisma:generate && pnpm typecheck` - harness: `prisma migrate dev` (Supabase) - rollback: re-run `add_subscription_and_billing`
 
