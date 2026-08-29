@@ -15,12 +15,13 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
  * hero con AuditForm (botón dentro del input + sample URLs, LND-1), cards
  * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero con evidencia
  * REAL del motor + bandas reales 90/75/60/40 (LND-3/LND-7), seis plataformas
- * (LND-4) y CTA pricing (LND-5). El copy de usuario viene de src/lib/copy.ts
- * (neutro, ATH-9).
+ * (LND-4) y CTA final adaptado a la sesión (LND-6). El copy de usuario viene
+ * de src/lib/copy.ts (neutro, ATH-9).
  *
- * LND-6 (sprint 8): la página resuelve auth() y adapta el CTA secundario —
- * con sesión muestra "Ir al dashboard" (/dashboard), sin sesión mantiene
- * "Crear cuenta gratis" (/signup). La Home pasa a dinámica (costo aceptado).
+ * LND-6 (sprint 10): la página resuelve auth() y adapta el CTA final — con
+ * sesión muestra "Ir al dashboard" (/dashboard), sin sesión "Auditar gratis"
+ * (/signup). El teaser de precios y el CTA "Ver Planes" se eliminaron con la
+ * ruta /pricing (WU-1). La Home pasa a dinámica (costo aceptado).
  *
  * LND-7 (sprint 8): el ScoreHero muestra la evidencia REAL de
  * src/app/score-hero-evidence.ts (mejor URL verificada por runAudit con su
@@ -525,39 +526,35 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. PRICING TEASER → /pricing (LND-5) */}
+      {/* 5. CTA FINAL — adaptado a la sesión (LND-6): sin teaser de precios
+          (la ruta /pricing se eliminó en WU-1) */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
         <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm sm:p-12">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-            {LANDING_COPY.sections.pricingEyebrow}
+            {LANDING_COPY.sections.ctaEyebrow}
           </span>
           <h2 className="mb-4 mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
-            {LANDING_COPY.sections.pricingTitle}
+            {LANDING_COPY.sections.ctaTitle}
           </h2>
           <p className="mx-auto mb-8 max-w-xl text-sm text-[#475569] sm:text-base">
-            {LANDING_COPY.sections.pricingSubtitle}
+            {LANDING_COPY.sections.ctaSubtitle}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/pricing"
-              className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md bg-[#0f172a] px-6 text-base font-medium text-white transition-all duration-150 hover:bg-[#1e293b] active:scale-[0.98]"
-            >
-              {LANDING_COPY.sections.pricingCta}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
             {isAuthenticated ? (
               <Link
                 href="/dashboard"
-                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
+                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md bg-[#0f172a] px-6 text-base font-medium text-white transition-all duration-150 hover:bg-[#1e293b] active:scale-[0.98]"
               >
-                {LANDING_COPY.sections.pricingSecondaryCtaLoggedIn}
+                {LANDING_COPY.sections.ctaLoggedIn}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             ) : (
               <Link
                 href="/signup"
-                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md border border-[#e2e8f0] bg-white px-6 text-base font-medium text-[#0f172a] transition-all duration-150 hover:border-[#cbd5e1] hover:bg-[#f8fafc] active:scale-[0.98]"
+                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-md bg-[#0f172a] px-6 text-base font-medium text-white transition-all duration-150 hover:bg-[#1e293b] active:scale-[0.98]"
               >
-                {LANDING_COPY.sections.pricingSecondaryCta}
+                {LANDING_COPY.sections.ctaPrimary}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             )}
           </div>

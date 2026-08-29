@@ -44,8 +44,8 @@ async function renderPage() {
 /**
  * U2.T4 — Landing page (LND-1..6, ADF-1/8): full marketing landing that drives
  * the real audit flow and explains the product with the five real domains, the
- * real severity bands, the six AI platforms, and a pricing teaser. The CTA
- * adapts to the auth session (LND-6).
+ * real severity bands, the six AI platforms, and a final CTA that adapts to
+ * the auth session (LND-6). The pricing teaser is gone (LND-6, sprint 10).
  */
 describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
   it("renders the GeoAudit hero heading", async () => {
@@ -267,17 +267,20 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
-  it("teases pricing with a link to /pricing (LND-5)", async () => {
+  it("renders no pricing teaser or /pricing link (LND-6)", async () => {
     await renderPage();
-    expect(
-      screen.getByRole("link", { name: /ver planes y precios/i }),
-    ).toHaveAttribute("href", "/pricing");
+    // The /pricing route is deleted (WU-1) — the landing must not link it.
+    const pricingLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href") === "/pricing");
+    expect(pricingLinks).toHaveLength(0);
+    expect(screen.queryByText(/ver planes y precios/i)).not.toBeInTheDocument();
   });
 
-  it("links the secondary CTA to /signup (LND-5)", async () => {
+  it("links the anonymous CTA 'Auditar gratis' to /signup (LND-6)", async () => {
     await renderPage();
     expect(
-      screen.getByRole("link", { name: /crear cuenta gratis/i }),
+      screen.getByRole("link", { name: /auditar gratis/i }),
     ).toHaveAttribute("href", "/signup");
   });
 
@@ -368,26 +371,25 @@ describe("landing page authenticated CTA (LND-6)", () => {
     expect(
       screen.getByRole("link", { name: "Ir al dashboard" }),
     ).toHaveAttribute("href", "/dashboard");
-    expect(
-      screen.queryByRole("link", { name: /crear cuenta gratis/i }),
-    ).toBeNull();
+    expect(screen.queryByRole("link", { name: /auditar gratis/i })).toBeNull();
   });
 
-  it("keeps the 'Ver Planes y Precios' CTA when authenticated (LND-6)", async () => {
+  it("shows no pricing link when authenticated (LND-6)", async () => {
     authMock.mockResolvedValueOnce(SESSION);
     await renderPage();
 
-    expect(
-      screen.getByRole("link", { name: /ver planes y precios/i }),
-    ).toHaveAttribute("href", "/pricing");
+    const pricingLinks = screen
+      .getAllByRole("link")
+      .filter((link) => link.getAttribute("href") === "/pricing");
+    expect(pricingLinks).toHaveLength(0);
   });
 
-  it("shows 'Crear cuenta gratis' for anonymous visitors (LND-6)", async () => {
+  it("shows 'Auditar gratis' for anonymous visitors (LND-6)", async () => {
     authMock.mockResolvedValueOnce(null);
     await renderPage();
 
     expect(
-      screen.getByRole("link", { name: /crear cuenta gratis/i }),
+      screen.getByRole("link", { name: /auditar gratis/i }),
     ).toHaveAttribute("href", "/signup");
     expect(screen.queryByRole("link", { name: "Ir al dashboard" })).toBeNull();
   });
