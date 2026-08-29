@@ -5,7 +5,7 @@
 # Threat-matrix note ("PR commands"): no step consumes real secrets — the e2e
 # job only sets throwaway non-secret env values (dummy DATABASE_URL to let the
 # app boot, dev AUTH_SECRET) and the secret-gated Playwright specs
-# (signup/Stripe/PDF, E2E-3/4/5) skip themselves via skip-if-no-env. If a
+# (signup/PDF, E2E-3/5) skip themselves via skip-if-no-env. If a
 # future job needs credentials it MUST read them via `${{ secrets.* }}` and
 # follow the skip-if-no-env pattern (see src/lib/__tests__/prisma.test.ts —
 # connectivity suite skips without DATABASE_URL).
@@ -66,7 +66,7 @@ jobs:
 
   # E2E (C12/C13, E2E-7): boots `pnpm dev` via the Playwright webServer and
   # runs the suite. No secrets: the free audit uses a real stable URL
-  # (example.com) with tolerant asserts, and the signup/Stripe/PDF specs skip
+  # (example.com) with tolerant asserts, and the signup/PDF specs skip
   # without their env vars. RATE_LIMIT_ENABLED=false keeps the fixed-window
   # limiter (unit-tested) from making retries flaky.
   e2e:

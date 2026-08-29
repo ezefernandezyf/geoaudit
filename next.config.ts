@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
    * report-only nothing is blocked — the header only reports violations, so
    * the app keeps working while we observe production traffic. To enforce:
    * rename the key to `Content-Security-Policy` after zero violations on
-   * landing/pricing/report (design Migration/Rollout).
+   * landing/report (design Migration/Rollout).
    */
   async headers() {
     return [

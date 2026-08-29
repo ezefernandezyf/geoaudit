@@ -14,7 +14,7 @@ GeoAudit analiza un sitio web en cinco dimensiones y entrega un score compuesto 
 | Schema | 14 % | JSON-LD / Schema.org para corroboración de entidades |
 | Plataforma | 14 % | Readiness, SSR, OpenGraph y headers por motor generativo |
 
-Cada auditoría genera un reporte con hallazgos priorizados, desglose por categoría, exportación PDF y links de compartición. El plan Free incluye 3 auditorías mensuales; los planes Pro y Enterprise suman multi-página, PDF y monitoreo continuo.
+Cada auditoría genera un reporte con hallazgos priorizados, desglose por categoría, exportación PDF y links de compartición. El plan Free incluye 10 auditorías cada 30 días, con multi-página, PDF y compartición incluidos.
 
 ## Stack
 
@@ -22,7 +22,7 @@ Cada auditoría genera un reporte con hallazgos priorizados, desglose por catego
 - **Styling**: Tailwind CSS 4 + design system propio (sin librerías de componentes)
 - **Base de datos**: PostgreSQL (Supabase) + Prisma ORM (driver adapters)
 - **Auth**: NextAuth.js v5 (Auth.js) — GitHub OAuth
-- **Pagos**: Stripe (Checkout + Customer Portal + Webhooks)
+- **Plan**: Free único — 10 auditorías / 30 días (sin pagos)
 - **Email**: Resend — **PDF**: Puppeteer + HTML template con print CSS
 - **Validación**: Zod 4 (contracts compartidos en `src/lib/contracts/`)
 - **Testing**: Vitest + React Testing Library + Playwright E2E + @axe-core/playwright
@@ -32,7 +32,7 @@ Cada auditoría genera un reporte con hallazgos priorizados, desglose por catego
 
 - Node.js 20+ y pnpm
 - Una instancia de PostgreSQL (Supabase) para `DATABASE_URL`
-- (Opcional) Apps de OAuth GitHub, Stripe y Resend para los flujos completos
+- (Opcional) Apps de OAuth GitHub y Resend para los flujos completos
 
 ## Cómo correr
 
@@ -74,7 +74,6 @@ src/
 ├── scoring/       # calculadora del GEO Score compuesto
 ├── report/        # presentadores y componentes del reporte
 ├── dashboard/     # dashboard de historial de auditorías
-├── billing/       # planes, checkout y webhooks de Stripe
 ├── ui/            # componentes UI propios (design system)
 └── lib/           # contracts (Zod), copy centralizada, rate limiting, fetch
 ```

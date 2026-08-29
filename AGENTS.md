@@ -8,7 +8,7 @@
 - **Styling**: Tailwind CSS 4 + design system propio con tokens (sin librerías de componentes prefabricadas)
 - **Database**: PostgreSQL (Supabase) + Prisma ORM
 - **Auth**: NextAuth.js v5 (Auth.js) — GitHub OAuth (único proveedor)
-- **Payments**: Stripe (Checkout + Customer Portal + Webhooks)
+- **Monetization**: None — single Free plan (10 audits / 30 days, no payments)
 - **Email**: Resend (V1) — **PDF**: Puppeteer + HTML template con print CSS
 - **Validation**: Zod 4 (contracts compartidos en `src/lib/contracts/`)
 - **Testing**: Vitest + React Testing Library + Playwright E2E

@@ -3,7 +3,7 @@ schema: spec-driven
 context: |
   Project: GeoAudit (geo-saas) — micro-SaaS for automated GEO/SEO auditing. URL in -> GEO Score 0-100 + AI visibility report.
   Stack (declared target, scaffold pending for Sprint 0): Next.js 15 App Router + TypeScript strict + Tailwind CSS 4 +
-  Prisma (PostgreSQL/Supabase) + NextAuth v5 + Stripe + Resend + Puppeteer + Zod 4 + Vitest/RTL/Playwright + pnpm + Vercel.
+  Prisma (PostgreSQL/Supabase) + NextAuth v5 + Resend + Puppeteer + Zod 4 + Vitest/RTL/Playwright + pnpm + Vercel.
   Architecture: single Next.js app (no monorepo). Screaming Architecture — business domains are top-level src/ folders
   (crawlers, citability, schema, eeat, platform, scoring); app/ is routing only; Zod contracts in src/lib/contracts/.
   Testing target: Vitest + React Testing Library (unit/integration) + Playwright (E2E).

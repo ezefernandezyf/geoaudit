@@ -10,7 +10,7 @@
  *
  * Usage:
  *   pnpm dev                      # terminal 1 — the dev server must be up
- *   pnpm lighthouse               # measure landing, pricing and report
+ *   pnpm lighthouse               # measure landing and report
  *   pnpm lighthouse report        # measure a single page
  *
  * Env overrides:
@@ -37,7 +37,6 @@ const OUTPUT_DIR = path.join(REPO_ROOT, ".lighthouse");
 /** Pages measured by default; the report page audits a live URL (PERF-2). */
 const PAGES = {
   landing: { path: "/", label: "Landing" },
-  pricing: { path: "/pricing", label: "Pricing" },
   report: { path: "/report", label: "Report (live audit)" },
 };
 
