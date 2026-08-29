@@ -71,12 +71,11 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     expect(SHARE_MODAL_ERROR_COPY.auth).toBe(
       "Necesita iniciar sesión para compartir.",
     );
-    expect(SHARE_MODAL_ERROR_COPY.upgrade).toBe(
-      "Compartir es una función PRO. Mejore su plan para activarla.",
-    );
     expect(SHARE_MODAL_ERROR_COPY.failed).toBe(
       "No pudimos generar el link. Pruebe de nuevo en unos minutos.",
     );
+    // The "upgrade" code is gone — sharing is FREE (SHR-3, TLM-5).
+    expect(SHARE_MODAL_ERROR_COPY.upgrade).toBeUndefined();
   });
 
   it("keeps the checkout error copy neutral (B8)", () => {

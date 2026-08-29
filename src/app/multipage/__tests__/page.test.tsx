@@ -82,7 +82,7 @@ describe("MultiPagePage trigger (MPU-1/2)", () => {
       screen.getByRole("button", { name: MULTIPAGE_COPY.form.submitLabel }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: MULTIPAGE_COPY.gate.cta }),
+      screen.queryByRole("link", { name: "Mejorar a PRO" }),
     ).not.toBeInTheDocument();
     expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });

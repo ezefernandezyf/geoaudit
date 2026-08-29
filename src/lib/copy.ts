@@ -56,7 +56,6 @@ export const CHECKOUT_ERROR_COPY: Record<string, string> = {
 export const SHARE_MODAL_ERROR_COPY: Record<string, string> = {
   auth: "Necesita iniciar sesión para compartir.",
   "not-found": "No encontramos la auditoría.",
-  upgrade: "Compartir es una función PRO. Mejore su plan para activarla.",
   failed: "No pudimos generar el link. Pruebe de nuevo en unos minutos.",
 };
 
@@ -310,9 +309,9 @@ export const PROFILE_COPY = {
     usageCaption: "del límite de su plan",
   },
   manage: {
-    upgradeCta: "Mejorar a Pro",
-    upgradeBlurb:
-      "Obtenga más auditorías, multi-página, PDF y links de compartición.",
+    // portalCta/portalBlurb (billing portal) se limpian en WU-5 con el resto
+    // del copy de precios/planes; los textos de upgrade de features (upgradeCta/
+    // upgradeBlurb) ya no aplican — todo es FREE (WU-2, TLM-5).
     portalCta: "Gestionar suscripción",
     portalBlurb:
       "Administre su método de pago, facturas o cancele su plan desde el portal.",
@@ -483,13 +482,14 @@ export const SHARE_COPY = {
 } as const;
 
 /**
- * Multi-page audit copy (U6, MPU-1/2/3, design U6) — Gemini trigger page
+ * Multi-page audit copy (U6, MPU-1/3, design U6) — Gemini trigger page
  * wording, neutral Spanish (usted). `MultiPageErrorCode` → neutral copy for
- * the `useActionState` trigger form (MPU-3).
+ * the `useActionState` trigger form (MPU-3). Multi-page is FREE (MPU-2
+ * removed): no gate/upgrade copy (TLM-5).
  */
 export const MULTIPAGE_COPY = {
   header: {
-    eyebrow: "Auditoría Multi-Página (Pro)",
+    eyebrow: "Auditoría Multi-Página",
     title: "Auditoría Multi-Página",
     description:
       "Analice varias rutas de su sitio en una sola auditoría para obtener una vista agregada de su visibilidad de IA.",
@@ -506,17 +506,10 @@ export const MULTIPAGE_COPY = {
     invalid:
       "Formato de URL inválido. Verifique que la URL sea correcta y vuelva a intentarlo.",
     auth: "Necesita iniciar sesión para ejecutar una auditoría multi-página.",
-    upgrade:
-      "La auditoría multi-página es una función PRO. Mejore su plan para activarla.",
     limit:
       "Alcanzó el límite de auditorías de su plan. Espere al próximo ciclo para continuar.",
     failed:
       "No pudimos completar la auditoría multi-página. Pruebe nuevamente en unos minutos.",
-  },
-  gate: {
-    title: "La auditoría multi-página es una función PRO",
-    body: "Analice múltiples rutas de su sitio en una sola auditoría y obtenga un reporte agregado de visibilidad de IA.",
-    cta: "Mejorar a PRO",
   },
   results: {
     emptyTitle: "Sin auditorías multi-página todavía",
