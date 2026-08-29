@@ -5,10 +5,9 @@ import DashboardPage from "@/app/dashboard/page";
 import { formatAuditDate } from "@/report/format";
 import { DASHBOARD_COPY } from "@/lib/copy";
 
-const { authMock, findManyMock, userFindUniqueMock } = vi.hoisted(() => ({
+const { authMock, findManyMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
   findManyMock: vi.fn(),
-  userFindUniqueMock: vi.fn(),
 }));
 
 // next-auth/lib/env.js imports next/server (unresolvable in vitest); the auth
@@ -19,7 +18,6 @@ vi.mock("@/lib/auth", () => ({ auth: authMock }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findMany: findManyMock },
-    user: { findUnique: userFindUniqueMock },
   },
 }));
 vi.mock("next/navigation", () => ({
@@ -55,8 +53,6 @@ beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: "user-1" } });
   findManyMock.mockClear();
   findManyMock.mockResolvedValue(prismaRows);
-  userFindUniqueMock.mockClear();
-  userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
   vi.mocked(redirect).mockClear();
 });
 

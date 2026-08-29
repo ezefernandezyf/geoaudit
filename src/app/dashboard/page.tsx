@@ -56,15 +56,6 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // The runner bar shows the plan label; sprint 10 removed the billing CTA
-  // (DSH-6) so this read only feeds runnerUser.plan until the tier column is
-  // dropped (WU-4).
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { tier: true },
-  });
-  const tier = user?.tier ?? "FREE";
-
   const audits: DashboardAudit[] = rows.map((row) => ({
     id: row.id,
     url: row.url,
@@ -80,8 +71,6 @@ export default async function DashboardPage() {
   const runnerUser = {
     name: session.user.name ?? session.user.email ?? null,
     email: session.user.email ?? null,
-    // Lowercase plan pill, Gemini style ("pro Plan").
-    plan: tier.toLowerCase(),
   };
 
   return (

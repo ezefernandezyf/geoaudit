@@ -6,14 +6,14 @@ import type { AuditAction } from "@/lib/audit/actions";
 
 /**
  * U4.1 — Dashboard runner bar (DSH-8, design U4). Gemini verbatim: the URL
- * input with the "Run Audit" button INSIDE it, plus the user chip (name, plan
- * pill, initials avatar) in the same bar. The input drives the real audit via
- * the injected Server Action.
+ * input with the "Run Audit" button INSIDE it, plus the user chip (name,
+ * static plan pill, initials avatar) in the same bar. The input drives the
+ * real audit via the injected Server Action.
  */
 
 const okAction: AuditAction = async () => ({ error: null });
 
-const USER = { name: "Marcos Delgado", email: "m@x.com", plan: "pro" };
+const USER = { name: "Marcos Delgado", email: "m@x.com" };
 
 describe("DashboardRunnerBar (DSH-8)", () => {
   it("renders the URL input with the 'Run Audit' button inside it", () => {
@@ -44,11 +44,11 @@ describe("DashboardRunnerBar (DSH-8)", () => {
     );
   });
 
-  it("renders the user chip with name, plan pill and initials", () => {
+  it("renders the user chip with name, static plan pill and initials", () => {
     render(<DashboardRunnerBar action={okAction} user={USER} />);
 
     expect(screen.getByText("Marcos Delgado")).toBeInTheDocument();
-    expect(screen.getByText("pro Plan")).toBeInTheDocument();
+    expect(screen.getByText("free Plan")).toBeInTheDocument();
     expect(screen.getByText("MD")).toBeInTheDocument();
   });
 

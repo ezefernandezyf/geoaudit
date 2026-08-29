@@ -14,14 +14,12 @@ const INITIAL_STATE: AuditFormState = { error: null };
 type RunnerBarUser = {
   name: string | null;
   email: string | null;
-  /** Lowercase plan label (free/pro/enterprise), Gemini pill. */
-  plan: string | null;
 };
 
 type RunnerBarProps = {
   /** The `auditAction` Server Action, injected by the RSC page (DSH-8). */
   action: AuditAction;
-  /** Session user + plan for the right-hand chip. */
+  /** Session user for the right-hand chip. */
   user: RunnerBarUser;
 };
 
@@ -111,11 +109,11 @@ export function DashboardRunnerBar({ action, user }: RunnerBarProps) {
           <p className="text-xs font-bold text-[#0f172a]">
             {user.name ?? user.email ?? "Usuario"}
           </p>
-          {user.plan ? (
-            <p className="font-mono text-[10px] uppercase tracking-wider text-[#475569]">
-              {user.plan} Plan
-            </p>
-          ) : null}
+          {/* Static plan pill (Sprint 10): the tier column is gone, every
+              account is FREE — same "free Plan" label for all users. */}
+          <p className="font-mono text-[10px] uppercase tracking-wider text-[#475569]">
+            free Plan
+          </p>
         </div>
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#cbd5e1] text-xs font-bold text-[#0f172a]">
           {initials}

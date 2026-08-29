@@ -18,7 +18,8 @@ const { authMock, findManyMock, userFindUniqueMock, auditCountMock } =
 
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 // The dashboard reads persisted audits (DSH-5) and the layout resolves the
-// nav plan (SHL-2): findMany + count on audit, findUnique on user.
+// nav plan (SHL-2): findMany + count on audit, findUnique on user (existence
+// check only — no tier field is read anymore).
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findMany: findManyMock, count: auditCountMock },
@@ -64,7 +65,7 @@ async function renderPage() {
     user: { id: "user-1", name: "Marcos", email: "m@x.com" },
   });
   findManyMock.mockResolvedValue(prismaRows);
-  userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+  userFindUniqueMock.mockResolvedValue({ id: "user-1" });
   auditCountMock.mockResolvedValue(2);
   return render(await DashboardPage());
 }
@@ -90,7 +91,7 @@ describe("dashboard page axe (A11Y-2)", () => {
       user: { id: "user-1", name: "Marcos", email: "m@x.com" },
     });
     findManyMock.mockResolvedValue(prismaRows);
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+    userFindUniqueMock.mockResolvedValue({ id: "user-1" });
     auditCountMock.mockResolvedValue(2);
     const page = await DashboardPage();
     await renderShell(page);
@@ -104,7 +105,7 @@ describe("dashboard shell landmarks (A11Y-4)", () => {
       user: { id: "user-1", name: "Marcos", email: "m@x.com" },
     });
     findManyMock.mockResolvedValue(prismaRows);
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+    userFindUniqueMock.mockResolvedValue({ id: "user-1" });
     auditCountMock.mockResolvedValue(2);
     const page = await DashboardPage();
     await renderShell(page);
@@ -126,7 +127,7 @@ describe("dashboard focus (A11Y-5)", () => {
       user: { id: "user-1", name: "Marcos", email: "m@x.com" },
     });
     findManyMock.mockResolvedValue(prismaRows);
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+    userFindUniqueMock.mockResolvedValue({ id: "user-1" });
     auditCountMock.mockResolvedValue(2);
     const page = await DashboardPage();
     await renderShell(page);
