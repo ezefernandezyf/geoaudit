@@ -2,23 +2,25 @@ import { test, expect } from "@playwright/test";
 import { hasGithubCreds, signInViaGithub } from "./helpers";
 
 /**
- * PDF export E2E (E2E-5, sprint 8 C12).
+ * PDF export E2E (E2E-5, sprint 8 C12; sprint 10 — FREE flow).
  *
- * The full journey: authenticated PRO user → run a real audit (persists the
+ * The full journey: authenticated user → run a real audit (persists the
  * Audit row, TLM-6) → dashboard history → audit detail page → "Exportar PDF"
- * → the `/api/report/[id]/pdf` route re-checks ownership + tier (PDF-2/3) and
- * streams `geo-audit-<id>.pdf` → the browser fires a download event.
+ * → the `/api/report/[id]/pdf` route re-checks ownership (PDF-9) and streams
+ * `geo-audit-<id>.pdf` → the browser fires a download event.
  *
- * skip-if-no-env: requires a REAL authenticated PRO user in the database —
+ * PDF is FREE for every authenticated user since sprint 10 (E2E-5) — there is
+ * no tier gate and no upgrade CTA.
+ *
+ * skip-if-no-env: requires a REAL authenticated user in the database —
  * `E2E_PDF_ENABLED=true` (explicit opt-in), GitHub test-account credentials
- * and DATABASE_URL. A GitHub sign-in alone is FREE tier, which shows the
- * upgrade CTA instead of the export action (PDF-3), so this spec can never
- * run in CI — it skips with a clear message.
+ * and DATABASE_URL. No GitHub sign-in happens in CI, so this spec can never
+ * run there — it skips with a clear message.
  */
 const PDF_SKIP_MSG =
-  "Requiere E2E_PDF_ENABLED=true, un usuario PRO real en la DB (DATABASE_URL) y credenciales GitHub de test; no disponible en CI.";
+  "Requiere E2E_PDF_ENABLED=true, un usuario autenticado real en la DB (DATABASE_URL) y credenciales GitHub de test; no disponible en CI.";
 
-test("PDF downloads from the audit detail page of a PRO user", async ({
+test("PDF downloads from the audit detail page of any authenticated user", async ({
   page,
 }) => {
   test.skip(process.env.E2E_PDF_ENABLED !== "true", PDF_SKIP_MSG);
@@ -41,7 +43,8 @@ test("PDF downloads from the audit detail page of a PRO user", async ({
     .first()
     .click();
 
-  // PRO gate allowed → the real export action is rendered (PDF-3).
+  // PDF is FREE for every authenticated user (E2E-5) — the export action is
+  // always rendered (PDF-9), no tier gate.
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("link", { name: "Exportar PDF" }).click();
   const download = await downloadPromise;
