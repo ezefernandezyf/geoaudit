@@ -1,28 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 import { resolveNavPlan, type NavPlanPrisma } from "@/lib/nav-plan";
+import { FREE_AUDIT_LIMIT } from "@/lib/audit/tier";
 
 /**
- * U1.9 — resolveNavPlan (SHL-2): the plan pill data resolver. FREE users are
- * measured by Audit rows in the 30-day window (TLM-2); paid tiers by the
- * Subscription-backed counter resolved against currentPeriodEnd (TLM-7/8).
+ * U1.9 — resolveNavPlan (SHL-2): the plan pill data resolver. There is a
+ * single FREE plan: `used` counts Audit rows in the 30-day window (TLM-2) and
+ * `limit` is the FREE constant. No tier, no subscription counter (TLM-7/8
+ * removed).
  */
-const paidUser = {
-  id: "user-1",
-  tier: "PRO",
-  subscription: {
-    plan: "PRO",
-    auditsUsed: 4,
-    auditsResetAt: new Date("2026-08-01T00:00:00.000Z"),
-    currentPeriodEnd: new Date("2026-08-31T00:00:00.000Z"),
-  },
-} as const;
-
-const freeUser = {
-  id: "user-1",
-  tier: "FREE",
-  subscription: null,
-} as const;
-
 function makePrisma(user: unknown): NavPlanPrisma {
   return {
     user: {
@@ -40,41 +25,19 @@ describe("resolveNavPlan (SHL-2)", () => {
     expect(await resolveNavPlan(prisma, "user-1", Date.now())).toBeNull();
   });
 
-  it("returns the FREE tier limit and the moving-window audit count", async () => {
-    const prisma = makePrisma(freeUser);
+  it("returns the FREE limit and the moving-window audit count", async () => {
+    const prisma = makePrisma({ id: "user-1" });
     const plan = await resolveNavPlan(prisma, "user-1", Date.now());
-    expect(plan).toEqual({ tier: "FREE", used: 2, limit: 3 });
+    expect(plan).toEqual({ used: 2, limit: FREE_AUDIT_LIMIT });
   });
 
-  it("returns the paid tier limit and the subscription counter", async () => {
-    const prisma = makePrisma(paidUser);
-    const plan = await resolveNavPlan(prisma, "user-1", Date.now());
-    expect(plan).toEqual({ tier: "PRO", used: 4, limit: 10 });
-  });
+  it("never consults the tier or subscription (SHL-2, TLM-8 removed)", async () => {
+    const prisma = makePrisma({ id: "user-1" });
+    await resolveNavPlan(prisma, "user-1", Date.now());
 
-  it("treats a missing subscription as zero usage for paid tiers", async () => {
-    const prisma = makePrisma({
-      id: "user-1",
-      tier: "PRO",
-      subscription: null,
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: "user-1" },
     });
-    const plan = await resolveNavPlan(prisma, "user-1", Date.now());
-    expect(plan).toEqual({ tier: "PRO", used: 0, limit: 10 });
-  });
-
-  it("resets the paid counter lazily once currentPeriodEnd passes", async () => {
-    const user = {
-      id: "user-1",
-      tier: "PRO",
-      subscription: {
-        plan: "PRO",
-        auditsUsed: 9,
-        auditsResetAt: new Date("2026-08-01T00:00:00.000Z"),
-        currentPeriodEnd: new Date("2026-07-31T00:00:00.000Z"), // past
-      },
-    };
-    const prisma = makePrisma(user);
-    const plan = await resolveNavPlan(prisma, "user-1", Date.now());
-    expect(plan).toEqual({ tier: "PRO", used: 0, limit: 10 });
+    expect(prisma.audit.count).toHaveBeenCalledTimes(1);
   });
 });

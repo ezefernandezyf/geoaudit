@@ -20,12 +20,6 @@ export function Footer({ session }: FooterProps = {}) {
         <Logo size={20} />
         <nav aria-label="Pie de página" className="flex items-center gap-4">
           <Link
-            href="/pricing"
-            className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
-          >
-            Precios
-          </Link>
-          <Link
             href="/"
             className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
           >

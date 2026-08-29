@@ -5,21 +5,16 @@ import { usePathname } from "next/navigation";
 
 /**
  * Client island for the navbar's primary links (SHL-1, U1.9): renders
- * Producto → / and Precios → /pricing with the active route highlighted the
- * Gemini way (white pill + border + emerald dot). Client-only because
- * `usePathname` needs the router; the Navbar shell stays a server component.
+ * Producto → / with the active route highlighted the Gemini way (white pill +
+ * border + emerald dot). Client-only because `usePathname` needs the router;
+ * the Navbar shell stays a server component.
  *
- * U6.4 (MPU-6): a multi-page link (→ /multipage) is exposed to paid users —
- * the Navbar resolves `showMultiPage` from the plan tier so FREE/anon visitors
- * don't see the (PRO-gated) entry.
+ * U6.4 (MPU-6): a multi-page link (→ /multipage) is exposed to every
+ * authenticated user — the Navbar resolves `showMultiPage` from the session
+ * so anonymous visitors don't see the signed-in entry.
  */
 const LINKS = [
   { href: "/", label: "Producto", match: (path: string) => path === "/" },
-  {
-    href: "/pricing",
-    label: "Precios",
-    match: (path: string) => path.startsWith("/pricing"),
-  },
 ] as const;
 
 const MULTI_PAGE_LINK = {
@@ -29,7 +24,7 @@ const MULTI_PAGE_LINK = {
 } as const;
 
 type NavLinksProps = {
-  /** Show the PRO-gated multi-page link (MPU-6). Resolved by the server Navbar. */
+  /** Show the signed-in multi-page link (MPU-6). Resolved by the server Navbar. */
   showMultiPage?: boolean;
 };
 

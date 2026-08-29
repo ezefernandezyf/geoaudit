@@ -57,9 +57,14 @@ describe("root layout shell (SHL-1, U2.1)", () => {
   it("wraps children in the global Navbar and Footer", async () => {
     await renderLayout(<p>contenido</p>);
 
+    // Navbar renders the primary Producto link; /pricing is gone (WU-1/2).
+    expect(screen.getByRole("link", { name: "Producto" })).toHaveAttribute(
+      "href",
+      "/",
+    );
     expect(
-      screen.getAllByRole("link", { name: "Precios" }).length,
-    ).toBeGreaterThan(0);
+      screen.queryByRole("link", { name: "Precios" }),
+    ).not.toBeInTheDocument();
     expect(
       screen.getByLabelText("GeoAudit AI Visibility Audit"),
     ).toBeInTheDocument();

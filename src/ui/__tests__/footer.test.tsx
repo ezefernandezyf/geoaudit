@@ -3,9 +3,10 @@ import { describe, expect, it } from "vitest";
 import { Footer } from "@/ui/footer";
 
 /**
- * U1.10 — Footer (SHL-5, LGL-5): logo, links (Precios, Inicio, Dashboard for
+ * U1.10 — Footer (SHL-5, LGL-5): logo, links (Inicio, Dashboard for
  * authed, Términos, Privacidad) and copyright. Dashboard is gated on session
- * (D6: the anonymous shell has no /dashboard entry).
+ * (D6: the anonymous shell has no /dashboard entry). The /pricing link was
+ * removed with the pricing page (WU-1/2).
  */
 describe("Footer (SHL-5)", () => {
   it("shows the product logo", () => {
@@ -13,12 +14,8 @@ describe("Footer (SHL-5)", () => {
     expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
   });
 
-  it("links Precios, Inicio, Términos and Privacidad", () => {
+  it("links Inicio, Términos and Privacidad", () => {
     render(<Footer />);
-    expect(screen.getByRole("link", { name: "Precios" })).toHaveAttribute(
-      "href",
-      "/pricing",
-    );
     expect(screen.getByRole("link", { name: "Inicio" })).toHaveAttribute(
       "href",
       "/",
@@ -31,6 +28,9 @@ describe("Footer (SHL-5)", () => {
       "href",
       "/privacy",
     );
+    expect(
+      screen.queryByRole("link", { name: "Precios" }),
+    ).not.toBeInTheDocument();
   });
 
   // LND-12 (sprint 9): the E-E-A-T trustworthiness engine awards contact info

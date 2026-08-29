@@ -4,21 +4,14 @@ import { Sparkles } from "lucide-react";
 import { LogoutButton } from "@/ui/logout-button";
 import { Logo } from "@/ui/logo";
 import { NavLinks } from "@/ui/nav-links";
-import { isPaidTier } from "@/lib/audit/tier";
 import type { NavPlan } from "@/lib/nav-plan";
 import { SHELL_COPY } from "@/lib/copy";
 
 type NavbarProps = {
   /** Auth session resolved by the layout via `auth()` (SHL-3). Optional for anon. */
   session?: Session | null;
-  /** Plan + usage resolved by the layout for the plan pill (SHL-2). */
+  /** Usage for the plan pill (SHL-2). Resolved by the layout; optional for anon. */
   plan?: NavPlan | null;
-};
-
-const TIER_LABEL: Record<NavPlan["tier"], string> = {
-  FREE: "Free",
-  PRO: "Pro",
-  ENTERPRISE: "Enterprise",
 };
 
 /**
@@ -28,6 +21,10 @@ const TIER_LABEL: Record<NavPlan["tier"], string> = {
  * an async server component can't be awaited inside RTL tests. The active-route
  * links live in the client `NavLinks` island (usePathname); logout is the
  * existing client `LogoutButton` island.
+ *
+ * SHL-2: the plan pill is a STATIC "Free" label + usage (used/limit) — no
+ * `/pricing` href (route deleted), no tier-dependent label. MPU-6: the
+ * multi-page link is exposed to every authenticated user.
  */
 export function Navbar({ session, plan }: NavbarProps) {
   const user = session?.user;
@@ -58,29 +55,28 @@ export function Navbar({ session, plan }: NavbarProps) {
             <Logo size={32} decorative />
           </Link>
 
-          <NavLinks showMultiPage={isPaidTier(plan?.tier ?? "FREE")} />
+          <NavLinks showMultiPage={Boolean(user)} />
         </div>
 
         <div className="flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-3">
               {plan ? (
-                <Link
-                  href="/pricing"
-                  className="hidden items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857] transition-colors hover:bg-[#10b981]/20 sm:inline-flex"
-                  title={`Plan ${TIER_LABEL[plan.tier]}: ${plan.used}/${plan.limit} auditorías usadas`}
+                <span
+                  className="hidden items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857] sm:inline-flex"
+                  title={`Plan Free: ${plan.used}/${plan.limit} auditorías usadas`}
                 >
                   <Sparkles
                     className="h-3 w-3 text-[#10b981]"
                     aria-hidden="true"
                   />
                   <span className="font-mono text-[10px] uppercase tracking-wider">
-                    Plan {TIER_LABEL[plan.tier]}
+                    Plan Free
                   </span>
                   <span className="font-mono text-[#0f172a]">
                     ({plan.used}/{plan.limit})
                   </span>
-                </Link>
+                </span>
               ) : null}
 
               <Link

@@ -32,15 +32,11 @@ describe("Navbar (SHL-2/3/4)", () => {
     expect(screen.getByText("AI Visibility Audit")).toBeInTheDocument();
   });
 
-  it("links Producto to / and Precios to /pricing", () => {
+  it("links Producto to /", () => {
     render(<Navbar />);
     expect(screen.getByRole("link", { name: "Producto" })).toHaveAttribute(
       "href",
       "/",
-    );
-    expect(screen.getByRole("link", { name: "Precios" })).toHaveAttribute(
-      "href",
-      "/pricing",
     );
   });
 
@@ -55,23 +51,21 @@ describe("Navbar (SHL-2/3/4)", () => {
     ).toHaveAttribute("href", "/signup");
   });
 
-  it("shows the plan pill with usage for an authenticated PRO user (SHL-2)", () => {
-    render(
-      <Navbar
-        session={PRO_SESSION}
-        plan={{ tier: "PRO", used: 2, limit: 10 }}
-      />,
-    );
-    const pill = screen.getByRole("link", { name: /Plan Pro/ });
-    expect(pill).toHaveAttribute("href", "/pricing");
+  it("shows the static Free pill with usage for an authenticated user (SHL-2)", () => {
+    render(<Navbar session={PRO_SESSION} plan={{ used: 2, limit: 10 }} />);
+    // The pill is a static label, not a link — there is no /pricing href
+    // (route deleted) and no tier-dependent label.
+    expect(screen.getByText("Plan Free")).toBeInTheDocument();
     expect(screen.getByText(/\(2\/10\)/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: /Plan Free/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Plan Pro/ })).toBeNull();
   });
 
   it("renders no plan pill for an authenticated user without plan data", () => {
     render(<Navbar session={PRO_SESSION} plan={null} />);
-    expect(
-      screen.queryByRole("link", { name: /Plan Pro/ }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Plan Free")).not.toBeInTheDocument();
   });
 
   it("shows avatar initials + logout and hides login links to authenticated users (SHL-3)", () => {
@@ -83,43 +77,31 @@ describe("Navbar (SHL-2/3/4)", () => {
   });
 
   it("highlights the active route link (SHL-1)", () => {
-    nav.usePathname.mockReturnValue("/pricing");
+    nav.usePathname.mockReturnValue("/");
     render(<Navbar />);
-    expect(screen.getByRole("link", { name: "Precios" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Producto" })).toHaveAttribute(
       "aria-current",
       "page",
-    );
-    expect(screen.getByRole("link", { name: "Producto" })).not.toHaveAttribute(
-      "aria-current",
     );
     nav.usePathname.mockReturnValue("/");
   });
 });
 
 describe("Navbar multi-page link (MPU-6)", () => {
-  it("exposes the multi-page trigger link to paid users", () => {
-    render(
-      <Navbar
-        session={PRO_SESSION}
-        plan={{ tier: "PRO", used: 2, limit: 10 }}
-      />,
-    );
+  it("exposes the multi-page trigger link to any authenticated user", () => {
+    render(<Navbar session={PRO_SESSION} plan={{ used: 2, limit: 10 }} />);
     expect(screen.getByRole("link", { name: "Multi-página" })).toHaveAttribute(
       "href",
       "/multipage",
     );
   });
 
-  it("hides the multi-page link for FREE users", () => {
-    render(
-      <Navbar
-        session={PRO_SESSION}
-        plan={{ tier: "FREE", used: 1, limit: 3 }}
-      />,
+  it("exposes the multi-page link even without plan data", () => {
+    render(<Navbar session={PRO_SESSION} plan={null} />);
+    expect(screen.getByRole("link", { name: "Multi-página" })).toHaveAttribute(
+      "href",
+      "/multipage",
     );
-    expect(
-      screen.queryByRole("link", { name: "Multi-página" }),
-    ).not.toBeInTheDocument();
   });
 
   it("hides the multi-page link for anonymous visitors", () => {
