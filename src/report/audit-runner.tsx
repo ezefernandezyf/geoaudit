@@ -2,8 +2,7 @@ import { runAudit } from "@/audit";
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { checkTierLimit, recordPaidAudit } from "@/lib/audit/enforcement";
-import { isPaidTier } from "@/lib/audit/tier";
+import { checkTierLimit } from "@/lib/audit/enforcement";
 import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
 import type { Prisma } from "@/generated/prisma/client";
 import {
@@ -26,17 +25,15 @@ export type AuditRunnerProps = {
  * `meta.errors` and the true (rebalanced) GEO Score (ARU-7).
  *
  * U3 persist gate (TLM-4/5/6, D5): after a SUCCESSFUL audit, signed-in users
- * pass the authoritative tier re-check (TOCTOU guard — the cheap pre-check
+ * pass the authoritative limit re-check (TOCTOU guard — the cheap pre-check
  * ran in the action) and the Audit row is persisted with the full AuditResult
  * JSON. Over-limit users see the limit copy and nothing is persisted;
  * anonymous audits never persist (TLM-6). Persistence is best-effort: a DB
  * failure logs and still renders the report (the audit already ran).
  *
- * U4: the gate now branches by tier (TLM-8, design U4) through the SAME
- * `checkTierLimit` used by the action pre-check. For PRO/ENTERPRISE the audit
- * counter is incremented — `recordPaidAudit` runs inside the SAME
- * `$transaction` that creates the Audit row (TLM-7), so the increment is
- * atomic with the persisted result.
+ * There is no tier branch (TLM-8 removed): every signed-in user within the
+ * limit writes the Audit row directly — no paid counter, no $transaction
+ * (TLM-7 removed).
  *
  * It catches the page-fetch failure throw and renders the mapped friendly
  * Spanish copy + a Reintentar link (ARU-6); unexpected errors are rethrown so
@@ -60,49 +57,26 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
   if (userId) {
     const { allowed } = await checkTierLimit(prisma, userId, Date.now());
     if (!allowed) {
-      // Authoritative gate (TLM-4): the audit ran, but the tier says no — show
-      // the limit copy (TLM-5) and do NOT persist.
+      // Authoritative gate (TLM-4): the audit ran, but the limit says no —
+      // show the limit copy (TLM-5) and do NOT persist.
       return <TierLimitState />;
     }
 
-    // U4 (TLM-8): the persist path depends on tier — FREE writes the Audit row
-    // directly; PRO/ENTERPRISE increments the paid counter in the same
-    // transaction as the Audit row (TLM-7).
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { tier: true },
-    });
     try {
-      if (user && isPaidTier(user.tier)) {
-        await prisma.$transaction(async (tx) => {
-          await recordPaidAudit(tx, userId, Date.now());
-          await tx.audit.create({
-            data: {
-              userId,
-              url,
-              geoScore: Math.round(result.summary.geoScore),
-              severityBand: result.summary.severityBand,
-              durationMs: Math.round(result.summary.durationMs),
-              // AuditResult is JSON-serializable by contract (RAO-10); the
-              // engines produce plain data, so this cast only satisfies
-              // Prisma's Json input typing (nested `unknown` values in records
-              // are not assignable).
-              result: result as unknown as Prisma.InputJsonValue,
-            },
-          });
-        });
-      } else {
-        await prisma.audit.create({
-          data: {
-            userId,
-            url,
-            geoScore: Math.round(result.summary.geoScore),
-            severityBand: result.summary.severityBand,
-            durationMs: Math.round(result.summary.durationMs),
-            result: result as unknown as Prisma.InputJsonValue,
-          },
-        });
-      }
+      await prisma.audit.create({
+        data: {
+          userId,
+          url,
+          geoScore: Math.round(result.summary.geoScore),
+          severityBand: result.summary.severityBand,
+          durationMs: Math.round(result.summary.durationMs),
+          // AuditResult is JSON-serializable by contract (RAO-10); the
+          // engines produce plain data, so this cast only satisfies
+          // Prisma's Json input typing (nested `unknown` values in records
+          // are not assignable).
+          result: result as unknown as Prisma.InputJsonValue,
+        },
+      });
     } catch (error) {
       // Best-effort persist: never hide the finished report behind a DB error.
       console.error("audit persist failed", error);
