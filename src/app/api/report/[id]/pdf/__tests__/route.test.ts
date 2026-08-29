@@ -4,31 +4,28 @@ import { PdfRenderError } from "@/pdf/render";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
 /**
- * U4.7/U4.8 — PDF route (PDF-1/2/3/7/9, threat matrix U4.5).
+ * U4.7/U4.8 — PDF route (PDF-1/2/7/9, threat matrix U4.5).
  *
  * `GET /api/report/[id]/pdf`:
  * - PDF-2: ownership via `findFirst({ id, userId })` — non-owner and missing
  *   collapse to null → 404 (same D2 pattern as the detail page).
- * - PDF-3: `requirePaidTier` — FREE → 403 upgrade denial, no PDF produced.
  * - PDF-7: success → `application/pdf` + `Content-Disposition` attachment
  *   filename `geo-audit-{id}.pdf`.
  * - PDF-9/threat: a `renderPdf` rejection (typed `PdfRenderError`) becomes a
  *   5xx — never an uncaught exception; unauth → 401 typed.
+ * - No tier gate (PDF-3 removed): every authenticated owner exports the PDF.
  */
 
-const { authMock, findFirstMock, userFindUniqueMock, renderPdfMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    findFirstMock: vi.fn(),
-    userFindUniqueMock: vi.fn(),
-    renderPdfMock: vi.fn(),
-  }));
+const { authMock, findFirstMock, renderPdfMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  findFirstMock: vi.fn(),
+  renderPdfMock: vi.fn(),
+}));
 
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findFirst: findFirstMock },
-    user: { findUnique: userFindUniqueMock },
   },
 }));
 vi.mock("@/pdf/render", () => ({
@@ -61,8 +58,6 @@ beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: "user-1" } });
   findFirstMock.mockReset();
   findFirstMock.mockResolvedValue(auditRow);
-  userFindUniqueMock.mockReset();
-  userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
   renderPdfMock.mockReset();
   renderPdfMock.mockResolvedValue(PDF_BYTES);
 });
@@ -113,18 +108,6 @@ describe("GET /api/report/[id]/pdf (PDF-2 ownership)", () => {
   });
 });
 
-describe("GET /api/report/[id]/pdf (PDF-3 tier gate)", () => {
-  it("denies a FREE owner with 403 and produces no PDF", async () => {
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
-
-    const res = await get();
-
-    expect(res.status).toBe(403);
-    expect(await res.json()).toEqual({ error: "upgrade_required" });
-    expect(renderPdfMock).not.toHaveBeenCalled();
-  });
-});
-
 describe("GET /api/report/[id]/pdf (PDF-7 response contract)", () => {
   it("returns the PDF with application/pdf and a download filename", async () => {
     const res = await get();
@@ -137,6 +120,15 @@ describe("GET /api/report/[id]/pdf (PDF-7 response contract)", () => {
     expect(new Uint8Array(await res.arrayBuffer())).toEqual(
       new Uint8Array(PDF_BYTES),
     );
+    expect(renderPdfMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("exports for every authenticated owner — no tier lookup (PDF-3 removed)", async () => {
+    // The prisma mock exposes ONLY audit.findFirst: any tier lookup the route
+    // attempted would throw. Every authenticated owner reaches the render.
+    const res = await get();
+
+    expect(res.status).toBe(200);
     expect(renderPdfMock).toHaveBeenCalledTimes(1);
   });
 });

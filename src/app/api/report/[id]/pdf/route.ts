@@ -5,12 +5,11 @@ import type {
 } from "@/lib/contracts/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { buildReportHtml } from "@/pdf/report-template";
 import { renderPdf } from "@/pdf/render";
 
 /**
- * PDF export route (U4, PDF-1/2/3/7/9, design D3 — "PDF/detail render from
+ * PDF export route (U4, PDF-1/2/7/9, design D3 — "PDF/detail render from
  * aggregate"). `GET /api/report/[id]/pdf` returns a client-ready PDF of a
  * persisted audit.
  *
@@ -20,8 +19,8 @@ import { renderPdf } from "@/pdf/render";
  * - PDF-2 ownership (D2): the query is `findFirst({ id, userId })`, so a
  *   non-owner and a missing audit both collapse to `null` → 404. No existence
  *   leak, same pattern as the detail page.
- * - PDF-3 tier gate (D7): `requirePaidTier` — the SAME gate the actions and
- *   UI use. FREE → 403 `upgrade_required`, no PDF produced.
+ * - No tier gate (PDF-3 removed): every authenticated owner exports the PDF;
+ *   ownership (PDF-2) is the sole access check.
  * - Render (PDF-4): `buildReportHtml` (template, PDF-5/6) → `renderPdf`
  *   (chromium-min, PDF-4/6). PDF-9/threat matrix: a failure is ALWAYS a typed
  *   `PdfRenderError` (render.ts) mapped to 5xx here — never an uncaught throw.
@@ -50,16 +49,6 @@ export async function GET(_request: Request, { params }: PdfRouteContext) {
   });
   if (!audit) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
-  }
-
-  // PDF-3: PRO/ENTERPRISE only (D7 shared gate).
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { tier: true },
-  });
-  const gate = requirePaidTier(user?.tier ?? "FREE");
-  if (!gate.allowed) {
-    return NextResponse.json({ error: "upgrade_required" }, { status: 403 });
   }
 
   // D3: the master row holds either the full AuditResult or the light
