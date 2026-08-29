@@ -4,7 +4,7 @@ import type { Metadata } from "next";
  * C16 — shared OpenGraph/Twitter metadata builder (LND-8, PRC-8).
  *
  * Single source for the social preview fields emitted by the public marketing
- * pages (landing, pricing). Each page reuses its own `title`/`description`
+ * pages (landing, login, signup). Each page reuses its own `title`/`description`
  * and references the shared 1200×630 `public/og.png` asset. Relative URLs
  * (canonical, og:url, images) resolve against `metadataBase`, which the root
  * layout defines (see src/app/layout.tsx).
@@ -21,7 +21,7 @@ export const OG_IMAGE = {
 export type BuildOgMetadataInput = {
   title: string;
   description: string;
-  /** Route path used for canonical + og:url (e.g. "/" or "/pricing"). */
+  /** Route path used for canonical + og:url (e.g. "/" or "/login"). */
   path: string;
 };
 

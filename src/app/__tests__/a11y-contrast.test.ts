@@ -5,7 +5,8 @@
  * (jest-axe disables `cat.color`), so WCAG 2.2 AA contrast is verified here.
  *
  * WU-4 extends the original landing-only contrast scan to the three measured
- * pages (landing/pricing/report — PERF-3) and to the rules behind the PERF-3
+ * pages (landing/report — PERF-3; the pricing page was removed in sprint 10)
+ * and to the rules behind the PERF-3
  * deviations: `aria-progressbar-name` (ScoreBar fill), `color-contrast`
  * (ScoreBar /100 + "Recomendado" badge) and `label-content-name-mismatch`
  * (navbar brand link). It also asserts the SHL-7 security headers are present
@@ -66,10 +67,11 @@ function chromiumExecutable(): string | undefined {
 /**
  * WU-4 (A11Y-6): the pages that PERF-3 measured. The report runs a live audit
  * (example.com, ~2.8s) so its browser timeout is larger than the static pages.
+ * Sprint 10 (PRC-8, A11Y-2): the `/pricing` page was removed, so the contrast
+ * scan covers landing + report.
  */
 const A11Y_PAGES = [
   { name: "landing", url: `${BASE_URL}/`, waitFor: "heading" as const },
-  { name: "pricing", url: `${BASE_URL}/pricing`, waitFor: "heading" as const },
   {
     name: "report",
     // Full URL with protocol: resolveReportUrl parses searchParams.url with
@@ -89,7 +91,7 @@ const A11Y_RULES = [
 ];
 
 describe.skipIf(!reachable)(
-  `landing/pricing/report a11y (A11Y-3, A11Y-6) against ${BASE_URL}`,
+  `landing/report a11y (A11Y-3, A11Y-6) against ${BASE_URL}`,
   () => {
     for (const page of A11Y_PAGES) {
       it(

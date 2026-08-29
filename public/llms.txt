@@ -5,7 +5,6 @@
 ## Páginas principales
 
 - [Inicio](https://geoaudit-tau.vercel.app/): Ingrese una URL para auditar su visibilidad en motores de IA y obtener su GEO Score.
-- [Planes y Precios](https://geoaudit-tau.vercel.app/pricing): Planes Free, Pro y Enterprise con auditorías gratuitas, monitoreo continuo y reportes PDF.
 - [Iniciar sesión](https://geoaudit-tau.vercel.app/login): Acceso al panel de auditorías y al historial de GEO Scores.
 - [Crear cuenta](https://geoaudit-tau.vercel.app/signup): Registro gratuito con 3 auditorías GEO mensuales sin costo.
 - [Términos de Servicio](https://geoaudit-tau.vercel.app/terms): Términos legales del servicio.

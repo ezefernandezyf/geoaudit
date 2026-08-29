@@ -10,7 +10,7 @@ import type { MetadataRoute } from "next";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 /** Public, indexable routes of the marketing/landing surface. */
-const PUBLIC_ROUTES = ["", "/pricing", "/login", "/signup"] as const;
+const PUBLIC_ROUTES = ["", "/login", "/signup"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

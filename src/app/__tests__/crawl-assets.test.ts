@@ -51,8 +51,8 @@ describe("sitemap.ts (LND-10)", () => {
   it("lists the public routes", () => {
     const entries = sitemap();
     const urls = entries.map((entry) => entry.url);
-    expect(urls).toHaveLength(4);
-    for (const route of ["", "/pricing", "/login", "/signup"]) {
+    expect(urls).toHaveLength(3);
+    for (const route of ["", "/login", "/signup"]) {
       expect(urls.some((url) => url.endsWith(route))).toBe(true);
     }
   });
@@ -89,7 +89,7 @@ describe("public/llms.txt (LND-10)", () => {
     const hrefs = [
       ...content.matchAll(/\[[^\]]*\]\((https?:\/\/[^)]+)\)/g),
     ].map((match) => match[1]);
-    for (const route of ["/", "/pricing", "/login", "/signup"]) {
+    for (const route of ["/", "/login", "/signup"]) {
       expect(hrefs.some((href) => href.endsWith(route))).toBe(true);
     }
   });
