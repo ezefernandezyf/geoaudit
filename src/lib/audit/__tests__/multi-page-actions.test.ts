@@ -6,31 +6,29 @@ import type { MultiPageFormState } from "@/lib/audit/multi-page-actions";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkTierLimit } from "@/lib/audit/enforcement";
-import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { runMultiPageAudit } from "@/audit/multi-page";
 import { persistMultiPageAudit } from "@/lib/audit/multi-page-persist";
 import { getDefaultRateLimiter } from "@/lib/rate-limit";
 
 /**
- * U3 — multi-page Server Action (MPA-8, TLM-9, D7). The action follows the
+ * U3 — multi-page Server Action (MPA-1, TLM-3/10). The action follows the
  * single-page auditAction contract (rate limit → Zod → protocol → auth →
- * gates) plus the PRO feature gate (`requirePaidTier`, D7) — FREE users get
- * `"upgrade"` and the engine is NEVER run (MPA-8). PRO users run
- * `runMultiPageAudit`, persist through the SAME $transaction and redirect to
- * the audit detail page. `requirePaidTier` stays REAL (imported from the
- * actual module) so the gate decision is exercised; everything else is mocked.
+ * limit check) with NO tier gate (MPA-8 removed): any authenticated user runs
+ * `runMultiPageAudit`, persists through the SAME $transaction and redirects
+ * to the audit detail page. `checkTierLimit` stays REAL (imported from the
+ * actual module) so the limit decision is exercised; everything else is
+ * mocked.
  */
 
 const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
 const checkTierLimitMock = vi.mocked(checkTierLimit);
 const runMultiPageAuditMock = vi.mocked(runMultiPageAudit);
 const persistMultiPageAuditMock = vi.mocked(persistMultiPageAudit);
-const userFindUniqueMock = vi.mocked(prisma.user.findUnique) as unknown as Mock<
-  () => Promise<{ tier: string } | null>
->;
 const transactionMock = vi.mocked(prisma.$transaction) as unknown as Mock<
   (...args: unknown[]) => Promise<unknown>
 >;
+/** Kept in the prisma mock ONLY to assert the tier lookup is never consulted. */
+const userFindUniqueMock = vi.mocked(prisma.user.findUnique);
 
 const { limiterMock } = vi.hoisted(() => ({
   limiterMock: {
@@ -121,8 +119,6 @@ beforeEach(() => {
   checkTierLimitMock.mockResolvedValue({ allowed: true });
   runMultiPageAuditMock.mockReset();
   persistMultiPageAuditMock.mockReset();
-  userFindUniqueMock.mockReset();
-  userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
   runMultiPageAuditMock.mockResolvedValue(engineResult as never);
   transactionMock.mockReset();
   transactionMock.mockImplementation(async (...args: unknown[]) => {
@@ -131,7 +127,7 @@ beforeEach(() => {
   });
 });
 
-describe("multiPageAuditAction PRO flow (MPA-8, TLM-9)", () => {
+describe("multiPageAuditAction flow (MPA-1)", () => {
   it("runs the engine, persists in one $transaction and redirects to the detail page", async () => {
     authMock.mockResolvedValue(session());
 
@@ -146,42 +142,27 @@ describe("multiPageAuditAction PRO flow (MPA-8, TLM-9)", () => {
     expect(persistMultiPageAuditMock).toHaveBeenCalledTimes(1);
     const [tx, args] = persistMultiPageAuditMock.mock.calls[0] as [
       unknown,
-      { userId: string; aggregate: unknown; pages: unknown; now: number },
+      { userId: string; aggregate: unknown; pages: unknown },
     ];
     expect(tx).toEqual({}); // the $transaction client
     expect(args.userId).toBe("user-1");
     expect(args.aggregate).toEqual(engineResult.aggregate);
     expect(args.pages).toEqual(engineResult.pages);
-    expect(typeof args.now).toBe("number");
   });
 
-  it("passes the PRO tier gate through the real requirePaidTier (D7)", async () => {
+  it("runs for any authenticated user — no tier lookup (MPA-8 removed)", async () => {
     authMock.mockResolvedValue(session());
-    expect(requirePaidTier("PRO")).toEqual({ allowed: true });
 
     await expectRedirect(
       fd("https://example.com"),
       "/dashboard/audits/audit-42",
     );
     expect(runMultiPageAuditMock).toHaveBeenCalledTimes(1);
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
   });
 });
 
 describe("multiPageAuditAction gates", () => {
-  it("denies a FREE user with the upgrade CTA and never runs the engine (MPA-8)", async () => {
-    authMock.mockResolvedValue(session());
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
-
-    const state = await multiPageAuditAction(
-      { error: null },
-      fd("https://example.com"),
-    );
-
-    expect(state).toEqual({ error: "upgrade" });
-    expect(runMultiPageAuditMock).not.toHaveBeenCalled();
-    expect(transactionMock).not.toHaveBeenCalled();
-  });
-
   it("returns 'auth' without a session", async () => {
     authMock.mockResolvedValue(null);
 

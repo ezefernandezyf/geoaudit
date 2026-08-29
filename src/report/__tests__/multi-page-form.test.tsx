@@ -70,7 +70,6 @@ describe("MultiPageForm error copy (MPU-3)", () => {
     ["rate-limited", MULTIPAGE_COPY.errors["rate-limited"]],
     ["invalid", MULTIPAGE_COPY.errors.invalid],
     ["auth", MULTIPAGE_COPY.errors.auth],
-    ["upgrade", MULTIPAGE_COPY.errors.upgrade],
     ["limit", MULTIPAGE_COPY.errors.limit],
     ["failed", MULTIPAGE_COPY.errors.failed],
   ] as const)("maps the %s error code to neutral copy", async (code, copy) => {

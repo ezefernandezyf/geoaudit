@@ -1,5 +1,4 @@
 import type { Prisma } from "@/generated/prisma/client";
-import { recordPaidAudit, type PaidAuditTx } from "@/lib/audit/enforcement";
 import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
 
 /**
@@ -13,14 +12,14 @@ import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
  * MPA-6). Failed pages (no result) are skipped — there is no AuditResult to
  * persist, they remain visible in the engine's return (MPA-1 isolation).
  *
- * Tier accounting (TLM-10): a multi-page audit counts EXACTLY once toward the
- * paid counter — `recordPaidAudit` increments by one inside the same
- * transaction, never per page (MPA-7). The feature is PRO-gated upstream
- * (MPA-8), so this persist path is only reached by paid tiers.
+ * Limit accounting (TLM-10): the master `Audit` row is the single count
+ * toward the 30-day window — one row per multi-page run, never per page
+ * (MPA-7). There is no separate counter (the `recordPaidAudit` increment was
+ * removed with the tier layer).
  */
 
-/** Structural transaction surface (enforcement.ts pattern) — unit-testable. */
-export type MultiPageTx = PaidAuditTx & {
+/** Structural transaction surface — unit-testable (plain mocks, no real DB). */
+export type MultiPageTx = {
   audit: {
     create(args: {
       data: {
@@ -52,21 +51,17 @@ export interface PersistMultiPageArgs {
   userId: string;
   aggregate: MultiPageAggregate;
   pages: PerPageAudit[];
-  now: number;
 }
 
 /**
- * Persists one multi-page audit inside the caller's `$transaction`:
- * recordPaidAudit (exactly one increment, TLM-10) → master Audit row →
- * AuditPage rows (createMany, only pages with a result). Returns the created
- * master audit id (the action redirects to its detail page).
+ * Persists one multi-page audit inside the caller's `$transaction`: master
+ * Audit row → AuditPage rows (createMany, only pages with a result). Returns
+ * the created master audit id (the action redirects to its detail page).
  */
 export async function persistMultiPageAudit(
   tx: MultiPageTx,
-  { userId, aggregate, pages, now }: PersistMultiPageArgs,
+  { userId, aggregate, pages }: PersistMultiPageArgs,
 ): Promise<string> {
-  await recordPaidAudit(tx, userId, now);
-
   const succeeded = pages.filter(
     (
       page,

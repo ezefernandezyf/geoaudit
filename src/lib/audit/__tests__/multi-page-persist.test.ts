@@ -8,9 +8,10 @@ import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
  * U3 — multi-page persistence (MPA-6/7, TLM-10, D3). `persistMultiPageAudit`
  * orchestrates the SAME $transaction that created the audit: one master
  * `Audit` row (light aggregate result) + N `AuditPage` rows (full per-page
- * AuditResult) + exactly ONE paid-counter increment (TLM-10) — never five.
- * The transaction client is structural (the enforcement.ts pattern), so the
- * whole flow is unit-tested with plain mocks — no real DB.
+ * AuditResult). TLM-10 is satisfied structurally: the master Audit row is the
+ * single count toward the 30-day window — there is no separate counter (the
+ * `recordPaidAudit` increment was removed). The transaction client is
+ * structural, so the whole flow is unit-tested with plain mocks — no real DB.
  */
 
 const NOW = 1_750_000_000_000;
@@ -71,10 +72,6 @@ const failedPages: PerPageAudit[] = [
 ];
 
 const tx = {
-  subscription: {
-    findUnique: vi.fn(),
-    update: vi.fn(async () => ({})),
-  },
   audit: {
     create: vi.fn(async (args: { data: Record<string, unknown> }) => ({
       id: "audit-master-1",
@@ -93,12 +90,6 @@ const tx = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  tx.subscription.findUnique.mockResolvedValue({
-    plan: "PRO",
-    auditsUsed: 2,
-    auditsResetAt: null,
-    currentPeriodEnd: null,
-  });
   tx.audit.create.mockImplementation(
     async (args: { data: Record<string, unknown> }) => ({
       id: "audit-master-1",
@@ -113,7 +104,6 @@ describe("persistMultiPageAudit (MPA-6 1:N)", () => {
       userId: "user-1",
       aggregate,
       pages,
-      now: NOW,
     });
 
     // Exactly ONE master Audit row.
@@ -164,7 +154,6 @@ describe("persistMultiPageAudit (MPA-6 1:N)", () => {
       userId: "user-1",
       aggregate: { ...aggregate, geoScore: 68 },
       pages: failedPages,
-      now: NOW,
     });
 
     expect(tx.auditPage.createMany).toHaveBeenCalledTimes(1);
@@ -177,23 +166,18 @@ describe("persistMultiPageAudit (MPA-6 1:N)", () => {
   });
 });
 
-describe("persistMultiPageAudit (MPA-7 / TLM-10 one audit toward tier)", () => {
-  it("increments auditsUsed exactly once regardless of page count", async () => {
+describe("persistMultiPageAudit (MPA-7 / TLM-10 one audit toward the window)", () => {
+  it("creates exactly one master Audit row and no separate counter increment", async () => {
     await persistMultiPageAudit(tx, {
       userId: "user-1",
       aggregate,
       pages,
-      now: NOW,
     });
 
-    expect(tx.subscription.findUnique).toHaveBeenCalledTimes(1);
-    expect(tx.subscription.update).toHaveBeenCalledTimes(1);
-    expect(tx.subscription.update).toHaveBeenCalledWith({
-      where: { userId: "user-1" },
-      data: {
-        auditsUsed: { increment: 1 },
-        auditsResetAt: null,
-      },
-    });
+    // The master Audit row is the single count toward the 30-day window; the
+    // paid Subscription counter no longer exists (TLM-10).
+    expect(tx.audit.create).toHaveBeenCalledTimes(1);
+    expect(tx.auditPage.createMany).toHaveBeenCalledTimes(1);
+    expect("subscription" in tx).toBe(false);
   });
 });
