@@ -1,12 +1,16 @@
 import type { Prisma } from "@/generated/prisma/client";
-import type { Tier } from "@/lib/contracts/billing";
 
 /**
- * FREE tier limits (TLM-1/TLM-2, design U3).
+ * FREE tier limit (TLM-2, design U3 / decision B).
  *
  * Pure helpers over an injected Prisma client, so the counting logic is
  * unit-testable with a plain mock — no real DB and no Prisma runtime are
  * pulled into the module (type-only import).
+ *
+ * Sprint 10 (TLM-1/7/8 removed): the tier layer collapses to a SINGLE FREE
+ * limit — 10 audits per 30-day moving window. There is no `Tier` type, no
+ * paid counter, no `getTierLimit`/`isPaidTier`/`resolvePaidCounter`: every
+ * authenticated user is measured by `Audit` rows in the window.
  */
 
 /**
@@ -21,8 +25,8 @@ export type AuditCountClient = {
   };
 };
 
-/** TLM-2: FREE users get 3 audits per 30-day moving window. */
-export const FREE_AUDIT_LIMIT = 3;
+/** TLM-2: every user gets 10 audits per 30-day moving window. */
+export const FREE_AUDIT_LIMIT = 10;
 
 /** TLM-2: window length — 30 days in milliseconds. */
 export const FREE_AUDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -53,57 +57,4 @@ export function countAuditsInWindow(
       createdAt: { gte: new Date(now - FREE_AUDIT_WINDOW_MS) },
     },
   });
-}
-
-/**
- * Paid-tier limits per billing period (TLM-2, design U4): PRO = 10,
- * ENTERPRISE = 50. FREE is NOT in this map — it uses the 30-day moving window
- * (FREE_AUDIT_LIMIT) instead (TLM-8 counter selection).
- */
-export const PAID_TIER_LIMITS = { PRO: 10, ENTERPRISE: 50 } as const;
-
-/**
- * Per-tier audit limit (TLM-2): FREE → 3 (moving window), PRO/ENTERPRISE →
- * their `PAID_TIER_LIMITS` value (per billing period).
- */
-export function getTierLimit(tier: Tier): number {
-  if (tier === "FREE") return FREE_AUDIT_LIMIT;
-  return PAID_TIER_LIMITS[tier];
-}
-
-/**
- * True while a paid user is still under their period limit; false once `used`
- * reaches the tier limit (TLM-2, "Pro gets ten per period").
- */
-export function hasPaidAuditsLeft(used: number, tier: Tier): boolean {
-  return used < getTierLimit(tier);
-}
-
-/**
- * True for PRO/ENTERPRISE — the tiers that use the Subscription-backed paid
- * counter instead of the FREE 30-day window (TLM-8 counter selection).
- */
-export function isPaidTier(tier: Tier): boolean {
-  return tier === "PRO" || tier === "ENTERPRISE";
-}
-
-/**
- * Lazy period-end reset for the paid counter (TLM-7, design U4 — NO cron).
- *
- * Pure: given the moment `now`, the current `used`/`resetAt` and the Stripe
- * `periodEnd`, returns the effective counter state. When `periodEnd` has
- * passed (<= now), the counter resets to `{ used: 0, resetAt: periodEnd }`;
- * otherwise it stays `{ used, resetAt }` unchanged. `periodEnd` null means no
- * boundary has been set yet — the counter is kept as-is.
- */
-export function resolvePaidCounter(
-  now: number,
-  used: number,
-  resetAt: Date | null,
-  periodEnd: Date | null,
-): { used: number; resetAt: Date | null } {
-  if (periodEnd !== null && periodEnd.getTime() <= now) {
-    return { used: 0, resetAt: periodEnd };
-  }
-  return { used, resetAt };
 }
