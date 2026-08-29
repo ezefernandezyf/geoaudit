@@ -9,11 +9,11 @@ Chain strategy: feature-branch-chain
 
 ## WU-1: Billing Removal - PR 1 - ~1,900 lines - test: `pnpm typecheck && pnpm test` - harness: local suite - rollback: git revert
 
-- [ ] 1.1 Delete `src/billing/` (8+8 tests) + `src/app/api/webhooks/stripe/` (+test) - BLG-4..8
-- [ ] 1.2 Delete `src/app/pricing/` (+2 tests) + `/pricing` refs (`sitemap.ts`, `og.ts`, a11y/crawl tests) - PRC-1..8
-- [ ] 1.3 Delete `billing-cta.tsx` (+test); drop `BillingCta`/`portalAction` in dashboard/profile - DSH-6
-- [ ] 1.4 Delete `e2e/stripe-checkout.spec.ts`, `docs/stripe-test-setup.md`, `stripe` dep - E2E-4
-- [ ] 1.5 Gate: `rg -ri "stripe|@/billing" src/` empty; typecheck + test green
+- [x] 1.1 Delete `src/billing/` (8+8 tests) + `src/app/api/webhooks/stripe/` (+test) - BLG-4..8
+- [x] 1.2 Delete `src/app/pricing/` (+2 tests) + `/pricing` refs (`sitemap.ts`, `og.ts`, a11y/crawl tests) - PRC-1..8
+- [x] 1.3 Delete `billing-cta.tsx` (+test); drop `BillingCta`/`portalAction` in dashboard/profile - DSH-6
+- [x] 1.4 Delete `e2e/stripe-checkout.spec.ts`, `docs/stripe-test-setup.md`, `stripe` dep - E2E-4
+- [x] 1.5 Gate: `rg -ri "stripe|@/billing" src/` empty; typecheck + test green
 
 ## WU-2: Lift PRO Gates - PR 2 - ~700 lines - test: `pnpm test -- src/lib/audit src/ui/__tests__/navbar.test.tsx` - harness: unit suite - rollback: revert rewrites
 
