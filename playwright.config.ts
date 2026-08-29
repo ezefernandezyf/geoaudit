@@ -13,10 +13,10 @@ import { defineConfig, devices } from "@playwright/test";
  * - Retries: 2 in CI, 0 locally. Trace on first retry, screenshot on failure
  *   only — the `playwright-report/` HTML is uploaded by the CI job (E2E-7).
  *
- * Skipping secret-gated flows (E2E-3/4/5): the signup, Stripe and PDF specs
+ * Skipping secret-gated flows (E2E-3/5): the signup and PDF specs
  * use the project's skip-if-no-env pattern (see src/lib/__tests__/prisma.test.ts
  * describe.skip) — they call `test.skip(!env, msg)` and CI stays green without
- * secrets.
+ * secrets. (Sprint 10 removed the Stripe checkout spec, E2E-4.)
  *
  * Note on the rate limiter (RTL): the free audit Server Action enforces a
  * fixed 5 req / 60s window per client key. The audit specs run against real

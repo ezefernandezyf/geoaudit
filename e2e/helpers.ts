@@ -1,9 +1,10 @@
 import { expect, type Page } from "@playwright/test";
 
 /**
- * Shared E2E helpers (sprint 8, C12 — signup/Stripe/PDF flows).
+ * Shared E2E helpers (sprint 8, C12 — signup/PDF flows; sprint 10 removed the
+ * Stripe checkout spec, E2E-4).
  *
- * The signup, Stripe and PDF specs need a REAL authenticated GitHub session:
+ * The signup and PDF specs need a REAL authenticated GitHub session:
  * NextAuth v5 signs in through GitHub OAuth, so there is no way to mock the
  * session in the browser (the JWT cookie + the Prisma-backed user row are
  * server-side). Following the project's skip-if-no-env pattern (see
