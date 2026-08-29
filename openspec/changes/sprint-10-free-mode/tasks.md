@@ -43,10 +43,10 @@ Chain strategy: feature-branch-chain
 
 ## WU-5: Landing, Copy, Deploy - PR 5 - ~170 lines - test: `pnpm test && pnpm run lint && pnpm run typecheck && pnpm run build` - harness: live smoke `geoaudit-tau.vercel.app` - rollback: revert config/env
 
-- [ ] 5.1 `page.tsx` (+test): `auth()`; CTA dashboard/"Auditar gratis"; no teaser - LND-6
-- [ ] 5.2 `copy.ts`: limit 3->10; delete checkout/pricing copy - TLM-5
-- [ ] 5.3 `.env.example`/`ci.yml`/README/AGENTS/config.yaml: drop Stripe refs
-- [ ] 5.4 `package.json`: add `build:vercel` (generate + migrate deploy + build) - DPV-2
-- [ ] 5.5 `e2e/pdf-download.spec.ts`: drop PRO skip - E2E-5
-- [ ] 5.6 Full gate: test + lint + typecheck + build
-- [ ] 5.7 Vercel env/Build Command/OAuth callback; smoke audit+login+PDF - DPV-1/3/4
+- [x] 5.1 `page.tsx` (+test): `auth()`; CTA dashboard/"Auditar gratis"; no teaser - LND-6
+- [x] 5.2 `copy.ts`: limit 3->10; delete checkout/pricing copy - TLM-5
+- [x] 5.3 `.env.example`/`ci.yml`/README/AGENTS/config.yaml: drop Stripe refs
+- [x] 5.4 `package.json`: add `build:vercel` (generate + migrate deploy + build) - DPV-2
+- [x] 5.5 `e2e/pdf-download.spec.ts`: drop PRO skip - E2E-5
+- [x] 5.6 Full gate: test + lint + typecheck + build
+- [x] 5.7 Vercel env/Build Command/OAuth callback; smoke audit+login+PDF - DPV-1/3/4 (repo-side: `build:vercel` + pasos manuales documentados en PR; smoke en vivo = orquestador post-deploy)
