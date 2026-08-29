@@ -4,21 +4,19 @@ import { notFound, redirect } from "next/navigation";
 import AuditDetailPage from "@/app/dashboard/audits/[id]/page";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
-const { authMock, findFirstMock, userFindUniqueMock, auditPageFindManyMock } =
-  vi.hoisted(() => ({
-    authMock: vi.fn(),
-    findFirstMock: vi.fn(),
-    userFindUniqueMock: vi.fn(),
-    auditPageFindManyMock: vi.fn(),
-  }));
+const { authMock, findFirstMock, auditPageFindManyMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  findFirstMock: vi.fn(),
+  auditPageFindManyMock: vi.fn(),
+}));
 
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 // Read-only page (ADP-3): the mocked audit delegate exposes ONLY findFirst, so
-// any write/re-run call the page (or its imports) attempted would throw.
+// any write/re-run call the page (or its imports) attempted would throw. The
+// tier lookup is absent: no gate exists (ADP-7/8 removed).
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findFirst: findFirstMock },
-    user: { findUnique: userFindUniqueMock },
     auditPage: { findMany: auditPageFindManyMock },
   },
 }));
@@ -50,9 +48,6 @@ beforeEach(() => {
   authMock.mockResolvedValue({ user: { id: "user-1" } });
   findFirstMock.mockReset();
   findFirstMock.mockResolvedValue(auditRow);
-  userFindUniqueMock.mockReset();
-  // Default: PRO — the share + export actions render (ADP-7/8); FREE tests override.
-  userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
   auditPageFindManyMock.mockReset();
   // Default: no AuditPage rows (single-page audit path is unaffected).
   auditPageFindManyMock.mockResolvedValue([]);
@@ -64,8 +59,8 @@ beforeEach(() => {
  * U5.9 — Audit detail page (ADP-6/7/8, design U5). `/dashboard/audits/[id]`
  * renders the persisted report through the shared `<AuditReport>` (adapter at
  * the boundary, Gemini composition) plus the Gemini action bar: ShareModal
- * with the real share actions and the real Export PDF download — both gated
- * by `requirePaidTier`.
+ * with the real share actions and the real Export PDF download — available to
+ * every authenticated owner (ADP-7/8, no tier gate).
  */
 describe("AuditDetailPage (ADP-1/ADP-2)", () => {
   it("queries the audit by id scoped to the session user", async () => {
@@ -289,27 +284,22 @@ describe("AuditDetailPage multi-page drill-down (A3, MPU-7/8)", () => {
   });
 });
 
-describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
-  it("shows the upgrade CTA for a FREE user — no share modal, no export link", async () => {
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
+describe("AuditDetailPage share + export (ADP-7/8)", () => {
+  it("renders share + export for every authenticated owner — no tier lookup (ADP-7/8)", async () => {
+    render(await AuditDetailPage({ params }));
 
-    const { container } = render(await AuditDetailPage({ params }));
-
-    const cta = screen.getByRole("link", { name: "Mejorar a PRO" });
-    expect(cta).toHaveAttribute("href", "/pricing");
     expect(
-      screen.queryByRole("button", { name: "Compartir reporte" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Compartir reporte" }),
+    ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "Exportar PDF" }),
+      screen.getByRole("link", { name: "Exportar PDF" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Mejorar a PRO" }),
     ).not.toBeInTheDocument();
-    // B9: the PRO-gate card uses direct hex classes, never semantic tokens.
-    expect(container.innerHTML).not.toMatch(
-      /text-navy|bg-navy|bg-surface(?!-)|text-text-secondary|font-display|border-border|bg-surface-muted/,
-    );
   });
 
-  it("PRO user: share trigger opens the Gemini modal with the real create action (ADP-7)", async () => {
+  it("owner: share trigger opens the Gemini modal with the real create action (ADP-7)", async () => {
     render(await AuditDetailPage({ params }));
 
     expect(
@@ -326,7 +316,7 @@ describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
     expect(screen.getByText("Compartir Reporte Público")).toBeInTheDocument();
   });
 
-  it("PRO user with a token: modal shows the public link, revoke and social intents", async () => {
+  it("owner with a token: modal shows the public link, revoke and social intents", async () => {
     findFirstMock.mockResolvedValue({ ...auditRow, shareToken: "tok-9" });
 
     render(await AuditDetailPage({ params }));
@@ -347,11 +337,11 @@ describe("AuditDetailPage PRO gates (ADP-7/8, TLM-9)", () => {
     ).toHaveAttribute("href", "/share/tok-9");
   });
 
-  it("PRO user: Export PDF links to the real PRO-gated PDF route (ADP-8)", async () => {
+  it("owner: Export PDF links to the ownership-gated PDF route (ADP-8)", async () => {
     render(await AuditDetailPage({ params }));
 
     const exportLink = screen.getByRole("link", { name: "Exportar PDF" });
-    // The PDF route itself re-checks ownership + tier (PDF-2/3).
+    // The PDF route itself re-checks ownership (PDF-2); there is no tier gate.
     expect(exportLink).toHaveAttribute("href", "/api/report/audit-1/pdf");
   });
 });

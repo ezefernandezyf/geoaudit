@@ -1,14 +1,11 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Layers, Lock } from "lucide-react";
+import { Layers } from "lucide-react";
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { requirePaidTier } from "@/lib/audit/feature-gate";
 import { multiPageAuditAction } from "@/lib/audit/multi-page-actions";
 import { MultiPageForm } from "@/report/multi-page-form";
 import { MultiPageReport } from "@/report/multi-page-report";
-import { Card } from "@/ui/card";
 import { MULTIPAGE_COPY } from "@/lib/copy";
 
 /**
@@ -25,15 +22,12 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
 }
 
 /**
- * Multi-page trigger page (U6.2, MPU-1/2/4/5, design U6).
+ * Multi-page trigger page (U6.2, MPU-1/4/5, design U6).
  *
- * force-dynamic + nodejs: per-user tier + result lookup via Prisma.
+ * force-dynamic + nodejs: per-user result lookup via Prisma.
  *
- * PRO gate (MPU-2): the tier is read from the DB and fed through the SAME
- * `requirePaidTier` the Server Action uses. FREE users see the upgrade CTA and
- * NEVER get the form (the action is never reachable from this page). PRO/
- * ENTERPRISE get the real `MultiPageForm` wired to `multiPageAuditAction`
- * (MPU-1).
+ * No tier gate (MPU-2 removed): every authenticated user gets the real
+ * `MultiPageForm` wired to `multiPageAuditAction` (MPU-1).
  *
  * Real data (MPU-4/5): below the form, the most recent multi-page audit result
  * renders the Gemini route-selector + inspector (`MultiPageReport`) — an honest
@@ -49,24 +43,15 @@ export default async function MultiPagePage() {
     redirect("/login");
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { tier: true },
-  });
-  const gate = requirePaidTier(user?.tier ?? "FREE");
-
   // Latest multi-page result for the real-data selector + inspector (MPU-4).
-  let latestMultiPage: MultiPageResult | null = null;
-  if (gate.allowed) {
-    const recent = await prisma.audit.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: { result: true },
-    });
-    const found = recent.map((r) => r.result).find(isMultiPageResult);
-    latestMultiPage = found ?? null;
-  }
+  const recent = await prisma.audit.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+    select: { result: true },
+  });
+  const latestMultiPage =
+    recent.map((r) => r.result).find(isMultiPageResult) ?? null;
 
   return (
     <main className="min-h-dvh bg-[#f8fafc]">
@@ -84,51 +69,24 @@ export default async function MultiPagePage() {
           </p>
         </div>
 
-        {!gate.allowed ? (
-          /* MPU-2: FREE users see the upgrade CTA, never the form. */
-          <Card>
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2">
-                <Lock className="h-4 w-4 text-[#10b981]" aria-hidden="true" />
-                <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
-                  {MULTIPAGE_COPY.gate.title}
-                </h2>
-              </div>
-              <p className="text-sm text-[#475569]">
-                {MULTIPAGE_COPY.gate.body}
-              </p>
-              <div>
-                <Link
-                  href="/pricing"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2"
-                >
-                  {MULTIPAGE_COPY.gate.cta}
-                </Link>
-              </div>
-            </div>
-          </Card>
-        ) : (
-          <>
-            {/* MPU-1: the real action is injected from this RSC page. */}
-            <div className="rounded-xl border border-[#e2e8f0] bg-white p-5 shadow-sm sm:p-6">
-              <MultiPageForm action={multiPageAuditAction} />
-            </div>
+        {/* MPU-1: the real action is injected from this RSC page. */}
+        <div className="rounded-xl border border-[#e2e8f0] bg-white p-5 shadow-sm sm:p-6">
+          <MultiPageForm action={multiPageAuditAction} />
+        </div>
 
-            {/* MPU-4/5: real-data route selector + inspector. */}
-            {latestMultiPage ? (
-              <MultiPageReport result={latestMultiPage} />
-            ) : (
-              <div className="flex flex-col items-start gap-3 rounded-xl border border-[#e2e8f0] bg-white p-6">
-                <Layers className="h-5 w-5 text-[#94a3b8]" aria-hidden="true" />
-                <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
-                  {MULTIPAGE_COPY.results.emptyTitle}
-                </h2>
-                <p className="text-sm text-[#475569]">
-                  {MULTIPAGE_COPY.results.emptyBody}
-                </p>
-              </div>
-            )}
-          </>
+        {/* MPU-4/5: real-data route selector + inspector. */}
+        {latestMultiPage ? (
+          <MultiPageReport result={latestMultiPage} />
+        ) : (
+          <div className="flex flex-col items-start gap-3 rounded-xl border border-[#e2e8f0] bg-white p-6">
+            <Layers className="h-5 w-5 text-[#94a3b8]" aria-hidden="true" />
+            <h2 className="font-serif text-xl tracking-tight text-[#0f172a]">
+              {MULTIPAGE_COPY.results.emptyTitle}
+            </h2>
+            <p className="text-sm text-[#475569]">
+              {MULTIPAGE_COPY.results.emptyBody}
+            </p>
+          </div>
         )}
       </div>
     </main>
