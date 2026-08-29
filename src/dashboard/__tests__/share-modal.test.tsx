@@ -6,10 +6,10 @@ import type { ShareLinkAction } from "@/lib/audit/share-actions";
 
 /**
  * U5.9 — ShareModal (ADP-7, design U5): Gemini modal verbatim over the REAL
- * share actions (injected as props, the BillingCta → CheckoutButton pattern):
- * create/revoke via the two Server Actions, copy to clipboard, real share
- * intents (X / LinkedIn / WhatsApp) and the public-view link. PRO-gated by
- * the page (the page only renders it when gate.allowed).
+ * share actions (injected as props): create/revoke via the two Server
+ * Actions, copy to clipboard, real share intents (X / LinkedIn / WhatsApp)
+ * and the public-view link. No tier gate — every authenticated owner shares
+ * (SHR-3).
  */
 
 const okCreate: ShareLinkAction = async () => ({
@@ -184,10 +184,10 @@ describe("ShareModal revoke flow (real action)", () => {
 });
 
 describe("ShareModal error + close (ADP-7)", () => {
-  it("renders the action error with role=alert (TLM-9: FREE denied)", async () => {
+  it("renders the action error with role=alert", async () => {
     const deniedCreate: ShareLinkAction = async () => ({
       shareToken: null,
-      error: "upgrade",
+      error: "failed",
       revoked: false,
     });
     renderModal({ createAction: deniedCreate });
@@ -196,7 +196,7 @@ describe("ShareModal error + close (ADP-7)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Activar enlace" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      SHARE_MODAL_ERROR_COPY.upgrade,
+      SHARE_MODAL_ERROR_COPY.failed,
     );
   });
 

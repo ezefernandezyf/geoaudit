@@ -3,10 +3,9 @@
 import { randomUUID } from "node:crypto";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { requirePaidTier } from "@/lib/audit/feature-gate";
 
 /**
- * Share-link Server Actions (SHR-1/3/4, TLM-9, design D4/D7).
+ * Share-link Server Actions (SHR-1/3/4, design D4).
  *
  * Both actions follow the `(prevState, formData)` `"use server"` contract and
  * return a `ShareLinkState` for `useActionState` — failures are returned as an
@@ -17,17 +16,16 @@ import { requirePaidTier } from "@/lib/audit/feature-gate";
  * with the D2 scoped `findFirst { id, userId }`, so a missing or non-owned
  * audit collapses to the same `"not-found"` error (no existence leak).
  *
- * CREATE (SHR-3): ownership → PRO gate (`requirePaidTier`, D7 — the same
- * enforcement point the UI and routes use) → `randomUUID()` (D4, node:crypto)
- * → `update({ shareToken })`. A FREE user is denied with `"upgrade"` BEFORE
- * any write (TLM-9).
+ * CREATE (SHR-3): ownership → `randomUUID()` (D4, node:crypto) → `update({
+ * shareToken })`. There is no tier gate — every authenticated owner creates
+ * the link (SHR-3).
  *
  * REVOKE (SHR-4): ownership → `update({ shareToken: null })` — nulling is
  * instant revocation; the public `/share/[token]` then 404s (SHR-6).
  */
 
 /** Error codes returned instead of thrown, mapped to copy in the panel. */
-export type ShareLinkErrorCode = "auth" | "not-found" | "upgrade" | "failed";
+export type ShareLinkErrorCode = "auth" | "not-found" | "failed";
 
 /**
  * State consumed by useActionState. `revoked` discriminates a SUCCESSFUL
@@ -56,9 +54,9 @@ function auditIdFrom(formData: FormData): string {
 
 /**
  * Creates a revocable public share link (SHR-3): generates a `randomUUID()`
- * (D4) and persists it on the owned audit. FREE users get `"upgrade"` and no
- * DB write (TLM-9). Returns the token; the panel builds the `/share/[token]`
- * URL client-side from the current origin.
+ * (D4) and persists it on the owned audit. No tier gate — every authenticated
+ * owner can create the link. Returns the token; the panel builds the
+ * `/share/[token]` URL client-side from the current origin.
  */
 export async function createShareToken(
   _prev: ShareLinkState,
@@ -73,16 +71,6 @@ export async function createShareToken(
   });
   if (!audit) return { shareToken: null, error: "not-found", revoked: false };
 
-  // PRO gate (TLM-9, D7): single enforcement point — the UI shows the CTA via
-  // the same requirePaidTier, so the action is authoritative and they agree.
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { tier: true },
-  });
-  const gate = requirePaidTier(user?.tier ?? "FREE");
-  if (!gate.allowed)
-    return { shareToken: null, error: "upgrade", revoked: false };
-
   const token = randomUUID();
   await prisma.audit.update({
     where: { id: audit.id },
@@ -95,7 +83,7 @@ export async function createShareToken(
 /**
  * Revokes a share link (SHR-4): nulls `shareToken` for the owner — the token
  * is gone, so the public page 404s (SHR-6). No tier gate: removing access is
- * always allowed for the owner (creation is the gated operation, TLM-9).
+ * always allowed for the owner.
  */
 export async function revokeShareToken(
   _prev: ShareLinkState,

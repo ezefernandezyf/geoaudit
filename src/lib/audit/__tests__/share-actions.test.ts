@@ -5,20 +5,16 @@ import {
   type ShareLinkState,
 } from "@/lib/audit/share-actions";
 
-const { authMock, findFirstMock, updateMock, userFindUniqueMock } = vi.hoisted(
-  () => ({
-    authMock: vi.fn(),
-    findFirstMock: vi.fn(),
-    updateMock: vi.fn(),
-    userFindUniqueMock: vi.fn(),
-  }),
-);
+const { authMock, findFirstMock, updateMock } = vi.hoisted(() => ({
+  authMock: vi.fn(),
+  findFirstMock: vi.fn(),
+  updateMock: vi.fn(),
+}));
 
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findFirst: findFirstMock, update: updateMock },
-    user: { findUnique: userFindUniqueMock },
   },
 }));
 
@@ -53,21 +49,19 @@ beforeEach(() => {
   authMock.mockReset();
   findFirstMock.mockReset();
   updateMock.mockReset();
-  userFindUniqueMock.mockReset();
   authMock.mockResolvedValue({ user: { id: "user-1" } });
   findFirstMock.mockResolvedValue(auditRow);
-  userFindUniqueMock.mockResolvedValue({ tier: "PRO" });
   updateMock.mockResolvedValue({ ...auditRow, shareToken: "tok" });
 });
 
 /**
- * U2.3/U2.4 — share-link Server Actions (SHR-1/3/4, TLM-9, design D4/D7).
+ * U2.3/U2.4 — share-link Server Actions (SHR-1/3/4, design D4).
  *
  * `createShareToken` / `revokeShareToken` take `(prevState, formData)` (the
  * `"use server"` action contract); the audit id travels in the form while the
  * USER id always comes from the session (never from the client). Ownership is
- * enforced with the D2 scoped `findFirst { id, userId }`; creation is gated
- * by `requirePaidTier` (D7) — FREE never reaches the DB write.
+ * enforced with the D2 scoped `findFirst { id, userId }`; there is no tier
+ * gate (SHR-3: any authenticated owner creates a link).
  */
 describe("createShareToken (SHR-3)", () => {
   it("rejects an unauthenticated request before any DB access", async () => {
@@ -96,20 +90,7 @@ describe("createShareToken (SHR-3)", () => {
     expect(updateMock).not.toHaveBeenCalled();
   });
 
-  it("denies a FREE owner with the upgrade error and never writes (TLM-9)", async () => {
-    userFindUniqueMock.mockResolvedValue({ tier: "FREE" });
-
-    const state = await createShareToken(prevState, formWithAudit("audit-1"));
-
-    expect(state).toEqual({
-      shareToken: null,
-      error: "upgrade",
-      revoked: false,
-    });
-    expect(updateMock).not.toHaveBeenCalled();
-  });
-
-  it("generates a random UUID and persists it as shareToken for PRO (SHR-1)", async () => {
+  it("generates a random UUID and persists it as shareToken for any owner (SHR-1)", async () => {
     const state = await createShareToken(prevState, formWithAudit("audit-1"));
 
     expect(UUID_RE.test(state.shareToken ?? "")).toBe(true);
@@ -125,16 +106,6 @@ describe("createShareToken (SHR-3)", () => {
     const second = await createShareToken(prevState, formWithAudit("audit-2"));
 
     expect(first.shareToken).not.toBe(second.shareToken);
-  });
-
-  it("allows ENTERPRISE too (TLM-9)", async () => {
-    userFindUniqueMock.mockResolvedValue({ tier: "ENTERPRISE" });
-
-    const state = await createShareToken(prevState, formWithAudit("audit-1"));
-
-    expect(updateMock).toHaveBeenCalled();
-    expect(state.error).toBeNull();
-    expect(UUID_RE.test(state.shareToken ?? "")).toBe(true);
   });
 });
 
