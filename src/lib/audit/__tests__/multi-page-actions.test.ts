@@ -27,8 +27,6 @@ const persistMultiPageAuditMock = vi.mocked(persistMultiPageAudit);
 const transactionMock = vi.mocked(prisma.$transaction) as unknown as Mock<
   (...args: unknown[]) => Promise<unknown>
 >;
-/** Kept in the prisma mock ONLY to assert the tier lookup is never consulted. */
-const userFindUniqueMock = vi.mocked(prisma.user.findUnique);
 
 const { limiterMock } = vi.hoisted(() => ({
   limiterMock: {

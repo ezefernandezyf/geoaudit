@@ -33,9 +33,8 @@ type MultiPageFormProps = {
  * `/dashboard/audits/[id]`. MPU-3: each `MultiPageErrorCode` maps to neutral
  * Spanish copy (MULTIPAGE_COPY.errors) rendered with `role="alert"`.
  *
- * The PRO gate (MPU-2) lives in the RSC page via `requirePaidTier` — FREE users
- * see the upgrade CTA and this form is not rendered, so no gate is duplicated
- * here.
+ * There is no tier gate (MPU-2 removed): the form renders for every
+ * authenticated user; the limit check lives in the Server Action (TLM-3).
  */
 export function MultiPageForm({ action }: MultiPageFormProps) {
   const [serverState, formAction, isPending] = useActionState(

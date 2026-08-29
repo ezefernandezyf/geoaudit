@@ -14,8 +14,6 @@ import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
  * structural, so the whole flow is unit-tested with plain mocks — no real DB.
  */
 
-const NOW = 1_750_000_000_000;
-
 function auditResultFor(url: string, geoScore: number): AuditResult {
   return {
     ...auditResultFixture,
