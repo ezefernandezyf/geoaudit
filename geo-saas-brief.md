@@ -553,6 +553,8 @@ Docker Compose
 
 ## 17. Milestones & Timeline
 
+> **⚠️ ACTUALIZADO 2026-08-30**: El plan original (Sprints 0-7) se completó y superó. El roadmap VIVO está en `docs/SPRINT-ROADMAP.md` — este §17 queda como referencia histórica del plan original. Decisiones que cambiaron la realidad: producto renombrado a **Relevy** (`relevy.app`), Vercel Free sin monetización (Stripe eliminado en Sprint 10), monetización diferida hasta validar tracción, Cloudflare diferida. Próximos: Sprint 11 = Rebrand & Polish · Sprint 12 = Brand Authority · Sprint 13 = Launch.
+
 ### Sprint 0 — Setup & Scaffold (Week 1)
 - [ ] `create-next-app` con App Router, TypeScript, Tailwind, ESLint, Prettier
 - [ ] Configurar Prisma + Supabase PostgreSQL
