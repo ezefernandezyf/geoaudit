@@ -11,11 +11,15 @@ import { defineConfig } from "prisma/config";
  *   auto-load `.env`, so this file imports `dotenv/config` and reads the URL
  *   lazily: `prisma generate` keeps working when DATABASE_URL is unset (CI
  *   has no secrets), while `migrate` fails loudly without it.
+ * - Migrations prefer `DIRECT_DATABASE_URL` (session pooler, port 5432 +
+ *   `pgbouncer=true`): Prisma Migrate hangs on the transaction pooler (6543),
+ *   which is only suitable for runtime queries. `DATABASE_URL` remains the
+ *   runtime connection and the CLI fallback.
  */
 export default defineConfig({
   schema: "prisma/schema.prisma",
   datasource: {
-    url: process.env.DATABASE_URL,
+    url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL,
   },
   migrations: {
     path: "prisma/migrations",
