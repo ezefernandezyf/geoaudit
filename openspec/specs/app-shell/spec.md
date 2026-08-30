@@ -1,17 +1,17 @@
 # App Shell Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page. Since Sprint 8, the shell copy (navbar links, user actions, footer text) is neutral Spanish (usted), centralized in `copy.ts`, and free of voseo/tuteo forms (SHL-6).
+The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page. Since Sprint 8, the shell copy (navbar links, user actions, footer text) is neutral Spanish (usted), centralized in `copy.ts`, and free of voseo/tuteo forms (SHL-6). Since Sprint 10, the plan pill is static "Free" for every user (no tier-dependent pill).
 
 ## Requirements
 
 | # | Requirement | Status | Strength | Summary |
 |---|-------------|--------|----------|---------|
 | SHL-1 | Active nav states | New | MUST | Navbar MUST highlight the active route |
-| SHL-2 | Plan pill | New | MUST | Navbar MUST show the user's plan pill |
+| SHL-2 | Plan pill | New | MUST | Navbar MUST show a static "Free" plan pill for every user |
 | SHL-3 | User chip | New | MUST | Navbar MUST show a user chip with identity/logout |
 | SHL-4 | Logo | New | MUST | Navbar MUST render the new logo + wordmark |
 | SHL-5 | Footer links | New | MUST | Footer MUST link to terms/privacy |
@@ -30,13 +30,13 @@ When the navbar renders, then it MUST visually mark the link corresponding to th
 
 ### Requirement: Plan Pill (SHL-2)
 
-When an authenticated user is signed in, then the navbar MUST show a plan pill reflecting their tier (`Free`/`Pro`/`Enterprise`).
+When an authenticated user is signed in, then the navbar MUST show a plan pill reading "Free" for every user. There is no tier-dependent pill.
 
 #### Scenario: Plan pill shown
 
-- GIVEN a PRO user
+- GIVEN an authenticated user
 - WHEN the navbar renders
-- THEN a "Pro" plan pill is visible
+- THEN a "Free" plan pill is visible
 
 ### Requirement: User Chip (SHL-3)
 

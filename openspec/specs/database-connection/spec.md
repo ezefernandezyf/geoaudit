@@ -1,6 +1,6 @@
 # Database Connection Specification
 
-> **Change**: `sprint-2-free-audit-flow` + `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-2-free-audit-flow` + `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
@@ -13,10 +13,9 @@ Define the database connectivity layer for GeoAudit. The system must connect to 
 | R1 | Prisma connectivity | MUST | PrismaClient singleton must connect to the DATABASE_URL PostgreSQL instance |
 | R2 | Configuration validation | MUST | Missing DATABASE_URL must produce a clear, actionable error |
 | R3 | Graceful startup | SHOULD | Application startup SHOULD NOT crash if the database is unreachable at boot |
-| R4 | Schema baseline | MUST | Prisma schema must define the Sprint 3 data models (`User`, `Account`, `Session`, `VerificationToken`, `Audit`, `RateLimitEntry`) plus the Sprint 4 `Subscription` model, `SubscriptionStatus` enum, and `Tier.ENTERPRISE`, plus the Sprint 5 `AuditPage` model and `Audit.shareToken`, and a migration must apply them to Supabase |
+| R4 | Schema baseline | MUST | Prisma schema must define `User`, `Account`, `Session`, `VerificationToken`, `Audit`, `AuditPage`, and `RateLimitEntry`; MUST NOT contain `Subscription`, `StripeWebhookEvent`, `SubscriptionStatus`, or `Tier`; a down-migration must drop the billing models/enums and `User.tier`/`User.subscription` |
 | R5 | Audit model | MUST | `Audit` must store the full result JSON per authenticated audit with a nullable unique `shareToken`, indexed by user and creation time |
 | R6 | RateLimitEntry model | MUST | `RateLimitEntry` must be keyed by `(key, windowStart)` with a `count`, supporting atomic UPSERT |
-| R7 | Subscription model | MUST | `Subscription` 1:1 `User` with billing + monthly-counter fields |
 | R8 | AuditPage model | MUST | `AuditPage` MUST be 1:N with `Audit` (one master + N pages) |
 
 ### Requirement: Prisma Connectivity (R1)
@@ -60,19 +59,21 @@ The application SHOULD start even when the database is unreachable.
 
 ### Requirement: Schema Baseline (R4)
 
-The system MUST contain a Prisma schema with the Sprint 3 data models (`User`, `Account`, `Session`, `VerificationToken`, `Audit`, `RateLimitEntry`), the Sprint 4 `Subscription` model, the `SubscriptionStatus` enum, `Tier` extended with `ENTERPRISE`, and the Sprint 5 additions (`AuditPage` model, `Audit.shareToken`), with a migration that applies them to Supabase.
+The system MUST contain a Prisma schema with the data models `User`, `Account`, `Session`, `VerificationToken`, `Audit`, `AuditPage`, and `RateLimitEntry`, with a migration that applies them to Supabase. The schema MUST NOT contain `Subscription`, `StripeWebhookEvent`, the `SubscriptionStatus` enum, or the `Tier` enum. A down-migration MUST drop those billing models/enums and the `User.tier`/`User.subscription` columns.
 
 #### Scenario: Migration applies cleanly
 
 - GIVEN `DATABASE_URL` resolves to the Supabase instance
-- WHEN `pnpm run prisma:migrate` runs the first migration
-- THEN all models are created without errors
+- WHEN `pnpm run prisma:migrate` runs the migration
+- THEN all non-billing models are created without errors
 
-#### Scenario: Sprint 5 migration applies
+#### Scenario: Down-migration drops billing schema
 
-- GIVEN `DATABASE_URL` resolves to the Supabase instance
-- WHEN `pnpm run prisma:migrate` runs the Sprint 5 migration
-- THEN the `AuditPage` table and `Audit.shareToken` column are created without errors
+- GIVEN a database with the Sprint 4 billing schema applied
+- WHEN the Sprint 10 down-migration runs
+- THEN `Subscription` and `StripeWebhookEvent` tables are dropped
+- AND the `Tier` and `SubscriptionStatus` enums are dropped
+- AND `User.tier` and `User.subscription` columns are removed
 
 #### Scenario: Schema generation succeeds
 
@@ -106,16 +107,6 @@ The system MUST define a `RateLimitEntry` model keyed by `(key, windowStart)` wi
 - GIVEN a `RateLimitEntry` for `(key, windowStart)`
 - WHEN the limiter increments the key
 - THEN the count is updated atomically without a read-modify-write race
-
-### Requirement: Subscription Model (R7)
-
-The system MUST define a `Subscription` model in 1:1 relation with `User` carrying `stripeCustomerId` (unique), `stripeSubscriptionId` (nullable), `plan` (typed as `Tier`), `status` (typed as `SubscriptionStatus`), `currentPeriodEnd` (nullable), `auditsUsed` (default 0), and `auditsResetAt` (nullable).
-
-#### Scenario: Subscription links to user
-
-- GIVEN the migrated schema
-- WHEN a `Subscription` row is created
-- THEN it references exactly one `User` and `stripeCustomerId` is unique
 
 ### Requirement: AuditPage Model (R8)
 

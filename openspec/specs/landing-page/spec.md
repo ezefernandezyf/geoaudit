@@ -1,10 +1,10 @@
 # Landing Page Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8).
+The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis").
 
 ## Requirements
 
@@ -15,7 +15,7 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-3 | Scorecard demo | New | MUST | Demo ScoreHero + band table MUST use the real 90/75/60/40 thresholds |
 | LND-4 | Six platforms | New | MUST | The page MUST surface the six AI platforms |
 | LND-5 | GEO Engine badge | New | MUST | Hero MUST show the "GEO Engine" badge |
-| LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else keep plan CTA |
+| LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else signup/audit CTA; no pricing teaser |
 | LND-7 | Veracious ScoreHero | New | MUST | ScoreHero MUST show verified score + `auditDate` + `categoryScores` (no placeholder) |
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
 | LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD via `application/ld+json` |
@@ -81,7 +81,7 @@ When the hero renders, then it MUST show a "GEO Engine" badge above/beside the h
 
 ### Requirement: Authenticated CTA (LND-6)
 
-When the Home page renders, then it MUST call `auth()` (making Home dynamic) and adapt the CTA: with an active session the CTA reads "Ir al dashboard", and without a session it keeps "Ver planes y precios".
+When the Home page renders, then it MUST call `auth()` (making Home dynamic) and adapt the CTA: with an active session the CTA reads "Ir al dashboard", and without a session it reads a signup/audit CTA (e.g. "Auditar gratis"). There is no pricing teaser or "Ver Planes" CTA.
 
 #### Scenario: Logged-in user sees dashboard CTA
 
@@ -89,11 +89,12 @@ When the Home page renders, then it MUST call `auth()` (making Home dynamic) and
 - WHEN Home renders
 - THEN the primary CTA reads "Ir al dashboard"
 
-#### Scenario: Anonymous visitor sees plans CTA
+#### Scenario: Anonymous visitor sees audit CTA
 
 - GIVEN no session
 - WHEN Home renders
-- THEN the primary CTA reads "Ver planes y precios"
+- THEN the primary CTA reads a signup/audit CTA (e.g. "Auditar gratis")
+- AND no pricing link is present
 
 ### Requirement: Veracious ScoreHero (LND-7)
 
@@ -172,7 +173,7 @@ When the landing renders, then it MUST surface trust and authority signals: lega
 | LND-3 | Real thresholds shown | Covered |
 | LND-4 | Six platform logos/names | Covered |
 | LND-5 | Badge visible | Covered |
-| LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees plans CTA | Covered |
+| LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees audit CTA | Covered |
 | LND-7 | Verified evidence shown, No candidate reaches 90+ | Covered |
 | LND-8 | OG + Twitter tags present | Covered |
 | LND-9 | Organization + WebSite present | Covered |

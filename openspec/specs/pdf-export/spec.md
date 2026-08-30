@@ -1,10 +1,10 @@
 # PDF Export Specification
 
-> **Change**: `sprint-5-pro-features` · **Type**: New capability (ADDED)
+> **Change**: `sprint-5-pro-features` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Generate a client-ready PDF of a persisted audit report via `GET /api/report/[id]/pdf`. The `src/pdf/` domain renders an HTML template with the design-system tokens and self-hosted fonts through `puppeteer-core` + `@sparticuz/chromium-min`, with `printBackground: true` so navy/emerald/amber/red print correctly. The route enforces ownership and PRO tier.
+Generate a client-ready PDF of a persisted audit report via `GET /api/report/[id]/pdf`. The `src/pdf/` domain renders an HTML template with the design-system tokens and self-hosted fonts through `puppeteer-core` + `@sparticuz/chromium-min`, with `printBackground: true` so navy/emerald/amber/red print correctly. The route enforces ownership; every authenticated audit owner can export (no tier gate since Sprint 10).
 
 ## Requirements
 
@@ -12,13 +12,12 @@ Generate a client-ready PDF of a persisted audit report via `GET /api/report/[id
 |---|-------------|--------|----------|---------|
 | PDF-1 | PDF route | New | MUST | `GET /api/report/[id]/pdf` MUST return the audit's PDF |
 | PDF-2 | Ownership gate | New | MUST | Only the audit owner MUST be able to export; others get 404 |
-| PDF-3 | Tier gate | New | MUST | PDF export MUST be gated to PRO/Enterprise |
 | PDF-4 | Render pipeline | New | MUST | Use `puppeteer-core` + `@sparticuz/chromium-min` to render HTML→PDF |
 | PDF-5 | Self-hosted fonts | New | MUST | Fonts MUST be self-hosted in `public/fonts/` via `@font-face` |
 | PDF-6 | Print fidelity | New | MUST | `printBackground: true` so navy/emerald/amber/red print |
 | PDF-7 | Response contract | New | MUST | Response MUST be `application/pdf` with a download filename |
 | PDF-8 | Bundle config | New | MUST | `serverExternalPackages` + `outputFileTracingIncludes` trace chromium + fonts |
-| PDF-9 | Error states | New | MUST | Missing/non-owner/FREE/render-failure MUST return typed errors |
+| PDF-9 | Error states | New | MUST | Missing/non-owner/render-failure MUST return typed errors |
 
 ### Requirement: PDF Route (PDF-1)
 
@@ -39,16 +38,6 @@ When the PDF route runs, then the system MUST verify the requester owns the audi
 - GIVEN audit `123` owned by user A
 - WHEN user B requests its PDF
 - THEN the route returns 404 and no PDF is produced
-
-### Requirement: Tier Gate (PDF-3)
-
-When the PDF route runs, then the system MUST allow only PRO/Enterprise (`isPaidTier`) and MUST deny FREE users.
-
-#### Scenario: FREE user denied
-
-- GIVEN a FREE user who owns audit `123`
-- WHEN they request its PDF
-- THEN the route returns an upgrade/denied response and no PDF is produced
 
 ### Requirement: Render Pipeline (PDF-4)
 
@@ -104,13 +93,19 @@ When the PDF route is built for serverless deployment, then `next.config.ts` MUS
 
 ### Requirement: Error States (PDF-9)
 
-When the PDF route encounters a failure, then it MUST return typed errors rather than throwing uncaught exceptions.
+When the PDF route encounters a failure, then it MUST return typed errors rather than throwing uncaught exceptions. Error cases are: missing audit, non-owner, and render failure.
 
 #### Scenario: Missing audit 404
 
 - GIVEN audit id `999` does not exist
 - WHEN its PDF is requested
 - THEN the route returns 404
+
+#### Scenario: Non-owner blocked
+
+- GIVEN audit `123` owned by user A
+- WHEN user B requests its PDF
+- THEN the route returns 404 and no PDF is produced
 
 #### Scenario: Render failure
 

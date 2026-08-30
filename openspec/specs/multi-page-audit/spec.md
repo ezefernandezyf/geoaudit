@@ -1,10 +1,10 @@
 # Multi-Page Audit Specification
 
-> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Audit up to 5 pages of a site in one run, driven by sitemap discovery, and persist the result as one master `Audit` plus N `AuditPage` rows. Multi-page reuses the single-page `runAudit` per URL, bounds concurrency to 2–3, and relaxes the fetch layer's content-type gate (`RFL-8`) to accept `application/xml` for sitemap probes only. One multi-page audit counts as exactly one audit toward the tier limit, and the feature is gated to PRO/Enterprise. Since Sprint 7, the multi-page report presentation is a Gemini-styled presenter of the real `MultiPageResult`. The orchestration, persistence, tier counting, and PRO gate (MPA-1..MPA-9) are unchanged; the delta only covers the report page rendering (aggregate + per-page list) with honest data derivation.
+Audit up to 5 pages of a site in one run, driven by sitemap discovery, and persist the result as one master `Audit` plus N `AuditPage` rows. Multi-page reuses the single-page `runAudit` per URL, bounds concurrency to 2–3, and relaxes the fetch layer's content-type gate (`RFL-8`) to accept `application/xml` for sitemap probes only. One multi-page audit counts as exactly one audit toward the FREE limit, and the feature is available to every authenticated user (no tier gate since Sprint 10). Since Sprint 7, the multi-page report presentation is a Gemini-styled presenter of the real `MultiPageResult`. The orchestration, persistence, and limit counting (MPA-1..MPA-11) are unchanged by the Sprint 10 gate lift.
 
 ## Requirements
 
@@ -16,15 +16,14 @@ Audit up to 5 pages of a site in one run, driven by sitemap discovery, and persi
 | MPA-4 | Sitemap discovery | MUST | URLs MUST be discovered from `RobotsTxt.sitemaps` and/or `/sitemap.xml` |
 | MPA-5 | Sitemap content-type gate | MUST | Relax `RFL-8` to accept `application/xml` for sitemap probes only |
 | MPA-6 | AuditPage 1:N persistence | MUST | Persist one master `Audit` + N `AuditPage` rows (1:N) |
-| MPA-7 | One audit toward tier | MUST | One multi-page audit MUST count as exactly one audit toward the tier limit |
-| MPA-8 | PRO feature gate | MUST | Multi-page MUST be gated to PRO/Enterprise; FREE sees an upgrade CTA |
+| MPA-7 | One audit toward limit | MUST | One multi-page audit MUST count as exactly one audit toward the FREE limit |
 | MPA-9 | Single-page preservation | MUST | Single-page `runAudit` behavior MUST remain unchanged |
 | MPA-10 | Multi-page report presenter | MUST | The multi-page report MUST render from the real `MultiPageResult` in Gemini style |
 | MPA-11 | Per-page data honesty | MUST | Per-page rows MUST derive citability + durationMs; omit non-existent metrics |
 
 ### Requirement: Multi-page Orchestration (MPA-1)
 
-When a paid user runs a multi-page audit, then the system MUST invoke `runMultiPageAudit`, which audits each discovered page by reusing the single-page `runAudit` and returns one composite result with per-page results and an aggregate view.
+When an authenticated user runs a multi-page audit, then the system MUST invoke `runMultiPageAudit`, which audits each discovered page by reusing the single-page `runAudit` and returns one composite result with per-page results and an aggregate view.
 
 #### Scenario: Composite result assembled
 
@@ -97,31 +96,15 @@ When a multi-page audit completes, then the system MUST persist one master `Audi
 - THEN one `Audit` row and four `AuditPage` rows are written
 - AND each `AuditPage` references the master `Audit`
 
-### Requirement: One Audit Toward Tier (MPA-7)
+### Requirement: One Audit Toward Limit (MPA-7)
 
-When a multi-page audit is counted against the user's tier, then it MUST count as exactly one audit.
+When a multi-page audit is counted against the user's limit, then it MUST count as exactly one audit.
 
 #### Scenario: Multi-page counts once
 
-- GIVEN a PRO user runs a 5-page multi-page audit
-- WHEN the tier counter is updated
-- THEN `auditsUsed` increments by one, not five
-
-### Requirement: PRO Feature Gate (MPA-8)
-
-When an authenticated user attempts a multi-page audit, then the system MUST allow it only when `isPaidTier(user.tier)` is true; otherwise it MUST deny and show an upgrade CTA.
-
-#### Scenario: FREE user is blocked
-
-- GIVEN a `FREE` user
-- WHEN they attempt a multi-page audit
-- THEN the audit is denied with an upgrade CTA
-
-#### Scenario: PRO user is allowed
-
-- GIVEN a PRO user
-- WHEN they attempt a multi-page audit
-- THEN the multi-page audit proceeds
+- GIVEN an authenticated user runs a 5-page multi-page audit
+- WHEN the limit counter is updated
+- THEN the 30-day window increments by one, not five
 
 ### Requirement: Single-page Preservation (MPA-9)
 
@@ -164,7 +147,6 @@ When per-page rows render, then they MUST derive their values from real fields (
 | MPA-5 | XML sitemap accepted | Covered |
 | MPA-6 | Rows persisted 1:N | Covered |
 | MPA-7 | Multi-page counts once | Covered |
-| MPA-8 | FREE user is blocked, PRO user is allowed | Covered |
 | MPA-9 | Existing single-page tests stay green | Covered |
 | MPA-10 | Aggregate + pages rendered | Covered |
 | MPA-11 | Non-existent metrics omitted | Covered |

@@ -1,10 +1,10 @@
 # E2E Testing Specification
 
-> **Change**: `sprint-8-polish-testing-backlog` · **Type**: New capability (ADDED)
+> **Change**: `sprint-8-polish-testing-backlog` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-End-to-end testing with Playwright from scratch: config + `e2e` script + browsers, four critical flows (free audit, signup, Stripe test checkout, PDF download), mobile viewports, and a CI job. Stripe checkout uses test secrets and skips when env vars are absent.
+End-to-end testing with Playwright from scratch: config + `e2e` script + browsers, three critical flows (free audit, signup, PDF download), mobile viewports, and a CI job. Since Sprint 10, the Stripe test checkout flow (E2E-4) is removed with the billing capability, and the PDF flow is exercised as a FREE flow for any authenticated user.
 
 ## Requirements
 
@@ -13,8 +13,7 @@ End-to-end testing with Playwright from scratch: config + `e2e` script + browser
 | E2E-1 | Playwright setup | New | MUST | @playwright/test + playwright.config.ts + `e2e` script + browsers installed |
 | E2E-2 | Free audit flow | New | MUST | Anonymous URL input → report page renders |
 | E2E-3 | Signup flow | New | MUST | GitHub signup → authenticated dashboard |
-| E2E-4 | Stripe test checkout | New | MUST | Pro checkout with test secrets; skip-if-no-env |
-| E2E-5 | PDF download flow | New | MUST | Report PDF generation/download |
+| E2E-5 | PDF download flow | New | MUST | Report PDF generation/download for an authenticated user (no tier gate) |
 | E2E-6 | Mobile viewports | New | MUST | Tests run at mobile viewports; report/multipage reviewed at mobile |
 | E2E-7 | CI E2E job | New | MUST | GitHub Actions job runs the Playwright suite |
 
@@ -48,29 +47,13 @@ When a new user signs up, then the E2E flow MUST complete GitHub signup and land
 - WHEN signup completes
 - THEN the user is redirected to `/dashboard`
 
-### Requirement: Stripe Test Checkout (E2E-4)
-
-When a paid flow is exercised, then the E2E flow MUST drive Stripe test checkout using test secrets, and MUST skip itself (not fail) when those env vars are absent.
-
-#### Scenario: Checkout with test secrets
-
-- GIVEN Stripe test secrets are set
-- WHEN a Pro upgrade is initiated
-- THEN the Stripe test checkout completes
-
-#### Scenario: Skip when secrets absent
-
-- GIVEN Stripe test secrets are NOT set
-- WHEN the checkout spec runs
-- THEN it is skipped (skip-if-no-env), not failed
-
 ### Requirement: PDF Download Flow (E2E-5)
 
-When a report PDF is requested, then the E2E flow MUST trigger generation and assert the download.
+When a report PDF is requested, then the E2E flow MUST trigger generation and assert the download for an authenticated user (no tier gate).
 
 #### Scenario: PDF downloads
 
-- GIVEN a completed audit
+- GIVEN a completed audit owned by an authenticated user
 - WHEN the user requests the PDF
 - THEN the PDF file downloads successfully
 
@@ -101,7 +84,6 @@ When a PR is opened, then a GitHub Actions job MUST install browsers and run the
 | E2E-1 | Config + script present | Covered |
 | E2E-2 | Anonymous audit end-to-end | Covered |
 | E2E-3 | Signup lands on dashboard | Covered |
-| E2E-4 | Checkout with test secrets, Skip when secrets absent | Covered |
 | E2E-5 | PDF downloads | Covered |
 | E2E-6 | Mobile layout exercised | Covered |
 | E2E-7 | E2E runs in CI | Covered |

@@ -1,5 +1,7 @@
 # Auth (GitHub OAuth) Specification
 
+> **Change**: `sprint-0-setup-scaffold` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+
 ## Purpose
 
 Define the authentication skeleton for GeoAudit using NextAuth v5 with GitHub as the sole OAuth provider during Sprint 0. The setup must be minimal — configuration, a route handler, and middleware — without a user database or session persistence yet.
@@ -81,7 +83,7 @@ The system MUST persist GitHub sign-ups and sign-ins via `@auth/prisma-adapter`,
 
 - GIVEN a user signs in with GitHub for the first time
 - WHEN the OAuth callback completes
-- THEN a `User` row is created with tier `FREE`
+- THEN a `User` row is created
 - AND an `Account` row is linked to that user
 - AND no `Session` row is written (JWT sessions are stateless)
 

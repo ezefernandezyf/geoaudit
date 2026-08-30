@@ -1,10 +1,10 @@
 # Audit Detail Page Specification
 
-> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-First dynamic route in the app: `/dashboard/audits/[id]` renders a single persisted audit's report. It enforces ownership (non-owner or missing audit → 404), renders the persisted `Audit.result` without re-running, and reuses the report UI by extracting a shared `<AuditReport result>` component from `src/report/audit-runner.tsx` so the detail page and the `/report` page render from one source of truth. Since Sprint 7, the detail page is restyled to Gemini's composition: findings with code snippets (only from real sources), the Gemini-style share modal, and an Export PDF button gated to PRO. The ownership/404 and no-rerun contract (ADP-1..ADP-5) is unchanged.
+First dynamic route in the app: `/dashboard/audits/[id]` renders a single persisted audit's report. It enforces ownership (non-owner or missing audit → 404), renders the persisted `Audit.result` without re-running, and reuses the report UI by extracting a shared `<AuditReport result>` component from `src/report/audit-runner.tsx` so the detail page and the `/report` page render from one source of truth. Since Sprint 7, the detail page is restyled to Gemini's composition: findings with code snippets (only from real sources), the Gemini-style share modal, and an Export PDF button. Since Sprint 10, the share modal and Export PDF button are ungated: every audit owner can share and export (no tier gate). The ownership/404 and no-rerun contract (ADP-1..ADP-5) is unchanged.
 
 ## Requirements
 
@@ -16,8 +16,8 @@ First dynamic route in the app: `/dashboard/audits/[id]` renders a single persis
 | ADP-4 | Shared AuditReport | MUST | Extract shared `<AuditReport result>` from `audit-runner.tsx` |
 | ADP-5 | Single source of truth | MUST | Detail page and `/report` MUST render from the same `AuditReport` |
 | ADP-6 | Findings with code | MUST | Findings MUST render code snippets only from real sources (e.g. generated JSON-LD) |
-| ADP-7 | Share modal (Gemini) | MUST | The share modal MUST be restyled to Gemini and keep the real share actions |
-| ADP-8 | Export PDF button | MUST | An "Export PDF" button MUST be shown, gated to PRO via `requirePaidTier` |
+| ADP-7 | Share modal (Gemini) | MUST | The share modal MUST be restyled to Gemini and keep the real share actions; no tier gate |
+| ADP-8 | Export PDF button | MUST | An "Export PDF" button MUST be shown and available to every audit owner |
 
 ### Requirement: Dynamic Route (ADP-1)
 
@@ -93,29 +93,29 @@ When the detail findings render, then they MUST include code snippets only where
 
 ### Requirement: Share Modal (Gemini) — ADP-7
 
-When the share modal renders, then it MUST be restyled to Gemini (neutral copy, Gemini hex) while still invoking the real `createShareToken`/`revokeShareToken` actions and enforcing the PRO gate.
+When the share modal renders, then it MUST be restyled to Gemini (neutral copy, Gemini hex) while still invoking the real `createShareToken`/`revokeShareToken` actions. There is no tier gate.
 
 #### Scenario: Modal uses real actions
 
-- GIVEN a PRO user opens the share modal
+- GIVEN an authenticated user opens the share modal
 - WHEN they activate share
 - THEN `createShareToken` runs and the public link is shown
 
 ### Requirement: Export PDF Button (ADP-8)
 
-When the detail page renders, then it MUST show an "Export PDF" button that is gated to PRO/Enterprise via `requirePaidTier`; a FREE user sees the upgrade CTA.
+When the detail page renders, then it MUST show an "Export PDF" button that is available to every audit owner. There is no tier gate.
 
-#### Scenario: PRO can export
+#### Scenario: Owner can export
 
-- GIVEN a PRO user on the detail page
+- GIVEN an authenticated audit owner on the detail page
 - WHEN it renders
 - THEN the "Export PDF" button is enabled
 
-#### Scenario: FREE sees CTA
+#### Scenario: Non-owner blocked
 
-- GIVEN a FREE user on the detail page
-- WHEN it renders
-- THEN the export is gated with an upgrade CTA
+- GIVEN a user viewing another user's audit
+- WHEN the detail page renders for that audit
+- THEN the export is not available (ownership 404 applies)
 
 ## Compliance Matrix
 
@@ -128,4 +128,4 @@ When the detail page renders, then it MUST show an "Export PDF" button that is g
 | ADP-5 | Both pages share the component | Covered |
 | ADP-6 | Code from real source, No fabricated code | Covered |
 | ADP-7 | Modal uses real actions | Covered |
-| ADP-8 | PRO can export, FREE sees CTA | Covered |
+| ADP-8 | Owner can export, Non-owner blocked | Covered |

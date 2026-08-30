@@ -1,10 +1,10 @@
 # Share Links Specification
 
-> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-5-pro-features` + `sprint-7-ui-fidelity` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Let a PRO/Enterprise user share a read-only, public report via a revocable token. `Audit.shareToken` is a nullable unique `randomUUID()`; setting it creates a public `/share/[token]` link that renders the persisted result without re-running the audit; nulling it revokes the link. The public page exposes the report only — never `userId`, email, or tier. Since Sprint 7, the public share page is restyled to Gemini's composition: a "Verificado" pill, the share token ID display, and a footer CTA inviting the visitor to run their own audit. The revocable-token contract (SHR-1..SHR-6) is unchanged.
+Let an authenticated user share a read-only, public report via a revocable token. `Audit.shareToken` is a nullable unique `randomUUID()`; setting it creates a public `/share/[token]` link that renders the persisted result without re-running the audit; nulling it revokes the link. The public page exposes the report only — never `userId`, email, or account data. Since Sprint 7, the public share page is restyled to Gemini's composition: a "Verificado" pill, the share token ID display, and a footer CTA inviting the visitor to run their own audit. Since Sprint 10, share-link creation is FREE for every authenticated user (no tier gate).
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Let a PRO/Enterprise user share a read-only, public report via a revocable token
 |---|-------------|----------|---------|
 | SHR-1 | shareToken column | MUST | `Audit.shareToken` MUST be a nullable unique `String` (`randomUUID`) |
 | SHR-2 | Public route | MUST | `/share/[token]` MUST render the persisted result without re-running |
-| SHR-3 | Create link | MUST | PRO/Enterprise MUST be able to create a share link |
+| SHR-3 | Create link | MUST | Any authenticated user MUST be able to create a share link |
 | SHR-4 | Revoke link | MUST | Nulling `shareToken` MUST revoke the link |
 | SHR-5 | Data exposure isolation | MUST | Public page MUST expose report only, never private fields |
 | SHR-6 | Missing token 404 | MUST | Missing/null/unknown token MUST render 404 |
@@ -44,19 +44,13 @@ When a request hits `/share/[token]` with a valid token, then the system MUST re
 
 ### Requirement: Create Link (SHR-3)
 
-When a PRO or Enterprise user shares an audit, then the system MUST create a `shareToken` and present the public link.
+When an authenticated user shares an audit, then the system MUST create a `shareToken` and present the public link. There is no tier gate.
 
-#### Scenario: Paid user creates link
+#### Scenario: Authenticated user creates link
 
-- GIVEN a PRO user with an audit
+- GIVEN an authenticated user with an audit
 - WHEN they activate "share"
 - THEN a `shareToken` is generated and the `/share/[token]` link is shown
-
-#### Scenario: FREE user blocked
-
-- GIVEN a FREE user
-- WHEN they attempt to share an audit
-- THEN the action is denied with an upgrade CTA
 
 ### Requirement: Revoke Link (SHR-4)
 
@@ -70,13 +64,13 @@ When a user revokes a share link, then the system MUST null `shareToken`, making
 
 ### Requirement: Data Exposure Isolation (SHR-5)
 
-When the public share page renders, then the system MUST expose the report content only and MUST NOT expose `userId`, email, tier, or billing data.
+When the public share page renders, then the system MUST expose the report content only and MUST NOT expose `userId`, email, or any account data.
 
 #### Scenario: No private fields leaked
 
 - GIVEN a valid shared report
 - WHEN the public page renders
-- THEN the report renders but `userId`, email, and tier are absent from the payload
+- THEN the report renders but `userId` and email are absent from the payload
 
 ### Requirement: Missing Token 404 (SHR-6)
 
@@ -124,7 +118,7 @@ When the public share page renders, then it MUST include a footer CTA inviting t
 |-------------|-----------|----------|
 | SHR-1 | Token is nullable unique | Covered |
 | SHR-2 | Zero re-run | Covered |
-| SHR-3 | Paid user creates link, FREE user blocked | Covered |
+| SHR-3 | Authenticated user creates link | Covered |
 | SHR-4 | Revoked token 404s | Covered |
 | SHR-5 | No private fields leaked | Covered |
 | SHR-6 | Unknown token | Covered |

@@ -1,17 +1,17 @@
 # Accessibility Specification
 
-> **Change**: `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` · **Type**: New capability (ADDED) + Delta (ADDED)
+> **Change**: `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Automated accessibility coverage with jest-axe asserting WCAG 2.2 AA on the main pages (landing, report, dashboard, pricing, auth), covering contrast, landmarks, roles, and focus order.
+Automated accessibility coverage with jest-axe asserting WCAG 2.2 AA on the main pages (landing, report, dashboard, auth), covering contrast, landmarks, roles, and focus order.
 
 ## Requirements
 
 | # | Requirement | Status | Strength | Summary |
 |---|-------------|--------|----------|---------|
 | A11Y-1 | jest-axe integration | New | MUST | jest-axe installed + configured in the test setup |
-| A11Y-2 | WCAG 2.2 AA on main pages | New | MUST | axe runs on landing/report/dashboard/pricing/auth pages |
+| A11Y-2 | WCAG 2.2 AA on main pages | New | MUST | axe runs on landing/report/dashboard/auth pages |
 | A11Y-3 | Color contrast | New | MUST | Contrast violations MUST be caught (or documented with justification) |
 | A11Y-4 | Landmarks | New | MUST | Main/landmark regions MUST be asserted per page |
 | A11Y-5 | Focus management | New | MUST | Visible focus + logical order MUST be asserted |
@@ -29,7 +29,7 @@ When the test suite runs, then `jest-axe` MUST be installed and wired into the t
 
 ### Requirement: WCAG 2.2 AA on Main Pages (A11Y-2)
 
-When the accessibility suite runs, then it MUST assert WCAG 2.2 AA compliance on the main pages: landing, report, dashboard, pricing, and auth.
+When the accessibility suite runs, then it MUST assert WCAG 2.2 AA compliance on the main pages: landing, report, dashboard, and auth.
 
 #### Scenario: Main pages scanned
 
@@ -69,7 +69,7 @@ When the accessibility suite runs, then it MUST assert a visible focus indicator
 
 ### Requirement: Audit Fixes Batch (A11Y-6)
 
-The codebase MUST apply the four one-line accessibility fixes identified by the audit: an `aria-progressbar-name` on the score bar, contrast corrections on affected UI, and `label-content-name-mismatch` fixes on the navbar/pricing controls.
+The codebase MUST apply the four one-line accessibility fixes identified by the audit: an `aria-progressbar-name` on the score bar, contrast corrections on affected UI, and `label-content-name-mismatch` fixes on the navbar controls.
 
 #### Scenario: Progress bar is named
 
@@ -79,7 +79,7 @@ The codebase MUST apply the four one-line accessibility fixes identified by the 
 
 #### Scenario: Contrast and label mismatches resolved
 
-- GIVEN the pricing cards and navbar controls
+- GIVEN the navbar controls
 - WHEN axe scans them
 - THEN no contrast violation and no `label-content-name-mismatch` violation remain
 
