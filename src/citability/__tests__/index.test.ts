@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { load } from "cheerio";
-import { scorePage, toContractResult } from "@/citability/index";
+import {
+  scorePage,
+  toContractResult,
+  type CitabilityPageResult,
+} from "@/citability/index";
 import { suggestRewrites } from "@/citability/rewrite";
 import { citabilityResultSchema } from "@/lib/contracts/audit-result";
 
@@ -117,5 +121,69 @@ describe("scorePage edge cases (RCI-14)", () => {
     expect(result.blocks.length).toBeGreaterThan(0);
     expect(result.pageScore).toBeGreaterThanOrEqual(0);
     expect(result.pageScore).toBeLessThanOrEqual(100);
+  });
+});
+
+/**
+ * RCI-10 (sprint 11 fix): bottom3 MUST be derived from the blocks NOT in
+ * top3, so the two lists are disjoint on every page size — including pages
+ * with 3, 4 or 5 blocks where the old independent sorts overlapped.
+ */
+describe("RCI-10 disjoint top3/bottom3", () => {
+  /** Asserts no block appears in both lists. */
+  function assertDisjoint(result: CitabilityPageResult): void {
+    const topIds = new Set(result.top3.map((summary) => summary.id));
+    for (const summary of result.bottom3) {
+      expect(topIds.has(summary.id)).toBe(false);
+    }
+  }
+
+  /** Asserts every scored block lands in exactly one of the two lists. */
+  function expectComplement(result: CitabilityPageResult): void {
+    const topIds = new Set(result.top3.map((summary) => summary.id));
+    const bottomIds = new Set(result.bottom3.map((summary) => summary.id));
+    for (const entry of result.blocks) {
+      expect(topIds.has(entry.block.id)).not.toBe(
+        bottomIds.has(entry.block.id),
+      );
+    }
+  }
+
+  it("returns disjoint 3+3 on a long page with 8 blocks", () => {
+    const result = scorePage(page("page-eight-blocks.html"));
+    expect(result.top3).toHaveLength(3);
+    expect(result.bottom3).toHaveLength(3);
+    assertDisjoint(result);
+    // No block id repeats across the union of the two lists.
+    const combined = [...result.top3, ...result.bottom3].map((b) => b.id);
+    expect(new Set(combined).size).toBe(combined.length);
+    // Ordering is preserved: top3 best-first, bottom3 worst-first.
+    const topComposites = result.top3.map((b) => b.composite);
+    expect([...topComposites].sort((a, b) => b - a)).toEqual(topComposites);
+    const bottomComposites = result.bottom3.map((b) => b.composite);
+    expect([...bottomComposites].sort((a, b) => a - b)).toEqual(
+      bottomComposites,
+    );
+  });
+
+  it("returns 3 top + 2 bottom disjoint on a genuine 5-block page", () => {
+    const result = scorePage(page("page-five-sections.html"));
+    expect(result.top3).toHaveLength(3);
+    expect(result.bottom3).toHaveLength(2);
+    expectComplement(result);
+  });
+
+  it("returns 3 top + 1 bottom disjoint on a 4-block page", () => {
+    const result = scorePage(page("page-four-blocks.html"));
+    expect(result.top3).toHaveLength(3);
+    expect(result.bottom3).toHaveLength(1);
+    expectComplement(result);
+  });
+
+  it("returns 3 top + 0 bottom on a 3-block page — fewer shown, never repeated", () => {
+    const result = scorePage(page("page-three-blocks.html"));
+    expect(result.top3).toHaveLength(3);
+    expect(result.bottom3).toHaveLength(0);
+    expectComplement(result);
   });
 });

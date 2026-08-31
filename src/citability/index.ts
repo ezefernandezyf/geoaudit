@@ -95,11 +95,22 @@ export function scorePage($: CheerioAPI): CitabilityPageResult {
   const coverage =
     scored.length > 0 ? Math.round((covered / scored.length) * 100) : 0;
 
+  // RCI-10 (sprint 11 fix): the bottom 3 are derived from the blocks NOT in
+  // the top 3, so the two lists are always disjoint. With fewer than 3
+  // non-overlapping blocks remaining the bottom list is simply shorter —
+  // never a repeated top block.
+  const top3 = [...scored].sort(byTop).slice(0, 3);
+  const top3Ids = new Set(top3.map((entry) => entry.block.id));
+  const bottom3 = scored
+    .filter((entry) => !top3Ids.has(entry.block.id))
+    .sort(byBottom)
+    .slice(0, 3);
+
   return {
     pageScore,
     coverage,
-    top3: [...scored].sort(byTop).slice(0, 3).map(toSummary),
-    bottom3: [...scored].sort(byBottom).slice(0, 3).map(toSummary),
+    top3: top3.map(toSummary),
+    bottom3: bottom3.map(toSummary),
     suggestions: suggestRewrites(scored),
     blocks: scored,
   };
