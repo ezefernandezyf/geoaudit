@@ -25,7 +25,7 @@ import { renderPdf } from "@/pdf/render";
  *   (chromium-min, PDF-4/6). PDF-9/threat matrix: a failure is ALWAYS a typed
  *   `PdfRenderError` (render.ts) mapped to 5xx here — never an uncaught throw.
  * - PDF-7 response: `application/pdf` + `Content-Disposition` attachment
- *   filename `geo-audit-{id}.pdf`.
+ *   filename `relevy-{id}.pdf`.
  */
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -69,7 +69,7 @@ export async function GET(_request: Request, { params }: PdfRouteContext) {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="geo-audit-${id}.pdf"`,
+      "Content-Disposition": `attachment; filename="relevy-${id}.pdf"`,
       "Content-Length": String(pdf.byteLength),
     },
   });

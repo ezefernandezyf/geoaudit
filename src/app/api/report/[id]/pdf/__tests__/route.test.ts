@@ -10,7 +10,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
  * - PDF-2: ownership via `findFirst({ id, userId })` — non-owner and missing
  *   collapse to null → 404 (same D2 pattern as the detail page).
  * - PDF-7: success → `application/pdf` + `Content-Disposition` attachment
- *   filename `geo-audit-{id}.pdf`.
+ *   filename `relevy-{id}.pdf`.
  * - PDF-9/threat: a `renderPdf` rejection (typed `PdfRenderError`) becomes a
  *   5xx — never an uncaught exception; unauth → 401 typed.
  * - No tier gate (PDF-3 removed): every authenticated owner exports the PDF.
@@ -115,7 +115,7 @@ describe("GET /api/report/[id]/pdf (PDF-7 response contract)", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("application/pdf");
     expect(res.headers.get("content-disposition")).toBe(
-      'attachment; filename="geo-audit-audit-1.pdf"',
+      'attachment; filename="relevy-audit-1.pdf"',
     );
     expect(new Uint8Array(await res.arrayBuffer())).toEqual(
       new Uint8Array(PDF_BYTES),
