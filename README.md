@@ -1,10 +1,12 @@
-# GeoAudit
+# Relevy
 
 Micro-SaaS de auditoría GEO (Generative Engine Optimization) y SEO para visibilidad en motores de búsqueda con IA. Ingrese una URL y obtenga un GEO Score de 0 a 100 con un reporte completo de AI visibility en ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot.
 
+El repositorio vive en [github.com/ezefernandezyf/relevy](https://github.com/ezefernandezyf/relevy) (renombrado manualmente desde `geo-saas`; el alias redirige).
+
 ## Qué hace
 
-GeoAudit analiza un sitio web en cinco dimensiones y entrega un score compuesto ponderado:
+Relevy analiza un sitio web en cinco dimensiones y entrega un score compuesto ponderado:
 
 | Dimensión | Peso (v2.0.0) | Qué evalúa |
 | --------- | ------------- | ---------- |

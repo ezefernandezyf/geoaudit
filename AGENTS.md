@@ -1,4 +1,4 @@
-# GeoAudit — Agent Context
+# Relevy — Agent Context
 
 > Micro-SaaS de auditoría GEO/SEO automatizada. Ingresá una URL → GEO Score 0-100 + reporte completo de AI visibility (ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews, Bing Copilot).
 
@@ -49,6 +49,8 @@
 - Cero sobreingeniería. Cero complejidad sin justificación explícita. "Clear over clever."
 
 ## Git Workflow (STRICT — zero exceptions)
+
+**Repo**: renombrado manualmente a `relevy` en GitHub ([github.com/ezefernandezyf/relevy](https://github.com/ezefernandezyf/relevy)); el checkout local puede conservar el nombre `geo-saas` y el alias redirige. `geoaudit` no debe reaparecer como marca visible en ningún artefacto nuevo.
 
 1. **`develop`** = rama de integración (fuente de verdad en desarrollo). **`main`** = release estable: SOLO versiones 100% estables, se mergea `develop → main` al completar cada sprint/milestone.
 2. **Feature branches**: cada tarea arranca en una branch nueva desde `develop`: `feat/short-name`, `fix/short-name`, `chore/short-name`
