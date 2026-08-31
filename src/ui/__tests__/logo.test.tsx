@@ -3,30 +3,32 @@ import { describe, expect, it } from "vitest";
 import { Logo } from "@/ui/logo";
 
 /**
- * U1.8 — Logo (DNF-12): SVG inline mark (serif G + emerald wave + globe) with
- * the "GeoAudit" wordmark. Full variant renders the wordmark; mark-only
- * (favicon / compact) renders just the SVG.
+ * SHL-4 (sprint 11 rebrand) — Logo: user-generated Relevy mark (two stylized
+ * quote paths, navy + emerald, no tile) with the "Relevy" wordmark in
+ * Instrument Serif. Full variant renders the wordmark; mark-only (favicon /
+ * compact) renders just the SVG. The "AI Visibility Audit" tagline is gone
+ * (brief §3: no tagline).
  */
-describe("Logo (DNF-12)", () => {
+describe("Logo (SHL-4)", () => {
   it("renders the mark with an accessible label", () => {
     render(<Logo />);
-    expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Relevy" })).toBeInTheDocument();
   });
 
-  it("renders the GeoAudit wordmark by default", () => {
+  it("renders the Relevy wordmark by default", () => {
     render(<Logo />);
-    expect(screen.getByText("GeoAudit")).toBeInTheDocument();
+    expect(screen.getByText("Relevy")).toBeInTheDocument();
   });
 
-  it("renders the AI Visibility Audit tagline by default", () => {
+  it("does not render the AI Visibility Audit tagline (brief §3)", () => {
     render(<Logo />);
-    expect(screen.getByText("AI Visibility Audit")).toBeInTheDocument();
+    expect(screen.queryByText("AI Visibility Audit")).not.toBeInTheDocument();
   });
 
   it("omits the wordmark in mark-only variant", () => {
     render(<Logo showWordmark={false} />);
-    expect(screen.queryByText("GeoAudit")).not.toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
+    expect(screen.queryByText("Relevy")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Relevy" })).toBeInTheDocument();
   });
 
   it("applies an explicit size", () => {
@@ -36,17 +38,21 @@ describe("Logo (DNF-12)", () => {
     expect(svg).toHaveAttribute("height", "48");
   });
 
-  it("keeps the mark minimal for small sizes (A7): navy tile + emerald serif G", () => {
+  it("keeps the quote mark minimal for small sizes (A7): two quote paths, no tile", () => {
     const { container } = render(<Logo showWordmark={false} />);
     const svg = container.querySelector("svg");
-    expect(svg?.querySelector("rect")).toHaveAttribute("fill", "#0f172a");
-    // The G is a vector PATH (not <text>): text nodes leak into a parent
-    // link's textContent and break axe label-content-name-mismatch (WU-4).
-    const g = svg?.querySelector("path");
-    expect(g).not.toBeNull();
-    expect(g).toHaveAttribute("fill", "#10b981");
-    // The fine wave path and globe were removed for 16x16/32x32 readability.
-    expect(svg?.querySelectorAll("path").length).toBe(1);
+    // The user mark is two quote paths without a navy tile: no <rect>.
+    expect(svg?.querySelector("rect")).toBeNull();
     expect(svg?.querySelector("circle")).toBeNull();
+    const paths = svg?.querySelectorAll("path");
+    expect(paths).toHaveLength(2);
+    // Quote 1 is navy and flips to white in dark mode (functional contract of
+    // the user's mark, not decorative styling).
+    const navyClass = paths?.[0].getAttribute("class") ?? "";
+    expect(navyClass).toContain("fill-[#0f172a]");
+    expect(navyClass).toContain("dark:fill-white");
+    // Quote 2 is the emerald accent.
+    const emeraldClass = paths?.[1].getAttribute("class") ?? "";
+    expect(emeraldClass).toContain("fill-[#10b981]");
   });
 });

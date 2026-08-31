@@ -27,9 +27,10 @@ describe("Navbar (SHL-2/3/4)", () => {
   it("shows the new logo and wordmark", () => {
     render(<Navbar />);
     // The SVG mark is decorative inside the brand link (the link owns the
-    // accessible name, WU-4) — assert the visible wordmark + tagline.
-    expect(screen.getByText("GeoAudit")).toBeInTheDocument();
-    expect(screen.getByText("AI Visibility Audit")).toBeInTheDocument();
+    // accessible name, WU-4) — assert the visible Relevy wordmark; the
+    // "AI Visibility Audit" tagline is gone (brief §3, SHL-4).
+    expect(screen.getByText("Relevy")).toBeInTheDocument();
+    expect(screen.queryByText("AI Visibility Audit")).not.toBeInTheDocument();
   });
 
   it("links Producto to /", () => {

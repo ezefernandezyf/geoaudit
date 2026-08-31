@@ -348,7 +348,7 @@ describe("landing page metadata (LND-8)", () => {
     expect(landingMetadata.openGraph).toMatchObject({
       title: "Auditoría de visibilidad en motores de IA",
       url: "/",
-      siteName: "GeoAudit",
+      siteName: "Relevy",
       type: "website",
       images: [{ url: "/og.png", width: 1200, height: 630 }],
     });

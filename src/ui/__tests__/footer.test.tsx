@@ -11,7 +11,7 @@ import { Footer } from "@/ui/footer";
 describe("Footer (SHL-5)", () => {
   it("shows the product logo", () => {
     render(<Footer />);
-    expect(screen.getByRole("img", { name: "GeoAudit" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Relevy" })).toBeInTheDocument();
   });
 
   it("links Inicio, Términos and Privacidad", () => {

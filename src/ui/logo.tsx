@@ -1,9 +1,12 @@
 /**
- * GeoAudit logo (DNF-12, U1.8, A7 sprint 8): SVG inline mark — serif "G" in a
- * navy tile with the emerald glyph — plus the "GeoAudit" wordmark. Two
- * variants: full (navbar/login/footer) and mark-only (favicon / compact
- * spots). The fine wave and globe details were removed (A7) so the mark stays
- * legible at favicon sizes (16x16/32x32).
+ * Relevy logo (SHL-4, sprint 11 rebrand): user-generated mark from the brand
+ * brief (docs/RELEVY-BRAND-BRIEF.md) — two stylized quote paths evoking
+ * "being cited", navy + emerald accent, no tile. Wordmark "Relevy" in
+ * Instrument Serif; the "AI Visibility Audit" tagline is dropped (brief §3:
+ * no tagline). Full variant renders mark + wordmark; mark-only
+ * (showWordmark=false) renders just the SVG (favicon / compact spots).
+ * The API {size, showWordmark, className, decorative} is unchanged so the
+ * navbar/footer/login call sites keep working.
  */
 export function Logo({
   size = 32,
@@ -15,7 +18,7 @@ export function Logo({
   showWordmark?: boolean;
   className?: string;
   /** aria-hidden the SVG mark: use inside a link that already carries its own
-   *  accessible name (navbar brand, WU-4) so the mark's "GeoAudit" label does
+   *  accessible name (navbar brand, WU-4) so the mark's "Relevy" label does
    *  not leak into the link's visible text (label-content-name-mismatch). */
   decorative?: boolean;
 }) {
@@ -24,34 +27,27 @@ export function Logo({
       <svg
         width={size}
         height={size}
-        viewBox="0 0 40 40"
+        viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         role={decorative ? undefined : "img"}
-        aria-label={decorative ? undefined : "GeoAudit"}
+        aria-label={decorative ? undefined : "Relevy"}
         aria-hidden={decorative || undefined}
       >
-        {/* Navy tile */}
-        <rect width="40" height="40" rx="10" fill="#0f172a" />
-        {/* Serif G in brand emerald — VECTOR PATH (not <text>): a <text> node
-            leaks its glyph into the parent link's textContent even when
-            aria-hidden, breaking axe label-content-name-mismatch on the
-            navbar brand link (WU-4). The path carries no text at all. */}
-        <g transform="translate(10 10) scale(0.8333)">
-          <path
-            d="M11,7A2,2 0 0,0 9,9V15A2,2 0 0,0 11,17H13A2,2 0 0,0 15,15V13H13V15H11V9H17V7H11Z"
-            fill="#10b981"
-          />
-        </g>
+        {/* Quote 1 (navy → white in dark mode) */}
+        <path
+          d="M5 11h8v8c0 4.418-3.582 8-8 8v-4c2.209 0 4-1.791 4-4H5v-8z"
+          className="fill-[#0f172a] dark:fill-white"
+        />
+        {/* Quote 2 (emerald accent) */}
+        <path
+          d="M19 5h8v8c0 4.418-3.582 8-8 8v-4c2.209 0 4-1.791 4-4h-4V5z"
+          className="fill-[#10b981]"
+        />
       </svg>
       {showWordmark ? (
-        <span className="flex flex-col leading-none">
-          <span className="font-serif italic tracking-tighter text-xl text-[#0f172a]">
-            GeoAudit
-          </span>{" "}
-          <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-[#475569]">
-            AI Visibility Audit
-          </span>
+        <span className="font-serif text-2xl leading-none text-[#0f172a] dark:text-white">
+          Relevy
         </span>
       ) : null}
     </span>
