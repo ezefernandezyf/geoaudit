@@ -1,10 +1,10 @@
 # Landing Page Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis").
+The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10).
 
 ## Requirements
 
@@ -18,8 +18,8 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else signup/audit CTA; no pricing teaser |
 | LND-7 | Veracious ScoreHero | New | MUST | ScoreHero MUST show verified score + `auditDate` + `categoryScores` (no placeholder) |
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
-| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD via `application/ld+json` |
-| LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt |
+| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo |
+| LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt (Relevy brand, `relevy.app`, accurate 10/30d limit) |
 | LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats |
 | LND-12 | E-E-A-T signals | New | MUST | Landing MUST surface author/org trust signals (legal links, contact, HTTPS) |
 
@@ -126,23 +126,31 @@ When the landing page renders, then it MUST emit OpenGraph and Twitter card meta
 
 ### Requirement: JSON-LD Organization (LND-9)
 
-When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name`, `url`, and `sameAs` links.
+When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` set to "Relevy", `url` set to the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`.
+(Previously: JSON-LD name was "GeoAudit" and `sameAs` linked `geo-saas`.)
 
-#### Scenario: Organization + WebSite present
+#### Scenario: Relevy Organization + WebSite
 
 - GIVEN the landing page
 - WHEN it renders
-- THEN an `application/ld+json` block contains Organization and WebSite nodes with name/url/sameAs
+- THEN the JSON-LD `name` is "Relevy" and `sameAs`/`url` reference Relevy (no "GeoAudit")
 
 ### Requirement: Crawl/AI Assets (LND-10)
 
-When the site serves static assets, then the landing MUST expose `robots.txt`, `sitemap.xml`, and `llms.txt` at the site root.
+When the site serves static assets, then the landing MUST expose `robots.txt`, `sitemap.xml`, and `llms.txt` at the site root. `llms.txt` MUST reference the Relevy brand and `relevy.app` domain and MUST state the accurate free limit (10 audits / 30 days), not the stale "3 auditorías mensuales".
+(Previously: assets served at root; llms.txt carried the GeoAudit brand and a stale 3-audit claim.)
 
 #### Scenario: Assets served at root
 
 - GIVEN a request to `/robots.txt`, `/sitemap.xml`, and `/llms.txt`
 - WHEN each is fetched
 - THEN each returns 200 with valid content
+
+#### Scenario: llms.txt is Relevy-accurate
+
+- GIVEN `public/llms.txt`
+- WHEN its content is inspected
+- THEN it names Relevy, links `relevy.app`, and states the 10/30-day limit
 
 ### Requirement: Citable Passages (LND-11)
 
@@ -176,7 +184,7 @@ When the landing renders, then it MUST surface trust and authority signals: lega
 | LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees audit CTA | Covered |
 | LND-7 | Verified evidence shown, No candidate reaches 90+ | Covered |
 | LND-8 | OG + Twitter tags present | Covered |
-| LND-9 | Organization + WebSite present | Covered |
-| LND-10 | Assets served at root | Covered |
+| LND-9 | Relevy Organization + WebSite | Covered |
+| LND-10 | Assets served at root, llms.txt is Relevy-accurate | Covered |
 | LND-11 | Answer-first copy with stats | Covered |
 | LND-12 | Trust signals present | Covered |

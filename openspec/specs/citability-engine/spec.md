@@ -1,5 +1,7 @@
 # Citability Engine Specification
 
+> **Change**: `sprint-11-rebrand-polish` · **Type**: Delta (MODIFIED)
+
 ## Purpose
 
 Analyze the main textual content of a page to determine how likely AI systems (ChatGPT, Claude, Perplexity, Gemini) are to cite or quote passages. Segment content by H2/H3 headings into blocks, score each block across five weighted dimensions, and produce top/bottom block analysis with template-based rewrite suggestions.
@@ -17,7 +19,7 @@ Analyze the main textual content of a page to determine how likely AI systems (C
 | RCI-7 | Uniqueness (10%) | MUST | Score each block: original-data phrases ("we surveyed…", "our data shows…"), first-person voice — proxy signal |
 | RCI-8 | Block composite score | MUST | Compute per-block weighted average of the 5 dimensions (30/25/20/15/10) |
 | RCI-9 | Page aggregate score | MUST | Compute page citability score as mean of all validated block scores |
-| RCI-10 | Top/bottom block output | MUST | Return top 3 and bottom 3 blocks with individual dimension scores and excerpts |
+| RCI-10 | Top/bottom block output | MUST | Return top 3 and bottom 3 blocks with individual dimension scores and excerpts; bottom 3 MUST be disjoint from top 3 (fewer bottoms shown when <3 non-overlapping blocks remain) |
 | RCI-11 | Citability coverage | MUST | Return citability coverage as percentage of blocks scoring ≥ 70 |
 | RCI-12 | Rewrite suggestions | MUST | For bottom blocks, generate template-based rewrite suggestions (definition pattern, answer-first, stat injection) |
 | RCI-13 | Single-block fallback | MUST | Pages with no H2/H3 headings MUST treat the entire extracted content as one block |
@@ -133,6 +135,35 @@ The system MUST award intermediate points by stat-density level (percentages, cu
 - WHEN Statistical Density is scored
 - THEN the score is ≤ 10
 
+### Requirement: Top/Bottom Block Output (RCI-10)
+
+The system MUST return the top 3 and bottom 3 blocks with individual dimension scores and excerpts. The bottom 3 MUST be derived from blocks NOT in the top 3, so the two lists are disjoint. When fewer than 3 non-overlapping blocks remain, the system MUST show fewer bottom blocks rather than repeating a top block.
+(Previously: top3 and bottom3 were computed independently from the same array and could overlap.)
+
+#### Scenario: Disjoint on long pages
+
+- GIVEN a page with 8 scored blocks
+- WHEN top/bottom output is computed
+- THEN the top 3 and bottom 3 share no block
+
+#### Scenario: Five blocks → 3 top + 2 bottom
+
+- GIVEN a page with 5 scored blocks
+- WHEN top/bottom output is computed
+- THEN the top 3 and bottom 2 are disjoint (no overlap)
+
+#### Scenario: Three blocks → 3 top + 0 bottom
+
+- GIVEN a page with exactly 3 scored blocks
+- WHEN top/bottom output is computed
+- THEN the top 3 is returned and the bottom list is empty (fewer shown, never repeated)
+
+#### Scenario: Four blocks → 3 top + 1 bottom
+
+- GIVEN a page with 4 scored blocks
+- WHEN top/bottom output is computed
+- THEN the bottom list contains only the 1 block not in the top 3, with no duplication
+
 ### Requirement: Malformed HTML Tolerance (RCI-14)
 
 The system MUST handle malformed HTML without throwing exceptions.
@@ -164,7 +195,7 @@ The system MUST handle malformed HTML without throwing exceptions.
 | RCI-7 | (tested via RCI-8 composite + first-person fixtures) | Implicit |
 | RCI-8 | (tested via all dimension scenarios — composite assertion) | Implicit |
 | RCI-9 | (tested via RCI-10 top/bottom output + score assertion) | Implicit |
-| RCI-10 | (fixture with known-good blocks → top/bottom exact match) | Covered |
+| RCI-10 | Disjoint on long pages, Five blocks → 3 top + 2 bottom, Three blocks → 3 top + 0 bottom, Four blocks → 3 top + 1 bottom | Covered |
 | RCI-11 | (fixture with mixed scores → coverage % assertion) | Covered |
 | RCI-12 | (bottom block fixture → template key present in suggestion) | Covered |
 | RCI-13 | (no-heading fixture → single block with full text) | Covered |

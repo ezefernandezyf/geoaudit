@@ -1,10 +1,10 @@
 # Legal Pages Specification
 
-> **Change**: `sprint-7-ui-fidelity` · **Type**: New capability (ADDED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-Static Server Components `/terms` and `/privacy`, rendered with the Gemini visual language (hex directos, same shell), written in neutral Spanish. They are static legal content — no dynamic data, no interactivity beyond the shared navbar/footer — and are reachable from the footer (and navbar where applicable).
+Static Server Components `/terms` and `/privacy`, rendered with the Gemini visual language (hex directos, same shell), written in neutral Spanish. They are static legal content — no dynamic data, no interactivity beyond the shared navbar/footer — and are reachable from the footer (and navbar where applicable). Since Sprint 11, the legal copy describes a single free model with no paid plans, billing, subscription, or payment-processing references (LGL-6).
 
 ## Requirements
 
@@ -15,6 +15,7 @@ Static Server Components `/terms` and `/privacy`, rendered with the Gemini visua
 | LGL-3 | Gemini visual language | New | MUST | Both pages MUST use the shared shell and Gemini hex/font styling |
 | LGL-4 | Neutral copy | New | MUST | All legal copy MUST be neutral Spanish (no voseo) |
 | LGL-5 | Footer reachability | New | MUST | Both pages MUST be linked from the footer |
+| LGL-6 | Free-model legal copy | New | MUST | Legal copy MUST describe a single free model with no paid plans, billing, subscription, or payment-processing references |
 
 ### Requirement: Terms Route (LGL-1)
 
@@ -66,6 +67,22 @@ When the footer renders, then it MUST link to both `/terms` and `/privacy`.
 - WHEN it renders
 - THEN links to `/terms` and `/privacy` are present
 
+### Requirement: Free-Model Legal Copy (LGL-6)
+
+The legal copy (`LEGAL_COPY`) MUST describe a single free model. It MUST NOT contain paid plans, billing, subscription, or payment-processing references. The "Planes y facturación" terms section MUST be rewritten or removed, and the privacy policy MUST NOT mention processing payments.
+
+#### Scenario: Terms has no paid plans
+
+- GIVEN the `/terms` content
+- WHEN it is inspected
+- THEN no paid plans, billing, or pricing section appears
+
+#### Scenario: Privacy has no payments
+
+- GIVEN the `/privacy` content
+- WHEN it is inspected
+- THEN no payment-processing reference appears
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -75,3 +92,4 @@ When the footer renders, then it MUST link to both `/terms` and `/privacy`.
 | LGL-3 | Shared shell applied | Covered |
 | LGL-4 | No voseo | Covered |
 | LGL-5 | Footer links present | Covered |
+| LGL-6 | Terms has no paid plans, Privacy has no payments | Covered |

@@ -1,10 +1,10 @@
 # Rate Limiting Specification
 
-> **Change**: `sprint-2-free-audit-flow` · **Type**: New capability (ADDED)
+> **Change**: `sprint-2-free-audit-flow` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED)
 
 ## Purpose
 
-Server-action in-memory rate limiter to protect the free audit flow from abuse. Fixed-window algorithm, store injectable via interface, keyed by client IP. Best-effort in serverless (no shared state across instances). No database, no public API endpoint. Disableable via `RATE_LIMIT_ENABLED` env var.
+Server-action in-memory rate limiter to protect the free audit flow from abuse. Fixed-window algorithm, store injectable via interface, keyed by client IP. Best-effort in serverless (no shared state across instances). No database, no public API endpoint. Disableable via `RATE_LIMIT_ENABLED` env var. Since Sprint 11, a second limiter `getAnonymousAuditLimiter()` (3 requests / 30-day window, keyed `anon:{ip}`) enforces the anonymous audit cap at completion in the audit runner, reusing the same `PrismaRateLimitStore` and `rateLimitEntry` table (RTL-8).
 
 ## Requirements
 
@@ -17,6 +17,7 @@ Server-action in-memory rate limiter to protect the free audit flow from abuse. 
 | RTL-5 | Over-limit response | MUST | Return `{ allowed: false, remaining: 0, resetMs }`; form shows inline error with `role="alert"` |
 | RTL-6 | DB-backed store | MUST | Default store is `PrismaRateLimitStore` performing atomic UPSERT on `(key, windowStart)`; `RATE_LIMIT_ENABLED=false` bypasses it |
 | RTL-7 | Feature flag | MUST | Read `RATE_LIMIT_ENABLED`; when `"false"`, bypass all checks (no counter increment) |
+| RTL-8 | Anonymous audit limiter | MUST | Provide `getAnonymousAuditLimiter()` — 3 requests / 30-day window, keyed `anon:{ip}`, enforced ONLY at anonymous audit completion (no pre-check in `actions.ts`) |
 
 ### RTL-1: Fixed window algorithm
 
@@ -84,6 +85,34 @@ The system MUST use a DB-backed `PrismaRateLimitStore` as the default store, per
 - WHEN the limiter checks any key
 - THEN no DB read or write occurs and the check returns allowed
 
+### RTL-8: Anonymous audit limiter
+
+The system MUST provide a second limiter `getAnonymousAuditLimiter()` — a singleton configured as **3 requests / 30-day window**, keyed `anon:{ip}`, reusing the existing `PrismaRateLimitStore` and `rateLimitEntry` table (no schema change). Its namespaced key MUST NOT collide with the burst limiter's plain-IP keys (RTL-1, 5/60s). Unlike the burst limiter (enforced in the audit form Server Action, RTL-4), the anonymous limiter MUST be enforced ONLY in the audit runner at the point an anonymous audit completes, incrementing exactly once (no pre-check in `actions.ts`).
+
+#### Scenario: Namespace isolation
+
+- GIVEN both limiters share `PrismaRateLimitStore`
+- WHEN the burst limiter increments `1.2.3.4` and the anonymous limiter increments `anon:1.2.3.4`
+- THEN the two counters are stored under distinct keys and do not affect each other
+
+#### Scenario: 3/30d configuration
+
+- GIVEN `getAnonymousAuditLimiter()` is instantiated
+- WHEN it checks an IP
+- THEN it applies a 30-day window with a maximum of 3 requests
+
+#### Scenario: Single increment on completion
+
+- GIVEN an anonymous audit completes via the audit runner
+- WHEN the limiter is consulted
+- THEN exactly one increment is recorded (no pre-check in the form action double-counts it)
+
+#### Scenario: Kill switch bypasses anonymous limiter
+
+- GIVEN `RATE_LIMIT_ENABLED="false"`
+- WHEN the anonymous limiter checks any `anon:{ip}` key
+- THEN it returns allowed and no counter is incremented
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -95,3 +124,4 @@ The system MUST use a DB-backed `PrismaRateLimitStore` as the default store, per
 | RTL-5 | (via ADF-9 rate limit scenario) | Implicit |
 | RTL-6 | Shared counter across instances, Kill switch bypasses store | Covered (prisma-store tests + HARD GATE DB real) |
 | RTL-7 | Rate limiting disabled | Covered |
+| RTL-8 | Namespace isolation, 3/30d configuration, Single increment on completion, Kill switch bypasses anonymous limiter | Covered |

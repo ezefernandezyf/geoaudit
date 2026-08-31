@@ -1,10 +1,10 @@
 # App Shell Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page. Since Sprint 8, the shell copy (navbar links, user actions, footer text) is neutral Spanish (usted), centralized in `copy.ts`, and free of voseo/tuteo forms (SHL-6). Since Sprint 10, the plan pill is static "Free" for every user (no tier-dependent pill).
+The shared app shell (navbar + footer) restyled to Gemini: active-state nav links, a plan pill, a user chip, and the new logo. The shell is present on all authenticated/landing pages and provides the entry points for profile, terms, privacy, and multi-page. Since Sprint 8, the shell copy (navbar links, user actions, footer text) is neutral Spanish (usted), centralized in `copy.ts`, and free of voseo/tuteo forms (SHL-6). Since Sprint 10, the plan pill is static "Free" for every user (no tier-dependent pill). Since Sprint 11, the shell carries the Relevy brand: the navbar renders the Relevy mark + wordmark (SHL-4), the footer support `mailto:` resolves to the single shared `SUPPORT_EMAIL` constant (SHL-8), and page title/OG metadata plus the footer copyright read "Relevy" (SHL-9).
 
 ## Requirements
 
@@ -13,10 +13,12 @@ The shared app shell (navbar + footer) restyled to Gemini: active-state nav link
 | SHL-1 | Active nav states | New | MUST | Navbar MUST highlight the active route |
 | SHL-2 | Plan pill | New | MUST | Navbar MUST show a static "Free" plan pill for every user |
 | SHL-3 | User chip | New | MUST | Navbar MUST show a user chip with identity/logout |
-| SHL-4 | Logo | New | MUST | Navbar MUST render the new logo + wordmark |
+| SHL-4 | Logo | New | MUST | Navbar MUST render the Relevy mark + wordmark; favicon MUST serve the same Relevy mark |
 | SHL-5 | Footer links | New | MUST | Footer MUST link to terms/privacy |
 | SHL-6 | Neutral shell copy | New | MUST | Navbar/footer copy MUST be neutral Spanish (usted), sourced from `copy.ts` |
 | SHL-7 | Security headers | New | MUST | Every response MUST send CSP + HSTS (CSP report-only first, then enforced) |
+| SHL-8 | Support email constant | New | MUST | Footer support `mailto:` MUST resolve to the single shared support email constant |
+| SHL-9 | Brand metadata + copyright | New | MUST | Title/OG `siteName`/`alt` and footer copyright MUST read "Relevy" |
 
 ### Requirement: Active Nav States (SHL-1)
 
@@ -50,13 +52,20 @@ When an authenticated user is signed in, then the navbar MUST show a user chip w
 
 ### Requirement: Logo (SHL-4)
 
-When the navbar renders, then it MUST show the new "G" serif + wave + globe logo with the "GeoAudit" wordmark.
+When the navbar renders, then it MUST show the Relevy mark — the user-generated Relevy icon + wordmark — replacing the previous "GeoAudit" logo. The same Relevy mark MUST be served as the site favicon via `src/app/icon.svg`.
+(Previously: navbar showed the "G" serif + wave + globe logo with the "GeoAudit" wordmark.)
 
-#### Scenario: Logo + wordmark
+#### Scenario: Relevy wordmark
 
 - GIVEN the navbar
 - WHEN it renders
-- THEN the new logo and "GeoAudit" wordmark appear
+- THEN the Relevy logo and "Relevy" wordmark appear (no "GeoAudit" text)
+
+#### Scenario: Relevy favicon
+
+- GIVEN a request for the site favicon
+- WHEN the App Router serves `icon.svg`
+- THEN it renders the Relevy mark (not the legacy "G" tile)
 
 ### Requirement: Footer Links (SHL-5)
 
@@ -94,6 +103,38 @@ Every app response MUST send a Content-Security-Policy and Strict-Transport-Secu
 - WHEN the landing/report routes render
 - THEN CSP is report-only until no inline/third-party breakage is observed, then it is enforced
 
+### Requirement: Support Email Constant (SHL-8)
+
+The footer MUST render the support contact using the single shared support email constant (`ezefernandezyf@gmail.com`). The literal email MUST NOT be hardcoded anywhere else.
+
+#### Scenario: Footer support mailto
+
+- GIVEN the shared footer
+- WHEN it renders the support link
+- THEN the `mailto:` target resolves to the shared support email constant
+
+### Requirement: Brand Metadata + Copyright (SHL-9)
+
+The app MUST emit "Relevy" as the page `<title>`/metadata template and in the shared OG helper's `siteName`/`alt` fields. The footer MUST show a copyright line reading "© Relevy".
+
+#### Scenario: Page title is Relevy
+
+- GIVEN any route
+- WHEN the `<head>` metadata renders
+- THEN the title template resolves to "Relevy"
+
+#### Scenario: OG siteName is Relevy
+
+- GIVEN the shared OG helper
+- WHEN OG metadata is generated
+- THEN `siteName` and image `alt` read "Relevy"
+
+#### Scenario: Footer copyright
+
+- GIVEN the shared footer
+- WHEN it renders
+- THEN the copyright line reads "© Relevy"
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -101,7 +142,9 @@ Every app response MUST send a Content-Security-Policy and Strict-Transport-Secu
 | SHL-1 | Active link highlighted | Covered |
 | SHL-2 | Plan pill shown | Covered |
 | SHL-3 | User chip with logout | Covered |
-| SHL-4 | Logo + wordmark | Covered |
+| SHL-4 | Relevy wordmark, Relevy favicon | Covered |
 | SHL-5 | Legal links present | Covered |
 | SHL-6 | Navbar copy is neutral | Covered |
 | SHL-7 | CSP + HSTS emitted, CSP report-only before enforce | Covered |
+| SHL-8 | Footer support mailto | Covered |
+| SHL-9 | Page title is Relevy, OG siteName is Relevy, Footer copyright | Covered |

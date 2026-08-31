@@ -1,10 +1,10 @@
 # App Profile Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The `/dashboard/profile` page, styled with the Gemini visual language, showing the authenticated user's account data — name, email, plan, audit usage, and support — read from real `User` rows. It is a read-only account surface. Since Sprint 10, the tier and subscription surfaces are removed: the plan pill shows the single "Free" plan and audit usage is shown against the FREE 10/30-day limit (PRF-5 Manage Subscription removed with the billing capability).
+The `/dashboard/profile` page, styled with the Gemini visual language, showing the authenticated user's account data — name, email, plan, audit usage, and support — read from real `User` rows. It is a read-only account surface. Since Sprint 10, the tier and subscription surfaces are removed: the plan pill shows the single "Free" plan and audit usage is shown against the FREE 10/30-day limit (PRF-5 Manage Subscription removed with the billing capability). Since Sprint 11, the plan pill reads "Plan Free", unified with the navbar pill (PRF-3), and the support entry uses the shared support email constant (PRF-6).
 
 ## Requirements
 
@@ -12,9 +12,9 @@ The `/dashboard/profile` page, styled with the Gemini visual language, showing t
 |---|-------------|--------|----------|---------|
 | PRF-1 | Profile route | New | MUST | `/dashboard/profile` MUST render for an authenticated user |
 | PRF-2 | User identity | New | MUST | MUST show the user's name and email from the session |
-| PRF-3 | Plan display | New | MUST | MUST show the user's single plan ("Free") |
+| PRF-3 | Plan display | New | MUST | MUST show the user's single plan pill reading "Plan Free" (unified with the navbar) |
 | PRF-4 | Audit usage | New | MUST | MUST show audit usage against the single FREE limit (10 per 30 days) |
-| PRF-6 | Support entry | New | MUST | MUST expose a support entry point |
+| PRF-6 | Support entry | New | MUST | MUST expose a support entry using the shared support email constant |
 
 ### Requirement: Profile Route (PRF-1)
 
@@ -44,13 +44,14 @@ When the profile page renders, then it MUST display the user's name and email so
 
 ### Requirement: Plan Display (PRF-3)
 
-When the profile page renders, then it MUST show the user's single plan ("Free"), since there is only one plan.
+When the profile page renders, then it MUST show the user's single plan pill reading "Plan Free", unified with the navbar pill (SHL-2).
+(Previously: the pill read "Free"; the profile and navbar strings differed.)
 
-#### Scenario: Plan visible
+#### Scenario: Unified plan pill
 
 - GIVEN an authenticated user
 - WHEN the profile renders
-- THEN the plan pill shows "Free"
+- THEN the plan pill reads "Plan Free" (matching the navbar)
 
 ### Requirement: Audit Usage (PRF-4)
 
@@ -64,13 +65,14 @@ When the profile page renders, then it MUST show the user's audits used against 
 
 ### Requirement: Support Entry (PRF-6)
 
-When the profile page renders, then it MUST expose a support entry point (link/contact) for account help.
+When the profile page renders, then it MUST expose a support entry point using the shared support email constant (`ezefernandezyf@gmail.com`).
+(Previously: support entry existed; email was not guaranteed to come from the shared constant.)
 
-#### Scenario: Support link present
+#### Scenario: Support link uses shared email
 
 - GIVEN the profile page
 - WHEN it renders
-- THEN a support link is visible
+- THEN the support contact references the shared support email constant
 
 ## Compliance Matrix
 
@@ -78,6 +80,6 @@ When the profile page renders, then it MUST expose a support entry point (link/c
 |-------------|-----------|----------|
 | PRF-1 | Authenticated access, Unauthenticated redirect | Covered |
 | PRF-2 | Name and email shown | Covered |
-| PRF-3 | Plan visible | Covered |
+| PRF-3 | Unified plan pill | Covered |
 | PRF-4 | Usage against limit | Covered |
-| PRF-6 | Support link present | Covered |
+| PRF-6 | Support link uses shared email | Covered |
