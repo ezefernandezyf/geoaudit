@@ -292,8 +292,8 @@ export const LEGAL_COPY = {
         body: "El usuario es responsable de mantener la confidencialidad de su cuenta y de todas las actividades que ocurran bajo ella. Debe notificar de inmediato cualquier uso no autorizado.",
       },
       {
-        heading: "3. Planes y facturación",
-        body: "Los planes de pago se facturan mensualmente y se renuevan de forma automática. El usuario puede cancelar en cualquier momento y conservará el acceso hasta el final del período pagado.",
+        heading: "3. Plan único gratuito",
+        body: `${BRAND_NAME} es un servicio gratuito: cada cuenta puede realizar hasta 10 auditorías por ventana de 30 días. El límite se reinicia 30 días después de cada auditoría.`,
       },
       {
         heading: "4. Propiedad intelectual",
@@ -321,7 +321,7 @@ export const LEGAL_COPY = {
       },
       {
         heading: "2. Uso de los datos",
-        body: "Utilizamos sus datos para proveer el servicio, procesar pagos, mejorar nuestros análisis y enviarle comunicaciones relacionadas con su cuenta.",
+        body: "Utilizamos sus datos para proveer el servicio, mejorar nuestros análisis y enviarle comunicaciones relacionadas con su cuenta.",
       },
       {
         heading: "3. Compartición de datos",

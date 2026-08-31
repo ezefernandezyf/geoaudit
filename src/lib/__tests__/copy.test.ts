@@ -169,6 +169,29 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
   });
 });
 
+describe("LEGAL_COPY free model (LGL-6, sprint 11)", () => {
+  it("describes the single free plan in the terms section 3, keeping the numbering", () => {
+    const section = LEGAL_COPY.terms.sections[2];
+    expect(section.heading).toMatch(/^3\./);
+    expect(section.heading).not.toMatch(/facturación|pago|suscripción/i);
+    expect(section.body).toMatch(/gratuit/i);
+    expect(section.body).not.toMatch(/factur|pago|suscripción|renueva/i);
+  });
+
+  it("removes payment-processing from the privacy data-use section", () => {
+    const section = LEGAL_COPY.privacy.sections[1];
+    expect(section.body).toContain("proveer el servicio");
+    expect(section.body).not.toMatch(/pago/i);
+  });
+
+  it("keeps the legal copy free of paid-plan language across terms and privacy", () => {
+    const legalText = JSON.stringify(LEGAL_COPY);
+    expect(legalText).not.toMatch(
+      /planes de pago|facturación|procesar pagos|renuevan de forma automática/i,
+    );
+  });
+});
+
 describe("REPORT_COPY / SHARE_COPY (U5, neutral Spanish)", () => {
   it("keeps the report copy neutral and Gemini-verbatim", () => {
     expect(REPORT_COPY.hero.scoreLabel).toBe("GEO Score");
