@@ -153,3 +153,32 @@ export function getDefaultRateLimiter(): Promise<RateLimiter> {
     }))();
   return defaultLimiterPromise;
 }
+
+/** Anonymous audit limiter window (TLM-11, RTL-8): 30-day fixed window. */
+export const ANON_AUDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+/** Anonymous audit limiter budget (TLM-11, RTL-8): 3 audits per window. */
+export const ANON_AUDIT_MAX_REQUESTS = 3;
+
+let anonLimiterPromise: Promise<RateLimiter> | null = null;
+
+/**
+ * Anonymous audit limiter (RTL-8, TLM-11): 3 audits per 30-day fixed window
+ * per client IP, keyed `anon:{ip}` at the call site so it never collides with
+ * the burst limiter's plain-IP keys (RTL-1). Reuses the same default store:
+ * production shares the `rateLimitEntry` table with the burst limiter; dev/test
+ * keep the in-memory store. Enforced ONLY in the audit runner (authoritative
+ * gate, TLM-11) — never pre-checked in the form action — so each completed
+ * anonymous audit increments exactly once. Same kill switch as the burst
+ * limiter (RTL-7): `RATE_LIMIT_ENABLED=false` bypasses without touching the
+ * store. Async because the default store must be resolved before the first
+ * check — memoized per process like `getDefaultRateLimiter`.
+ */
+export function getAnonymousAuditLimiter(): Promise<RateLimiter> {
+  anonLimiterPromise ??= (async () =>
+    createRateLimiter({
+      store: await createDefaultStore(),
+      windowMs: ANON_AUDIT_WINDOW_MS,
+      maxRequests: ANON_AUDIT_MAX_REQUESTS,
+    }))();
+  return anonLimiterPromise;
+}
