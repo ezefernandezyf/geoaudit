@@ -34,19 +34,21 @@ export function Logo({
         aria-label={decorative ? undefined : "Relevy"}
         aria-hidden={decorative || undefined}
       >
-        {/* Quote 1 (navy → white in dark mode) */}
+        {/* Quote 1 (navy) — fill directo: la clase Tailwind arbitraria
+            `dark:fill-white` volvía la comilla invisible sobre la navbar
+            siempre-blanca en dark mode (SHL-4 fix post-sprint 11). */}
         <path
           d="M5 11h8v8c0 4.418-3.582 8-8 8v-4c2.209 0 4-1.791 4-4H5v-8z"
-          className="fill-[#0f172a] dark:fill-white"
+          fill="#0f172a"
         />
         {/* Quote 2 (emerald accent) */}
         <path
           d="M19 5h8v8c0 4.418-3.582 8-8 8v-4c2.209 0 4-1.791 4-4h-4V5z"
-          className="fill-[#10b981]"
+          fill="#10b981"
         />
       </svg>
       {showWordmark ? (
-        <span className="font-serif text-2xl leading-none text-[#0f172a] dark:text-white">
+        <span className="font-serif text-2xl leading-none text-[#0f172a]">
           Relevy
         </span>
       ) : null}
