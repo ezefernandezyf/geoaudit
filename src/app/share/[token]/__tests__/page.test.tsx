@@ -87,6 +87,15 @@ describe("SharePage (SHR-2)", () => {
     expect(screen.getByText(/ID: tok-1/)).toBeInTheDocument();
   });
 
+  it("renders the Relevy brand in the public header (SHL-4, rebrand)", async () => {
+    render(await SharePage({ params }));
+
+    // The legacy GeoAudit wordmark (and its "G" tile) are gone from the
+    // public share shell — the Relevy brand wordmark renders instead.
+    expect(screen.getByText("Relevy")).toBeInTheDocument();
+    expect(screen.queryByText("GeoAudit")).not.toBeInTheDocument();
+  });
+
   it("includes the footer CTA inviting the visitor to run their own audit (SHR-9)", async () => {
     render(await SharePage({ params }));
 

@@ -9,6 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { AuditReport } from "@/report/audit-report";
 import { MultiPageReport } from "@/report/multi-page-report";
 import { SHARE_COPY } from "@/lib/copy";
+import { Logo } from "@/ui/logo";
+import { BRAND_NAME } from "@/lib/brand";
 
 /**
  * Discriminates the two persisted result shapes (same structural check as the
@@ -80,12 +82,13 @@ export default async function SharePage({ params }: SharePageProps) {
       <header className="sticky top-0 z-30 border-b border-[#e2e8f0] bg-white px-4 py-3.5 sm:px-8">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0f172a] font-serif text-sm font-bold text-white">
-              G
-            </div>
+            {/* Relevy brand (SHL-4): the shared Logo mark replaces the legacy
+                "G" tile (mark-only; the wordmark text comes from the brand
+                constant below, so the brand reads once). */}
+            <Logo size={24} decorative showWordmark={false} />
             <div className="leading-none">
               <span className="block font-serif text-lg leading-none text-[#0f172a]">
-                GeoAudit
+                {BRAND_NAME}
               </span>
               <span className="font-mono text-[10px] text-[#64748b]">
                 {SHARE_COPY.header.sub}
