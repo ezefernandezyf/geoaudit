@@ -10,6 +10,7 @@ import {
   isEngineDegraded,
   rowScore,
 } from "@/report/domain-metrics";
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
  * PDF report template (U4, PDF-4/5/6, design D3).
@@ -138,7 +139,6 @@ const PRINT_CSS = `
     border-bottom: 2px solid var(--emerald); padding-bottom: 6px; margin-bottom: 14px;
   }
   .brand-header .brand { font-family: "Instrument Serif", serif; font-size: 20px; letter-spacing: -0.01em; }
-  .brand-header .brand em { color: var(--emerald); font-style: italic; }
   .brand-header .doc-title { font-size: 10px; color: var(--text-secondary); }
   .hero {
     display: flex; align-items: center; justify-content: space-between;
@@ -293,7 +293,7 @@ function document(hero: string, body: string, footerUrl: string): string {
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<title>GeoAudit — Reporte de auditoría GEO</title>
+<title>${BRAND_NAME} — ${BRAND_DESCRIPTOR}</title>
 <style>
 :root {${BRAND_CSS}}
 ${FONT_FACES}
@@ -303,13 +303,13 @@ ${PRINT_CSS}
 <body>
 <div class="page">
   <div class="brand-header">
-    <span class="brand">Geo<em>Audit</em></span>
+    <span class="brand">${BRAND_NAME}</span>
     <span class="doc-title">Reporte de auditoría GEO</span>
   </div>
   ${hero}
   ${body}
   <div class="footer">
-    <span>GeoAudit — Reporte de auditoría GEO</span>
+    <span>${BRAND_NAME} — Reporte de auditoría GEO</span>
     <span>${escapeHtml(footerUrl)}</span>
   </div>
 </div>

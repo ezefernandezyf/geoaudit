@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildReportHtml } from "@/pdf/report-template";
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
  * U4.3/U4.4 — PDF report template (PDF-4/5/6, design D3).
@@ -44,6 +45,17 @@ describe("buildReportHtml (PDF-5/6)", () => {
     const html = buildReportHtml(auditResultFixture);
 
     expect(html).toMatch(/@page\s*\{[^}]*size:\s*A4/i);
+  });
+
+  it("renders the Relevy brand in the title, wordmark and footer (SHL-9)", () => {
+    const html = buildReportHtml(auditResultFixture);
+
+    expect(html).toContain(
+      `<title>${BRAND_NAME} — ${BRAND_DESCRIPTOR}</title>`,
+    );
+    expect(html).toContain(`<span class="brand">${BRAND_NAME}</span>`);
+    expect(html).toContain(`${BRAND_NAME} — Reporte de auditoría GEO`);
+    expect(html).not.toContain("GeoAudit");
   });
 
   it("emits a complete HTML document", () => {
