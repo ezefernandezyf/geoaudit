@@ -95,8 +95,10 @@ describe("ProfilePage (PRF-1)", () => {
 
     render(await ProfilePage());
 
+    // Sprint 11: the support email comes from the shared SUPPORT_EMAIL
+    // constant (copy.ts) — the old soporte@geoaudit.app address is gone.
     expect(
-      screen.getByRole("link", { name: "soporte@geoaudit.app" }),
-    ).toHaveAttribute("href", "mailto:soporte@geoaudit.app");
+      screen.getByRole("link", { name: "ezefernandezyf@gmail.com" }),
+    ).toHaveAttribute("href", "mailto:ezefernandezyf@gmail.com");
   });
 });
