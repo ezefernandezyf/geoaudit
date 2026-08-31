@@ -2,7 +2,7 @@
  * Gemini-shaped view model types (APT-1, design `presenters/types.ts`).
  *
  * These are the honest, nullable version of the Gemini reference
- * (`/home/ezeyf/Descargas/geoaudit/src/types.ts`): every field the report
+ * (`/home/ezeyf/Descargas/relevy/src/types.ts`): every field the report
  * components need, but where the real `AuditResult` contract does not measure
  * something (citationRate, impactScore, presenceInPrompts, lastCrawled) the
  * field is either omitted or nullable — the adapter never fabricates a value

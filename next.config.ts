@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 /**
- * GeoAudit Next.js config.
+ * Relevy Next.js config.
  *
  * PDF export (U4, PDF-8): the `/api/report/[id]/pdf` route runs in a
  * serverless function and renders with `puppeteer-core` +

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /**
- * GeoAudit design tokens (STYLE-BRIEF.md §2-§4, spec DNF-2).
+ * Relevy design tokens (STYLE-BRIEF.md §2-§4, spec DNF-2).
  * Every --color-* / --font-* / --spacing-* name below generates a compile-time
  * utility class: --color-navy → bg-navy / text-navy / border-navy, etc.
  * Source of truth for the palette, typography and the 4px spacing grid.

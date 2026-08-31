@@ -12,7 +12,7 @@ import { defineConfig } from "vitest/config";
  * resolvable from this project root.
  */
 const cssStub = () => ({
-  name: "geoaudit:css-stub",
+  name: "relevy:css-stub",
   enforce: "pre" as const,
   resolveId(id: string) {
     if (id.endsWith(".css")) {
@@ -30,7 +30,7 @@ const cssStub = () => ({
 });
 
 /**
- * Vitest 4 configuration for GeoAudit.
+ * Vitest 4 configuration for Relevy.
  * jsdom environment + globals (RTL auto-cleanup), jest-dom matchers via setup,
  * v8 coverage, and the `@/*` alias shared with tsconfig.
  */
