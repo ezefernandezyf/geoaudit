@@ -20,7 +20,7 @@ const PRO_SESSION = {
 describe("Navbar (SHL-2/3/4)", () => {
   it("links the logo to home", () => {
     render(<Navbar />);
-    const logo = screen.getByLabelText("GeoAudit AI Visibility Audit");
+    const logo = screen.getByLabelText("Relevy");
     expect(logo).toHaveAttribute("href", "/");
   });
 

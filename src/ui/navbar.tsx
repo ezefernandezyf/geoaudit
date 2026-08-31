@@ -45,11 +45,11 @@ export function Navbar({ session, plan }: NavbarProps) {
             // PERF-3: label-content-name-mismatch (WCAG 2.5.3). axe 4.x compara
             // el nombre accesible contra el textContent del link como substring
             // EXACTO (case-insensitive, sin normalizar espacios) — el em dash
-            // o un espacio extra rompe el match. El Logo emite el wordmark con
-            // un espacio real entre "GeoAudit" y "AI Visibility Audit", así que
-            // el aria-label debe replicarlo EXACTO (y el mark SVG es
+            // o un espacio extra rompe el match. El Logo emite solo el
+            // wordmark "Relevy" (tagline eliminado, SHL-4), así que el
+            // aria-label debe ser EXACTO "Relevy" (y el mark SVG es
             // decorative: su texto no debe filtrarse al textContent del link).
-            aria-label="GeoAudit AI Visibility Audit"
+            aria-label="Relevy"
             className="flex items-center text-left transition-colors hover:text-emerald-700"
           >
             <Logo size={32} decorative />

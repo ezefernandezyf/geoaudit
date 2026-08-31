@@ -26,9 +26,7 @@ export function assertLogicalFocusOrder(focusable: HTMLElement[]): void {
       `expected more than 5 focusable elements, got ${focusable.length}`,
     );
   }
-  if (
-    focusable[0].getAttribute("aria-label") !== "GeoAudit AI Visibility Audit"
-  ) {
+  if (focusable[0].getAttribute("aria-label") !== "Relevy") {
     throw new Error(
       `expected first tab stop to be the brand link, got ${focusable[0].outerHTML}`,
     );

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Footer } from "@/ui/footer";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 /**
  * U1.10 — Footer (SHL-5, LGL-5): logo, links (Inicio, Dashboard for
@@ -39,7 +40,7 @@ describe("Footer (SHL-5)", () => {
     render(<Footer />);
     expect(screen.getByRole("link", { name: "Contacto" })).toHaveAttribute(
       "href",
-      "mailto:soporte@geoaudit.app",
+      `mailto:${SUPPORT_EMAIL}`,
     );
   });
 
@@ -68,7 +69,7 @@ describe("Footer (SHL-5)", () => {
   it("shows the copyright", () => {
     render(<Footer />);
     expect(
-      screen.getByText(`© ${new Date().getFullYear()} GeoAudit`),
+      screen.getByText(`© ${new Date().getFullYear()} ${BRAND_NAME}`),
     ).toBeInTheDocument();
   });
 });

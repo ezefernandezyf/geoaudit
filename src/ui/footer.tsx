@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Session } from "next-auth";
 import { Logo } from "@/ui/logo";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 type FooterProps = {
   /** Optional session — gates the Dashboard link (D6: anon shell has none). */
@@ -47,16 +48,16 @@ export function Footer({ session }: FooterProps = {}) {
           </Link>
           {/* LND-12 (sprint 9): contact signal — the E-E-A-T trustworthiness
               engine awards contact info (mailto/tel/contact/address) +5. The
-              mailto uses the same support address as PROFILE_COPY. */}
+              mailto uses the shared SUPPORT_EMAIL constant (SHL-8). */}
           <a
-            href="mailto:soporte@geoaudit.app"
+            href={`mailto:${SUPPORT_EMAIL}`}
             className="text-sm text-[#475569] transition-colors hover:text-[#0f172a]"
           >
             Contacto
           </a>
         </nav>
         <p className="text-xs text-[#475569]">
-          © {new Date().getFullYear()} GeoAudit
+          © {new Date().getFullYear()} {BRAND_NAME}
         </p>
       </div>
     </footer>

@@ -65,9 +65,9 @@ describe("root layout shell (SHL-1, U2.1)", () => {
     expect(
       screen.queryByRole("link", { name: "Precios" }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByLabelText("GeoAudit AI Visibility Audit"),
-    ).toBeInTheDocument();
+    // The navbar brand link owns the accessible name (SHL-4): the footer
+    // Logo img also carries aria-label "Relevy", so scope the query to links.
+    expect(screen.getByRole("link", { name: "Relevy" })).toBeInTheDocument();
     // Navbar + Footer both render the brand (Relevy wordmark, SHL-4).
     expect(screen.getAllByText("Relevy").length).toBeGreaterThan(0);
     expect(screen.getByText("contenido")).toBeInTheDocument();
