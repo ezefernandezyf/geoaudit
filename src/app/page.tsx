@@ -6,6 +6,7 @@ import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
 import { buildOgMetadata } from "@/lib/og";
+import { BRAND_NAME, BRAND_REPO } from "@/lib/brand";
 import { ScoreHero } from "@/report/score-hero";
 import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
 
@@ -44,7 +45,7 @@ export const dynamic = "force-dynamic";
  */
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 /** Real, verifiable org profiles only (never invented sameAs — LND-7 honesty). */
-const ORG_SAME_AS = ["https://github.com/ezefernandezyf/geoaudit"];
+const ORG_SAME_AS = [BRAND_REPO];
 
 function OrganizationJsonLd() {
   return (
@@ -54,7 +55,7 @@ function OrganizationJsonLd() {
         __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "GeoAudit",
+          name: BRAND_NAME,
           url: APP_URL,
           logo: `${APP_URL}/og.png`,
           description:
@@ -74,7 +75,7 @@ function WebSiteJsonLd() {
         __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "GeoAudit",
+          name: BRAND_NAME,
           url: APP_URL,
           potentialAction: {
             "@type": "SearchAction",
@@ -354,12 +355,12 @@ export default async function Home() {
               </li>
               <li>
                 <a
-                  href="https://github.com/ezefernandezyf/geoaudit"
+                  href={BRAND_REPO}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  GeoAudit — GitHub
+                  {BRAND_NAME} — GitHub
                 </a>
               </li>
               <li>

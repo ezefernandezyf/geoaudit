@@ -21,10 +21,10 @@ import type { GeminiBand, GeminiView } from "@/report/presenters/types";
  * run, copied verbatim (crawler 95, citability 29.3, E-E-A-T 39, schema 10,
  * platform 36).
  *
- * TODO(A3.2, post-deploy): the landing itself (geoaudit-tau.vercel.app) is
- * the dogfooding target. The live deploy audits at GEO Score 20 (critical)
+ * TODO(A3.2, post-deploy): the landing itself (relevy.app) is the
+ * dogfooding target. The live deploy audits at GEO Score 20 (critical)
  * because it still runs the PRE-fix build (no robots.txt/sitemap/llms.txt,
- * no JSON-LD, old copy). After deploying this branch (WU-1), re-run:
+ * no JSON-LD, old copy). The rebrand deploy (WU-1) is live; re-run:
  *
  *   pnpm verify:scorehero
  *

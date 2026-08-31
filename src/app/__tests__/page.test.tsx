@@ -48,7 +48,7 @@ async function renderPage() {
  * the auth session (LND-6). The pricing teaser is gone (LND-6, sprint 10).
  */
 describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
-  it("renders the GeoAudit hero heading", async () => {
+  it("renders the Relevy hero heading", async () => {
     await renderPage();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "motores de IA",
@@ -304,10 +304,11 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(types).toContain("Organization");
     expect(types).toContain("WebSite");
     const org = payloads.find((payload) => payload["@type"] === "Organization");
-    expect(org.name).toBe("GeoAudit");
+    expect(org.name).toBe("Relevy");
     expect(org.url).toMatch(/^https?:\/\//);
     expect(Array.isArray(org.sameAs)).toBe(true);
-    expect(org.sameAs.length).toBeGreaterThan(0);
+    // LND-9 (sprint 11): sameAs links the renamed Relevy repo, not geoaudit.
+    expect(org.sameAs).toContain("https://github.com/ezefernandezyf/relevy");
     const site = payloads.find((payload) => payload["@type"] === "WebSite");
     expect(site.potentialAction).toBeDefined();
   });

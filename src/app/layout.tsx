@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Instrument_Serif, JetBrains_Mono, Work_Sans } from "next/font/google";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 import { resolveNavPlan, type NavPlan } from "@/lib/nav-plan";
 import { Footer } from "@/ui/footer";
 import { Navbar } from "@/ui/navbar";
@@ -32,14 +33,14 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "GeoAudit — AI Visibility & GEO Audit",
-    template: "%s | GeoAudit",
+    default: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description:
     "GEO/SEO audit platform: URL in, GEO Score 0-100 and a full AI visibility report out.",
   // C16 (LND-8/PRC-8): base URL for the relative OG/Twitter/canonical URLs
-  // emitted by the public pages (og.png + page paths). Fallback chain matches
-  // billing/actions.ts: NEXT_PUBLIC_APP_URL → localhost (dev).
+  // emitted by the public pages (og.png + page paths). Fallback chain:
+  // NEXT_PUBLIC_APP_URL → localhost (dev).
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
