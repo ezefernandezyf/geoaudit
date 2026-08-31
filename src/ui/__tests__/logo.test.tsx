@@ -46,13 +46,11 @@ describe("Logo (SHL-4)", () => {
     expect(svg?.querySelector("circle")).toBeNull();
     const paths = svg?.querySelectorAll("path");
     expect(paths).toHaveLength(2);
-    // Quote 1 is navy and flips to white in dark mode (functional contract of
-    // the user's mark, not decorative styling).
-    const navyClass = paths?.[0].getAttribute("class") ?? "";
-    expect(navyClass).toContain("fill-[#0f172a]");
-    expect(navyClass).toContain("dark:fill-white");
+    // Quote 1 is navy via native fill attribute (functional contract of the
+    // user's mark; direct fill so the mark stays visible on the always-white
+    // navbar regardless of system dark mode — no Tailwind arbitrary class).
+    expect(paths?.[0].getAttribute("fill")).toBe("#0f172a");
     // Quote 2 is the emerald accent.
-    const emeraldClass = paths?.[1].getAttribute("class") ?? "";
-    expect(emeraldClass).toContain("fill-[#10b981]");
+    expect(paths?.[1].getAttribute("fill")).toBe("#10b981");
   });
 });
