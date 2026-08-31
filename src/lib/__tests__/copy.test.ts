@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SUPPORT_EMAIL } from "@/lib/brand";
 import {
   AUDIT_FORM_ERRORS,
   AUTH_COPY,
@@ -7,6 +8,8 @@ import {
   FETCH_ERROR_COPY,
   GENERIC_AUDIT_ERROR_COPY,
   LANDING_COPY,
+  LEGAL_COPY,
+  PROFILE_COPY,
   REPORT_COPY,
   SHARE_COPY,
   SHARE_MODAL_ERROR_COPY,
@@ -111,7 +114,7 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
       "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
     );
     expect(LANDING_COPY.hero.subtitleLead).toBe(
-      "GeoAudit es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
+      "Relevy es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
     );
     expect(LANDING_COPY.hero.sampleLabel).toBe("O pruebe un ejemplo real:");
     // LND-6 (sprint 10): the final CTA is "Auditar gratis" (anonymous) or
@@ -141,6 +144,15 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
 
   it("contains no voseo anywhere in COPY", () => {
     expect(JSON.stringify(COPY)).not.toMatch(VOSEO_PATTERN);
+  });
+
+  it("uses the shared Relevy brand and support email constants (sprint 11)", () => {
+    // Brand refs must come from BRAND_NAME (via copy.ts), never hardcoded.
+    expect(JSON.stringify(COPY)).not.toContain("GeoAudit");
+    // Support email (SHL-8, PRF-6): profile support + legal privacy contact.
+    expect(PROFILE_COPY.support.email).toBe(SUPPORT_EMAIL);
+    const privacyContact = LEGAL_COPY.privacy.sections[5].body;
+    expect(privacyContact).toContain(SUPPORT_EMAIL);
   });
 });
 
@@ -202,7 +214,7 @@ describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
    */
   const STAT_PATTERN = /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b/;
   const ANSWER_FIRST_PATTERN =
-    /^(?:GeoAudit|El GEO Score|La citabilidad|La plataforma|El engine|Los motores|Los pasajes)/;
+    /^(?:Relevy|El GEO Score|La citabilidad|La plataforma|El engine|Los motores|Los pasajes)/;
 
   it("hero subtitle is answer-first and carries at least one concrete stat", () => {
     const subtitle =

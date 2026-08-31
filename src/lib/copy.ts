@@ -1,4 +1,5 @@
 import type { FetchErrorCode } from "@/lib/contracts/fetch-types";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 /**
  * Centralized user-facing copy (design U2, ATH-9, LGL-4).
@@ -130,8 +131,7 @@ export const LANDING_COPY = {
     // LND-11 (sprint 9): answer-first subtitle with a concrete stat — the
     // first sentence states the claim so the passage is self-contained. The
     // stats are REAL product facts (6 engines, 5 dimensions, weights sum 100).
-    subtitleLead:
-      "GeoAudit es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
+    subtitleLead: `${BRAND_NAME} es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.`,
     subtitleHighlight:
       " El GEO Score pondera 5 dimensiones que suman el 100 % del resultado.",
     subtitleTail: " Entrega un puntaje de 0 a 100 en menos de 30 segundos.",
@@ -151,32 +151,32 @@ export const LANDING_COPY = {
     {
       number: "01",
       title: "Acceso de bots",
-      body: "GeoAudit verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 20 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.",
+      body: `${BRAND_NAME} verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 20 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.`,
     },
     {
       number: "02",
       title: "Citabilidad",
-      body: "La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. GeoAudit analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 28 % del GEO Score, la dimensión con mayor peso del engine.",
+      body: `La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. ${BRAND_NAME} analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 28 % del GEO Score, la dimensión con mayor peso del engine.`,
     },
     {
       number: "03",
       title: "E-E-A-T",
-      body: "GeoAudit evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 24 puntos por dimensión. E-E-A-T pondera el 24 % del GEO Score y favorece al contenido con señales de confianza explícitas.",
+      body: `${BRAND_NAME} evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 24 puntos por dimensión. E-E-A-T pondera el 24 % del GEO Score y favorece al contenido con señales de confianza explícitas.`,
     },
     {
       number: "04",
       title: "Datos estructurados",
-      body: "GeoAudit detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 14 % del GEO Score y aportan precisión a las citas de entidades.",
+      body: `${BRAND_NAME} detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 14 % del GEO Score y aportan precisión a las citas de entidades.`,
     },
     {
       number: "05",
       title: "Plataforma",
-      body: "GeoAudit evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 14 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.",
+      body: `${BRAND_NAME} evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 14 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.`,
     },
   ],
   sections: {
     howItWorksEyebrow: "Metodología de análisis",
-    howItWorksTitle: "Cómo analiza GeoAudit tu visibilidad sintética",
+    howItWorksTitle: `Cómo analiza ${BRAND_NAME} tu visibilidad sintética`,
     scorecardEyebrow: "Scorecard Unificado",
     scorecardTitle: "El GEO Score: un estándar de 0 a 100",
     scorecardLead:
@@ -187,8 +187,7 @@ export const LANDING_COPY = {
     scorecardBandsTitle: "Escala de Bandas y Criterios Técnicos",
     platformsEyebrow: "Ecosistema de Búsqueda de IA",
     platformsTitle: "6 plataformas de búsqueda generativa auditadas",
-    platformsLead:
-      "GeoAudit analiza la interacción de cada crawler y motor de respuesta con el contenido web en las 6 plataformas que concentran la búsqueda asistida por IA en 2026.",
+    platformsLead: `${BRAND_NAME} analiza la interacción de cada crawler y motor de respuesta con el contenido web en las 6 plataformas que concentran la búsqueda asistida por IA en 2026.`,
     // LND-6 (sprint 10): final CTA — the /pricing teaser is gone (route
     // deleted). Anonymous → signup/audit ("Auditar gratis"); authenticated →
     // dashboard ("Ir al dashboard").
@@ -262,7 +261,7 @@ export const PROFILE_COPY = {
     blurb:
       "¿Problemas con su cuenta o con sus auditorías? Escríbanos y lo ayudamos a la brevedad.",
     emailLabel: "Correo de soporte",
-    email: "soporte@geoaudit.app",
+    email: SUPPORT_EMAIL,
   },
 } as const;
 
@@ -276,12 +275,11 @@ export const LEGAL_COPY = {
     eyebrow: "Legal",
     title: "Términos de Servicio",
     updated: "Última actualización: agosto de 2026",
-    intro:
-      "Al utilizar GeoAudit acepta estos términos. Le recomendamos leerlos detenidamente antes de usar el servicio.",
+    intro: `Al utilizar ${BRAND_NAME} acepta estos términos. Le recomendamos leerlos detenidamente antes de usar el servicio.`,
     sections: [
       {
         heading: "1. Uso del servicio",
-        body: "GeoAudit ofrece auditorías de visibilidad en motores de búsqueda con IA. El usuario se compromete a utilizarlo de forma lícita y a no abusar del servicio ni intentar vulnerar su seguridad.",
+        body: `${BRAND_NAME} ofrece auditorías de visibilidad en motores de búsqueda con IA. El usuario se compromete a utilizarlo de forma lícita y a no abusar del servicio ni intentar vulnerar su seguridad.`,
       },
       {
         heading: "2. Cuenta y responsabilidad",
@@ -293,11 +291,11 @@ export const LEGAL_COPY = {
       },
       {
         heading: "4. Propiedad intelectual",
-        body: "El servicio y su contenido son propiedad de GeoAudit. El usuario conserva los derechos sobre el contenido de sus propios sitios y sobre los reportes generados para sus dominios.",
+        body: `El servicio y su contenido son propiedad de ${BRAND_NAME}. El usuario conserva los derechos sobre el contenido de sus propios sitios y sobre los reportes generados para sus dominios.`,
       },
       {
         heading: "5. Limitación de responsabilidad",
-        body: "El servicio se ofrece 'tal cual'. GeoAudit no garantiza resultados específicos de posicionamiento ni se hace responsable por decisiones tomadas en base a los reportes.",
+        body: `El servicio se ofrece 'tal cual'. ${BRAND_NAME} no garantiza resultados específicos de posicionamiento ni se hace responsable por decisiones tomadas en base a los reportes.`,
       },
       {
         heading: "6. Modificaciones",
@@ -309,8 +307,7 @@ export const LEGAL_COPY = {
     eyebrow: "Legal",
     title: "Política de Privacidad",
     updated: "Última actualización: agosto de 2026",
-    intro:
-      "Esta política describe cómo GeoAudit recopila, utiliza y protege su información personal al usar el servicio.",
+    intro: `Esta política describe cómo ${BRAND_NAME} recopila, utiliza y protege su información personal al usar el servicio.`,
     sections: [
       {
         heading: "1. Datos que recopilamos",
@@ -334,7 +331,7 @@ export const LEGAL_COPY = {
       },
       {
         heading: "6. Contacto",
-        body: "Ante cualquier consulta sobre esta política, escríbanos a soporte@geoaudit.app y responderemos a la brevedad.",
+        body: `Ante cualquier consulta sobre esta política, escríbanos a ${SUPPORT_EMAIL} y responderemos a la brevedad.`,
       },
     ],
   },

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
  * C16 — shared OpenGraph/Twitter metadata builder (LND-8, PRC-8).
@@ -15,7 +16,7 @@ export const OG_IMAGE = {
   url: "/og.png",
   width: 1200,
   height: 630,
-  alt: "GeoAudit — AI Visibility & GEO Audit",
+  alt: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
 } as const;
 
 export type BuildOgMetadataInput = {
@@ -38,7 +39,7 @@ export function buildOgMetadata({
       title,
       description,
       url: path,
-      siteName: "GeoAudit",
+      siteName: BRAND_NAME,
       images: [OG_IMAGE],
       locale: "es_AR",
       type: "website",

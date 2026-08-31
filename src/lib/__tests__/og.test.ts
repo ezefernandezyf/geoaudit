@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildOgMetadata } from "@/lib/og";
+import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
+import { buildOgMetadata, OG_IMAGE } from "@/lib/og";
 
 /**
  * C16 — shared OG/Twitter metadata builder (LND-8).
@@ -29,7 +30,7 @@ describe("buildOgMetadata (C1.1, LND-8)", () => {
       title: "Iniciar sesión",
       description: "Descripción de prueba.",
       url: "/login",
-      siteName: "GeoAudit",
+      siteName: BRAND_NAME,
       locale: "es_AR",
       type: "website",
       images: [
@@ -37,7 +38,7 @@ describe("buildOgMetadata (C1.1, LND-8)", () => {
           url: "/og.png",
           width: 1200,
           height: 630,
-          alt: expect.any(String),
+          alt: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
         },
       ],
     });
@@ -67,5 +68,9 @@ describe("OG asset (C1.2)", () => {
     expect(buf.subarray(1, 4).toString("ascii")).toBe("PNG");
     expect(buf.readUInt32BE(16)).toBe(1200);
     expect(buf.readUInt32BE(20)).toBe(630);
+  });
+
+  it("carries the Relevy brand in the shared OG alt (SHL-9)", () => {
+    expect(OG_IMAGE.alt).toBe(`${BRAND_NAME} — ${BRAND_DESCRIPTOR}`);
   });
 });
