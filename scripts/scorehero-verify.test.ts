@@ -39,7 +39,7 @@ import type { GeminiBand } from "@/report/presenters/types";
  * content, AI-crawler-friendly robots.txt — the profile the GEO engine
  * rewards. Homes score worst; docs pages are the best-in-class profile.
  *
- * The landing itself (geoaudit-tau.vercel.app) is the dogfooding target
+ * The landing itself (relevy.app) is the dogfooding target
  * (A3.2): the live deploy still runs the PRE-fix build, so it audits low —
  * the breakdown below shows WHY (score-hero-evidence.ts TODO).
  */
@@ -60,7 +60,7 @@ export const CANDIDATE_URLS = [
   "https://webflow.com",
   "https://notion.so",
   // Dogfooding target (A3.2) — pre-fix build, baseline of the recalibration
-  "https://geoaudit-tau.vercel.app",
+  "https://relevy.app",
 ] as const;
 
 /** One verified entry: the URL, its real score and band, and the honest summary. */
