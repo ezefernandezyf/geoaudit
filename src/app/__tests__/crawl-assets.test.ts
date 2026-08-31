@@ -79,7 +79,7 @@ describe("public/llms.txt (LND-10)", () => {
   it("follows the standard format: title, summary and link list", () => {
     const content = readFileSync(LLMS_PATH, "utf8");
     // Standard llms.txt: a # title, a > summary, and markdown links.
-    expect(content).toMatch(/^# GeoAudit/m);
+    expect(content).toMatch(/^# Relevy/m);
     expect(content).toMatch(/^> /m);
     expect(content).toMatch(/\[.*\]\(https?:\/\/.*\)/);
   });
@@ -92,5 +92,14 @@ describe("public/llms.txt (LND-10)", () => {
     for (const route of ["/", "/login", "/signup"]) {
       expect(hrefs.some((href) => href.endsWith(route))).toBe(true);
     }
+  });
+
+  it("names Relevy and states the accurate 10/30-day limit (LND-10)", () => {
+    const content = readFileSync(LLMS_PATH, "utf8");
+
+    expect(content).toContain("Relevy");
+    expect(content).toMatch(/10 auditorías cada 30 días/);
+    expect(content).not.toMatch(/3 auditorías/);
+    expect(content).not.toContain("geoaudit-tau.vercel.app");
   });
 });
