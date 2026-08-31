@@ -53,7 +53,8 @@ describe("ProfilePage (PRF-1)", () => {
 
     expect(screen.getByText("Ana")).toBeInTheDocument();
     expect(screen.getByText("ana@example.com")).toBeInTheDocument();
-    expect(screen.getByText("free")).toBeInTheDocument();
+    // PRF-3 (sprint 11): the pill reads "Plan Free" — unified with the navbar.
+    expect(screen.getByText("Plan Free")).toBeInTheDocument();
   });
 
   it("shows usage against the single FREE limit (PRF-4)", async () => {

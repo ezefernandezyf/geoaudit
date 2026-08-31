@@ -11,10 +11,11 @@ import { PROFILE_COPY } from "@/lib/copy";
  * real `User` row (PRF-2) and shows audit usage against the single FREE limit
  * (PRF-4): `Audit` rows in the 30-day moving window, limit `FREE_AUDIT_LIMIT`.
  *
- * Sprint 10 (PRF-3/5): there is ONE plan — the pill is always "Free" (no tier
- * lookup) and subscription management is REMOVED with the billing capability —
- * no portal action, no upgrade CTA. Support entry (PRF-6) via email (the
- * /pricing link was removed with the route, WU-1).
+ * Sprint 10 (PRF-3/5): there is ONE plan — the pill reads "Plan Free",
+ * unified with the navbar pill (SHL-2), and subscription management is
+ * REMOVED with the billing capability — no portal action, no upgrade CTA.
+ * Support entry (PRF-6) via email (the /pricing link was removed with the
+ * route, WU-1).
  */
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -91,7 +92,7 @@ export default async function ProfilePage() {
               {PROFILE_COPY.identity.tierLabel}
             </span>
             <span className="rounded-full border border-[#10b981]/30 bg-[#10b981]/10 px-2.5 py-0.5 font-mono text-xs text-[#047857]">
-              free
+              Plan Free
             </span>
           </div>
 
