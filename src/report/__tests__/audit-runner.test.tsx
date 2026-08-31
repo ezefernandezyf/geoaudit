@@ -7,6 +7,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkTierLimit } from "@/lib/audit/enforcement";
 import { AuditRunner } from "@/report/audit-runner";
+import { headers } from "next/headers";
+import { getAnonymousAuditLimiter, resolveClientKey } from "@/lib/rate-limit";
 import {
   degradedCitabilityResult,
   unsupportedPageResult,
@@ -33,6 +35,29 @@ vi.mock("@/lib/audit/enforcement", () => ({
   checkTierLimit: vi.fn(async () => ({ allowed: true })),
 }));
 
+/**
+ * TLM-11 anonymous gate: the runner consults the anonymous limiter exactly
+ * once per completed anonymous audit, keyed `anon:{ip}` (RTL-8). The default
+ * mock lets every anonymous audit through so pre-existing anonymous tests
+ * (TLM-6) keep rendering the report; the dedicated describe below overrides
+ * the decision per scenario.
+ */
+const anonLimiter = vi.hoisted(() => ({
+  check: vi.fn(async () => ({ allowed: true, remaining: 3, resetMs: 0 })),
+  reset: vi.fn(async () => {}),
+}));
+
+vi.mock("next/headers", () => ({
+  headers: vi.fn(async () => ({
+    get: (name: string) => (name === "x-forwarded-for" ? "203.0.113.9" : null),
+  })),
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  getAnonymousAuditLimiter: vi.fn(async () => anonLimiter),
+  resolveClientKey: vi.fn(() => "203.0.113.9"),
+}));
+
 const runAuditMock = vi.mocked(runAudit);
 
 /**
@@ -43,6 +68,9 @@ const runAuditMock = vi.mocked(runAudit);
 const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
 const checkTierLimitMock = vi.mocked(checkTierLimit);
 const auditCreateMock = vi.mocked(prisma.audit.create);
+const headersMock = vi.mocked(headers);
+const getAnonLimiterMock = vi.mocked(getAnonymousAuditLimiter);
+const resolveClientKeyMock = vi.mocked(resolveClientKey);
 
 const session = (): Session => ({
   user: { id: "user-1", name: "Ana", email: "ana@example.com" },
@@ -277,5 +305,65 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
     render(await AuditRunner({ url: "https://example.com/" }));
 
     expect(screen.getByText("68")).toBeInTheDocument();
+  });
+});
+
+describe("AuditRunner anonymous gate (TLM-6, TLM-11)", () => {
+  beforeEach(() => {
+    runAuditMock.mockReset();
+    authMock.mockReset();
+    auditCreateMock.mockReset();
+    authMock.mockResolvedValue(null);
+    headersMock.mockClear();
+    getAnonLimiterMock.mockClear();
+    resolveClientKeyMock.mockClear();
+    anonLimiter.check.mockReset();
+    anonLimiter.check.mockResolvedValue({
+      allowed: true,
+      remaining: 3,
+      resetMs: 0,
+    });
+  });
+
+  it("increments the anonymous limiter exactly once with anon:{ip} and renders the report (TLM-6, TLM-11)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(getAnonLimiterMock).toHaveBeenCalledTimes(1);
+    expect(anonLimiter.check).toHaveBeenCalledTimes(1);
+    expect(anonLimiter.check).toHaveBeenCalledWith("anon:203.0.113.9");
+    expect(auditCreateMock).not.toHaveBeenCalled();
+    expect(screen.getByText("68")).toBeInTheDocument();
+  });
+
+  it("renders the anonymous limit state and does not persist when the 4th audit is blocked (TLM-11)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    anonLimiter.check.mockResolvedValue({
+      allowed: false,
+      remaining: 0,
+      resetMs: 0,
+    });
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "límite de auditorías anónimas",
+    );
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "3 auditorías cada 30 días",
+    );
+    expect(auditCreateMock).not.toHaveBeenCalled();
+    expect(screen.queryByText("68")).not.toBeInTheDocument();
+  });
+
+  it("never consults the anonymous limiter for signed-in users (TLM-11)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    authMock.mockResolvedValue(session());
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(getAnonLimiterMock).not.toHaveBeenCalled();
+    expect(auditCreateMock).toHaveBeenCalledTimes(1);
   });
 });

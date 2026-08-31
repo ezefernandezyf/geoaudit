@@ -27,6 +27,12 @@ export const AUDIT_FORM_ERRORS = {
     "Alcanzó el límite de 10 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
 } as const;
 
+/** Anonymous audit limit state (TLM-11, RTL-8) — neutral Spanish (LGL-4). */
+export const ANONYMOUS_AUDIT_LIMIT_COPY = {
+  title: "Alcanzó el límite de auditorías anónimas",
+  body: "Sin una cuenta puede realizar 3 auditorías cada 30 días por IP. Inicie sesión para acceder a 10 auditorías gratuitas por ventana de 30 días, con historial y exportación a PDF.",
+} as const;
+
 /** FetchErrorCode → user-facing Spanish copy (ARU-6) — neutral (LGL-4). */
 export const FETCH_ERROR_COPY: Record<FetchFailureCode, string> = {
   SSRF_BLOCKED: "El sitio bloqueó el acceso automatizado al contenido.",

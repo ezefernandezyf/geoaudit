@@ -4,6 +4,9 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { checkTierLimit } from "@/lib/audit/enforcement";
 import { AUDIT_FORM_ERRORS } from "@/lib/audit/url-policy";
+import { ANONYMOUS_AUDIT_LIMIT_COPY } from "@/lib/copy";
+import { getAnonymousAuditLimiter, resolveClientKey } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 import type { Prisma } from "@/generated/prisma/client";
 import {
   detectFetchFailureCode,
@@ -28,8 +31,11 @@ export type AuditRunnerProps = {
  * pass the authoritative limit re-check (TOCTOU guard — the cheap pre-check
  * ran in the action) and the Audit row is persisted with the full AuditResult
  * JSON. Over-limit users see the limit copy and nothing is persisted;
- * anonymous audits never persist (TLM-6). Persistence is best-effort: a DB
- * failure logs and still renders the report (the audit already ran).
+ * anonymous audits never persist (TLM-6) and instead pass the anonymous
+ * IP-based 3/30d gate (TLM-11): one authoritative increment per completed
+ * anonymous audit, keyed `anon:{ip}` — no pre-check in the form action, so
+ * the counter is never double-counted (RTL-8). Persistence is best-effort: a
+ * DB failure logs and still renders the report (the audit already ran).
  *
  * There is no tier branch (TLM-8 removed): every signed-in user within the
  * limit writes the Audit row directly — no paid counter, no $transaction
@@ -81,6 +87,18 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
       // Best-effort persist: never hide the finished report behind a DB error.
       console.error("audit persist failed", error);
     }
+  } else {
+    // Anonymous gate (TLM-11, RTL-8): exactly one increment per completed
+    // anonymous audit, keyed `anon:{ip}` (namespaced away from the burst
+    // limiter's plain-IP keys). No persist for anonymous (TLM-6). The kill
+    // switch lives in the limiter itself (RTL-7: RATE_LIMIT_ENABLED=false).
+    const requestHeaders = await headers();
+    const ip = resolveClientKey(requestHeaders);
+    const anonLimiter = await getAnonymousAuditLimiter();
+    const decision = await anonLimiter.check(`anon:${ip}`);
+    if (!decision.allowed) {
+      return <AnonymousLimitState />;
+    }
   }
 
   return <AuditReport result={result} />;
@@ -97,6 +115,22 @@ function TierLimitState() {
       </h2>
       <p className="max-w-md text-[#475569]">
         {AUDIT_FORM_ERRORS.limitReached}
+      </p>
+    </section>
+  );
+}
+
+function AnonymousLimitState() {
+  return (
+    <section
+      role="alert"
+      className="mx-auto flex w-full max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center"
+    >
+      <h2 className="font-serif text-3xl tracking-tight text-[#0f172a]">
+        {ANONYMOUS_AUDIT_LIMIT_COPY.title}
+      </h2>
+      <p className="max-w-md text-[#475569]">
+        {ANONYMOUS_AUDIT_LIMIT_COPY.body}
       </p>
     </section>
   );

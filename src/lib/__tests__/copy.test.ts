@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SUPPORT_EMAIL } from "@/lib/brand";
 import {
+  ANONYMOUS_AUDIT_LIMIT_COPY,
   AUDIT_FORM_ERRORS,
   AUTH_COPY,
   COPY,
@@ -51,6 +52,18 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     // TLM-5 (sprint 10): the single FREE limit is 10 audits per 30-day window.
     expect(AUDIT_FORM_ERRORS.limitReached).toBe(
       "Alcanzó el límite de 10 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
+    );
+  });
+
+  it("describes the anonymous 3/30d limit copy (TLM-11)", () => {
+    expect(ANONYMOUS_AUDIT_LIMIT_COPY.title).toBe(
+      "Alcanzó el límite de auditorías anónimas",
+    );
+    expect(ANONYMOUS_AUDIT_LIMIT_COPY.body).toContain(
+      "3 auditorías cada 30 días",
+    );
+    expect(ANONYMOUS_AUDIT_LIMIT_COPY.body).toContain(
+      "10 auditorías gratuitas",
     );
   });
 
