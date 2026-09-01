@@ -307,10 +307,47 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(org.name).toBe("Relevy");
     expect(org.url).toMatch(/^https?:\/\//);
     expect(Array.isArray(org.sameAs)).toBe(true);
-    // LND-9 (sprint 11): sameAs links the renamed Relevy repo, not geoaudit.
-    expect(org.sameAs).toContain("https://github.com/ezefernandezyf/relevy");
+    // LND-9 (sprint 12): sameAs links the real, verifiable profiles - the
+    // founder's GitHub, LinkedIn and personal site - never the repo or
+    // invented handles.
+    expect(org.sameAs).toContain("https://github.com/ezefernandezyf");
+    expect(org.sameAs).toContain(
+      "https://www.linkedin.com/in/ezequiel-fernandez-59a21a387/",
+    );
+    expect(org.sameAs).toContain("https://ezefernandez.com");
     const site = payloads.find((payload) => payload["@type"] === "WebSite");
     expect(site.potentialAction).toBeDefined();
+  });
+
+  // LND-9 (sprint 12): the Organization node carries the recommended
+  // properties populated with real Relevy data - nothing invented (LND-7).
+  it("emits the recommended Organization properties with real data (LND-9)", async () => {
+    const { container } = await renderPage();
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const payloads = [...scripts].map((script) =>
+      JSON.parse(script.textContent ?? ""),
+    );
+    const org = payloads.find((payload) => payload["@type"] === "Organization");
+
+    expect(org.knowsAbout).toContain("GEO");
+    expect(org.founder).toEqual({
+      "@type": "Person",
+      name: "Ezequiel Alejandro Fernandez",
+    });
+    expect(org.address).toEqual({
+      "@type": "PostalAddress",
+      addressCountry: "AR",
+      addressLocality: "Ciudad Autónoma de Buenos Aires",
+    });
+    expect(org.contactPoint).toMatchObject({
+      "@type": "ContactPoint",
+      email: "ezefernandezyf@gmail.com",
+    });
+    expect(org.email).toBe("ezefernandezyf@gmail.com");
+    expect(org.foundingDate).toBe("2026-08-05");
+    expect(org.logo).toMatch(/og\.png$/);
   });
 
   // LND-12 (sprint 9): E-E-A-T trust signals - external citations to authority
@@ -341,6 +378,61 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       authorityHosts.some((host) => href.includes(host)),
     );
     expect(matched.length).toBeGreaterThanOrEqual(5);
+  });
+
+  // LND-13 (sprint 12): a visible FAQ section with real questions. Per the
+  // product decision, NO FAQPage JSON-LD is emitted (the engine docks
+  // FAQPage as deprecated, RSC-7) - the visible Q&A is the signal.
+  it("renders a visible FAQ section with real questions (LND-13)", async () => {
+    await renderPage();
+    const faq = screen.getByText(
+      "Respuestas rápidas sobre GEO y visibilidad en IA",
+    );
+    expect(faq).toBeInTheDocument();
+    expect(
+      screen.getByText("¿Qué es el GEO Score y cómo se calcula?"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("¿Qué motores de búsqueda con IA analiza Relevy?"),
+    ).toBeInTheDocument();
+  });
+
+  // LND-13 (sprint 12): the page emits NO FAQPage JSON-LD block - only the
+  // Organization + WebSite scripts (decision: FAQPage is deprecated RSC-7).
+  it("does not emit FAQPage JSON-LD (LND-13 product decision)", async () => {
+    const { container } = await renderPage();
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const payloads = [...scripts].map((script) =>
+      JSON.parse(script.textContent ?? ""),
+    );
+    const types = payloads.map((payload) => payload["@type"]);
+    expect(types).not.toContain("FAQPage");
+  });
+
+  // LND-13 (sprint 12): real content date + author byline on the content
+  // sections - never a placeholder.
+  it("renders a real datePublished and an author byline (LND-13)", async () => {
+    await renderPage();
+    expect(screen.getByText(/Publicado el 2026-08-20/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Ezequiel Alejandro Fernandez"),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Fundador de Relevy/)).toBeInTheDocument();
+  });
+
+  // LND-13 (sprint 12): every <img> on the landing has a descriptive alt.
+  // The landing currently has no <img> elements (only the og:image meta tag),
+  // so the invariant holds vacuously - if an image is added it must carry alt.
+  it("gives every image a non-empty alt attribute (LND-13)", async () => {
+    const { container } = await renderPage();
+    const images = container.querySelectorAll("img");
+    for (const img of images) {
+      const alt = img.getAttribute("alt");
+      expect(alt).toBeTruthy();
+      expect(alt!.trim()).not.toBe("");
+    }
   });
 });
 

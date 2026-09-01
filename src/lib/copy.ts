@@ -203,6 +203,43 @@ export const LANDING_COPY = {
     ctaPrimary: "Auditar gratis",
     ctaLoggedIn: "Ir al dashboard",
   },
+  // LND-13 (sprint 12): real Q&A pairs backed by the FAQPage JSON-LD (visible
+  // FAQ section). Real product questions - nothing invented.
+  faq: {
+    eyebrow: "Preguntas frecuentes",
+    title: "Respuestas rápidas sobre GEO y visibilidad en IA",
+    items: [
+      {
+        question: "¿Qué es el GEO Score y cómo se calcula?",
+        answer:
+          "El GEO Score es un puntaje de 0 a 100 que sintetiza la visibilidad de su sitio en los motores de búsqueda con IA. Se pondera sobre 5 dimensiones: acceso de bots (20 %), citabilidad (28 %), E-E-A-T (24 %), datos estructurados (14 %) y plataforma (14 %).",
+      },
+      {
+        question: "¿Qué motores de búsqueda con IA analiza Relevy?",
+        answer:
+          "Relevy audita 6 plataformas: ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews y Bing Copilot. Cada motor tiene su propio crawler y criterios de elegibilidad que el engine verifica.",
+      },
+      {
+        question: "¿Cuánto tarda una auditoría y cuántas puedo hacer?",
+        answer:
+          "Cada auditoría entrega su resultado en menos de 30 segundos. Con una cuenta gratuita dispone de 10 auditorías por ventana de 30 días, con historial, auditoría multi-página y exportación a PDF.",
+      },
+      {
+        question: "¿Cómo mejoro mi citabilidad en los motores de IA?",
+        answer:
+          "Escriba pasajes answer-first de 50 a 200 palabras, autocontenidos y con cifras concretas; verifique el acceso de los crawlers en robots.txt y encabezados; y publique JSON-LD válido con señales de autoridad y fechas.",
+      },
+    ],
+  },
+  // LND-13 (sprint 12): real content date and author byline - never a placeholder.
+  contentDates: {
+    datePublished: "2026-08-20",
+    dateModified: "2026-08-28",
+  },
+  contentByline: {
+    name: "Ezequiel Alejandro Fernandez",
+    role: "Fundador de Relevy",
+  },
 } as const;
 
 /**

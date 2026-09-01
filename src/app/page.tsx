@@ -6,7 +6,18 @@ import { AuditForm } from "@/ui/audit-form";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 import { LANDING_COPY } from "@/lib/copy";
 import { buildOgMetadata } from "@/lib/og";
-import { BRAND_NAME, BRAND_REPO } from "@/lib/brand";
+import {
+  BRAND_ADDRESS,
+  BRAND_CONTACT_POINT,
+  BRAND_NAME,
+  BRAND_REPO,
+  BRAND_DESCRIPTOR,
+  FOUNDER,
+  FOUNDING_DATE,
+  KNOWS_ABOUT,
+  ORG_SAME_AS,
+  SUPPORT_EMAIL,
+} from "@/lib/brand";
 import { ScoreHero } from "@/report/score-hero";
 import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
 
@@ -38,14 +49,14 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
 export const dynamic = "force-dynamic";
 
 /**
- * LND-9 (sprint 9): Organization + WebSite structured data, inline in the SSR
+ * LND-9 (sprint 9/12): Organization + WebSite structured data, inline in the SSR
  * HTML. The site URL is derived from NEXT_PUBLIC_APP_URL so the JSON-LD stays
  * truthful regardless of environment. SearchAction on WebSite unlocks schema
- * criterion 5; sameAs feeds both schema criterion 2 and E-E-A-T authority.
+ * criterion 5. LND-9 (sprint 12) enriches the Organization with the real
+ * recommended properties (knowsAbout, founder, address, contactPoint, email,
+ * foundingDate) and real sameAs profiles - never invented data (LND-7).
  */
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-/** Real, verifiable org profiles only (never invented sameAs - LND-7 honesty). */
-const ORG_SAME_AS = [BRAND_REPO];
 
 function OrganizationJsonLd() {
   return (
@@ -61,6 +72,13 @@ function OrganizationJsonLd() {
           description:
             "Plataforma de auditoría GEO/SEO que mide la visibilidad y citabilidad de un sitio en los motores de búsqueda con IA.",
           sameAs: ORG_SAME_AS,
+          // LND-9 (sprint 12): real recommended properties, one source in brand.ts.
+          knowsAbout: KNOWS_ABOUT,
+          founder: FOUNDER,
+          address: BRAND_ADDRESS,
+          contactPoint: BRAND_CONTACT_POINT,
+          email: SUPPORT_EMAIL,
+          foundingDate: FOUNDING_DATE,
         }),
       }}
     />
@@ -527,7 +545,53 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. CTA FINAL - adaptado a la sesión (LND-6): sin teaser de precios
+      {/* 5. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
+          descuenta FAQPage como deprecado, RSC-7) */}
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <div className="mb-10 text-center">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {LANDING_COPY.faq.eyebrow}
+          </span>
+          <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+            {LANDING_COPY.faq.title}
+          </h2>
+        </div>
+        <div className="divide-y divide-[#e2e8f0] overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+          {LANDING_COPY.faq.items.map((item) => (
+            <details
+              key={item.question}
+              className="group px-6 py-5 open:bg-[#f8fafc]"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-medium text-[#0f172a]">
+                <span>{item.question}</span>
+                <span className="text-[#94a3b8] transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-[#475569]">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+
+        {/* LND-13 (sprint 12): real content date + author byline, never a
+            placeholder. */}
+        <div className="mt-8 flex flex-col items-center justify-center gap-1 border-t border-[#e2e8f0] pt-8 text-center text-xs text-[#64748b]">
+          <time dateTime={LANDING_COPY.contentDates.datePublished}>
+            Publicado el {LANDING_COPY.contentDates.datePublished}
+          </time>
+          <p>
+            Por{" "}
+            <span className="font-medium text-[#0f172a]">
+              {LANDING_COPY.contentByline.name}
+            </span>
+            {` · ${LANDING_COPY.contentByline.role}`}
+          </p>
+        </div>
+      </section>
+
+      {/* 6. CTA FINAL - adaptado a la sesión (LND-6): sin teaser de precios
           (la ruta /pricing se eliminó en WU-1) */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
         <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm sm:p-12">
