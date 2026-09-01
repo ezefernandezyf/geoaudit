@@ -23,12 +23,13 @@ export function isEngineDegraded(errors: string[], engine: string): boolean {
 }
 
 /**
- * Schema presence proxy: 0 when no structured data was detected, otherwise
- * 100 minus 10 per validation issue (floor 0). Mirrors the UI derivation.
+ * Schema row score: the real engine rubric score (0-100, RSC-14). A defensive
+ * `?? 0` guards legacy persisted rows that predate `schema.score` (read via
+ * `as unknown as AuditResult` without Zod re-parse) so they never surface an
+ * `undefined`; it never reconstructs the old `100 - issues*10` proxy (APT-6).
  */
 export function deriveSchemaScore(schema: AuditResult["schema"]): number {
-  if (schema.detected.length === 0) return 0;
-  return Math.max(0, 100 - schema.issues.length * 10);
+  return schema.score ?? 0;
 }
 
 /** Reads a numeric 0-100 `score` from a contract `unknown` entry. */

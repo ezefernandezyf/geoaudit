@@ -20,6 +20,7 @@ export const emptySchema: AuditResult["schema"] = {
   issues: [],
   generated: null,
   businessType: "hybrid",
+  score: 0,
 };
 
 export const emptyPlatform: AuditResult["platform"] = {

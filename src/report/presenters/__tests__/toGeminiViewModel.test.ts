@@ -61,10 +61,10 @@ describe("toGeminiViewModel", () => {
     // content.composite 65 → fair; v2 weight 24%
     expect(byId.content.score).toBe(65);
     expect(byId.content.weight).toBe("24%");
-    // schema: 1 detected, 1 issue → 90 → excellent; v2 weight 14%
-    expect(byId.schema.score).toBe(90);
+    // schema: engine score 61 (fixture) → fair; v2 weight 14%
+    expect(byId.schema.score).toBe(61);
     expect(byId.schema.weight).toBe("14%");
-    expect(byId.schema.status).toBe("excellent");
+    expect(byId.schema.status).toBe("fair");
     // platform: aio 70 → fair (60-74 real band); v2 weight 14%
     expect(byId.platform.score).toBe(70);
     expect(byId.platform.weight).toBe("14%");

@@ -89,9 +89,9 @@ describe("buildReportHtml single-page report (PDF-4)", () => {
     ]) {
       expect(html).toContain(label);
     }
-    // crawlers 71 · citability 62 · content 65 · schema proxy 90 · platform aio 70
+    // crawlers 71 · citability 62 · content 65 · schema engine 61 · platform aio 70
     expect(html).toContain("71");
-    expect(html).toContain("90");
+    expect(html).toContain("61");
     expect(html).toContain("70");
   });
 

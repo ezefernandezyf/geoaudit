@@ -167,6 +167,15 @@ describe("toContractResult (SchemaResult contract)", () => {
     expect(schemaResultSchema.safeParse(contract).success).toBe(true);
   });
 
+  it("carries the real engine rubric score into the contract (RSC-14)", () => {
+    const result = scoreSchema(page("ld-rubric-rich.html"));
+    const contract = toContractResult(result);
+    // The contract exposes the engine's rubric score, never a reconstruction.
+    expect(contract.score).toBe(result.score);
+    expect(contract.score).toBe(98);
+    expect(schemaResultSchema.safeParse(contract).success).toBe(true);
+  });
+
   it("surfaces validation issues as strings in the contract", () => {
     const result = scoreSchema(page("ld-missing-required.html"));
     const contract = toContractResult(result);

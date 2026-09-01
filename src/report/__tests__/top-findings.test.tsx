@@ -113,6 +113,7 @@ describe("TopFindings honesty edge cases (APT-10)", () => {
         issues: [],
         generated: null,
         businessType: "hybrid" as const,
+        score: 0,
       },
       crawlers: { compositeScore: 0, perBot: { GPTBot: "allowed" as const } },
     };
@@ -132,6 +133,7 @@ describe("TopFindings honesty edge cases (APT-10)", () => {
         issues: ["Organization missing sameAs"],
         generated: null,
         businessType: "saas" as const,
+        score: 61,
       },
     };
     render(<TopFindings view={toGeminiViewModel(noSchemaSource)} />);

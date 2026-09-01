@@ -36,11 +36,11 @@ describe("DomainScorecard valid audit (ARU-10)", () => {
     expect(screen.getByText("Datos estructurados")).toBeInTheDocument();
     expect(screen.getByText("Plataforma")).toBeInTheDocument();
 
-    // crawlers 71 · citability 62 · content 65 · schema proxy 90 · platform aio 70
+    // crawlers 71 · citability 62 · content 65 · schema engine 61 · platform aio 70
     expect(screen.getByText("71")).toBeInTheDocument();
     expect(screen.getByText("62")).toBeInTheDocument();
     expect(screen.getByText("65")).toBeInTheDocument();
-    expect(screen.getByText("90")).toBeInTheDocument();
+    expect(screen.getByText("61")).toBeInTheDocument();
     expect(screen.getByText("70")).toBeInTheDocument();
   });
 
@@ -49,14 +49,14 @@ describe("DomainScorecard valid audit (ARU-10)", () => {
     const bars = screen.getAllByRole("progressbar");
     expect(bars).toHaveLength(5);
     const values = bars.map((b) => Number(b.getAttribute("aria-valuenow")));
-    expect(values).toEqual([71, 62, 65, 90, 70]);
+    expect(values).toEqual([71, 62, 65, 61, 70]);
   });
 
   it("sizes each ScoreBar fill to its category score", () => {
     render(<DomainScorecard view={geminiViewFixture} />);
     expect(fillOf(62)).toHaveAttribute("data-score-fill");
     expect(fillOf(62)).toHaveStyle({ width: "62%" });
-    expect(fillOf(90)).toHaveStyle({ width: "90%" });
+    expect(fillOf(61)).toHaveStyle({ width: "61%" });
   });
 
   it("shows the Gemini section header with the 5-categories chip", () => {
@@ -97,6 +97,7 @@ describe("DomainScorecard score derivation via the adapter", () => {
         issues: [],
         generated: null,
         businessType: "hybrid" as const,
+        score: 0,
       },
     };
     render(<DomainScorecard view={toGeminiViewModel(noSchema)} />);
@@ -105,8 +106,8 @@ describe("DomainScorecard score derivation via the adapter", () => {
 
   it("renders the real lowercase status band through the ScoreBar color", () => {
     render(<DomainScorecard view={geminiViewFixture} />);
-    // Score 90 (schema) → "excellent" → emerald fill; score 62 → "fair" → amber.
-    expect(fillOf(90).className).toContain("bg-[#10b981]");
+    // Score 61 (schema) → "fair" → amber fill; score 62 → "fair" → amber.
+    expect(fillOf(61).className).toContain("bg-[#f59e0b]");
     expect(fillOf(62).className).toContain("bg-[#f59e0b]");
   });
 });

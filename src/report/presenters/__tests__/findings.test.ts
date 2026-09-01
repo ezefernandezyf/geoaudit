@@ -32,6 +32,7 @@ const schemaWithGenerated: SchemaResult = {
   issues: ["Organization missing sameAs", "Missing url"],
   generated: { "@type": "Organization", name: "Example Corp" },
   businessType: "saas",
+  score: 61,
 };
 
 const crawlersWithBlocked: CrawlerResult = {
@@ -93,8 +94,9 @@ describe("deriveFindings (APT-7)", () => {
       "Organization missing sameAs",
       "Missing url",
     ]);
-    // 2 detected, 2 issues → deriveSchemaScore = 100 - 20 = 80 → "good".
-    expect(finding.severity).toBe("good");
+    // APT-6: the finding severity derives from the real engine score (61 → "fair"),
+    // never the old 100 - issues*10 proxy.
+    expect(finding.severity).toBe("fair");
     expect(finding.impactScore).toBeNull();
     // The JSON-LD snippet appears exactly once (one finding, one snippet).
     expect(finding.codeSnippet).toContain('"@type"');
