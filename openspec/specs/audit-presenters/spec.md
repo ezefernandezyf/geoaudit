@@ -1,6 +1,6 @@
 # Audit Presenters Specification
 
-> **Change**: `sprint-7-ui-fidelity` · **Type**: New capability (ADDED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-12-dogfood-geo-score` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
@@ -15,7 +15,7 @@ The pure adapter `toGeminiViewModel(result)` in `src/report/presenters/` that ma
 | APT-3 | Domain + title fallback | New | MUST | Derive `domain` from `summary.url`; `title` falls back to the domain when absent |
 | APT-4 | Summary template | New | MUST | Build `summary` from real metrics only; never fabricate numbers |
 | APT-5 | Duration seconds | New | MUST | Map `summary.durationMs`→`durationSeconds` |
-| APT-6 | Category scores (5) | New | MUST | Derive `categoryScores[5]` from the real engines (reuse `rowScore` derivation) |
+| APT-6 | Category scores (5) | New | MUST | Derive `categoryScores[5]` from the real engines — Datos estructurados uses `schema.score` (shared derivation, never a proxy) |
 | APT-7 | Findings derivation | New | MUST | Derive `findings[]` from real citability + schema + crawler data |
 | APT-8 | Platforms (6) | New | MUST | Derive `platforms[6]` from `perPlatform` + `perBot`; Claude = "No medido" |
 | APT-9 | Share token | New | MUST | Pass through `shareToken` when present |
@@ -79,13 +79,22 @@ When mapping duration, then the adapter MUST convert `summary.durationMs` (ms) t
 
 ### Requirement: Category Scores (APT-6)
 
-When deriving category scores, then the adapter MUST produce exactly five entries (Acceso de bots, Citabilidad, E-E-A-T, Datos estructurados, Plataforma) using the real engine outputs (`crawlers.compositeScore`, `citability.pageScore`, `content.composite`, `deriveSchemaScore(schema)`, `derivePlatformScore(perPlatform)`), the same derivation as `rowScore`.
+When deriving category scores, then the adapter MUST produce exactly five entries (Acceso de bots, Citabilidad, E-E-A-T, Datos estructurados, Plataforma) using the real engine outputs (`crawlers.compositeScore`, `citability.pageScore`, `content.composite`, `schema.score`, `derivePlatformScore(perPlatform)`), the same derivation as `rowScore`.
+(Previously: the Datos estructurados row used `deriveSchemaScore(schema)` reconstructing `100 - issues*10`; the fixture had 1 issue and showed 90 instead of the engine value.)
 
 #### Scenario: Five real category scores
 
 - GIVEN an `AuditResult` with all five engines present
 - WHEN the adapter maps
 - THEN `categoryScores` has length 5 and each score equals the corresponding engine value
+- AND the Datos estructurados entry equals `schema.score` of the contract (e.g. fixture with `issues: ["Organization missing sameAs"]` shows the fixture score, not 90)
+
+#### Scenario: Derivation is shared across web, PDF, and findings
+
+- GIVEN a schema section whose engine rubric score is 61 with 9 warnings
+- WHEN `deriveSchemaScore(schema)` runs (single source in `domain-metrics`)
+- THEN the row, the PDF template, and the findings severity all use 61, never the `100 - 9*10 = 10` proxy
+- AND findings tests no longer assert the derived proxy
 
 ### Requirement: Findings Derivation (APT-7)
 
@@ -136,7 +145,7 @@ When any metric has no real source (`citationRate`, `presenceInPrompts`, `impact
 | APT-3 | Title falls back to domain | Covered |
 | APT-4 | Summary uses real metrics | Covered |
 | APT-5 | Milliseconds to seconds | Covered |
-| APT-6 | Five real category scores | Covered |
+| APT-6 | Five real category scores, Derivation is shared across web/PDF/findings | Covered |
 | APT-7 | Findings from real sources only | Covered |
 | APT-8 | Claude not measured | Covered |
 | APT-9 | Token passthrough | Covered |

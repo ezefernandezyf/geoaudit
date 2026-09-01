@@ -1,10 +1,12 @@
 # Delta for Landing Page
 
 > **Change**: `sprint-12-dogfood-geo-score` · **Type**: Delta (MODIFIED + ADDED)
+>
+> **Reconciled at archive (2026-09-01)**: la versión original de este delta (spec phase) pedía FAQPage JSON-LD textualmente en LND-13. La decisión de producto final — registrada en tasks 2.4/3.2, apply-progress deviation #1 y verify-report WARNING #1 — emite la FAQ visible SIN el bloque `FAQPage` JSON-LD, porque el motor de schema descuenta FAQPage como deprecado (`deprecated_faqpage`, RSC-7, criterio 12 "No deprecated" −5). El texto a continuación refleja el estado FINAL. El wording original queda preservado en git history (`e329b73`).
 
 ## Racional
 
-Subir el GEO Score de relevy.app (hoy 47/100) con señales verificables: JSON-LD completo (faltan 9 propiedades recomendadas), FAQ visible + FAQPage, fechas y byline en contenido, y alt text en imágenes. La verificación de llms.txt (LND-10) ya responde 200 en prod — no se crea duplicado, solo se re-audita como baseline.
+Subir el GEO Score de relevy.app (hoy 47/100) con señales verificables: JSON-LD completo (faltan 9 propiedades recomendadas), FAQ visible (sin FAQPage JSON-LD — decisión de producto, ver nota de reconciliación), fechas y byline en contenido, y alt text en imágenes. La verificación de llms.txt (LND-10) ya responde 200 en prod — no se crea duplicado, solo se re-audita como baseline.
 
 ## MODIFIED Requirements
 
@@ -30,18 +32,18 @@ When the landing page renders, then it MUST emit `Organization` and `WebSite` st
 
 | # | Requirement | Status | Strength | Summary |
 |---|-------------|--------|----------|---------|
-| LND-13 | Content signals: FAQ, dates, byline, alt text | New | MUST | Landing MUST expose FAQ + FAQPage JSON-LD, `datePublished` on content sections, author byline, and alt text on images |
+| LND-13 | Content signals: FAQ, dates, byline, alt text | New | MUST | Landing MUST expose visible FAQ (FAQPage JSON-LD intentionally omitted — product decision, RSC-7), `datePublished` on content sections, author byline, and alt text on images |
 
 ### Requirement: Content Signals (LND-13)
 
-When the landing renders, then it MUST surface structured content signals: a visible FAQ section backed by FAQPage JSON-LD with real questions; `datePublished` on content sections with real dates; an author byline on content; and descriptive `alt` text on every image.
+When the landing renders, then it MUST surface structured content signals: a visible FAQ section with real questions (the FAQPage JSON-LD block is intentionally NOT emitted — documented product decision: the schema engine docks FAQPage as deprecated under RSC-7); `datePublished` on content sections with real dates; an author byline on content; and descriptive `alt` text on every image.
 
-#### Scenario: FAQ section and FAQPage JSON-LD
+#### Scenario: FAQ section visible, FAQPage JSON-LD omitted
 
 - GIVEN the landing page
 - WHEN it renders
 - THEN a visible FAQ section with real questions is present
-- AND a `<script type="application/ld+json">` block of `@type` FAQPage mirrors the same Q&A pairs
+- AND no `<script type="application/ld+json">` block of `@type` FAQPage is emitted (asserted by `page.test.tsx`)
 
 #### Scenario: Dates and byline on content
 
@@ -61,4 +63,4 @@ When the landing renders, then it MUST surface structured content signals: a vis
 | Requirement | Scenarios | Coverage |
 |-------------|-----------|----------|
 | LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data | Covered |
-| LND-13 | FAQ section and FAQPage JSON-LD, Dates and byline on content, Every image has alt text | Covered |
+| LND-13 | FAQ section visible (FAQPage JSON-LD omitted by product decision), Dates and byline on content, Every image has alt text | Covered |

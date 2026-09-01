@@ -1,10 +1,10 @@
 # Landing Page Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` + `sprint-12-dogfood-geo-score` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
-The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10).
+The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10). Since Sprint 12, the Organization JSON-LD carries the full recommended property set (`knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` — LND-9), and the landing shows a visible FAQ with real questions plus `datePublished`/byline/alt (LND-13; FAQPage JSON-LD intentionally omitted as a product decision — the schema engine docks FAQPage as deprecated under RSC-7).
 
 ## Requirements
 
@@ -18,10 +18,11 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else signup/audit CTA; no pricing teaser |
 | LND-7 | Veracious ScoreHero | New | MUST | ScoreHero MUST show verified score + `auditDate` + `categoryScores` (no placeholder) |
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
-| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo |
+| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` (real data) |
 | LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt (Relevy brand, `relevy.app`, accurate 10/30d limit) |
 | LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats |
 | LND-12 | E-E-A-T signals | New | MUST | Landing MUST surface author/org trust signals (legal links, contact, HTTPS) |
+| LND-13 | Content signals: FAQ, dates, byline, alt | New | MUST | Landing MUST expose a visible FAQ (FAQPage JSON-LD intentionally omitted — product decision, RSC-7), `datePublished` on content, author byline, and alt text on images |
 
 ### Requirement: Hero Form Inline (LND-1)
 
@@ -126,14 +127,21 @@ When the landing page renders, then it MUST emit OpenGraph and Twitter card meta
 
 ### Requirement: JSON-LD Organization (LND-9)
 
-When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` set to "Relevy", `url` set to the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`.
-(Previously: JSON-LD name was "GeoAudit" and `sameAs` linked `geo-saas`.)
+When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` set to "Relevy", `url` set to the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`. The `Organization` node MUST additionally include the recommended properties `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, and `foundingDate`, populated with real Relevy data (nothing invented, per the data-honesty rule).
+(Previously: Organization carried name/url/sameAs only — 9 recommended properties missing.)
 
 #### Scenario: Relevy Organization + WebSite
 
 - GIVEN the landing page
 - WHEN it renders
 - THEN the JSON-LD `name` is "Relevy" and `sameAs`/`url` reference Relevy (no "GeoAudit")
+
+#### Scenario: Recommended properties populated with real data
+
+- GIVEN the landing JSON-LD `Organization` node
+- WHEN it is inspected
+- THEN `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, and `foundingDate` are present
+- AND every value traces to real Relevy data (verified `sameAs` URLs, real founder/address/contact — no placeholders)
 
 ### Requirement: Crawl/AI Assets (LND-10)
 
@@ -172,6 +180,30 @@ When the landing renders, then it MUST surface trust and authority signals: lega
 - WHEN it renders
 - THEN terms, privacy, and contact links are present and all internal links are HTTPS
 
+### Requirement: Content Signals (LND-13)
+
+When the landing renders, then it MUST surface structured content signals: a visible FAQ section with real questions (the FAQPage JSON-LD block is intentionally NOT emitted — documented product decision: the schema engine docks FAQPage as deprecated under RSC-7); `datePublished` on content sections with real dates; an author byline on content; and descriptive `alt` text on every image.
+
+#### Scenario: FAQ section visible, FAQPage JSON-LD omitted
+
+- GIVEN the landing page
+- WHEN it renders
+- THEN a visible FAQ section with real questions is present
+- AND no `<script type="application/ld+json">` block of `@type` FAQPage is emitted (asserted by `page.test.tsx`)
+
+#### Scenario: Dates and byline on content
+
+- GIVEN a content section on the landing
+- WHEN it renders
+- THEN it carries a real `datePublished` value and an author byline
+- AND the value is not a placeholder
+
+#### Scenario: Every image has alt text
+
+- GIVEN all `<img>` elements on the landing
+- WHEN they are inspected
+- THEN each has a non-empty `alt` attribute describing the image
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -184,7 +216,8 @@ When the landing renders, then it MUST surface trust and authority signals: lega
 | LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees audit CTA | Covered |
 | LND-7 | Verified evidence shown, No candidate reaches 90+ | Covered |
 | LND-8 | OG + Twitter tags present | Covered |
-| LND-9 | Relevy Organization + WebSite | Covered |
+| LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data | Covered |
 | LND-10 | Assets served at root, llms.txt is Relevy-accurate | Covered |
 | LND-11 | Answer-first copy with stats | Covered |
 | LND-12 | Trust signals present | Covered |
+| LND-13 | FAQ section visible (FAQPage JSON-LD omitted by product decision), Dates and byline on content, Every image has alt text | Covered |

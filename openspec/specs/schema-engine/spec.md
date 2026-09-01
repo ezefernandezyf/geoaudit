@@ -20,7 +20,8 @@ Extract, parse, and validate JSON-LD structured data from a web page against an 
 | RSC-10 | @graph handling | MUST | When JSON-LD uses `@graph`, flatten and validate each node individually |
 | RSC-11 | Empty JSON-LD handling | MUST | Pages with no JSON-LD blocks MUST produce an empty detection result with reason "no_structured_data", not an error |
 | RSC-12 | Invalid JSON handling | MUST | Per-block JSON parse errors MUST be collected as warnings; valid blocks still processed |
-| RSC-13 | Partial-credit schema scoring | New | MUST | Schema criteria MUST award intermediate points, not only 0/5/10/15 |
+| RSC-13 | Partial-credit schema scoring | New | MUST | Schema criteria MUST award intermediate points; rubric `score` (0-100) MUST be carried in the shared contract, never a reconstructed proxy |
+| RSC-14 | SchemaResult exposes engine score | New | MUST | `SchemaResult` carries the rubric `score` (0-100); `toContractResult` maps it; `emptySchemaResult` defaults to 0 |
 
 ### Requirement: JSON-LD Extraction (RSC-1)
 
@@ -136,7 +137,8 @@ Pages with no structured data MUST produce a clean empty result, not an error.
 
 ### Requirement: Partial-Credit Schema Scoring (RSC-13)
 
-The schema dimension MUST award intermediate points per criterion (not only the discrete 0/5/10/15 steps), so partial compliance (e.g., an Organization node missing one recommended property, or one valid node among several missing) earns partial credit instead of a hard floor. Exact point tiers follow the WU-2 calibration decision.
+The schema dimension MUST award intermediate points per criterion (not only the discrete 0/5/10/15 steps), so partial compliance (e.g., an Organization node missing one recommended property, or one valid node among several missing) earns partial credit instead of a hard floor. Exact point tiers follow the WU-2 calibration decision. The resulting rubric `score` (0-100) MUST be carried in the shared contract so every consumer renders the engine's real number, never a reconstructed proxy.
+(Previously: the rubric score existed only engine-locally; contract consumers reconstructed `100 - issues*10` as a proxy.)
 
 #### Scenario: Partial schema earns intermediate credit
 
@@ -149,6 +151,23 @@ The schema dimension MUST award intermediate points per criterion (not only the 
 - GIVEN a page with Organization + WebSite nodes and all required/recommended properties present
 - WHEN the schema dimension is scored
 - THEN the criterion reaches the full point value
+
+### Requirement: SchemaResult Exposes Engine Score (RSC-14)
+
+The shared contract MUST expose the schema engine's rubric `score`: `schemaResultSchema` MUST include a numeric `score` bounded 0-100; `toContractResult` MUST map `SchemaEngineResult.score` into it; `emptySchemaResult` MUST default it to 0 (degraded engine path). The schema fixture MUST carry a realistic `score` so consumers assert the engine value, not a derived proxy.
+
+#### Scenario: Contract carries the rubric score
+
+- GIVEN a `SchemaEngineResult` with rubric `score = 61` (e.g. 9 warnings under the partial-credit rubric)
+- WHEN `toContractResult` maps it
+- THEN `SchemaResult.score === 61` and the value is not reconstructed from `issues`
+- AND the fixture `auditResultFixture.schema.score` matches the engine value
+
+#### Scenario: Degraded engine defaults to 0
+
+- GIVEN an audit where the schema engine failed
+- WHEN `emptySchemaResult()` builds the contract section
+- THEN `schema.score === 0` and no exception is raised
 
 ## Compliance Matrix
 
@@ -167,3 +186,4 @@ The schema dimension MUST award intermediate points per criterion (not only the 
 | RSC-11 | Zero ld+json scripts | Covered |
 | RSC-12 | (tested via RSC-2 invalid JSON scenario) | Implicit |
 | RSC-13 | Partial schema earns intermediate credit, Full schema earns the cap | Covered |
+| RSC-14 | Contract carries the rubric score, Degraded engine defaults to 0 | Covered |
