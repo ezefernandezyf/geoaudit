@@ -14,29 +14,21 @@ import type { GeminiBand, GeminiView } from "@/report/presenters/types";
  * score + band per URL. The best REAL result is copied below as a `GeminiView`
  * (the exact shape `toGeminiViewModel` produces), with its provenance.
  *
- * A3.2 (sprint 9): evidence VERIFIED on 2026-08-26 with the real script
- * against the real network. Best real candidate: stripe.com - GEO Score 46
- * (poor). The old placeholder (linear.app 85 "good") was NEVER verified and is
- * gone. Category scores below are the REAL `toGeminiViewModel` output of that
- * run, copied verbatim (crawler 95, citability 29.3, E-E-A-T 39, schema 10,
- * platform 36).
+ * A3.2 (sprint 12): evidence VERIFIED on 2026-09-01 with the real script
+ * against the real network. Best real candidate: moz.com - GEO Score 53
+ * (poor). Category scores below are the REAL `toGeminiViewModel` output of
+ * that run, copied verbatim (crawler 95, citability 36.9, E-E-A-T 54,
+ * schema 60, platform 44) - schema now carries the engine's rubric score
+ * (RSC-14), not the old 100 - issues*10 proxy.
  *
- * TODO(A3.2, post-deploy): the landing itself (relevy.app) is the
- * dogfooding target. The live deploy audits at GEO Score 20 (critical)
- * because it still runs the PRE-fix build (no robots.txt/sitemap/llms.txt,
- * no JSON-LD, old copy). The rebrand deploy (WU-1) is live; re-run:
- *
- *   pnpm verify:scorehero
- *
- * against the landing URL (add it to CANDIDATE_URLS in
- * scripts/scorehero-verify.test.ts) and replace this evidence with the
- * landing's REAL post-fix GeminiView - score, band, auditDate and
- * categoryScores. Do NOT invent values: if the post-fix score is e.g. 58
- * (fair), show 58 with its honest band and real category breakdown.
+ * Sprint 12 dogfood baseline: the landing itself (relevy.app) audited at GEO
+ * Score 47 (poor) with schema 61 (fair) - the schema row now shows the real
+ * engine value, confirming the RSC-14 propagation. The ScoreHero shows the
+ * best REAL candidate (moz.com), per the honesty rule (LND-7).
  */
-const VERIFIED_TOTAL_SCORE = 46;
-const VERIFIED_DOMAIN = "stripe.com";
-const VERIFIED_DATE = "2026-08-26";
+const VERIFIED_TOTAL_SCORE = 53;
+const VERIFIED_DOMAIN = "moz.com";
+const VERIFIED_DATE = "2026-09-01";
 
 export const SCOREHERO_EVIDENCE: GeminiView = {
   totalScore: VERIFIED_TOTAL_SCORE,
@@ -47,12 +39,12 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
   title: VERIFIED_DOMAIN,
   summary: `${VERIFIED_DOMAIN} - GEO Score ${VERIFIED_TOTAL_SCORE} (${severityForScore(
     VERIFIED_TOTAL_SCORE,
-  ).toLowerCase()}) en ~2s`,
-  durationSeconds: 2,
+  ).toLowerCase()}) en ~1s`,
+  durationSeconds: 1,
   // Real audit date of the verified run (A3.2) - no longer null.
   auditDate: VERIFIED_DATE,
-  // Real categoryScores from `pnpm verify:scorehero` (2026-08-26) - the exact
-  // `toGeminiViewModel` output for stripe.com, copied verbatim.
+  // Real categoryScores from `pnpm verify:scorehero` (2026-09-01) - the exact
+  // `toGeminiViewModel` output for moz.com, copied verbatim.
   categoryScores: [
     {
       id: "crawler",
@@ -67,7 +59,7 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
     {
       id: "citability",
       name: "Citabilidad",
-      score: 29.3,
+      score: 36.9,
       maxScore: 100,
       weight: "28%",
       status: "critical",
@@ -77,30 +69,30 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
     {
       id: "content",
       name: "E-E-A-T",
-      score: 39,
+      score: 54,
       maxScore: 100,
       weight: "24%",
-      status: "critical",
+      status: "poor",
       keyMetric: null,
       description: "Calidad del contenido según E-E-A-T.",
     },
     {
       id: "schema",
       name: "Datos estructurados",
-      score: 10,
+      score: 60,
       maxScore: 100,
       weight: "14%",
-      status: "critical",
+      status: "fair",
       keyMetric: null,
       description: "Marcado de datos estructurados.",
     },
     {
       id: "platform",
       name: "Plataforma",
-      score: 36,
+      score: 44,
       maxScore: 100,
       weight: "14%",
-      status: "critical",
+      status: "poor",
       keyMetric: null,
       description: "Preparación de la plataforma para IA.",
     },
