@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildPlatformRows } from "@/report/presenters/platforms";
 
 /**
- * U5.4 — `platforms.ts` (APT-8). Six platform rows derived from the real
+ * U5.4 - `platforms.ts` (APT-8). Six platform rows derived from the real
  * `perPlatform` (5 ids: aio/chatgpt/perplexity/gemini/copilot) plus
  * `crawlers.perBot` access map. Claude has no `perPlatform` id → readiness
  * null ("No medido"); its access still comes from `perBot["Claude-Web"]`.

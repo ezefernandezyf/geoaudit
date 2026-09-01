@@ -4,7 +4,7 @@ import { Footer } from "@/ui/footer";
 import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 /**
- * U1.10 — Footer (SHL-5, LGL-5): logo, links (Inicio, Dashboard for
+ * U1.10 - Footer (SHL-5, LGL-5): logo, links (Inicio, Dashboard for
  * authed, Términos, Privacidad) and copyright. Dashboard is gated on session
  * (D6: the anonymous shell has no /dashboard entry). The /pricing link was
  * removed with the pricing page (WU-1/2).
@@ -35,7 +35,7 @@ describe("Footer (SHL-5)", () => {
   });
 
   // LND-12 (sprint 9): the E-E-A-T trustworthiness engine awards contact info
-  // (mailto/tel/contact/address) +5 — the footer surfaces the support mailto.
+  // (mailto/tel/contact/address) +5 - the footer surfaces the support mailto.
   it("links contact info via mailto (LND-12)", () => {
     render(<Footer />);
     expect(screen.getByRole("link", { name: "Contacto" })).toHaveAttribute(

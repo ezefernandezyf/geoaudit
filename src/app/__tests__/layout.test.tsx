@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 /**
- * U1.T3 — Root layout font loading (DNF-3) + no /dashboard link (D6).
+ * U1.T3 - Root layout font loading (DNF-3) + no /dashboard link (D6).
  * next/font/google is mocked: it needs the Next build pipeline and would
  * otherwise attempt a network fetch under vitest.
  */
@@ -12,17 +12,17 @@ vi.mock("next/font/google", () => ({
   JetBrains_Mono: () => ({ variable: "mock-font-mono" }),
 }));
 
-// The layout now resolves auth() to feed the Navbar (U2.1/SHL-1). Mock it —
+// The layout now resolves auth() to feed the Navbar (U2.1/SHL-1). Mock it -
 // it imports next/server (unresolvable in vitest). An anonymous session keeps
 // the shell free of /dashboard links for anon visitors (D6).
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
-// The Navbar renders the client NavLinks island (usePathname) — mock the hook.
+// The Navbar renders the client NavLinks island (usePathname) - mock the hook.
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 import RootLayout from "@/app/layout";
 
-/** Layout is an async server component (awaits auth()) — render the resolved JSX. */
+/** Layout is an async server component (awaits auth()) - render the resolved JSX. */
 async function renderLayout(children: React.ReactNode) {
   return render(await RootLayout({ children }));
 }

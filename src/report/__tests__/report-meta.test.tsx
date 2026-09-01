@@ -6,7 +6,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
 
 /**
- * U5.6 — ReportMeta (ARU-10): pure presenter of the view model — the honest
+ * U5.6 - ReportMeta (ARU-10): pure presenter of the view model - the honest
  * metadata strip (duration from the adapter, persisted date via ctx). The
  * view model carries only measured metrics (APT-10): no fabricated avisos.
  */

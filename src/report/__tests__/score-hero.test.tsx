@@ -5,9 +5,9 @@ import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import { ScoreHero, type ScoreHeroView } from "@/report/score-hero";
 
 /**
- * U5.5 — ScoreHero (ARU-11): the complete Gemini hero consuming the view
- * model (never `AuditResult`) — big serif score, band chip, domain chip,
- * duration, title + summary — plus the benchmark bar that positions the score
+ * U5.5 - ScoreHero (ARU-11): the complete Gemini hero consuming the view
+ * model (never `AuditResult`) - big serif score, band chip, domain chip,
+ * duration, title + summary - plus the benchmark bar that positions the score
  * against the REAL thresholds (90/75/60/40, severityForScore), NOT Gemini's
  * 80/65/45/25.
  */
@@ -36,7 +36,7 @@ describe("ScoreHero view-model consumption (ARU-10/11)", () => {
   it("renders the one-line summary from the view model", () => {
     renderHero();
     expect(
-      screen.getByText("example.com — GEO Score 68 (fair) en ~3s"),
+      screen.getByText("example.com - GEO Score 68 (fair) en ~3s"),
     ).toBeInTheDocument();
   });
 

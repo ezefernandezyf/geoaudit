@@ -4,7 +4,7 @@
  */
 
 /** Focusable selector (A11Y-5 focus order): links, enabled form controls and
- * any explicit tabindex — in DOM order, which is the tab order. */
+ * any explicit tabindex - in DOM order, which is the tab order. */
 const FOCUSABLE_SELECTOR =
   "a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]";
 

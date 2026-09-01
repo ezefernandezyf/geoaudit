@@ -4,7 +4,7 @@ import { Navbar } from "@/ui/navbar";
 import { LogoutButton } from "@/ui/logout-button";
 
 /**
- * U1.9 — Navbar (SHL-1..4): sync server component receiving session + plan by
+ * U1.9 - Navbar (SHL-1..4): sync server component receiving session + plan by
  * prop. Anonymous → "Inicie sesión"/"Cree su cuenta" (SHL-6, neutral shell
  * copy from copy.ts); authenticated → plan pill + user chip + logout; active
  * route via the client NavLinks island (usePathname mocked here).
@@ -27,7 +27,7 @@ describe("Navbar (SHL-2/3/4)", () => {
   it("shows the new logo and wordmark", () => {
     render(<Navbar />);
     // The SVG mark is decorative inside the brand link (the link owns the
-    // accessible name, WU-4) — assert the visible Relevy wordmark; the
+    // accessible name, WU-4) - assert the visible Relevy wordmark; the
     // "AI Visibility Audit" tagline is gone (brief §3, SHL-4).
     expect(screen.getByText("Relevy")).toBeInTheDocument();
     expect(screen.queryByText("AI Visibility Audit")).not.toBeInTheDocument();
@@ -54,7 +54,7 @@ describe("Navbar (SHL-2/3/4)", () => {
 
   it("shows the static Free pill with usage for an authenticated user (SHL-2)", () => {
     render(<Navbar session={PRO_SESSION} plan={{ used: 2, limit: 10 }} />);
-    // The pill is a static label, not a link — there is no /pricing href
+    // The pill is a static label, not a link - there is no /pricing href
     // (route deleted) and no tier-dependent label.
     expect(screen.getByText("Plan Free")).toBeInTheDocument();
     expect(screen.getByText(/\(2\/10\)/)).toBeInTheDocument();

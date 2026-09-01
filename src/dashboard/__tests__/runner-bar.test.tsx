@@ -5,7 +5,7 @@ import { DASHBOARD_COPY } from "@/lib/copy";
 import type { AuditAction } from "@/lib/audit/actions";
 
 /**
- * U4.1 — Dashboard runner bar (DSH-8, design U4). Gemini verbatim: the URL
+ * U4.1 - Dashboard runner bar (DSH-8, design U4). Gemini verbatim: the URL
  * input with the "Run Audit" button INSIDE it, plus the user chip (name,
  * static plan pill, initials avatar) in the same bar. The input drives the
  * real audit via the injected Server Action.

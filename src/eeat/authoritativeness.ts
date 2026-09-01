@@ -6,12 +6,12 @@ import { externalLinkUrls, sameAsUrls } from "./text";
  * Authoritativeness dimension (REE-3, 0-25). Proxy signals for third-party
  * recognition:
  *
- * - External citations: absolute http(s) links on the page — 2 points per
+ * - External citations: absolute http(s) links on the page - 2 points per
  *   link, capped at 10 (5 links).
  * - Authority-domain matches: citations whose hostname is a known authority
- *   (`.gov`/`.edu` suffix or the AUTHORITY_DOMAINS list) — 3 points per
+ *   (`.gov`/`.edu` suffix or the AUTHORITY_DOMAINS list) - 3 points per
  *   match, capped at 15 (5 matches).
- * - Author identity sameAs links (JSON-LD `sameAs` / `rel="me"`) — 5 points
+ * - Author identity sameAs links (JSON-LD `sameAs` / `rel="me"`) - 5 points
  *   per link, capped at 10 (WU-3 partial credit, REE-3): a page with
  *   identity links but no authority citations, or citations without sameAs,
  *   earns intermediate credit instead of a hard 0 floor.

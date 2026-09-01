@@ -21,7 +21,7 @@ async function renderPage(params: Record<string, string>) {
 }
 
 /**
- * U3.T1 — Report page shell (ARU-1/ARU-2/ARU-5): force-dynamic + nodejs RSC
+ * U3.T1 - Report page shell (ARU-1/ARU-2/ARU-5): force-dynamic + nodejs RSC
  * that branches on `searchParams.url`. The decision itself lives in
  * resolve.ts (pure); here we assert the Empty state render, the pre-filled
  * correction input, and the Suspense→AuditRunner wiring for valid URLs.

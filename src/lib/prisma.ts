@@ -6,7 +6,7 @@ import { PrismaClient } from "@/generated/prisma/client";
  *
  * - Driver-adapter model (Prisma 7): no engine binary, no datasource url in schema;
  *   the connection string comes from DATABASE_URL at runtime.
- * - Missing/empty DATABASE_URL throws a clear, actionable error (R2) — fail fast.
+ * - Missing/empty DATABASE_URL throws a clear, actionable error (R2) - fail fast.
  * - Singleton is cached on globalThis so Next.js dev hot-reload reuses one pool.
  */
 function createPrismaClient(): PrismaClient {

@@ -4,7 +4,7 @@
  * Dimension weights follow the geo-citability rubric: Answer Block Quality
  * 30%, Self-Containment 25%, Structural Readability 20%, Statistical Density
  * 15%, Uniqueness 10%. Sub-scoring constants document the step-by-step
- * algorithms implemented in scorer.ts (heuristic calibration per design R3 —
+ * algorithms implemented in scorer.ts (heuristic calibration per design R3 -
  * output is labeled "heuristic" downstream).
  */
 
@@ -16,7 +16,7 @@ export const CITABILITY_WEIGHTS = {
   uniqueness: 0.1,
 } as const;
 
-// RCI-3 — Answer Block Quality (partial-credit tiers, WU-3 calibration)
+// RCI-3 - Answer Block Quality (partial-credit tiers, WU-3 calibration)
 /** Small structural base every extractable block earns (softened floor). */
 export const ANSWER_BASE_SCORE = 20;
 /** Bonus when the block contains a definition pattern "X is a/an ...". */
@@ -32,7 +32,7 @@ export const DEFINITION_PATTERN = /\bis\s+(?:a|an)\s+/i;
 /** Copula that marks a declarative answer sentence ("X is ..."). */
 export const ANSWER_COPULA = /\b(?:is|are|was|were)\b/i;
 
-// RCI-4 — Self-Containment
+// RCI-4 - Self-Containment
 /** Score for a pronoun/conjunction-led block that needs external context. */
 export const SELF_BAD_LEAD_SCORE = 10;
 export const SELF_BASE_SCORE = 10;
@@ -47,7 +47,7 @@ export const PRONOUN_LEAD = /^(?:it|this|that|these|those)\b/i;
 /** Conjunction leads that also imply prior context. */
 export const CONJUNCTION_LEAD = /^(?:but|however|and|also|so|yet)\b/i;
 
-// RCI-5 — Structural Readability
+// RCI-5 - Structural Readability
 export const STRUCTURE_HEADING_BONUS = 20;
 /** Bonus when every paragraph is 2-4 sentences long. */
 export const STRUCTURE_PARAGRAPH_BONUS = 40;
@@ -58,13 +58,13 @@ export const STRUCTURE_QUESTION_BONUS = 20;
 export const PARAGRAPH_SENTENCE_MIN = 2;
 export const PARAGRAPH_SENTENCE_MAX = 4;
 
-// RCI-6 — Statistical Density
+// RCI-6 - Statistical Density
 /** Percentages, currency amounts and 4-digit years (design stat regex). */
 export const STAT_PATTERN = /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b/g;
 /** Score reached at exactly one concrete stat per 500 words. */
 export const STATS_FULL_SCORE_AT_ONE_PER_500 = 70;
 
-// RCI-7 — Uniqueness (proxy signals: first-party data phrases + first person)
+// RCI-7 - Uniqueness (proxy signals: first-party data phrases + first person)
 export const FIRST_PERSON_LEAD = /^(?:we|our|i)\b/i;
 export const UNIQUENESS_PHRASES = [
   "we surveyed",
@@ -80,7 +80,7 @@ export const UNIQUENESS_PHRASES = [
 ] as const;
 export const UNIQUENESS_PER_HIT = 35;
 
-// RCI-9 / RCI-11 — page aggregation
+// RCI-9 / RCI-11 - page aggregation
 /** Blocks scoring at or above this count toward citability coverage (RCI-11). */
 export const COVERAGE_THRESHOLD = 70;
 /** Blocks below this composite receive rewrite suggestions (RCI-12). */

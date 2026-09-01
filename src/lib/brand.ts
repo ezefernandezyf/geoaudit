@@ -12,7 +12,7 @@ export const BRAND_NAME = "Relevy";
 /** Production domain (owns relevy.app; Vercel alias replaced the legacy one). */
 export const BRAND_DOMAIN = "relevy.app";
 
-/** Shared support inbox — MUST NOT be hardcoded anywhere else (SHL-8, PRF-6). */
+/** Shared support inbox - MUST NOT be hardcoded anywhere else (SHL-8, PRF-6). */
 export const SUPPORT_EMAIL = "ezefernandezyf@gmail.com";
 
 /** One-line descriptor used in OG alt text and metadata summaries. */

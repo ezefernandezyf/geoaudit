@@ -6,7 +6,7 @@ import { hasValue } from "./validate";
 /**
  * Corrected JSON-LD generation (RSC-9).
  *
- * With existing blocks: every parsed node is gap-filled — missing required
+ * With existing blocks: every parsed node is gap-filled - missing required
  * properties per its registry entry get a TODO marker while all existing
  * properties are preserved (RSC-9 scenario "Organization missing required
  * url"). The business-type primary schema is appended when absent.

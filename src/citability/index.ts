@@ -97,7 +97,7 @@ export function scorePage($: CheerioAPI): CitabilityPageResult {
 
   // RCI-10 (sprint 11 fix): the bottom 3 are derived from the blocks NOT in
   // the top 3, so the two lists are always disjoint. With fewer than 3
-  // non-overlapping blocks remaining the bottom list is simply shorter —
+  // non-overlapping blocks remaining the bottom list is simply shorter -
   // never a repeated top block.
   const top3 = [...scored].sort(byTop).slice(0, 3);
   const top3Ids = new Set(top3.map((entry) => entry.block.id));

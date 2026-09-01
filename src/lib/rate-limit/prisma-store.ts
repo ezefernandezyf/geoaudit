@@ -7,7 +7,7 @@ import type { RateLimitEntry, RateLimitStore } from "./store";
  * The in-memory store is per-instance: in serverless each instance enforces
  * its own budget, multiplying the effective limit by the instance count. This
  * store shares state across instances through the `rateLimitEntry` table,
- * using an atomic UPSERT on the composite `(key, windowStart)` primary key —
+ * using an atomic UPSERT on the composite `(key, windowStart)` primary key -
  * no read-modify-write race between concurrent requests.
  *
  * `windowStart` is persisted as `BigInt` (postgres `bigint`): epoch ms
@@ -17,7 +17,7 @@ import type { RateLimitEntry, RateLimitStore } from "./store";
  * The Prisma client is injected and typed structurally (same pattern as
  * `AuditCountClient` in tier.ts): only the `rateLimitEntry` delegate
  * capabilities the store uses, so both a real PrismaClient and a plain mock
- * are assignable — this module pulls in no Prisma runtime.
+ * are assignable - this module pulls in no Prisma runtime.
  */
 
 /** Row shape as persisted: `windowStart` is BigInt in the database. */

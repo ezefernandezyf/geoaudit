@@ -35,7 +35,7 @@ async function renderShell(page: React.ReactNode) {
 }
 
 /**
- * C14 — landing accessibility (A11Y-2/4/5): axe scans the page and the full
+ * C14 - landing accessibility (A11Y-2/4/5): axe scans the page and the full
  * shell (header/nav/main/footer), asserts the landmark regions and the logical
  * focus order, and checks the shared interactive primitives declare a visible
  * focus indicator. Contrast is intentionally not asserted here: jest-axe

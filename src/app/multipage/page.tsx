@@ -9,7 +9,7 @@ import { MultiPageReport } from "@/report/multi-page-report";
 import { MULTIPAGE_COPY } from "@/lib/copy";
 
 /**
- * Discriminates the two persisted result shapes (D3, U3.10) — same convention
+ * Discriminates the two persisted result shapes (D3, U3.10) - same convention
  * as the dashboard and audit detail pages.
  */
 function isMultiPageResult(value: unknown): value is MultiPageResult {
@@ -30,7 +30,7 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
  * `MultiPageForm` wired to `multiPageAuditAction` (MPU-1).
  *
  * Real data (MPU-4/5): below the form, the most recent multi-page audit result
- * renders the Gemini route-selector + inspector (`MultiPageReport`) — an honest
+ * renders the Gemini route-selector + inspector (`MultiPageReport`) - an honest
  * presenter of the persisted `MultiPageResult` that omits metrics the engine
  * does not produce. If none exists yet, a neutral empty hint is shown.
  */

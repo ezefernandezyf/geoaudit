@@ -19,15 +19,15 @@ import { MULTIPAGE_COPY } from "@/lib/copy";
  * inspector.
  *
  * Data honesty (MPA-11/MPU-5): the light shape only carries url/geoScore/
- * severityBand/durationMs per page — so each row derives its GEO score from
+ * severityBand/durationMs per page - so each row derives its GEO score from
  * `geoScore`, its duration from `durationMs` and OMITS the metrics the engine
  * does not produce (`schemaFound`, `crawlTimeMs`, `status`). No fabricated
- * values. Pure presenter — never runs an audit; the `selected` page is client
+ * values. Pure presenter - never runs an audit; the `selected` page is client
  * state only.
  *
- * Full mode (A3, MPU-7/9): when the caller supplies `pageViews` — the full
+ * Full mode (A3, MPU-7/9): when the caller supplies `pageViews` - the full
  * `GeminiView` per page, resolved SERVER-side from the persisted `AuditPage`
- * rows (via `toGeminiViewModel`) — the inspector renders the page's COMPLETE
+ * rows (via `toGeminiViewModel`) - the inspector renders the page's COMPLETE
  * report (ScoreHero + DomainScorecard + PlatformMatrix + TopFindings) of the
  * selected view. The selector (MPU-9) alternates between full reports. The
  * light `MultiPageResult` shape is never enriched: the detail comes from
@@ -60,7 +60,7 @@ function aggregateHeroView(
     band,
     domain,
     title: domain,
-    summary: `${domain} — GEO Score ${totalScore} (${band}) en ~${durationSeconds}s`,
+    summary: `${domain} - GEO Score ${totalScore} (${band}) en ~${durationSeconds}s`,
     durationSeconds,
     auditDate: null,
   };
@@ -72,7 +72,7 @@ export function MultiPageReport({
 }: {
   result: MultiPageResult;
   /**
-   * Full per-page views (A3, MPU-7) — resolved SERVER-side from the persisted
+   * Full per-page views (A3, MPU-7) - resolved SERVER-side from the persisted
    * `AuditPage` rows via `toGeminiViewModel`. When present, the inspector
    * renders the selected page's complete report; when absent, the light-shape
    * inspector renders (share/multipage pages keep the light view).
@@ -99,7 +99,7 @@ export function MultiPageReport({
             </span>
           </div>
           <h1 className="mt-1 font-serif text-3xl font-normal text-[#0f172a] sm:text-4xl">
-            {new URL(result.aggregate.url).hostname} — Desglose por Ruta
+            {new URL(result.aggregate.url).hostname} - Desglose por Ruta
           </h1>
         </div>
       </div>
@@ -219,7 +219,7 @@ export function MultiPageReport({
 
           {fullMode && selectedView ? (
             /* Full report of the selected page (A3, MPU-7): the SERVER-resolved
-               GeminiView renders the complete report — the light shape is never
+               GeminiView renders the complete report - the light shape is never
                enriched. The selector above (MPU-9) alternates between views. */
             <div className="space-y-8 pt-2">
               <ScoreHero view={selectedView} />

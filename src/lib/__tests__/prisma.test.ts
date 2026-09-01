@@ -52,7 +52,7 @@ describe("prisma connectivity failure (database-connection R1-S2)", () => {
   //   so the test forces the real connection attempt through the first query.
   // - pg-connection-string 2.14 drops `connect_timeout` from the URL (it is not
   //   mapped to connectionTimeoutMillis), so RFC 5737 TEST-NET-1 192.0.2.1 hangs
-  //   for the full OS TCP retry window (~2 min) — unusable in CI.
+  //   for the full OS TCP retry window (~2 min) - unusable in CI.
   // - The reachable loopback host with a closed port (127.0.0.1:1) fails in ~6ms
   //   with ECONNREFUSED, which the adapter classifies as DatabaseNotReachable and
   //   Prisma surfaces as PrismaClientKnownRequestError P2010 whose message says

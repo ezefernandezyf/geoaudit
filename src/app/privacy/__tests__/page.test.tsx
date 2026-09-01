@@ -4,7 +4,7 @@ import PrivacyPage from "@/app/privacy/page";
 import { LEGAL_COPY } from "@/lib/copy";
 
 /**
- * U4.7 — Privacy page (LGL-2, LGL-3, LGL-4): static Server Component, Gemini
+ * U4.7 - Privacy page (LGL-2, LGL-3, LGL-4): static Server Component, Gemini
  * shell styling (hex), neutral Spanish copy from the single copy source.
  */
 describe("PrivacyPage (LGL-2)", () => {
@@ -26,7 +26,7 @@ describe("PrivacyPage (LGL-2)", () => {
     }
   });
 
-  it("uses neutral Spanish copy — no voseo forms (LGL-4)", () => {
+  it("uses neutral Spanish copy - no voseo forms (LGL-4)", () => {
     render(<PrivacyPage />);
     const voseo = /hacé|tené|podés|tu cuenta|comenzá|probá|ingresá|mejorá/i;
     expect(screen.queryByText(voseo)).not.toBeInTheDocument();

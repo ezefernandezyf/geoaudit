@@ -17,7 +17,7 @@ const VARIANT_CLASSES: Record<CardVariant, string> = {
 };
 
 /**
- * Card primitive (spec DNF-6 delta, U1.3): Gemini verbatim — padded surface
+ * Card primitive (spec DNF-6 delta, U1.3): Gemini verbatim - padded surface
  * container with border, rounded corners and `transition-all`. Gemini has NO
  * header/footer slots (DNF-9), so callers place headings inside the children.
  */

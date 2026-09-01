@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Logo } from "@/ui/logo";
 
 /**
- * SHL-4 (sprint 11 rebrand) — Logo: user-generated Relevy mark (two stylized
+ * SHL-4 (sprint 11 rebrand) - Logo: user-generated Relevy mark (two stylized
  * quote paths, navy + emerald, no tile) with the "Relevy" wordmark in
  * Instrument Serif. Full variant renders the wordmark; mark-only (favicon /
  * compact) renders just the SVG. The "AI Visibility Audit" tagline is gone
@@ -48,7 +48,7 @@ describe("Logo (SHL-4)", () => {
     expect(paths).toHaveLength(2);
     // Quote 1 is navy via native fill attribute (functional contract of the
     // user's mark; direct fill so the mark stays visible on the always-white
-    // navbar regardless of system dark mode — no Tailwind arbitrary class).
+    // navbar regardless of system dark mode - no Tailwind arbitrary class).
     expect(paths?.[0].getAttribute("fill")).toBe("#0f172a");
     // Quote 2 is the emerald accent.
     expect(paths?.[1].getAttribute("fill")).toBe("#10b981");

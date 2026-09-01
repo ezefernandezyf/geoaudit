@@ -4,9 +4,9 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { AuditReport } from "@/report/audit-report";
 
 /**
- * U5.8 — AuditReport (ARU-10): consumes `toGeminiViewModel(result, ctx)` at
- * the boundary and renders the full Gemini report — ScoreHero (real
- * benchmark) + DomainScorecard + PlatformMatrix + TopFindings + ReportMeta —
+ * U5.8 - AuditReport (ARU-10): consumes `toGeminiViewModel(result, ctx)` at
+ * the boundary and renders the full Gemini report - ScoreHero (real
+ * benchmark) + DomainScorecard + PlatformMatrix + TopFindings + ReportMeta -
  * so every child is a pure presenter of the view model.
  */
 describe("AuditReport (ARU-10)", () => {

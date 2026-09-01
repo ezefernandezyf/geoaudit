@@ -42,7 +42,7 @@ export const parsedPageSchema = z.object({
 export type ParsedPage = z.infer<typeof parsedPageSchema>;
 
 /**
- * Typed fetch result — never throws (RFL-11). Discriminated at the type level on
+ * Typed fetch result - never throws (RFL-11). Discriminated at the type level on
  * `ok`; the failure branch is further discriminated by `reason` (content gate)
  * vs `error` (typed transport error).
  */

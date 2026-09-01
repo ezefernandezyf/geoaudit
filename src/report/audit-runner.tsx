@@ -22,23 +22,23 @@ export type AuditRunnerProps = {
 /**
  * Report driver (ARU-1/ARU-2): runs `runAudit(url)` under the page Suspense.
  *
- * U4: on success it composes the full MVP report (D1) — ScoreHero +
+ * U4: on success it composes the full MVP report (D1) - ScoreHero +
  * DomainScorecard + TopFindings + ReportMeta (ARU-8). Degraded results
  * (RAO-12/RAO-13) render honestly: "No disponible" chips, visible
  * `meta.errors` and the true (rebalanced) GEO Score (ARU-7).
  *
  * U3 persist gate (TLM-4/5/6, D5): after a SUCCESSFUL audit, signed-in users
- * pass the authoritative limit re-check (TOCTOU guard — the cheap pre-check
+ * pass the authoritative limit re-check (TOCTOU guard - the cheap pre-check
  * ran in the action) and the Audit row is persisted with the full AuditResult
  * JSON. Over-limit users see the limit copy and nothing is persisted;
  * anonymous audits never persist (TLM-6) and instead pass the anonymous
  * IP-based 3/30d gate (TLM-11): one authoritative increment per completed
- * anonymous audit, keyed `anon:{ip}` — no pre-check in the form action, so
+ * anonymous audit, keyed `anon:{ip}` - no pre-check in the form action, so
  * the counter is never double-counted (RTL-8). Persistence is best-effort: a
  * DB failure logs and still renders the report (the audit already ran).
  *
  * There is no tier branch (TLM-8 removed): every signed-in user within the
- * limit writes the Audit row directly — no paid counter, no $transaction
+ * limit writes the Audit row directly - no paid counter, no $transaction
  * (TLM-7 removed).
  *
  * It catches the page-fetch failure throw and renders the mapped friendly
@@ -52,7 +52,7 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     if (detectFetchFailureCode(message) === null) {
-      // Not a known fetch failure — let the error boundary (ARU-4) own it.
+      // Not a known fetch failure - let the error boundary (ARU-4) own it.
       throw error;
     }
     return <FetchErrorState url={url} copy={resolveFetchErrorCopy(error)} />;
@@ -63,7 +63,7 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
   if (userId) {
     const { allowed } = await checkTierLimit(prisma, userId, Date.now());
     if (!allowed) {
-      // Authoritative gate (TLM-4): the audit ran, but the limit says no —
+      // Authoritative gate (TLM-4): the audit ran, but the limit says no -
       // show the limit copy (TLM-5) and do NOT persist.
       return <TierLimitState />;
     }

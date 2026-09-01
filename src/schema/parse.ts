@@ -7,7 +7,7 @@ export const NO_STRUCTURED_DATA_REASON = "no_structured_data";
  * JSON-LD parsing (RSC-2, RSC-12, RSC-11).
  *
  * Each block is `JSON.parse`d independently. Per-block failures are collected
- * as warnings carrying the block index — never thrown — and valid blocks are
+ * as warnings carrying the block index - never thrown - and valid blocks are
  * still processed (RSC-12). Zero successfully parsed blocks produce reason
  * "no_structured_data" (RSC-11).
  */

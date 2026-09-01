@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { AuditReportSkeleton, Skeleton } from "@/ui/skeleton";
 
 /**
- * U1.7 — Skeleton primitive (DNF-11): Gemini verbatim — slate-300 blocks with
+ * U1.7 - Skeleton primitive (DNF-11): Gemini verbatim - slate-300 blocks with
  * `animate-pulse-subtle` (globals.css keyframes + reduced-motion), shape
  * variants, explicit width/height, accessible role="status". Plus the
  * `AuditReportSkeleton` composed placeholder.

@@ -6,7 +6,7 @@ import { AuditReportSkeleton } from "@/ui/skeleton";
 /**
  * Time-based stage slots for the live stepper (U5.11, ARU-10, design U5).
  * Calibrated over the 10–60s atomic run: the engine is atomic (no per-stage
- * progress), so these are VISUAL pacing estimates only — never real engine
+ * progress), so these are VISUAL pacing estimates only - never real engine
  * state. fetch dominates the tail (platform 40-60s).
  */
 const STAGES: readonly Stage[] = [
@@ -28,12 +28,12 @@ const STAGES: readonly Stage[] = [
 
 /**
  * Report loading skeleton (U5.11, ARU-3/ARU-10): Gemini LiveReportPage
- * scanning card VERBATIM — emerald spinner, "Auditoría en Progreso" eyebrow,
+ * scanning card VERBATIM - emerald spinner, "Auditoría en Progreso" eyebrow,
  * serif "Analizando <url>", the animated StageStepper (progress bar +
  * numbered circles) and the AuditReportSkeleton preview. NO simulation: the
  * stages pace on the honest timer only, the real report arrives via the
  * Suspense stream. The single `role="status"` live region is the nested
- * AuditReportSkeleton ("Cargando auditoría GEO...") — no duplicated regions.
+ * AuditReportSkeleton ("Cargando auditoría GEO...") - no duplicated regions.
  *
  * Shared by `loading.tsx` and the explicit `<Suspense fallback>` of the page;
  * the StageStepper is replaced by the report once the boundary resolves.

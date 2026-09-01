@@ -10,7 +10,7 @@ import {
 } from "@/report/__tests__/view-fixtures";
 
 /**
- * U5.6 — DomainScorecard (ARU-10): pure presenter of the view model. Gemini
+ * U5.6 - DomainScorecard (ARU-10): pure presenter of the view model. Gemini
  * "Scorecard por Categoría" section rendering the five `categoryScores` via
  * the shared ScoreBar (color by REAL lowercase band). The adapter owns the
  * rowScore derivation; the component never reads `AuditResult`.

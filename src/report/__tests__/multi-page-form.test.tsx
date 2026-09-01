@@ -14,7 +14,7 @@ import type {
 } from "@/lib/audit/multi-page-actions";
 
 /**
- * U6.1 — MultiPageForm (MPU-1/3, design U6): client island driving the REAL
+ * U6.1 - MultiPageForm (MPU-1/3, design U6): client island driving the REAL
  * `multiPageAuditAction` through `useActionState`.
  * - MPU-1: submit invokes the injected action with the URL as FormData.
  * - MPU-3: each MultiPageErrorCode maps to neutral Spanish copy rendered with

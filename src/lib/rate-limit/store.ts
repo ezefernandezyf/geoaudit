@@ -22,7 +22,7 @@ export interface RateLimitStore {
 }
 
 /**
- * Dev/test default store: an in-memory `Map`. Per-instance only — in
+ * Dev/test default store: an in-memory `Map`. Per-instance only - in
  * serverless each instance gets its own map (see RTL-6 JSDoc on the limiter).
  */
 export class InMemoryStore implements RateLimitStore {

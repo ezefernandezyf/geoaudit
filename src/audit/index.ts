@@ -46,7 +46,7 @@ import {
 } from "@/scoring/index";
 
 /**
- * Audit orchestrator (T25) — the core product behavior. `runAudit(url)` runs
+ * Audit orchestrator (T25) - the core product behavior. `runAudit(url)` runs
  * the whole pipeline: Zod-validate the URL (RAO-1), normalize http -> https,
  * parallel bounded fetches (RAO-2), a single shared Cheerio load passed to
  * every engine (RAO-3), all five engines (RAO-4..RAO-8), the weighted GEO
@@ -54,15 +54,15 @@ import {
  *
  * Testability (RAO-11): `fetcher`, `lookup`, `now` and every engine entry
  * point are injectable so each fetch, DNS resolution, timing and engine can
- * be mocked — zero network in tests.
+ * be mocked - zero network in tests.
  *
  * Edge cases (part B):
  * - RAO-1: an invalid URL returns a degraded AuditResult (score 0 / Critical,
- *   the Zod failure in `meta.errors`) — never a throw, never a fetch.
+ *   the Zod failure in `meta.errors`) - never a throw, never a fetch.
  * - RAO-12: every engine is wrapped in try/catch; a throwing engine degrades
  *   only its section (zeroed contract shape) and is recorded in `meta.errors`,
  *   while the other engines and the GEO Score (weight-rebalanced, RGS-9)
- *   still complete — never rethrown.
+ *   still complete - never rethrown.
  * - RAO-13: a non-HTML page (`unsupported_content_type`) skips the HTML parse
  *   and the four content engines report unsupported (zeroed sections + shared
  *   reason in `meta.errors`), while the crawler engine still runs.
@@ -126,7 +126,7 @@ function errorMessage(error: unknown): string {
  * RAO-13 unsupported). The shared AuditResult contract has no per-engine
  * status/reason field (its sections only carry numeric scores and lists), so
  * a degraded engine is represented as an empty/zeroed contract section PLUS a
- * `meta.errors` entry with the reason — the composite GEO Score excludes the
+ * `meta.errors` entry with the reason - the composite GEO Score excludes the
  * degraded dimension and rebalances weights (RGS-9).
  */
 function emptyCrawlerResult(): CrawlerResult {
@@ -184,7 +184,7 @@ export async function runAudit(
   // The orchestrator returns a degraded AuditResult (score 0 / Critical) with
   // the validation failure in meta.errors, and NO fetch or engine work starts.
   // `summary.url` keeps the raw input; a failed audit has no canonical URL, so
-  // this degraded result is intentionally not Zod-valid — consumers detect the
+  // this degraded result is intentionally not Zod-valid - consumers detect the
   // failure via meta.errors + the Critical band instead.
   const input = urlInputSchema.safeParse({ url });
   if (!input.success) {
@@ -223,7 +223,7 @@ export async function runAudit(
   const origin = target.origin;
   const pagePath = target.pathname;
 
-  // RAO-2: parallel bounded fetches — page HTML + robots.txt. The fetch layer
+  // RAO-2: parallel bounded fetches - page HTML + robots.txt. The fetch layer
   // never rejects (RFL-11), so Promise.allSettled results are always fulfilled.
   const [pageResult, robotsResult] = await Promise.allSettled([
     fetchAuditResource(pageUrl, {
@@ -273,14 +273,14 @@ export async function runAudit(
   }
 
   // RAO-3: single shared Cheerio load. The fetch layer already parsed the HTML
-  // once and returns `parsed.$`; it is passed as-is to every engine — this
+  // once and returns `parsed.$`; it is passed as-is to every engine - this
   // module never re-parses the HTML.
   const { $, html, headers } = pageFetched.parsed;
 
   // RAO-4 robots: parse when the probe succeeded; RCR-2/RCR-10 treat a missing
   // or 404 robots.txt as "all allowed" (empty RobotsTxt). DECISION (documented):
-  // a gated robots.txt — the fetch layer only accepts text/html (RFL-8) while
-  // real robots.txt is text/plain — also flows through this missing path.
+  // a gated robots.txt - the fetch layer only accepts text/html (RFL-8) while
+  // real robots.txt is text/plain - also flows through this missing path.
   const robotsFetched =
     robotsResult.status === "fulfilled" ? robotsResult.value : null;
   const robots =
@@ -289,7 +289,7 @@ export async function runAudit(
       : emptyRobots();
 
   // RAO-12: run the five engines with per-engine failure isolation. A throwing
-  // engine degrades only its section (recorded below) — the audit completes,
+  // engine degrades only its section (recorded below) - the audit completes,
   // the other engines produce results, and the GEO Score rebalances weights
   // over the available engines (RGS-9). The failure is NEVER rethrown.
   const engineFailures: Partial<Record<EngineName, string>> = {};
@@ -362,7 +362,7 @@ export async function runAudit(
 
   // RAO-10: assemble the fully typed contract shape. `scored.scoringModelVersion`
   // is the GEO_SCORE_V2_WEIGHTS version string, which the contract pins to the
-  // literal "2.0.0" (RAO-10 scenario) — narrowed here for the return type.
+  // literal "2.0.0" (RAO-10 scenario) - narrowed here for the return type.
   const scoringModelVersion = scored.scoringModelVersion as "2.0.0";
 
   return {
@@ -408,13 +408,13 @@ interface UnsupportedPageArgs {
 
 /**
  * RAO-13 non-HTML page: the four content engines cannot run (no DOM to parse),
- * so they report unsupported — zeroed contract sections + one `meta.errors`
+ * so they report unsupported - zeroed contract sections + one `meta.errors`
  * entry each with the shared reason. The crawler engine still runs over the
  * independent robots.txt: it receives an empty DOM and empty headers so the
  * page-level signals (meta robots, llms.txt link) default to absent. The GEO
  * Score is computed from the available engines only; with crawler alone the
  * technical dimension cannot be composed (RGS-2 needs platform), so the score
- * is 0 / Critical — an honest outcome for a non-HTML target.
+ * is 0 / Critical - an honest outcome for a non-HTML target.
  */
 function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
   const {

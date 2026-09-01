@@ -1,6 +1,6 @@
 /**
  * Relevy logo (SHL-4, sprint 11 rebrand): user-generated mark from the brand
- * brief (docs/RELEVY-BRAND-BRIEF.md) — two stylized quote paths evoking
+ * brief (docs/RELEVY-BRAND-BRIEF.md) - two stylized quote paths evoking
  * "being cited", navy + emerald accent, no tile. Wordmark "Relevy" in
  * Instrument Serif; the "AI Visibility Audit" tagline is dropped (brief §3:
  * no tagline). Full variant renders mark + wordmark; mark-only
@@ -34,7 +34,7 @@ export function Logo({
         aria-label={decorative ? undefined : "Relevy"}
         aria-hidden={decorative || undefined}
       >
-        {/* Quote 1 (navy) — fill directo: la clase Tailwind arbitraria
+        {/* Quote 1 (navy) - fill directo: la clase Tailwind arbitraria
             `dark:fill-white` volvía la comilla invisible sobre la navbar
             siempre-blanca en dark mode (SHL-4 fix post-sprint 11). */}
         <path

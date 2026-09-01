@@ -7,7 +7,7 @@ import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
 import type { GeminiView } from "@/report/presenters/types";
 
 /**
- * U6.3 — MultiPageReport (MPA-10/11, design U6). Gemini route-selector +
+ * U6.3 - MultiPageReport (MPA-10/11, design U6). Gemini route-selector +
  * inspector presenter over the REAL `MultiPageResult` light shape.
  * - MPA-10: aggregate hero + per-page route list + inspector render from
  *   persisted data.
@@ -109,7 +109,7 @@ describe("MultiPageReport full mode with pageViews (A3, MPU-7/9)", () => {
         domain: "example.com",
         totalScore: 80,
         band: "good",
-        summary: "example.com — GEO Score 80 (good) en ~3s",
+        summary: "example.com - GEO Score 80 (good) en ~3s",
       },
     },
   ];
@@ -136,7 +136,7 @@ describe("MultiPageReport full mode with pageViews (A3, MPU-7/9)", () => {
   it("switches the full report when navigating the selector (MPU-9)", () => {
     render(<MultiPageReport result={multiPageResult} pageViews={pageViews} />);
 
-    // First page selected by default — fixture view hero (score 68).
+    // First page selected by default - fixture view hero (score 68).
     expect(screen.getByText(/GEO Score 68/)).toBeInTheDocument();
 
     // Select page 2 (blog) → its view (score 80) renders.
@@ -148,7 +148,7 @@ describe("MultiPageReport full mode with pageViews (A3, MPU-7/9)", () => {
   it("does NOT enrich the light MultiPageResult shape (MPU-7)", () => {
     render(<MultiPageReport result={multiPageResult} pageViews={pageViews} />);
 
-    // The light shape still carries only url/score/band/duration per page —
+    // The light shape still carries only url/score/band/duration per page -
     // no full-report fields were injected into result.pages.
     expect(multiPageResult.pages[0]).not.toHaveProperty("findings");
     expect(multiPageResult.pages[0]).not.toHaveProperty("categoryScores");

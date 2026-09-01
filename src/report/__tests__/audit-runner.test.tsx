@@ -17,11 +17,11 @@ import {
 vi.mock("@/audit", () => ({ runAudit: vi.fn() }));
 
 /**
- * U3.T4 / U4 — tier persist gate (TLM-4/5/6, D5). auth + prisma are mocked so
+ * U3.T4 / U4 - tier persist gate (TLM-4/5/6, D5). auth + prisma are mocked so
  * the runner never instantiates NextAuth nor touches a real DB.
  * `checkTierLimit` is mocked; the persist path is now tier-free (TLM-8
  * removed): every signed-in user within the limit writes the Audit row
- * directly — no paid transaction, no counter (TLM-7 removed).
+ * directly - no paid transaction, no counter (TLM-7 removed).
  */
 vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => null) }));
 vi.mock("@/lib/prisma", () => ({
@@ -78,7 +78,7 @@ const session = (): Session => ({
 });
 
 /**
- * U4.T1 — AuditRunner composes the full MVP report: ScoreHero +
+ * U4.T1 - AuditRunner composes the full MVP report: ScoreHero +
  * DomainScorecard + TopFindings + ReportMeta (ARU-8), keeps the fetch-failure
  * copy mapping (ARU-6, pulled forward in U3) and renders degraded results
  * honestly (ARU-7 / RAO-13).
@@ -261,7 +261,7 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
     expect(screen.getByText("68")).toBeInTheDocument();
   });
 
-  it("persists directly for every signed-in user — no transaction, no counter (TLM-8 removed)", async () => {
+  it("persists directly for every signed-in user - no transaction, no counter (TLM-8 removed)", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     authMock.mockResolvedValue(session());
 

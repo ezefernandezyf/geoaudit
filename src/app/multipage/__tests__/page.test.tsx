@@ -68,13 +68,13 @@ beforeEach(() => {
 });
 
 /**
- * U6.2 — MultiPage page (MPU-1/4/5, design U6): trigger page for every
- * authenticated user (MPU-2 removed — no tier gate, no upgrade CTA). Renders
+ * U6.2 - MultiPage page (MPU-1/4/5, design U6): trigger page for every
+ * authenticated user (MPU-2 removed - no tier gate, no upgrade CTA). Renders
  * the real form (MPU-1) + the Gemini route-selector/inspector driven by the
  * latest real multi-page result (MPU-4/5).
  */
 describe("MultiPagePage trigger (MPU-1/2)", () => {
-  it("renders the trigger form for every authenticated user — no tier lookup (MPU-2 removed)", async () => {
+  it("renders the trigger form for every authenticated user - no tier lookup (MPU-2 removed)", async () => {
     findManyMock.mockResolvedValue(emptyAuditRows);
     render(await MultiPagePage());
 

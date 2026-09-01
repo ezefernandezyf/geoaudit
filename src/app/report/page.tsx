@@ -11,7 +11,7 @@ import { REPORT_COPY } from "@/lib/copy";
  *
  * force-dynamic: the page depends on `searchParams` + async I/O, so static
  * prerendering would drop the params. runtime nodejs: the audit pipeline's
- * SSRF guard resolves DNS with `node:dns` — unavailable on the Edge runtime.
+ * SSRF guard resolves DNS with `node:dns` - unavailable on the Edge runtime.
  *
  * Branch on `searchParams.url` (pure decision in resolve.ts):
  * - missing/invalid/disallowed → Empty state: inline AuditForm (same as the

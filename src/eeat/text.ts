@@ -37,7 +37,7 @@ export function paragraphTexts($: CheerioAPI): string[] {
 }
 
 /**
- * Absolute `http(s)` hrefs anywhere in the document — the external-citation
+ * Absolute `http(s)` hrefs anywhere in the document - the external-citation
  * proxy (REE-3). Relative and anchor-only links are not citations.
  */
 export function externalLinkUrls($: CheerioAPI): string[] {

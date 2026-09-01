@@ -11,7 +11,7 @@ import { TextField } from "@/ui/text-field";
 
 const INITIAL_STATE: AuditFormState = { error: null };
 
-/** Gemini landing sample URLs verbatim — pre-fill chips (LND-1). */
+/** Gemini landing sample URLs verbatim - pre-fill chips (LND-1). */
 const SAMPLE_URLS = [
   { label: "linear.app", url: "https://linear.app" },
   { label: "acme-store.io", url: "https://acme-store.io" },

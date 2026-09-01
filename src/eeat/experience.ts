@@ -5,11 +5,11 @@ import { pageText, paragraphTexts } from "./text";
 /**
  * Experience dimension (REE-1, 0-25). Proxy signals for first-hand knowledge:
  *
- * - First-person paragraph leads (design regex `/^(we|our team|I)\b/i`) — 5
+ * - First-person paragraph leads (design regex `/^(we|our team|I)\b/i`) - 5
  *   points per matching paragraph, capped at 10.
- * - Case-study phrasing anywhere in the visible text (phrase list) — 5 points
+ * - Case-study phrasing anywhere in the visible text (phrase list) - 5 points
  *   per distinct phrase, capped at 10.
- * - A "Case Study:"-style heading — 5 points.
+ * - A "Case Study:"-style heading - 5 points.
  *
  * Heuristic calibration per design R3 (single-page proxy; labeled downstream).
  */

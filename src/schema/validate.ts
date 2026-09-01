@@ -11,7 +11,7 @@ import type {
  * JSON-LD validation (RSC-3..RSC-7, RSC-10).
  *
  * Each parsed block is flattened (top-level arrays and @graph children become
- * individual nodes — RSC-10) and every node is validated against the static
+ * individual nodes - RSC-10) and every node is validated against the static
  * 8-type registry:
  * - unknown @type  -> flagged, node still included (RSC-3)
  * - missing required/recommended properties per the registry (RSC-4/RSC-5)
@@ -89,7 +89,7 @@ export function validateNode(
   const issues: SchemaIssue[] = [];
 
   // Deprecated flags apply to known AND unknown types (HowTo is not in the
-  // 8-type registry but must still be flagged — RSC-7).
+  // 8-type registry but must still be flagged - RSC-7).
   if (typeName !== null) {
     const deprecated = DEPRECATED_SCHEMAS.find(
       (entry_) => entry_.type.toLowerCase() === typeName.toLowerCase(),

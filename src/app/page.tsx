@@ -19,16 +19,16 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
  * (LND-4) y CTA final adaptado a la sesión (LND-6). El copy de usuario viene
  * de src/lib/copy.ts (neutro, ATH-9).
  *
- * LND-6 (sprint 10): la página resuelve auth() y adapta el CTA final — con
+ * LND-6 (sprint 10): la página resuelve auth() y adapta el CTA final - con
  * sesión muestra "Ir al dashboard" (/dashboard), sin sesión "Auditar gratis"
  * (/signup). El teaser de precios y el CTA "Ver Planes" se eliminaron con la
  * ruta /pricing (WU-1). La Home pasa a dinámica (costo aceptado).
  *
  * LND-7 (sprint 8): el ScoreHero muestra la evidencia REAL de
  * src/app/score-hero-evidence.ts (mejor URL verificada por runAudit con su
- * band honesta) — nunca un número inventado.
+ * band honesta) - nunca un número inventado.
  *
- * LND-9 (sprint 9): JSON-LD inline SSR — Organization + WebSite (+SearchAction)
+ * LND-9 (sprint 9): JSON-LD inline SSR - Organization + WebSite (+SearchAction)
  * y sameAs[], inyectados como `<script type="application/ld+json">` DENTRO de
  * este server component (nunca por JS client-side). El engine de schema
  * (extractJsonLd) solo detecta bloques en el HTML server-rendered estático, y
@@ -44,7 +44,7 @@ export const dynamic = "force-dynamic";
  * criterion 5; sameAs feeds both schema criterion 2 and E-E-A-T authority.
  */
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-/** Real, verifiable org profiles only (never invented sameAs — LND-7 honesty). */
+/** Real, verifiable org profiles only (never invented sameAs - LND-7 honesty). */
 const ORG_SAME_AS = [BRAND_REPO];
 
 function OrganizationJsonLd() {
@@ -93,7 +93,7 @@ function WebSiteJsonLd() {
 
 /**
  * LND-8 (sprint 8, C16): landing OpenGraph/Twitter metadata via the shared
- * helper — reuses the page title/description and the shared 1200×630 og.png.
+ * helper - reuses the page title/description and the shared 1200×630 og.png.
  */
 export const metadata = buildOgMetadata({
   title: "Auditoría de visibilidad en motores de IA",
@@ -102,7 +102,7 @@ export const metadata = buildOgMetadata({
   path: "/",
 });
 
-/** Real severity bands 90/75/60/40 (LND-3) — Gemini table composition. */
+/** Real severity bands 90/75/60/40 (LND-3) - Gemini table composition. */
 const BAND_ROWS: {
   band: GeminiBand;
   range: string;
@@ -137,14 +137,14 @@ const BAND_ROWS: {
   },
 ];
 
-/** The six AI search platforms audited by the engine (LND-4) — Gemini verbatim. */
+/** The six AI search platforms audited by the engine (LND-4) - Gemini verbatim. */
 const PLATFORMS = [
   {
     name: "ChatGPT",
     bot: "GPTBot / OAI-SearchBot",
     company: "OpenAI",
     desc: "Búsqueda web en vivo para usuarios Plus/Pro y navegación de GPT-4o.",
-    // Official crawler documentation — real external citation (E-E-A-T REE-3).
+    // Official crawler documentation - real external citation (E-E-A-T REE-3).
     docs: "https://platform.openai.com/docs/gptbot",
   },
   {
@@ -190,10 +190,10 @@ export default async function Home() {
 
   return (
     <main className="w-full bg-[#f8fafc]">
-      {/* LND-9 (sprint 9): JSON-LD inline SSR — Organization + WebSite. */}
+      {/* LND-9 (sprint 9): JSON-LD inline SSR - Organization + WebSite. */}
       <OrganizationJsonLd />
       <WebSiteJsonLd />
-      {/* 1. HERO — badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
+      {/* 1. HERO - badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
       <section className="mx-auto max-w-5xl px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-18">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white px-3 py-1 text-xs text-[#475569] shadow-xs">
           <span
@@ -226,7 +226,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 2. CÓMO FUNCIONA — cards 01-05 contrastadas, card 03 navy (LND-2) */}
+      {/* 2. CÓMO FUNCIONA - cards 01-05 contrastadas, card 03 navy (LND-2) */}
       <section className="border-y border-[#e2e8f0] bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-12 max-w-2xl">
@@ -243,7 +243,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
-            {/* Dominio 01 — tarjeta ancha destacada (Gemini col-span-5) */}
+            {/* Dominio 01 - tarjeta ancha destacada (Gemini col-span-5) */}
             <div className="flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-7 lg:col-span-5">
               <div>
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
@@ -268,7 +268,7 @@ export default async function Home() {
               </div>
             </div>
 
-            {/* Dominios 02-05 — columna derecha (Gemini col-span-7) */}
+            {/* Dominios 02-05 - columna derecha (Gemini col-span-7) */}
             <div className="flex flex-col gap-6 lg:col-span-7">
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
@@ -284,7 +284,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              {/* Card 03 — navy #0f172a + número emerald (LND-2) */}
+              {/* Card 03 - navy #0f172a + número emerald (LND-2) */}
               <div className="flex flex-col items-start gap-6 rounded-xl border border-[#1e293b] bg-[#0f172a] p-6 text-white sm:flex-row">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500 font-mono text-sm font-bold text-slate-950">
                   {LANDING_COPY.features[2].number}
@@ -340,7 +340,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  JSON-LD 1.1 — W3C
+                  JSON-LD 1.1 - W3C
                 </a>
               </li>
               <li>
@@ -350,7 +350,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  HTML Reference — MDN
+                  HTML Reference - MDN
                 </a>
               </li>
               <li>
@@ -360,7 +360,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  {BRAND_NAME} — GitHub
+                  {BRAND_NAME} - GitHub
                 </a>
               </li>
               <li>
@@ -370,7 +370,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  GPTBot — OpenAI
+                  GPTBot - OpenAI
                 </a>
               </li>
               <li>
@@ -380,7 +380,7 @@ export default async function Home() {
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-[#0f172a] hover:underline"
                 >
-                  ClaudeBot — Anthropic
+                  ClaudeBot - Anthropic
                 </a>
               </li>
             </ul>
@@ -388,7 +388,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 3. SCORECARD — ScoreHero con evidencia REAL (LND-7) + bandas reales 90/75/60/40 (LND-3) */}
+      {/* 3. SCORECARD - ScoreHero con evidencia REAL (LND-7) + bandas reales 90/75/60/40 (LND-3) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
@@ -404,7 +404,7 @@ export default async function Home() {
 
         {/*
           ScoreHero (LND-7): la mejor URL REAL verificada por runAudit, con su
-          band honesta — nunca un número inventado. La evidencia vive en
+          band honesta - nunca un número inventado. La evidencia vive en
           score-hero-evidence.ts y se fija con `pnpm verify:scorehero`.
         */}
         <div className="mb-10">
@@ -412,10 +412,10 @@ export default async function Home() {
         </div>
 
         {/*
-          Desglose por categoría — solo cuando la evidencia REAL está fijada
+          Desglose por categoría - solo cuando la evidencia REAL está fijada
           (categoryScores del GeminiView verificado). A3.2 (sprint 9): la
           evidencia real de `pnpm verify:scorehero` está fijada (stripe.com,
-          2026-08-26) — se renderiza el desglose verificado, nunca números
+          2026-08-26) - se renderiza el desglose verificado, nunca números
           inventados por dimensión.
         */}
         {SCOREHERO_EVIDENCE.categoryScores.length > 0 ? (
@@ -451,7 +451,7 @@ export default async function Home() {
           </div>
         ) : null}
 
-        {/* Tabla de bandas — thresholds reales 90/75/60/40 */}
+        {/* Tabla de bandas - thresholds reales 90/75/60/40 */}
         <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
           <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">
@@ -479,7 +479,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. PLATAFORMAS — 6 motores de IA (LND-4) */}
+      {/* 4. PLATAFORMAS - 6 motores de IA (LND-4) */}
       <section className="border-y border-[#e2e8f0] bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto mb-12 max-w-2xl text-center">
@@ -527,7 +527,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. CTA FINAL — adaptado a la sesión (LND-6): sin teaser de precios
+      {/* 5. CTA FINAL - adaptado a la sesión (LND-6): sin teaser de precios
           (la ruta /pricing se eliminó en WU-1) */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
         <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm sm:p-12">

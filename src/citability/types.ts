@@ -3,7 +3,7 @@ import { load } from "cheerio";
 /**
  * Engine-local citability I/O types (design: engine-local types keep engines
  * self-contained and avoid contract-bloat). Cross-engine shapes live in
- * `src/lib/contracts/` — the citability engine maps to `CitabilityResult`
+ * `src/lib/contracts/` - the citability engine maps to `CitabilityResult`
  * there via `toContractResult` (see index.ts).
  */
 

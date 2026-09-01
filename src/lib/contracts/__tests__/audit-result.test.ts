@@ -6,7 +6,7 @@ import {
 } from "@/lib/contracts/audit-result";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
-/** D3 master light shape — aggregate + per-page summaries (MPA-6). */
+/** D3 master light shape - aggregate + per-page summaries (MPA-6). */
 const multiPageFixture = {
   aggregate: {
     url: "https://example.com/",

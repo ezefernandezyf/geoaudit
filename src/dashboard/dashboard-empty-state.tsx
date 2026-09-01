@@ -4,7 +4,7 @@ import { DASHBOARD_COPY } from "@/lib/copy";
  * Empty state (DSH-4, design U4): honest copy for a user with zero audits and
  * a single call-to-action. The CTA targets /report, where the inline audit
  * form renders when no url param is present (ARU-5). Copy comes from
- * `DASHBOARD_COPY.empty` (neutral Spanish, no voseo) — the component must
+ * `DASHBOARD_COPY.empty` (neutral Spanish, no voseo) - the component must
  * NEVER hardcode its own strings (WU-4 regression).
  */
 export function DashboardEmptyState() {

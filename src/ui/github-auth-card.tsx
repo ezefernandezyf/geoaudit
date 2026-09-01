@@ -12,7 +12,7 @@ type AuthMode = "login" | "signup";
 
 /**
  * Shared GitHub OAuth card (ATH-1..ATH-9, design U2) used by /login and
- * /signup — both pages conflue in the same GitHub OAuth flow. Gemini verbatim:
+ * /signup - both pages conflue in the same GitHub OAuth flow. Gemini verbatim:
  * centered white card (direct hex), serif heading, brand mark, "Continuar con
  * GitHub" button with the GitHub glyph (ATH-8), terms note, and a prompt +
  * switch link. Signup mode adds the benefits list (ATH-7).

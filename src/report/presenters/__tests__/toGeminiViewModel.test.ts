@@ -3,7 +3,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 
 /**
- * U5.2 — Pure adapter `toGeminiViewModel` (APT-2..APT-6, APT-9, APT-10).
+ * U5.2 - Pure adapter `toGeminiViewModel` (APT-2..APT-6, APT-9, APT-10).
  * Maps a real AuditResult into the Gemini-shaped view model. Band thresholds
  * are the REAL 90/75/60/40 (`severityForScore`), never Gemini's 80/65/45/25.
  */

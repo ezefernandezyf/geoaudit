@@ -7,7 +7,7 @@
  */
 
 /**
- * Spanish error copy for the audit form (ADF-7) — re-exported from
+ * Spanish error copy for the audit form (ADF-7) - re-exported from
  * `src/lib/copy.ts` (U2.2, single source of truth). Callers keep importing
  * from this module so the Server Action and the client form compile unchanged.
  */

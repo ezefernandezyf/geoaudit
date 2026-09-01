@@ -57,7 +57,7 @@ beforeEach(() => {
 });
 
 /**
- * U4 — Dashboard RSC (DSH-1..DSH-5): reads the session user's persisted Audit
+ * U4 - Dashboard RSC (DSH-1..DSH-5): reads the session user's persisted Audit
  * rows newest→oldest and composes the presentational components. The page
  * never re-runs audits: it only queries, and the components render.
  */
@@ -139,7 +139,7 @@ describe("DashboardPage guard", () => {
 });
 
 /**
- * U4.1/U4.2 — Runner bar (DSH-8) + 12-column grid (DSH-9): the dashboard page
+ * U4.1/U4.2 - Runner bar (DSH-8) + 12-column grid (DSH-9): the dashboard page
  * composes the Gemini runner bar (input + "Run Audit" inside + user chip) and
  * the Aggregate (col-4) + Trend (col-8) grid on one row.
  */

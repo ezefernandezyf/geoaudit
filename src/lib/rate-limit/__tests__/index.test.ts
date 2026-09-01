@@ -15,7 +15,7 @@ import { InMemoryStore } from "@/lib/rate-limit/store";
 import type { RateLimitEntry, RateLimitStore } from "@/lib/rate-limit/store";
 
 /**
- * U5.T1/U5.T3 — fixed-window rate limiter (RTL-1), injectable store (RTL-2),
+ * U5.T1/U5.T3 - fixed-window rate limiter (RTL-1), injectable store (RTL-2),
  * client IP key (RTL-3) and kill switch (RTL-7). The window logic is asserted
  * against an injected mock store; one end-to-end case uses the real
  * InMemoryStore to prove the full cycle (allow → block → reset).
@@ -40,7 +40,7 @@ const MAX = 5;
 const KEY = "1.2.3.4";
 const NOW = new Date("2026-08-17T12:00:00Z").getTime();
 
-describe("createRateLimiter — fixed window (RTL-1)", () => {
+describe("createRateLimiter - fixed window (RTL-1)", () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -166,7 +166,7 @@ describe("kill switch (RTL-7)", () => {
     vi.unstubAllEnvs();
   });
 
-  it("bypasses all checks when enabled is false — no store access", async () => {
+  it("bypasses all checks when enabled is false - no store access", async () => {
     const store = mockStore({ count: 5, windowStart: NOW });
     const limiter = createRateLimiter({
       store,
@@ -292,7 +292,7 @@ describe("anonymous audit limiter (RTL-8, TLM-11)", () => {
     });
   });
 
-  it("anchors the fixed window at the first increment — day 29 blocked, day 31 resets (TLM-11)", async () => {
+  it("anchors the fixed window at the first increment - day 29 blocked, day 31 resets (TLM-11)", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(NOW);
     const limiter = createRateLimiter({
@@ -305,11 +305,11 @@ describe("anonymous audit limiter (RTL-8, TLM-11)", () => {
       await limiter.check("anon:203.0.113.9");
     }
 
-    // Day 29: still inside the anchored window — blocked (fixed, not rolling).
+    // Day 29: still inside the anchored window - blocked (fixed, not rolling).
     vi.setSystemTime(NOW + 29 * 24 * 60 * 60 * 1000);
     expect((await limiter.check("anon:203.0.113.9")).allowed).toBe(false);
 
-    // Day 31: the window expired — a new window starts with a fresh counter.
+    // Day 31: the window expired - a new window starts with a fresh counter.
     vi.setSystemTime(NOW + 31 * 24 * 60 * 60 * 1000);
     expect(await limiter.check("anon:203.0.113.9")).toEqual({
       allowed: true,
@@ -371,7 +371,7 @@ describe("anonymous audit limiter (RTL-8, TLM-11)", () => {
 });
 
 /**
- * U5.T4 — default store env guard (design U5): production backs the singleton
+ * U5.T4 - default store env guard (design U5): production backs the singleton
  * with the shared Prisma store; dev/test keep the per-instance InMemoryStore
  * so the module (and its tests) never require a DATABASE_URL.
  *

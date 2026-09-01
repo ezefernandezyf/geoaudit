@@ -110,7 +110,7 @@ export function DashboardRunnerBar({ action, user }: RunnerBarProps) {
             {user.name ?? user.email ?? "Usuario"}
           </p>
           {/* Static plan pill (Sprint 10): the tier column is gone, every
-              account is FREE — same "free Plan" label for all users. */}
+              account is FREE - same "free Plan" label for all users. */}
           <p className="font-mono text-[10px] uppercase tracking-wider text-[#475569]">
             free Plan
           </p>

@@ -14,7 +14,7 @@ import type {
  * (RPL-11). `extractStructure` pulls the on-page structure signals from the
  * shared DOM (engine-local, never mutating it); `scorePlatforms` maps those
  * signals through five platform rubrics drawn from the geo-platform-optimizer
- * skill — measured criteria only for what a single-page audit can see.
+ * skill - measured criteria only for what a single-page audit can see.
  * External-presence criteria (Wikipedia, Reddit, YouTube, Bing WMT, IndexNow)
  * are labeled "not_measured" with the mandated rationale: they arrive with the
  * brand-mention scanner in a future sprint.
@@ -51,7 +51,7 @@ function questionHeadingsIn(
   return count;
 }
 
-/** Visible page text with script/style/noscript/template stripped (clone — never mutates). */
+/** Visible page text with script/style/noscript/template stripped (clone - never mutates). */
 function visibleBodyText($: CheerioAPI): string {
   const body = $("body").clone();
   body.find("script, style, noscript, template").remove();

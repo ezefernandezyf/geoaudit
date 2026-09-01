@@ -1,7 +1,7 @@
 /**
  * Engine-local schema I/O types (design: engine-local types keep engines
  * self-contained and avoid contract-bloat). Cross-engine shapes live in
- * `src/lib/contracts/` — this engine maps to `SchemaResult` there via
+ * `src/lib/contracts/` - this engine maps to `SchemaResult` there via
  * `toContractResult` (see index.ts).
  *
  * Pipeline: extract (RSC-1) -> parse (RSC-2/RSC-12) -> validate (RSC-3..RSC-7)
@@ -40,7 +40,7 @@ export interface ParsedBlock {
   index: number;
   raw: string;
   /**
-   * `JSON.parse` result — an object, a top-level array, or an @graph wrapper
+   * `JSON.parse` result - an object, a top-level array, or an @graph wrapper
    * (RSC-10). Nodes inside arrays/@graph are flattened at validation time.
    */
   data: unknown;

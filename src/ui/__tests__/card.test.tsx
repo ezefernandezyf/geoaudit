@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Card } from "@/ui/card";
 
 /**
- * U1.3 — Card primitive (DNF-6 delta): Gemini verbatim — padded surface
+ * U1.3 - Card primitive (DNF-6 delta): Gemini verbatim - padded surface
  * container with rounded corners. Variants default/muted/highlight use hex
  * directos; NO header/footer slots (Gemini has none, DNF-9); `noPadding`
  * removes the p-6 padding.

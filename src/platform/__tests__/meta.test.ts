@@ -13,7 +13,7 @@ function page(name: string) {
 describe("analyzeMeta (RPL-2)", () => {
   it("reports title, description and viewport presence on a complete page", () => {
     const result = analyzeMeta(page("page-meta-full.html"));
-    expect(result.title).toBe("GeoAudit — AI Visibility Audit Platform");
+    expect(result.title).toBe("GeoAudit - AI Visibility Audit Platform");
     expect(result.titleLength).toBeGreaterThan(0);
     expect(result.description).not.toBeNull();
     expect(result.descriptionLength).toBeGreaterThanOrEqual(120);

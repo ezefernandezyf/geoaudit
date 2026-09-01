@@ -22,7 +22,7 @@ const authMock = auth as unknown as Mock<() => Promise<Session | null>>;
 const checkTierLimitMock = vi.mocked(checkTierLimit);
 
 /**
- * U5.T4 — rate limiting integration (ADF-9, RTL-4/5). The action module's
+ * U5.T4 - rate limiting integration (ADF-9, RTL-4/5). The action module's
  * limiter factory is mocked so tests control the decision; the IP key
  * resolution stays REAL (imported from the actual module) so the header→key
  * wiring is exercised. `next/headers` is mocked because vitest has no request
@@ -51,7 +51,7 @@ vi.mock("next/headers", () => ({
 }));
 
 /**
- * U3.T2 — tier pre-check (TLM-3). The auth stack and the prisma singleton are
+ * U3.T2 - tier pre-check (TLM-3). The auth stack and the prisma singleton are
  * mocked so the action never touches a real DB nor instantiates NextAuth.
  * `checkTierLimit` is mocked (its per-tier counter selection is covered in
  * enforcement.test.ts) so the action's gate wiring is exercised in isolation.
@@ -88,14 +88,14 @@ async function expectRedirect(
 }
 
 /**
- * U2.T1/U2.T2 — Server Action contract (ADF-3/4/5).
+ * U2.T1/U2.T2 - Server Action contract (ADF-3/4/5).
  * - isAllowedProtocol: pure protocol filter, http/https only (ADF-3).
  * - normalizeToHttps: silent http→https upgrade, idempotent (ADF-4).
  * - auditAction: FormData → Zod → filter → normalize → redirect (ADF-5),
  *   inline errors instead of throwing for validation failures.
  *
  * The redirect assertions use the REAL next/navigation redirect, which throws
- * a NEXT_REDIRECT error carrying the target in its digest — no mocks needed.
+ * a NEXT_REDIRECT error carrying the target in its digest - no mocks needed.
  */
 describe("isAllowedProtocol (ADF-3)", () => {
   it("accepts http and https schemes", () => {
@@ -135,7 +135,7 @@ describe("normalizeToHttps (ADF-4)", () => {
 });
 
 describe("urlInputSchema accepts ftp (protocol filter is mandatory)", () => {
-  it("passes ftp:// through Zod — the filter, not the schema, rejects it", () => {
+  it("passes ftp:// through Zod - the filter, not the schema, rejects it", () => {
     const result = urlInputSchema.safeParse({
       url: "ftp://archivos.ejemplo.com",
     });
@@ -176,7 +176,7 @@ describe("auditAction (ADF-5)", () => {
     expect(state).toEqual({ error: AUDIT_FORM_ERRORS.invalidUrl });
   });
 
-  it("never throws on validation failures — inline state only", async () => {
+  it("never throws on validation failures - inline state only", async () => {
     const bad: Array<string | null> = ["not a url", "", "ftp://x.com"];
     for (const value of bad) {
       const formData = new FormData();
@@ -214,7 +214,7 @@ describe("auditAction rate limiting (ADF-9, RTL-4/5)", () => {
     expect(state).toEqual({ error: AUDIT_FORM_ERRORS.rateLimited });
   });
 
-  it("checks the limiter before validation — over-limit wins over a bad URL", async () => {
+  it("checks the limiter before validation - over-limit wins over a bad URL", async () => {
     limiterMock.check.mockResolvedValue({
       allowed: false,
       remaining: 0,

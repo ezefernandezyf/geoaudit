@@ -7,23 +7,23 @@ import { parseRobotsTxt } from "@/crawlers/index";
 import { severityForScore } from "@/scoring/index";
 
 /**
- * Multi-page audit engine (MPA-1..MPA-5, D3/D6) — the PRO-gated sitemap-driven
+ * Multi-page audit engine (MPA-1..MPA-5, D3/D6) - the PRO-gated sitemap-driven
  * orchestrator. `runMultiPageAudit(url, deps)` discovers page URLs from the
- * sitemap (robots.txt `Sitemap:` first, `/sitemap.xml` fallback — MPA-4),
+ * sitemap (robots.txt `Sitemap:` first, `/sitemap.xml` fallback - MPA-4),
  * slices to the page cap (MPA-2), audits each URL by REUSING the single-page
  * `runAudit` (MPA-1/MPA-9) through a hand-rolled bounded worker (D6, MPA-3),
  * and returns one composite result: a light aggregate plus per-page results.
  *
  * Security (threat matrix): every sitemap hop passes the fetch layer's
- * `assertPublicHost` SSRF guard (RFL-2/3) — a robots.txt-declared sitemap
+ * `assertPublicHost` SSRF guard (RFL-2/3) - a robots.txt-declared sitemap
  * pointing at a private host is blocked before any request. The XML
  * content-type relaxation (MPA-5, D5) is scoped to the `"sitemap"` kind.
  *
  * Isolation (MPA-1): a failing page (runAudit throws on page-fetch errors) is
- * recorded with its error — `{ url, result: null, error }` — and the other
+ * recorded with its error - `{ url, result: null, error }` - and the other
  * pages still complete. The aggregate is the mean of the SUCCESSFUL page
  * scores (0 / Critical when none succeeded). Failed pages carry no AuditResult,
- * so they are absent from the persisted master light shape (D3) — the
+ * so they are absent from the persisted master light shape (D3) - the
  * persistence layer keeps only auditable pages (see multi-page-persist.ts).
  */
 
@@ -42,7 +42,7 @@ export interface MultiPageAggregate {
   durationMs: number;
 }
 
-/** Composite engine result — what the persistence layer and report consume. */
+/** Composite engine result - what the persistence layer and report consume. */
 export interface MultiPageEngineResult {
   aggregate: MultiPageAggregate;
   pages: PerPageAudit[];
@@ -125,7 +125,7 @@ async function discoverSitemapUrls(
 
 /**
  * Hand-rolled bounded worker (D6, MPA-3): at most `concurrency` audits run in
- * flight at any instant — never all pages in parallel. Each failure is
+ * flight at any instant - never all pages in parallel. Each failure is
  * isolated into its `PerPageAudit.error` (MPA-1); the worker never throws.
  */
 async function runBounded(

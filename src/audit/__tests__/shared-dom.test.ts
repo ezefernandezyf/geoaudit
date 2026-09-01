@@ -6,7 +6,7 @@ import type { FetchImpl } from "@/lib/fetch/redirect";
 import type { LookupFn } from "@/lib/fetch/ssrf";
 
 /**
- * T25 part A — RAO-3 shared parsed DOM. The orchestrator must parse the page
+ * T25 part A - RAO-3 shared parsed DOM. The orchestrator must parse the page
  * HTML exactly once (the fetch layer already loads it and returns `parsed.$`)
  * and pass the SAME Cheerio instance to every content engine. The four engine
  * entry points are wrapped in delegating spies (they still run the real

@@ -163,7 +163,7 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
 
   const orgPerson = nodes.filter(isOrgOrPerson);
 
-  // 1. Organization/Person present and complete — partial-credit tiers
+  // 1. Organization/Person present and complete - partial-credit tiers
   // (RSC-13): all nodes clean → 15; complete but with minor issues or a
   // mix of clean/incomplete nodes → 13; missing ONE required property →
   // 10; missing 2+ required properties → 7; absent → 0.
@@ -235,7 +235,7 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
     ),
   );
 
-  // 5. WebSite + SearchAction — partial credit for a WebSite node without
+  // 5. WebSite + SearchAction - partial credit for a WebSite node without
   // the SearchAction (RSC-13): 2 points, full 5 with potentialAction.
   const website = nodes.find((node) => node.type === "WebSite");
   const websitePoints =
@@ -315,7 +315,7 @@ export function scoreRubric(input: RubricInput): SchemaRubric {
     ),
   );
 
-  // 11. knowsAbout with 3+ topics on Organization/Person — partial credit
+  // 11. knowsAbout with 3+ topics on Organization/Person - partial credit
   // for 1-2 topics (RSC-13).
   const maxKnowsAbout = orgPerson.reduce(
     (max, node) => Math.max(max, knowsAboutCount(node.raw)),

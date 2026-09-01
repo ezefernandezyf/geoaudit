@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 /**
- * U2 — ATH-5: a failed/denied OAuth attempt surfaces an inline error.
+ * U2 - ATH-5: a failed/denied OAuth attempt surfaces an inline error.
  * Pure mapping from the NextAuth error query-param code to user-facing copy,
  * shared by the /login and /signup cards.
  */

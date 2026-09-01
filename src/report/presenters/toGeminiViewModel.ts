@@ -15,7 +15,7 @@ import type { GeminiBand, GeminiView } from "./types";
  * component becomes a pure presenter of this view model and never reads
  * `AuditResult` directly.
  *
- * Pure: no I/O, no state, deterministic — fully unit-testable with fixtures.
+ * Pure: no I/O, no state, deterministic - fully unit-testable with fixtures.
  *
  * Notes on the binding decisions:
  * - Score + band use the REAL `severityForScore` thresholds (90/75/60/40),
@@ -29,9 +29,9 @@ import type { GeminiBand, GeminiView } from "./types";
 
 /** Caller-provided context the contract does not carry. */
 export type ViewModelContext = {
-  /** Persisted share token — passed through when present (APT-9). */
+  /** Persisted share token - passed through when present (APT-9). */
   shareToken?: string | null;
-  /** Persisted audit date — passed through when present. */
+  /** Persisted audit date - passed through when present. */
   auditDate?: string | null;
 };
 
@@ -74,7 +74,7 @@ function buildSummary(
   band: GeminiBand,
   durationSeconds: number,
 ): string {
-  return `${domain} — GEO Score ${totalScore} (${band}) en ~${durationSeconds}s`;
+  return `${domain} - GEO Score ${totalScore} (${band}) en ~${durationSeconds}s`;
 }
 
 export function toGeminiViewModel(

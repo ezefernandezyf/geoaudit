@@ -11,7 +11,7 @@ import { persistMultiPageAudit } from "@/lib/audit/multi-page-persist";
 import { getDefaultRateLimiter } from "@/lib/rate-limit";
 
 /**
- * U3 — multi-page Server Action (MPA-1, TLM-3/10). The action follows the
+ * U3 - multi-page Server Action (MPA-1, TLM-3/10). The action follows the
  * single-page auditAction contract (rate limit → Zod → protocol → auth →
  * limit check) with NO tier gate (MPA-8 removed): any authenticated user runs
  * `runMultiPageAudit`, persists through the SAME $transaction and redirects
@@ -148,7 +148,7 @@ describe("multiPageAuditAction flow (MPA-1)", () => {
     expect(args.pages).toEqual(engineResult.pages);
   });
 
-  it("runs for any authenticated user — no tier lookup (MPA-8 removed)", async () => {
+  it("runs for any authenticated user - no tier lookup (MPA-8 removed)", async () => {
     authMock.mockResolvedValue(session());
 
     await expectRedirect(
@@ -211,7 +211,7 @@ describe("multiPageAuditAction gates", () => {
     expect(authMock).not.toHaveBeenCalled();
   });
 
-  it("returns 'failed' when the engine or persistence throws — never uncaught", async () => {
+  it("returns 'failed' when the engine or persistence throws - never uncaught", async () => {
     authMock.mockResolvedValue(session());
     runMultiPageAuditMock.mockRejectedValue(new Error("engine exploded"));
 

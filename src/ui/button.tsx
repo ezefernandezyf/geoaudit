@@ -10,7 +10,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: ButtonSize;
   /** Pending state: disables the button, sets aria-busy and swaps in a Loader2 spinner (DNF-7). */
   isLoading?: boolean;
-  /** Label shown while loading (default "Analizando…" — B11, parametrizable). */
+  /** Label shown while loading (default "Analizando…" - B11, parametrizable). */
   loadingLabel?: string;
   /** Optional icon rendered before the label (Gemini). Hidden while loading. */
   leftIcon?: ReactNode;
@@ -44,7 +44,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 };
 
 /**
- * Button primitive (spec DNF-7) — Gemini verbatim (hex classes, sizes,
+ * Button primitive (spec DNF-7) - Gemini verbatim (hex classes, sizes,
  * variants, Loader2 spinner). While loading the button is disabled, announces
  * `aria-busy="true"` and swaps the label for `loadingLabel` (default
  * "Analizando…", the app's established pending copy, ADF-6; B11 makes it

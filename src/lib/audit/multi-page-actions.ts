@@ -21,18 +21,18 @@ import { persistMultiPageAudit } from "@/lib/audit/multi-page-persist";
  * redirects to the audit detail page.
  *
  * Gates (cheapest first, following the auditAction pattern):
- * 1. Rate limit (ADF-9) — inline error, no processing.
- * 2. Zod `urlInputSchema` + protocol filter — inline error (ADF-3/5).
- * 3. Session — multi-page is a signed-in feature (counts against the user's
+ * 1. Rate limit (ADF-9) - inline error, no processing.
+ * 2. Zod `urlInputSchema` + protocol filter - inline error (ADF-3/5).
+ * 3. Session - multi-page is a signed-in feature (counts against the user's
  *    FREE limit, so it requires a user). No tier gate (MPA-8 removed).
- * 4. Limit (TLM-3): `checkTierLimit` — over-limit users get `"limit"` before
+ * 4. Limit (TLM-3): `checkTierLimit` - over-limit users get `"limit"` before
  *    any work.
  *
  * Success: `runMultiPageAudit(url)` → `prisma.$transaction` →
  * `persistMultiPageAudit` (1 master Audit + N AuditPage rows, MPA-6/7) →
  * redirect to `/dashboard/audits/[id]`. TLM-10 is satisfied structurally: the
  * master Audit row counts exactly once toward the 30-day window.
- * Engine/persist failures return `"failed"` — never uncaught; the redirect
+ * Engine/persist failures return `"failed"` - never uncaught; the redirect
  * (NEXT_REDIRECT throw) is intentionally OUTSIDE the try/catch so it
  * propagates normally.
  */
@@ -74,7 +74,7 @@ export async function multiPageAuditAction(
 
   // 3. Session: multi-page is a signed-in feature (it counts against the
   // user's FREE limit) so it requires a user; there is no tier gate (MPA-8
-  // removed — any authenticated user runs it).
+  // removed - any authenticated user runs it).
   const session = await auth();
   if (!session?.user?.id) {
     return { error: "auth" };

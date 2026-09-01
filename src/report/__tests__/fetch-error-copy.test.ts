@@ -6,7 +6,7 @@ import {
 } from "@/report/fetch-error-copy";
 
 /**
- * U3.T1 (ARU-6 pull-forward) — FetchErrorCode → Spanish copy. Pure module:
+ * U3.T1 (ARU-6 pull-forward) - FetchErrorCode → Spanish copy. Pure module:
  * detects the failure code embedded in the runAudit throw message and maps it
  * to user-facing copy. Extracted so the mapping is testable without rendering.
  */

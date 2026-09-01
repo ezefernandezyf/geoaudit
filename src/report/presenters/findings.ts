@@ -19,7 +19,7 @@ import type { Finding } from "./types";
  *   attached when a real source exists (`schema.generated`, JSON.stringify).
  * - `crawlers.perBot` blocked bots → actionable, band `critical`.
  *
- * `impactScore` is ALWAYS null — the engine does not compute one, so we never
+ * `impactScore` is ALWAYS null - the engine does not compute one, so we never
  * fabricate a number presented as measured (APT-7, APT-10). Same for any code
  * snippet: it only appears when `schema.generated` is present, never invented.
  */

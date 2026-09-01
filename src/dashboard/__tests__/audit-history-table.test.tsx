@@ -11,7 +11,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 /**
- * U4.3 — Dashboard history table (DSH-1/3/7/10/11, design U4). Gemini verbatim
+ * U4.3 - Dashboard history table (DSH-1/3/7/10/11, design U4). Gemini verbatim
  * header bar + rows with a "Multi-Page" chip, a refresh action and a
  * "SCANNING..." skeleton row during an in-flight audit.
  */
@@ -71,7 +71,7 @@ describe("AuditHistoryTable (DSH-3)", () => {
 });
 
 /**
- * U1 — Detail navigation (DSH-7): every history row links to its own detail
+ * U1 - Detail navigation (DSH-7): every history row links to its own detail
  * page, so the dashboard becomes the entry point to `/dashboard/audits/[id]`.
  */
 describe("AuditHistoryTable (DSH-7)", () => {
@@ -108,7 +108,7 @@ describe("AuditHistoryTable (DSH-7)", () => {
 });
 
 /**
- * U3.9 — History search (DSH-9): a client search input filters the table by
+ * U3.9 - History search (DSH-9): a client search input filters the table by
  * URL substring, and clearing it restores the full list.
  */
 describe("AuditHistoryTable search (DSH-9)", () => {
@@ -147,7 +147,7 @@ describe("AuditHistoryTable search (DSH-9)", () => {
 });
 
 /**
- * U4.3 — Multi-Page chip (DSH-10): a persisted multi-page audit row shows the
+ * U4.3 - Multi-Page chip (DSH-10): a persisted multi-page audit row shows the
  * "Multi-Page" chip.
  */
 describe("AuditHistoryTable Multi-Page chip (DSH-10)", () => {
@@ -163,7 +163,7 @@ describe("AuditHistoryTable Multi-Page chip (DSH-10)", () => {
 });
 
 /**
- * U4.3 — Refresh + scanning row (DSH-11): a refresh action exists in the
+ * U4.3 - Refresh + scanning row (DSH-11): a refresh action exists in the
  * header bar, and a "SCANNING..." row appears while an audit is in flight.
  */
 describe("AuditHistoryTable refresh + scanning (DSH-11)", () => {

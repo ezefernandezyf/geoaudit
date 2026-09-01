@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
- * C16 — shared OpenGraph/Twitter metadata builder (LND-8, PRC-8).
+ * C16 - shared OpenGraph/Twitter metadata builder (LND-8, PRC-8).
  *
  * Single source for the social preview fields emitted by the public marketing
  * pages (landing, login, signup). Each page reuses its own `title`/`description`
@@ -11,12 +11,12 @@ import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
  * layout defines (see src/app/layout.tsx).
  */
 
-/** Shared OG image asset (standard 1200×630 social preview) — C16. */
+/** Shared OG image asset (standard 1200×630 social preview) - C16. */
 export const OG_IMAGE = {
   url: "/og.png",
   width: 1200,
   height: 630,
-  alt: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
+  alt: `${BRAND_NAME} - ${BRAND_DESCRIPTOR}`,
 } as const;
 
 export type BuildOgMetadataInput = {

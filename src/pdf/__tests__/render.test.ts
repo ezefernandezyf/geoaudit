@@ -3,15 +3,15 @@ import { PdfRenderError, renderPdf } from "@/pdf/render";
 import type { PdfRenderDeps } from "@/pdf/render";
 
 /**
- * U4.5/U4.6 — PDF render pipeline (PDF-4/6, threat matrix: Chromium subprocess).
+ * U4.5/U4.6 - PDF render pipeline (PDF-4/6, threat matrix: Chromium subprocess).
  *
  * `renderPdf(html, deps)` launches headless Chromium through an INJECTED
  * `deps.launch` (the real default wires `puppeteer-core` +
  * `@sparticuz/chromium-min`), renders the HTML and returns PDF bytes.
  *
- * - PDF-6: `page.pdf({ printBackground: true, format: "A4" })` — brand colors
+ * - PDF-6: `page.pdf({ printBackground: true, format: "A4" })` - brand colors
  *   survive print.
- * - Threat: a launch/render rejection NEVER escapes raw — it is wrapped in the
+ * - Threat: a launch/render rejection NEVER escapes raw - it is wrapped in the
  *   typed `PdfRenderError` the route maps to a 5xx (never an uncaught throw),
  *   and the browser is always closed (finally).
  */
@@ -65,7 +65,7 @@ describe("renderPdf (PDF-6)", () => {
 });
 
 describe("renderPdf failure path (threat: Chromium subprocess)", () => {
-  it("wraps a launch rejection in the typed PdfRenderError — never uncaught", async () => {
+  it("wraps a launch rejection in the typed PdfRenderError - never uncaught", async () => {
     const deps: PdfRenderDeps = {
       launch: vi.fn().mockRejectedValue(new Error("chromium boom")),
     };

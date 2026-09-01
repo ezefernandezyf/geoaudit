@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildPlatformRows } from "@/report/platform-matrix";
 
 /**
- * U3.1/U3.2 — Platform matrix derivation (ADP-6, design PlatformMatrix).
+ * U3.1/U3.2 - Platform matrix derivation (ADP-6, design PlatformMatrix).
  * Pure function, no React: maps the six platform rows from the real
  * `platform.perPlatform` (5 ids: aio/chatgpt/perplexity/gemini/copilot) plus
  * `crawlers.perBot` access map. Claude has no `perPlatform` score → readiness

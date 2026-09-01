@@ -3,7 +3,7 @@ import { resolveNavPlan, type NavPlanPrisma } from "@/lib/nav-plan";
 import { FREE_AUDIT_LIMIT } from "@/lib/audit/tier";
 
 /**
- * U1.9 — resolveNavPlan (SHL-2): the plan pill data resolver. There is a
+ * U1.9 - resolveNavPlan (SHL-2): the plan pill data resolver. There is a
  * single FREE plan: `used` counts Audit rows in the 30-day window (TLM-2) and
  * `limit` is the FREE constant. No tier, no subscription counter (TLM-7/8
  * removed).

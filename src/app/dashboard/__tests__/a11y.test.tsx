@@ -19,7 +19,7 @@ const { authMock, findManyMock, userFindUniqueMock, auditCountMock } =
 vi.mock("@/lib/auth", () => ({ auth: authMock }));
 // The dashboard reads persisted audits (DSH-5) and the layout resolves the
 // nav plan (SHL-2): findMany + count on audit, findUnique on user (existence
-// check only — no tier field is read anymore).
+// check only - no tier field is read anymore).
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     audit: { findMany: findManyMock, count: auditCountMock },
@@ -75,7 +75,7 @@ async function renderShell(page: React.ReactNode) {
 }
 
 /**
- * C14 — dashboard accessibility (A11Y-2/4/5): axe scan of the page and the
+ * C14 - dashboard accessibility (A11Y-2/4/5): axe scan of the page and the
  * full authenticated shell (header/nav/main/footer), landmark regions and
  * logical focus order. Renders with a FREE session + 2 persisted audits so the
  * aggregate, trend and history table are all exercised.

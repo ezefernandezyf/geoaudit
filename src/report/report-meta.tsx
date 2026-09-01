@@ -1,7 +1,7 @@
 import type { GeminiView } from "@/report/presenters/types";
 
 /**
- * ReportMeta (U5.6, ARU-10, design U5): pure presenter of the view model —
+ * ReportMeta (U5.6, ARU-10, design U5): pure presenter of the view model -
  * the honest metadata strip (audit date + duration). The view model only
  * carries metrics the engine actually measured (APT-10); the caller supplies
  * the persisted date via the adapter `ctx`. Pure SSR Server Component.

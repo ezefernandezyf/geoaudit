@@ -7,7 +7,7 @@ import type {
 import { deriveFindings } from "@/report/presenters/findings";
 
 /**
- * U5.3 — `deriveFindings` (APT-7, APT-10). Findings derive ONLY from real
+ * U5.3 - `deriveFindings` (APT-7, APT-10). Findings derive ONLY from real
  * citability bottom3/top3, schema issues and blocked bots. `impactScore` is
  * always null; a `codeSnippet` appears only when a real source exists
  * (`schema.generated`).

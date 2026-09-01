@@ -5,10 +5,10 @@ import { SHARE_MODAL_ERROR_COPY } from "@/lib/copy";
 import type { ShareLinkAction } from "@/lib/audit/share-actions";
 
 /**
- * U5.9 — ShareModal (ADP-7, design U5): Gemini modal verbatim over the REAL
+ * U5.9 - ShareModal (ADP-7, design U5): Gemini modal verbatim over the REAL
  * share actions (injected as props): create/revoke via the two Server
  * Actions, copy to clipboard, real share intents (X / LinkedIn / WhatsApp)
- * and the public-view link. No tier gate — every authenticated owner shares
+ * and the public-view link. No tier gate - every authenticated owner shares
  * (SHR-3).
  */
 

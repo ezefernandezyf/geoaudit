@@ -16,7 +16,7 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 /**
- * TextField primitive (U1.4, DNF-8 delta): Gemini verbatim — label uppercase
+ * TextField primitive (U1.4, DNF-8 delta): Gemini verbatim - label uppercase
  * `tracking-wider` in slate-500, input with hex border/ring states, a reserved
  * error slot (`min-h-[18px]`) so validation never causes layout shift, and
  * `useId`-generated ids when the caller omits `id`. `data-error-slot` is a

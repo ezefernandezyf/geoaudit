@@ -5,13 +5,13 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
 
 /**
- * U3 — multi-page persistence (MPA-6/7, TLM-10, D3). `persistMultiPageAudit`
+ * U3 - multi-page persistence (MPA-6/7, TLM-10, D3). `persistMultiPageAudit`
  * orchestrates the SAME $transaction that created the audit: one master
  * `Audit` row (light aggregate result) + N `AuditPage` rows (full per-page
  * AuditResult). TLM-10 is satisfied structurally: the master Audit row is the
- * single count toward the 30-day window — there is no separate counter (the
+ * single count toward the 30-day window - there is no separate counter (the
  * `recordPaidAudit` increment was removed). The transaction client is
- * structural, so the whole flow is unit-tested with plain mocks — no real DB.
+ * structural, so the whole flow is unit-tested with plain mocks - no real DB.
  */
 
 function auditResultFor(url: string, geoScore: number): AuditResult {

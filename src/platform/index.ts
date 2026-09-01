@@ -14,7 +14,7 @@ import type { PlatformEngineResult } from "./types";
  *
  * `scorePlatform(input, opts?)` runs header checks (RPL-1), meta/OG/Twitter
  * analysis (RPL-2..RPL-4), SSR + question/answer detection (RPL-5/RPL-8/RPL-9),
- * the sitemap/llms.txt presence probes (RPL-6/RPL-7 — the only network touch,
+ * the sitemap/llms.txt presence probes (RPL-6/RPL-7 - the only network touch,
  * via an injectable fetcher) and the per-platform on-page readiness rubrics
  * (RPL-10/RPL-11). `toContractResult` maps the rich engine-local result to the
  * shared `PlatformResult` contract consumed by AuditResult (T25).
@@ -32,7 +32,7 @@ export interface PlatformInput {
 }
 
 export interface PlatformOptions {
-  /** Injectable probe fetcher — defaults to global fetch; tests inject a mock. */
+  /** Injectable probe fetcher - defaults to global fetch; tests inject a mock. */
   fetcher?: ProbeFn;
 }
 

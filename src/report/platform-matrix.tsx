@@ -4,11 +4,11 @@ import type { GeminiView } from "@/report/presenters/types";
 
 /**
  * Platform matrix (U5.7, ARU-12, design U5). The pure derivation
- * (`buildPlatformRows`, no React — fully unit-testable) lives here; the
+ * (`buildPlatformRows`, no React - fully unit-testable) lives here; the
  * presentational `<PlatformMatrix>` component is a pure presenter of the
  * Gemini view model (`view.platforms`).
  *
- * Rows derive from the REAL contract shapes — never a mock:
+ * Rows derive from the REAL contract shapes - never a mock:
  * - `platform.perPlatform` (5 ids: aio/chatgpt/perplexity/gemini/copilot) →
  *   each platform's readiness score.
  * - `crawlers.perBot` access map → each platform's bot access state.
@@ -101,7 +101,7 @@ const ACCESS_LABEL: Record<CrawlerAccess, string> = {
   unknown: REPORT_COPY.matrix.access.unknown,
 };
 
-/** Badge styling per bot state (emerald / red / muted — Gemini hex). */
+/** Badge styling per bot state (emerald / red / muted - Gemini hex). */
 const ACCESS_BADGE: Record<CrawlerAccess, string> = {
   allowed: "text-emerald-800 bg-emerald-50 border border-emerald-200",
   blocked: "text-red-700 bg-red-50 border border-red-200",
@@ -114,7 +114,7 @@ const ACCESS_BADGE: Record<CrawlerAccess, string> = {
  * adapter). Claude has no `perPlatform` measurement → its readiness renders
  * "No medido". Gemini AuditDetailPage table composition verbatim with the
  * HONEST columns the view model actually carries (Plataforma / Bot /
- * Acceso / Readiness — no fabricated citation-rate or last-crawled, APT-10).
+ * Acceso / Readiness - no fabricated citation-rate or last-crawled, APT-10).
  * Pure SSR Server Component.
  */
 export function PlatformMatrix({ view }: { view: GeminiView }) {
@@ -161,7 +161,7 @@ export function PlatformMatrix({ view }: { view: GeminiView }) {
                 </td>
                 <td className="px-4 py-3 font-mono font-bold text-[#0f172a]">
                   {row.readiness === null ? (
-                    // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA sobre blanco —
+                    // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA sobre blanco -
                     // #64748b (4.76:1), el hex del fix del /100 (PERF-3).
                     <span className="font-sans font-normal text-[#64748b]">
                       {REPORT_COPY.matrix.notMeasured}

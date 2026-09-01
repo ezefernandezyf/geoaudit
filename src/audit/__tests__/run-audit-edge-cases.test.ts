@@ -9,7 +9,7 @@ import type { FetchImpl } from "@/lib/fetch/redirect";
 import type { LookupFn } from "@/lib/fetch/ssrf";
 
 /**
- * T25 part B — orchestrator edge cases (RAO-1 invalid URL, RAO-12 engine
+ * T25 part B - orchestrator edge cases (RAO-1 invalid URL, RAO-12 engine
  * failure isolation, RAO-13 non-HTML page, robots.txt 404/gated → all allowed).
  * Zero network: every fetch goes through an injected mock fetcher.
  */
@@ -79,7 +79,7 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.meta.startedAt).toBe(NOW);
     expect(result.meta.completedAt).toBe(NOW);
 
-    // No engine ran — every section is the zeroed/empty contract shape.
+    // No engine ran - every section is the zeroed/empty contract shape.
     expect(result.citability.pageScore).toBe(0);
     expect(result.schema.detected).toEqual([]);
     expect(result.content.composite).toBe(0);
@@ -114,7 +114,7 @@ describe("runAudit edge cases (T25 part B)", () => {
       now: () => NOW,
     });
 
-    // The text/plain robots IS parsed — GPTBot is blocked by its Disallow rule.
+    // The text/plain robots IS parsed - GPTBot is blocked by its Disallow rule.
     expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
 
     const headers = new Headers({ "content-type": "text/html; charset=utf-8" });
@@ -178,7 +178,7 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("RAO-12: a throwing engine is isolated — others produce results and meta.errors records the failure", async () => {
+  it("RAO-12: a throwing engine is isolated - others produce results and meta.errors records the failure", async () => {
     const fetcher = mockAuditFetch();
     const throwingScorePage = () => {
       throw new Error("citability exploded");
@@ -206,7 +206,7 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.meta.errors).toContain("citability: citability exploded");
 
     // The GEO Score is computed from the 4 available engines (citability
-    // excluded, weights rebalanced — RGS-9).
+    // excluded, weights rebalanced - RGS-9).
     expect(result.summary.geoScore).toBeGreaterThan(0);
     expect(result.summary.geoScore).toBeLessThanOrEqual(100);
     expect(auditResultSchema.safeParse(result).success).toBe(true);

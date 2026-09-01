@@ -1,6 +1,6 @@
 /**
  * Shared text measurement helpers for the citability engine (used by segment
- * and scorer). Pure functions over strings — no DOM or network.
+ * and scorer). Pure functions over strings - no DOM or network.
  */
 
 export function countWords(text: string): number {

@@ -55,7 +55,7 @@ beforeEach(() => {
 });
 
 /**
- * U2.3/U2.4 — share-link Server Actions (SHR-1/3/4, design D4).
+ * U2.3/U2.4 - share-link Server Actions (SHR-1/3/4, design D4).
  *
  * `createShareToken` / `revokeShareToken` take `(prevState, formData)` (the
  * `"use server"` action contract); the audit id travels in the form while the

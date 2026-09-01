@@ -6,7 +6,7 @@ import { ScoreBar } from "@/ui/score-bar";
  * DomainScorecard (U5.6, ARU-10, design U5): pure presenter of the view
  * model. Gemini "Scorecard por Categoría" section verbatim (hex surfaces,
  * serif heading, mono chip) rendering the five `categoryScores` through the
- * shared `ScoreBar` primitive — the bars color by the REAL lowercase band
+ * shared `ScoreBar` primitive - the bars color by the REAL lowercase band
  * (`category.status`) and the adapter owns the rowScore derivation. Pure SSR
  * Server Component: view in, markup out.
  */

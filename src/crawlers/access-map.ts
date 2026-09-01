@@ -14,7 +14,7 @@ import type { CrawlerResult } from "@/lib/contracts/audit-result";
 
 /**
  * Crawler access map (RCR-4..RCR-11). Pure function over three parsed inputs:
- * the RobotsTxt contract, the page HTTP headers and the Cheerio DOM — zero
+ * the RobotsTxt contract, the page HTTP headers and the Cheerio DOM - zero
  * network. Produces a per-bot map (RCR-9) and the composite crawler score
  * (RCR-8: Tier1 50% + Tier2 25% + no-blanket-block 15% + AI-files 10%).
  *
@@ -42,7 +42,7 @@ const STATUS_TO_CONTRACT = {
  * Parses `X-Robots-Tag` header values (RCR-5), including bot-scoped values
  * (`googlebot: noindex, nofollow`). The Web Headers class joins repeated
  * header lines with ", " so a colon token re-scopes all following tokens until
- * the next colon — the best possible reconstruction for the combined value.
+ * the next colon - the best possible reconstruction for the combined value.
  */
 function parseHeaderDirectives(headers: Headers): DirectiveEntry[] {
   const value = headers.get("x-robots-tag");
@@ -161,7 +161,7 @@ function recommendationFor(access: Omit<BotAccess, "recommendation">): string {
       break;
     case "NotMentioned":
       parts.push(
-        `No robots.txt rule for ${access.userAgent} — allowed by default`,
+        `No robots.txt rule for ${access.userAgent} - allowed by default`,
       );
       break;
   }
@@ -169,7 +169,7 @@ function recommendationFor(access: Omit<BotAccess, "recommendation">): string {
     parts.push(`noindex via ${access.signals.noindex}`);
   if (access.signals.nofollow)
     parts.push(`nofollow via ${access.signals.nofollow}`);
-  if (access.signals.noai) parts.push("noai — AI training opted out");
+  if (access.signals.noai) parts.push("noai - AI training opted out");
   if (access.signals.noimageai)
     parts.push(`noimageai via ${access.signals.noimageai}`);
   return parts.join("; ");
@@ -224,7 +224,7 @@ function computeComposite(
 ): { compositeScore: number; components: CrawlerAccessComponents } {
   const tier1Total = perBot.filter((b) => b.tier === "Tier1").length;
   const tier2Total = perBot.filter((b) => b.tier === "Tier2").length;
-  // RFC 9309 default: no matching rule means allowed — NotMentioned counts as
+  // RFC 9309 default: no matching rule means allowed - NotMentioned counts as
   // accessible (RCR-10 maps "no rules" to Allowed); only Blocked is a penalty.
   const tier1Accessible = perBot.filter(
     (b) => b.tier === "Tier1" && b.status !== "Blocked",
@@ -251,7 +251,7 @@ function computeComposite(
 
 /**
  * Computes the crawler access map for a page. `path` defaults to `/` (the
- * site root — the design signature); callers may pass the audited page path
+ * site root - the design signature); callers may pass the audited page path
  * to evaluate per-path access (RCR-3).
  */
 export function scoreAccess(

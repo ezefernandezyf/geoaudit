@@ -5,7 +5,7 @@ import { PlatformMatrix } from "@/report/platform-matrix";
 import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 
 /**
- * U5.7 — PlatformMatrix (ARU-12): pure presenter of `view.platforms`. The
+ * U5.7 - PlatformMatrix (ARU-12): pure presenter of `view.platforms`. The
  * view model delivers the six rows (built by `buildPlatformRows` inside the
  * adapter); Claude (no perPlatform measurement) shows "No medido". The pure
  * `buildPlatformRows` derivation keeps its own unit tests (platform-matrix

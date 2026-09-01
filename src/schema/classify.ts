@@ -10,11 +10,11 @@ import type { AnyNode, BusinessType, ParsedBlock } from "./types";
  * Each business type scores a small set of boolean signals (schema types
  * present, navigation words, visible-text phrases, DOM markers such as
  * `<address>` or `tel:` links). The type with the unique highest score wins;
- * a tie between two or more types — or zero signals at all — resolves to
+ * a tie between two or more types - or zero signals at all - resolves to
  * "hybrid" (neutral).
  *
  * Heuristic, single-page proxy: the output is labeled as such downstream.
- * Helpers are local to this engine (engines stay independent — no imports
+ * Helpers are local to this engine (engines stay independent - no imports
  * from eeat/citability).
  */
 

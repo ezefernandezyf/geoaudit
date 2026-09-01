@@ -8,11 +8,11 @@ import type { BotAgent } from "./types";
  * Reconciliation note (brief §8.2 vs geo-crawlers skill):
  * - Skill Tier-1 (Critical) set: GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot,
  *   PerplexityBot. Brief §8.2 omits OAI-SearchBot, ChatGPT-User and ClaudeBot, so
- *   per the product contract those three are NOT registered — the registry keeps
+ *   per the product contract those three are NOT registered - the registry keeps
  *   exactly the 17 brief agents.
  * - Tier1/Critical (exactly 5) here: GPTBot and PerplexityBot (skill Tier-1 and
  *   present in the brief) plus the AI-search-surface crawlers of the brief:
- *   Claude-Web (Anthropic's live-feature crawler — ClaudeBot's stand-in),
+ *   Claude-Web (Anthropic's live-feature crawler - ClaudeBot's stand-in),
  *   Googlebot (Google index, which feeds AI Overviews/Gemini) and Bingbot
  *   (Bing index, which feeds Copilot).
  * - Skill Tier-2 agents present in the brief (Google-Extended, Applebot-Extended,
@@ -23,13 +23,13 @@ import type { BotAgent } from "./types";
  *   -> Other/Medium (no live AI search impact).
  */
 export const BOTS: readonly BotAgent[] = [
-  // Tier 1 — gate access to the five main AI answer surfaces.
+  // Tier 1 - gate access to the five main AI answer surfaces.
   { userAgent: "GPTBot", tier: "Tier1", impact: "Critical" },
   { userAgent: "PerplexityBot", tier: "Tier1", impact: "Critical" },
   { userAgent: "Claude-Web", tier: "Tier1", impact: "Critical" },
   { userAgent: "Googlebot", tier: "Tier1", impact: "Critical" },
   { userAgent: "Bingbot", tier: "Tier1", impact: "Critical" },
-  // Tier 2 — important for the broader AI ecosystem.
+  // Tier 2 - important for the broader AI ecosystem.
   { userAgent: "Google-Extended", tier: "Tier2", impact: "High" },
   { userAgent: "Applebot-Extended", tier: "Tier2", impact: "High" },
   { userAgent: "meta-externalagent", tier: "Tier2", impact: "High" },
@@ -38,7 +38,7 @@ export const BOTS: readonly BotAgent[] = [
   { userAgent: "Omgilibot", tier: "Tier2", impact: "High" },
   { userAgent: "ImagesiftBot", tier: "Tier2", impact: "Medium" },
   { userAgent: "Diffbot", tier: "Tier2", impact: "Medium" },
-  // Other — training-only crawlers with no live AI search impact.
+  // Other - training-only crawlers with no live AI search impact.
   { userAgent: "CCBot", tier: "Other", impact: "Medium" },
   { userAgent: "anthropic-ai", tier: "Other", impact: "Medium" },
   { userAgent: "cohere-ai", tier: "Other", impact: "Medium" },

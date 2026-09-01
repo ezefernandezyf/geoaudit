@@ -142,7 +142,7 @@ let defaultLimiterPromise: Promise<RateLimiter> | null = null;
  * Singleton limiter wired into the free audit Server Action (ADF-9). 5
  * requests per 60s window per client key; disable with
  * `RATE_LIMIT_ENABLED=false`. Async because the default store must be
- * resolved before the first check — memoized per process.
+ * resolved before the first check - memoized per process.
  */
 export function getDefaultRateLimiter(): Promise<RateLimiter> {
   defaultLimiterPromise ??= (async () =>
@@ -167,11 +167,11 @@ let anonLimiterPromise: Promise<RateLimiter> | null = null;
  * the burst limiter's plain-IP keys (RTL-1). Reuses the same default store:
  * production shares the `rateLimitEntry` table with the burst limiter; dev/test
  * keep the in-memory store. Enforced ONLY in the audit runner (authoritative
- * gate, TLM-11) — never pre-checked in the form action — so each completed
+ * gate, TLM-11) - never pre-checked in the form action - so each completed
  * anonymous audit increments exactly once. Same kill switch as the burst
  * limiter (RTL-7): `RATE_LIMIT_ENABLED=false` bypasses without touching the
  * store. Async because the default store must be resolved before the first
- * check — memoized per process like `getDefaultRateLimiter`.
+ * check - memoized per process like `getDefaultRateLimiter`.
  */
 export function getAnonymousAuditLimiter(): Promise<RateLimiter> {
   anonLimiterPromise ??= (async () =>

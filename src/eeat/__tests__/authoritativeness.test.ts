@@ -40,7 +40,7 @@ describe("scoreAuthoritativeness (REE-3)", () => {
     const result = scoreAuthoritativeness(
       page("page-authoritativeness-sameas-only.html"),
     );
-    // 1 non-authority citation (2) + 1 sameAs link (5) = 7 — intermediate, not 0.
+    // 1 non-authority citation (2) + 1 sameAs link (5) = 7 - intermediate, not 0.
     expect(result.score).toBe(7);
     expect(result.findings.map((f) => f.key)).toContain("same_as_links");
   });

@@ -29,8 +29,8 @@ beforeEach(() => {
 });
 
 /**
- * U4.5 — Profile RSC (PRF-1..6): renders the authenticated user's account
- * data — name/email (PRF-2), plan pill (PRF-3), usage against the single FREE
+ * U4.5 - Profile RSC (PRF-1..6): renders the authenticated user's account
+ * data - name/email (PRF-2), plan pill (PRF-3), usage against the single FREE
  * limit (PRF-4) and a support entry (PRF-6). Sprint 10 removed the tier and
  * subscription surfaces (PRF-5): there is ONE plan ("Free"), usage is measured
  * against `FREE_AUDIT_LIMIT` (10/30d), and no tier lookup happens.
@@ -53,7 +53,7 @@ describe("ProfilePage (PRF-1)", () => {
 
     expect(screen.getByText("Ana")).toBeInTheDocument();
     expect(screen.getByText("ana@example.com")).toBeInTheDocument();
-    // PRF-3 (sprint 11): the pill reads "Plan Free" — unified with the navbar.
+    // PRF-3 (sprint 11): the pill reads "Plan Free" - unified with the navbar.
     expect(screen.getByText("Plan Free")).toBeInTheDocument();
   });
 
@@ -97,7 +97,7 @@ describe("ProfilePage (PRF-1)", () => {
     render(await ProfilePage());
 
     // Sprint 11: the support email comes from the shared SUPPORT_EMAIL
-    // constant (copy.ts) — the old soporte@geoaudit.app address is gone.
+    // constant (copy.ts) - the old soporte@geoaudit.app address is gone.
     expect(
       screen.getByRole("link", { name: "ezefernandezyf@gmail.com" }),
     ).toHaveAttribute("href", "mailto:ezefernandezyf@gmail.com");

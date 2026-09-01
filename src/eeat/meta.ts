@@ -92,7 +92,7 @@ export function assessWordCount($: CheerioAPI): WordCountInfo {
  * Heading hierarchy check (REE-6). Walks headings in document order; a level
  * jump deeper than +1 (e.g. H1 -> H3) raises a `H{prev+1}_skipped` warning.
  * `score` is informational: presence bonuses for H1/H2/H3/H4+ minus 40 per
- * skip warning, clamped to 0-100 — a clean hierarchy scores higher than a
+ * skip warning, clamped to 0-100 - a clean hierarchy scores higher than a
  * skipped one.
  */
 export function assessHeadings($: CheerioAPI): HeadingMeta {

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import SignupPage from "@/app/signup/page";
 
 /**
- * U2 — ATH-6/7/9: /signup renders the Gemini centered card (max-w-lg) with the
+ * U2 - ATH-6/7/9: /signup renders the Gemini centered card (max-w-lg) with the
  * benefits list and neutral copy. The shared card needs mocked useSearchParams
  * + signIn; the page wiring itself is what's under test.
  */

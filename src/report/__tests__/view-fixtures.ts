@@ -9,7 +9,7 @@ import {
 /**
  * GeminiView fixtures for the U5.6+ presenter tests. Built through the REAL
  * pure adapter (`toGeminiViewModel`) from the canonical `AuditResult`
- * fixtures — the presenters are tested against the exact binding the app
+ * fixtures - the presenters are tested against the exact binding the app
  * ships, never a hand-rolled view that could drift from the adapter.
  */
 

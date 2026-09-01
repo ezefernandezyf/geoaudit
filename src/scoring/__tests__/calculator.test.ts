@@ -4,7 +4,7 @@ import { computeGeoScore, type EngineScores } from "@/scoring/calculator";
 
 /**
  * T24 RED fixtures (RGS-1..RGS-10). Pure math over the renormalized weight
- * config — no fixtures, no network. Every assertion derives from the spec's
+ * config - no fixtures, no network. Every assertion derives from the spec's
  * own numbers (RGS-1 uneven: 68.125 → 68; RGS-5 bands; RGS-9 rebalance).
  */
 

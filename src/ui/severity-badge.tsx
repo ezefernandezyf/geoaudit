@@ -1,6 +1,6 @@
 /**
  * Lowercase Gemini severity band (Gemini types.ts verbatim). The shared
- * Capitalized `SeverityBand` contract stays untouched — the adapter (U5)
+ * Capitalized `SeverityBand` contract stays untouched - the adapter (U5)
  * delivers lowercase view-model bands, so the badge only knows lowercase.
  */
 export type GeminiBand = "excellent" | "good" | "fair" | "poor" | "critical";
@@ -74,7 +74,7 @@ type SeverityBadgeProps = {
 };
 
 /**
- * SeverityBadge (DNF-5 delta, U1.5): re-copied Gemini verbatim — sleek pill
+ * SeverityBadge (DNF-5 delta, U1.5): re-copied Gemini verbatim - sleek pill
  * with a tinted background, crisp border, optional dot + mono score, lowercase
  * band input. Capitalized→lowercase normalization does NOT live here: the
  * adapter (U5) delivers lowercase bands to this badge.

@@ -1,15 +1,15 @@
 /**
  * GEO Score weights (design D4, RGS-1, RGS-7, RGS-8).
  *
- * Brand Authority (20% in brief §8.1) has no engine — per P1 the remaining 80%
+ * Brand Authority (20% in brief §8.1) has no engine - per P1 the remaining 80%
  * is renormalized across the five available engines, and the dimension
  * re-enters with a future `scoringModelVersion` bump.
  *
  * Two configurations exist:
  * - `SPRINT_1_WEIGHTS` (1.0.0): citability 31.25 / eeat 25 / technical 18.75 /
- *   schema 12.5 / platform 12.5 — kept for historical regression tests.
+ *   schema 12.5 / platform 12.5 - kept for historical regression tests.
  * - `GEO_SCORE_V2_WEIGHTS` (2.0.0): citability 28 / eeat 24 / technical 20 /
- *   schema 14 / platform 14 — the WU-2 calibration decision (sprint 9):
+ *   schema 14 / platform 14 - the WU-2 calibration decision (sprint 9):
  *   citability stays dominant, the two healthiest dimensions (crawler/content)
  *   yield weight to the dimensions that crushed the total (schema/citability).
  */

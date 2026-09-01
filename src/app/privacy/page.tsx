@@ -3,7 +3,7 @@ import { LEGAL_COPY } from "@/lib/copy";
 /**
  * Privacy Policy page (LGL-2, LGL-3, LGL-4, design U4).
  *
- * Static Server Component — no client interactivity (no "use client"). Renders
+ * Static Server Component - no client interactivity (no "use client"). Renders
  * the neutral legal copy from `LEGAL_COPY.privacy` inside the shared app shell
  * (navbar + footer from the root layout) with the Gemini visual language (hex
  * directos). No dynamic data, no business logic.

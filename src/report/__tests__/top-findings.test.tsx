@@ -6,7 +6,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { geminiViewFixture } from "@/report/__tests__/view-fixtures";
 
 /**
- * U5.6 — TopFindings (ARU-10): pure presenter of the view model. Gemini
+ * U5.6 - TopFindings (ARU-10): pure presenter of the view model. Gemini
  * "Hallazgos Técnicos Priorizados" section rendering `view.findings`
  * (deriveFindings over real engine data). Honesty (APT-10): NO impact-score
  * chip (always null) and a code snippet ONLY from a real source

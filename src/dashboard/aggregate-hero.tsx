@@ -13,7 +13,7 @@ type AggregateHeroProps = {
  * Aggregate hero (DSH-8, design U4). Gemini verbatim: a bordered white card
  * holding the "Aggregate GEO Score" label, the serif score (emerald /100) and
  * the severity band badge. Values arrive as props from the persisted Audit
- * rows (the page reads `audits[0]`) — never a recomputation. Pure presentation.
+ * rows (the page reads `audits[0]`) - never a recomputation. Pure presentation.
  */
 export function AggregateHero({ latestScore, latestBand }: AggregateHeroProps) {
   const band = latestBand.toLowerCase() as GeminiBand;

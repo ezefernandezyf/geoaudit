@@ -1,7 +1,7 @@
 /**
  * Engine-local platform readiness I/O types (design: engine-local types keep
  * engines self-contained and avoid contract-bloat). Cross-engine shapes live in
- * `src/lib/contracts/` — this engine maps to `PlatformResult` there via
+ * `src/lib/contracts/` - this engine maps to `PlatformResult` there via
  * `toContractResult` (see index.ts).
  *
  * Pipeline: headers (RPL-1) -> meta (RPL-2) -> OG/Twitter (RPL-3/RPL-4) ->
@@ -100,7 +100,7 @@ export interface SsrAnalysis {
   findings: PlatformFinding[];
 }
 
-/** One HEAD-probe result (RPL-6/RPL-7) — presence only, never parsed. */
+/** One HEAD-probe result (RPL-6/RPL-7) - presence only, never parsed. */
 export interface ProbeResult {
   url: string;
   run: boolean;
@@ -116,7 +116,7 @@ export interface SiteProbes {
 
 /**
  * On-page structure signals consumed by the per-platform rubrics (RPL-10).
- * Computed from the shared DOM + SSR/meta analysis — all engine-local.
+ * Computed from the shared DOM + SSR/meta analysis - all engine-local.
  */
 export interface PlatformStructure {
   questionHeadings: number;

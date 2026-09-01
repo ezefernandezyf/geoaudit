@@ -3,9 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GitHubAuthCard } from "@/ui/github-auth-card";
 
 /**
- * U2 — ATH-1..ATH-9: shared GitHub OAuth card used by /login and /signup,
+ * U2 - ATH-1..ATH-9: shared GitHub OAuth card used by /login and /signup,
  * restyled Gemini verbatim (direct hex, centered card, "Continuar con GitHub"
- * — ATH-8) with neutral copy from COPY.auth. The button starts the GitHub
+ * - ATH-8) with neutral copy from COPY.auth. The button starts the GitHub
  * handshake with the callbackUrl from the query string (default /dashboard)
  * and a denied/failed attempt surfaces an inline role="alert" error. signIn +
  * useSearchParams are mocked; everything else is real rendering.

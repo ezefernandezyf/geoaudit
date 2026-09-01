@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SeverityBadge, type GeminiBand } from "@/ui/severity-badge";
 
 /**
- * U1.5 — SeverityBadge (DNF-5 delta): Gemini verbatim — lowercase bands,
+ * U1.5 - SeverityBadge (DNF-5 delta): Gemini verbatim - lowercase bands,
  * Spanish labels, hex tinted pill, props score/showDot/size/labelOverride.
  * Capitalized→lowercase normalization lives in the adapter (U5), not here.
  */
@@ -27,7 +27,7 @@ describe("SeverityBadge (DNF-5)", () => {
     const { container } = render(<SeverityBadge band="critical" />);
     const chip = container.firstChild as HTMLElement;
     expect(chip.className).toContain("bg-[#ef4444]/10");
-    // C14 (A11Y-3): text is red-700 #b91c1c — the darkest-nearest hex that
+    // C14 (A11Y-3): text is red-700 #b91c1c - the darkest-nearest hex that
     // passes WCAG 2.2 AA (4.5:1) on the tinted pill background.
     expect(chip.className).toContain("text-[#b91c1c]");
   });
@@ -36,7 +36,7 @@ describe("SeverityBadge (DNF-5)", () => {
     const { container } = render(<SeverityBadge band="excellent" />);
     const chip = container.firstChild as HTMLElement;
     expect(chip.className).toContain("bg-[#10b981]/10");
-    // C14 (A11Y-3): text is emerald-700 #047857 — passes AA on the tint.
+    // C14 (A11Y-3): text is emerald-700 #047857 - passes AA on the tint.
     expect(chip.className).toContain("text-[#047857]");
   });
 

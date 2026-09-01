@@ -17,7 +17,7 @@ type AuditHistoryTableProps = {
   audits: DashboardAudit[];
   /**
    * When true, renders a "SCANNING..." skeleton row at the end of the table
-   * (DSH-11) — an in-flight audit the user just triggered from the runner bar.
+   * (DSH-11) - an in-flight audit the user just triggered from the runner bar.
    */
   isScanning?: boolean;
   /** URL to show in the scanning row (defaults to a neutral path). */

@@ -16,7 +16,7 @@ import { assertPublicHost, SsrfError, type LookupFn } from "./ssrf";
  * body reader, and charset decoder into one never-throwing `FetchResult`.
  *
  * RFL-1: https only; http is upgraded to https; other schemes are rejected.
- * RFL-4/5: default timeouts per kind — 15000ms for 'page', 10000ms for 'probe'.
+ * RFL-4/5: default timeouts per kind - 15000ms for 'page', 10000ms for 'probe'.
  * RFL-8: non-HTML Content-Type → `{ ok: false, reason: 'unsupported_content_type' }`.
  * RFL-11: every failure is a typed FetchResult error, never a thrown exception.
  * RFL-12: `fetcher` is injectable (defaults to the global fetch).
@@ -27,14 +27,14 @@ export const PROBE_TIMEOUT_MS = 10_000;
 
 /**
  * Fetch kinds (MPA-5, design D5): `"sitemap"` is scoped ONLY to sitemap probes
- * (sitemap discovery in `src/audit/multi-page.ts`) — it relaxes the RFL-8
+ * (sitemap discovery in `src/audit/multi-page.ts`) - it relaxes the RFL-8
  * content-type gate to accept XML without changing the page/probe gates.
  */
 export type FetchKind = "page" | "probe" | "sitemap";
 
 /**
  * P4 timeout resolution: explicit `timeoutMs` wins; otherwise the kind's
- * default applies (15000ms page / 10000ms probe — sitemaps are small files
+ * default applies (15000ms page / 10000ms probe - sitemaps are small files
  * like robots.txt, so they share the probe default). Pure so defaulting is
  * testable without wall-clock waits.
  */
@@ -152,9 +152,9 @@ export async function fetchAuditResource(
 
   // RFL-8: gate on content-type before reading any body. Pages must be
   // text/html; auxiliary probes additionally accept text/plain because real
-  // robots.txt files are served with that Content-Type — gating them would
+  // robots.txt files are served with that Content-Type - gating them would
   // silently treat every robots directive as missing ("all allowed"). Sitemap
-  // probes (MPA-5, D5) accept application/xml|text/xml ONLY — the RFL-8
+  // probes (MPA-5, D5) accept application/xml|text/xml ONLY - the RFL-8
   // relaxation is scoped to the `"sitemap"` kind; page/probe gates are
   // unchanged.
   const acceptedContentType =

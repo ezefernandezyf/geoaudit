@@ -12,13 +12,13 @@ import type { EeatResult } from "./types";
  *
  * `scoreEeat($)` runs the four dimension scorers over the Cheerio DOM and
  * returns the rich engine-local result: per-dimension breakdowns, the
- * composite (plain sum of the four dimensions, capped at 100 — REE-9),
+ * composite (plain sum of the four dimensions, capped at 100 - REE-9),
  * informational content meta (word count / headings / freshness) and the
  * Topical Authority placeholder (REE-8: single-page proxy, not measured).
  * `toContractResult` maps it to the shared `ContentResult` contract consumed
  * by AuditResult (T25).
  *
- * Every signal is proxy-based (single-page limitation) — output is labeled
+ * Every signal is proxy-based (single-page limitation) - output is labeled
  * "heuristic" downstream (design R3). The engine never throws (REE-10):
  * missing author/citation/contact/date signals produce partial results.
  */

@@ -6,7 +6,7 @@ import type { PlatformFinding, SsrAnalysis, SsrStatus } from "./types";
  *
  * `analyzeSsr($, html)` classifies the page as server-rendered when the raw
  * HTML contains >= MIN_SSR_CHARS of visible text (script/style stripped),
- * otherwise as an empty client-side shell — Critical for AI visibility.
+ * otherwise as an empty client-side shell - Critical for AI visibility.
  * It also counts question-pattern H2/H3 headings (RPL-8) and the direct
  * answers that follow them (RPL-9, first <p> before the next heading).
  *
@@ -89,7 +89,7 @@ export function analyzeSsr($: CheerioAPI, html: string): SsrAnalysis {
       key: "no_ssr_detected",
       severity: "Critical",
       message:
-        "Page contains less than 100 characters of server-rendered text — AI crawlers see an empty client-side shell.",
+        "Page contains less than 100 characters of server-rendered text - AI crawlers see an empty client-side shell.",
     });
   } else if (status === "client_side_shell") {
     findings.push({

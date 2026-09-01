@@ -3,11 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 import { Button } from "@/ui/button";
 
 /**
- * U1.2 — Button primitive (DNF-7): Gemini verbatim classes (hex directos),
+ * U1.2 - Button primitive (DNF-7): Gemini verbatim classes (hex directos),
  * variants (primary/secondary/ghost/emerald/danger), sizes (sm/md/lg) and a
  * loading state that prevents double-submit (isLoading → Loader2 spin +
  * disabled + aria-busy, label from `loadingLabel`, default "Analizando…").
- * B11: the deprecated `loading` alias was removed — `isLoading` is the only
+ * B11: the deprecated `loading` alias was removed - `isLoading` is the only
  * pending prop and the loading label is parametrizable.
  */
 describe("Button (DNF-7)", () => {

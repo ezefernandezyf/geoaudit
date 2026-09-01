@@ -7,18 +7,18 @@ import type { MultiPageAggregate, PerPageAudit } from "@/audit/multi-page";
  * Runs INSIDE the SAME `$transaction` that created the audit (caller passes
  * the tx callback client): one master `Audit` row whose `result` holds the
  * light aggregate shape `{ aggregate, pages: [{url, geoScore, severityBand,
- * durationMs}] }` (D3 — the master JSON stays small), plus one `AuditPage`
+ * durationMs}] }` (D3 - the master JSON stays small), plus one `AuditPage`
  * row per SUCCESSFUL page carrying the FULL per-page `AuditResult` (1:N,
- * MPA-6). Failed pages (no result) are skipped — there is no AuditResult to
+ * MPA-6). Failed pages (no result) are skipped - there is no AuditResult to
  * persist, they remain visible in the engine's return (MPA-1 isolation).
  *
  * Limit accounting (TLM-10): the master `Audit` row is the single count
- * toward the 30-day window — one row per multi-page run, never per page
+ * toward the 30-day window - one row per multi-page run, never per page
  * (MPA-7). There is no separate counter (the `recordPaidAudit` increment was
  * removed with the tier layer).
  */
 
-/** Structural transaction surface — unit-testable (plain mocks, no real DB). */
+/** Structural transaction surface - unit-testable (plain mocks, no real DB). */
 export type MultiPageTx = {
   audit: {
     create(args: {

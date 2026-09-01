@@ -1,6 +1,6 @@
 /**
  * C14 (A11Y-1): jest-axe ships no bundled types, so the module surface used by
- * the tests is declared here. Kept ambient (no top-level import) — jest-axe
+ * the tests is declared here. Kept ambient (no top-level import) - jest-axe
  * resolves to an untyped CommonJS module, so this declares it without
  * shadowing any real type package. The Vitest matcher augmentation lives in
  * `vitest-matchers.d.ts` (it must import "vitest" to augment, not shadow).

@@ -1,5 +1,5 @@
 /**
- * Presentation formatting helpers for the report domain (U4). Pure functions —
+ * Presentation formatting helpers for the report domain (U4). Pure functions -
  * no React, fully unit-testable.
  */
 

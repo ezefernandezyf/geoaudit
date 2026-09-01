@@ -5,7 +5,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
- * U4.3/U4.4 — PDF report template (PDF-4/5/6, design D3).
+ * U4.3/U4.4 - PDF report template (PDF-4/5/6, design D3).
  *
  * `buildReportHtml` turns a persisted result into a self-contained HTML
  * document that Chromium renders to PDF: design tokens inline (PDF-6), fonts
@@ -51,10 +51,10 @@ describe("buildReportHtml (PDF-5/6)", () => {
     const html = buildReportHtml(auditResultFixture);
 
     expect(html).toContain(
-      `<title>${BRAND_NAME} — ${BRAND_DESCRIPTOR}</title>`,
+      `<title>${BRAND_NAME} - ${BRAND_DESCRIPTOR}</title>`,
     );
     expect(html).toContain(`<span class="brand">${BRAND_NAME}</span>`);
-    expect(html).toContain(`${BRAND_NAME} — Reporte de auditoría GEO`);
+    expect(html).toContain(`${BRAND_NAME} - Reporte de auditoría GEO`);
     expect(html).not.toContain("GeoAudit");
   });
 

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ScoreBar, type ScoreCategory } from "@/ui/score-bar";
 
 /**
- * U1.6 — ScoreBar (DNF-9): receives a Gemini-style `category`; the fill color
+ * U1.6 - ScoreBar (DNF-9): receives a Gemini-style `category`; the fill color
  * derives from `category.status` (the real band), never the numeric
  * getBarColor. Progressbar semantics + `data-score-fill` width are preserved.
  */

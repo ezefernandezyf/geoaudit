@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
  * the Navbar shell stays a server component.
  *
  * U6.4 (MPU-6): a multi-page link (→ /multipage) is exposed to every
- * authenticated user — the Navbar resolves `showMultiPage` from the session
+ * authenticated user - the Navbar resolves `showMultiPage` from the session
  * so anonymous visitors don't see the signed-in entry.
  */
 const LINKS = [

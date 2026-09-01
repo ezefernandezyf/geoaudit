@@ -6,13 +6,13 @@ import { REPORT_COPY } from "@/lib/copy";
 
 /**
  * StageStepper (U5.11, ARU-10, design U5): Gemini LiveReportPage stepper
- * VERBATIM — progress bar + numbered circles (done → emerald check, current →
- * navy pulse, pending → slate) — over the atomic audit run (10–60s).
+ * VERBATIM - progress bar + numbered circles (done → emerald check, current →
+ * navy pulse, pending → slate) - over the atomic audit run (10–60s).
  *
- * The engine is atomic — it has NO per-stage progress — so this stepper never
+ * The engine is atomic - it has NO per-stage progress - so this stepper never
  * claims a real engine state. It advances purely on a timer and is replaced
  * by the report once the Suspense boundary resolves. Pure visual pacing
- * ("sin simulación": no fake results, no invented wait times — the real data
+ * ("sin simulación": no fake results, no invented wait times - the real data
  * arrives via the stream/result). The `role="status"` live region lives on
  * the owning `AuditReportSkeleton`, so this component does not nest its own.
  */
@@ -23,7 +23,7 @@ export type StageStatus = "done" | "current" | "pending";
 /** Timer tick granularity (1s). */
 const TICK_MS = 1000;
 
-/** Derived per-stage status from elapsed ms (pure — fully unit-testable). */
+/** Derived per-stage status from elapsed ms (pure - fully unit-testable). */
 export function getStageStatus(
   stages: readonly Stage[],
   elapsedMs: number,

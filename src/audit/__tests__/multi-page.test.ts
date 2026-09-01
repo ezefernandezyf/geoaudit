@@ -8,8 +8,8 @@ import { severityForScore } from "@/scoring/index";
 import { runAudit } from "@/audit";
 
 /**
- * U3 — multi-page engine (MPA-1..MPA-4, D3/D6). Zero network: `runAudit` is
- * mocked (the engine reuses it per URL — its own behavior is covered in
+ * U3 - multi-page engine (MPA-1..MPA-4, D3/D6). Zero network: `runAudit` is
+ * mocked (the engine reuses it per URL - its own behavior is covered in
  * run-audit.test.ts) and the sitemap/robots fetches go through an injected
  * mock fetcher + lookup. Assertions cover the cap (MPA-2), bounded
  * concurrency (MPA-3), one runAudit per URL and per-page isolation (MPA-1),
@@ -148,7 +148,7 @@ describe("runMultiPageAudit (MPA-3 bounded concurrency)", () => {
     });
 
     // Let the workers start: only 3 of the 5 urls may begin before any gate
-    // resolves — the remaining 2 wait for a worker slot.
+    // resolves - the remaining 2 wait for a worker slot.
     await new Promise((r) => setTimeout(r, 0));
     expect(maxInFlight).toBeLessThanOrEqual(3);
     expect(maxInFlight).toBeGreaterThan(0);

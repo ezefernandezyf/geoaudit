@@ -5,10 +5,10 @@ import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 import { buildOgMetadata, OG_IMAGE } from "@/lib/og";
 
 /**
- * C16 — shared OG/Twitter metadata builder (LND-8).
+ * C16 - shared OG/Twitter metadata builder (LND-8).
  *
  * The helper is the single source for the OpenGraph + Twitter card fields
- * emitted by the public marketing pages (landing, login, signup — both reuse
+ * emitted by the public marketing pages (landing, login, signup - both reuse
  * the page's own title/description and reference the shared 1200×630
  * `public/og.png` asset). Sprint 10 removed the pricing page (PRC-8); the
  * generic route example below uses `/login`.
@@ -38,7 +38,7 @@ describe("buildOgMetadata (C1.1, LND-8)", () => {
           url: "/og.png",
           width: 1200,
           height: 630,
-          alt: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
+          alt: `${BRAND_NAME} - ${BRAND_DESCRIPTOR}`,
         },
       ],
     });
@@ -58,7 +58,7 @@ describe("buildOgMetadata (C1.1, LND-8)", () => {
   });
 });
 
-/** C16 — the shared OG asset the metadata references (C1.2). */
+/** C16 - the shared OG asset the metadata references (C1.2). */
 describe("OG asset (C1.2)", () => {
   it("ships public/og.png at the standard 1200×630 size", () => {
     const file = join(process.cwd(), "public", "og.png");
@@ -71,6 +71,6 @@ describe("OG asset (C1.2)", () => {
   });
 
   it("carries the Relevy brand in the shared OG alt (SHL-9)", () => {
-    expect(OG_IMAGE.alt).toBe(`${BRAND_NAME} — ${BRAND_DESCRIPTOR}`);
+    expect(OG_IMAGE.alt).toBe(`${BRAND_NAME} - ${BRAND_DESCRIPTOR}`);
   });
 });

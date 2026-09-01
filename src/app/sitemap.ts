@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 /**
  * sitemap.xml (LND-10, sprint 9). Generated via the Next App Router metadata
  * route, deriving the public routes programmatically from NEXT_PUBLIC_APP_URL.
- * The crawler/platform engines probe `${origin}/sitemap.xml` — a 200 here is a
+ * The crawler/platform engines probe `${origin}/sitemap.xml` - a 200 here is a
  * detectable, rewarded signal.
  */
 

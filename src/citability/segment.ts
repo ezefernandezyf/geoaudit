@@ -16,7 +16,7 @@ import { countSentences, countWords } from "./text";
  * single block (RCI-13). Bare text not wrapped in `<p>` is still captured.
  *
  * Signature note (deviation from design): design wrote `segmentBlocks($)`, but
- * segmentation must run over the EXTRACTED subset — running over the whole
+ * segmentation must run over the EXTRACTED subset - running over the whole
  * document would leak nav/footer text into blocks. The stage boundary mirrors
  * the pipeline: extractMainContent($) -> segmentBlocks(extracted).
  */

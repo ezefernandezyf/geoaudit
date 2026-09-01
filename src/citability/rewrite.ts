@@ -8,7 +8,7 @@ import { firstSentence } from "./text";
  * Every block whose composite is below the rewrite threshold receives exactly
  * one suggestion. The suggestion key is chosen from the FIRST dimension below
  * its weakness threshold, in a fixed priority order (answer, self-containment,
- * stats, structure, uniqueness) — the most actionable fix wins; a block with
+ * stats, structure, uniqueness) - the most actionable fix wins; a block with
  * no single weak dimension falls back to a generic answer-first rewrite.
  */
 

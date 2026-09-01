@@ -1,6 +1,6 @@
 /**
  * Prebuilt HTTP header variants for platform header analysis tests (RPL-1).
- * Plain Web Headers objects — no network involved.
+ * Plain Web Headers objects - no network involved.
  */
 
 export const HEADERS_COMPLETE = new Headers({

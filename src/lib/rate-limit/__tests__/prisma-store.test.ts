@@ -4,18 +4,18 @@ import { PrismaRateLimitStore } from "@/lib/rate-limit/prisma-store";
 import type { RateLimitEntryClient } from "@/lib/rate-limit/prisma-store";
 
 /**
- * U5.T3 — PrismaRateLimitStore (RTL-6, design U5). The store maps the async
+ * U5.T3 - PrismaRateLimitStore (RTL-6, design U5). The store maps the async
  * limiter contract onto the `rateLimitEntry` delegate with an atomic UPSERT
  * on the composite `(key, windowStart)` PK. The Prisma client is injected and
  * mocked: no real DB, no real Prisma runtime (established pattern U1/U3).
  *
  * `windowStart` is BigInt in the DB (epoch ms overflows Int); the store
- * converts number↔bigint at this boundary — the limiter keeps working with
+ * converts number↔bigint at this boundary - the limiter keeps working with
  * `Date.now()` numbers.
  */
 
 const KEY = "1.2.3.4";
-/** Epoch ms far beyond Int32 — proves the number→BigInt boundary (R6). */
+/** Epoch ms far beyond Int32 - proves the number→BigInt boundary (R6). */
 const WINDOW_START = 1_752_000_000_000;
 const WINDOW_START_BIGINT = BigInt(WINDOW_START);
 
@@ -103,7 +103,7 @@ describe("PrismaRateLimitStore (RTL-6)", () => {
     await store.increment(KEY, WINDOW_START);
 
     // The upsert must be called with bigint (postgres `bigint`), never the raw
-    // epoch-ms number — that is the whole point of the boundary conversion.
+    // epoch-ms number - that is the whole point of the boundary conversion.
     expect(upsert.mock.calls[0][0]).toMatchObject({
       where: { key_windowStart: { windowStart: WINDOW_START_BIGINT } },
       create: { windowStart: WINDOW_START_BIGINT },
@@ -119,7 +119,7 @@ describe("PrismaRateLimitStore (RTL-6)", () => {
     expect(deleteMany).toHaveBeenCalledWith({ where: { key: KEY } });
   });
 
-  it("never reads before incrementing — the upsert itself is the write (atomicity by construction)", async () => {
+  it("never reads before incrementing - the upsert itself is the write (atomicity by construction)", async () => {
     const { client, findFirst, upsert } = mockClient();
     const store = new PrismaRateLimitStore(client);
 

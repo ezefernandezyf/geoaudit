@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { requireDashboardAuth } from "@/lib/auth-guard";
 
 /**
- * U2 — auth-github R3 delta: unauthenticated requests to /dashboard/:path*
+ * U2 - auth-github R3 delta: unauthenticated requests to /dashboard/:path*
  * are 307-redirected to the custom /login page preserving the original path
  * as callbackUrl (was: /api/auth/signin with the full href).
  */

@@ -127,7 +127,7 @@ export function analyzeOpenGraph($: CheerioAPI): OpenGraphAnalysis {
       key: "missing_open_graph",
       severity: "High",
       message:
-        "No Open Graph tags detected — link previews and AI crawlers see no social metadata.",
+        "No Open Graph tags detected - link previews and AI crawlers see no social metadata.",
     });
   } else if (presentCount < OG_PROPERTIES.length) {
     const missing = OG_PROPERTIES.filter((key) => !properties[key].present);

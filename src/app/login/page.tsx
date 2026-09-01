@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { GitHubAuthCard } from "@/ui/github-auth-card";
 
 /**
- * Custom sign-in page (ATH-1, R2/R7 delta, design U2) — replaces the default
+ * Custom sign-in page (ATH-1, R2/R7 delta, design U2) - replaces the default
  * NextAuth page via pages.signIn. Gemini verbatim shell: full-height centered
  * card on a #f8fafc backdrop; the card owns the brand mark, copy and switch
  * link. The card reads searchParams (error + callbackUrl), so it must sit

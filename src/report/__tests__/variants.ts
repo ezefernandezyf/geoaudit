@@ -51,7 +51,7 @@ export const degradedCitabilityResult: AuditResult = {
   meta: { ...auditResultFixture.meta, errors: ["citability: boom"] },
 };
 
-/** RAO-13: non-HTML page — only the crawler engine runs, score 0/Critical. */
+/** RAO-13: non-HTML page - only the crawler engine runs, score 0/Critical. */
 export const unsupportedPageResult: AuditResult = {
   ...auditResultFixture,
   summary: {

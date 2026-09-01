@@ -4,12 +4,12 @@ import { Logo } from "@/ui/logo";
 import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 type FooterProps = {
-  /** Optional session — gates the Dashboard link (D6: anon shell has none). */
+  /** Optional session - gates the Dashboard link (D6: anon shell has none). */
   session?: Session | null;
 };
 
 /**
- * Footer (SHL-5, LGL-5, U1.10): minimal global footer — logo, product links
+ * Footer (SHL-5, LGL-5, U1.10): minimal global footer - logo, product links
  * and copyright. Copy neutro: Términos / Privacidad per the legal pages. The
  * Dashboard link only renders for authenticated users (D6).
  */
@@ -46,7 +46,7 @@ export function Footer({ session }: FooterProps = {}) {
           >
             Privacidad
           </Link>
-          {/* LND-12 (sprint 9): contact signal — the E-E-A-T trustworthiness
+          {/* LND-12 (sprint 9): contact signal - the E-E-A-T trustworthiness
               engine awards contact info (mailto/tel/contact/address) +5. The
               mailto uses the shared SUPPORT_EMAIL constant (SHL-8). */}
           <a

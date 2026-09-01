@@ -7,7 +7,7 @@ import type { JWT } from "next-auth/jwt";
  *
  * Deliberately has NO Prisma adapter: src/middleware.ts runs on the Edge
  * runtime and imports this module, while the Prisma adapter pulls in
- * @prisma/adapter-pg → pg → node:net/node:tls (Node-only) — importing it
+ * @prisma/adapter-pg → pg → node:net/node:tls (Node-only) - importing it
  * here would break the Edge bundle. The full config in src/lib/auth.ts
  * spreads this object and adds the adapter for Node runtime (API route + RSC).
  *
@@ -17,7 +17,7 @@ import type { JWT } from "next-auth/jwt";
 
 /**
  * Auth.js default session callback (JWT strategy) exposes only name/email/
- * image — NO `id` (verified in @auth/core 0.41.3 lib/init.js). The tier
+ * image - NO `id` (verified in @auth/core 0.41.3 lib/init.js). The tier
  * gates (U3) filter audits by `userId`, so the User id must be surfaced:
  * `token.sub` holds it and this pure helper copies it into `session.user.id`.
  * Kept framework-free (pure object spread) so it is unit-testable and

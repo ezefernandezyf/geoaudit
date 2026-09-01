@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import { AggregateHero } from "@/dashboard/aggregate-hero";
 
 /**
- * U3.8 — Aggregate hero (DSH-8): summarizes the most recent GEO score and its
+ * U3.8 - Aggregate hero (DSH-8): summarizes the most recent GEO score and its
  * severity band. Values arrive as props from the persisted Audit rows (the
- * page reads `audits[0]` — never a recomputation). Pure presentation.
+ * page reads `audits[0]` - never a recomputation). Pure presentation.
  */
 describe("AggregateHero (DSH-8)", () => {
   it("renders the latest GEO score and its Spanish band label", () => {

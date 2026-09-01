@@ -35,7 +35,7 @@ describe("bot registry (RCR-1)", () => {
     );
   });
 
-  it("selects exactly 5 Tier1 agents — the AI-search-surface critical set", () => {
+  it("selects exactly 5 Tier1 agents - the AI-search-surface critical set", () => {
     const tier1 = BOTS.filter((b) => b.tier === "Tier1")
       .map((b) => b.userAgent)
       .sort();
@@ -69,7 +69,7 @@ describe("bot registry (RCR-1)", () => {
     }
   });
 
-  it("keeps the brief list authoritative — skill Tier-1 agents absent from brief are NOT added", () => {
+  it("keeps the brief list authoritative - skill Tier-1 agents absent from brief are NOT added", () => {
     const tier1Agents = BOTS.filter((b) => b.tier === "Tier1").map(
       (b) => b.userAgent,
     );

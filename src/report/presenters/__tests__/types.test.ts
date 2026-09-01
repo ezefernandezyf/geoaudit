@@ -8,7 +8,7 @@ import type {
 } from "@/report/presenters/types";
 
 /**
- * U5.1 — View model shape (APT-1). The adapter returns a single object whose
+ * U5.1 - View model shape (APT-1). The adapter returns a single object whose
  * fields cover every field the report components need, with no invented
  * metrics (APT-10). Types are erased at runtime, so this test proves the
  * SHAPE contract by exercising the type surface: a representative value must
@@ -20,7 +20,7 @@ const representative: GeminiView = {
   band: "fair",
   domain: "example.com",
   title: "example.com",
-  summary: "example.com — GEO Score 68 (fair) en ~3s",
+  summary: "example.com - GEO Score 68 (fair) en ~3s",
   durationSeconds: 3,
   auditDate: null,
   categoryScores: [],

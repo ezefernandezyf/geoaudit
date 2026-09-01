@@ -4,7 +4,7 @@ import { countAuditsInWindow, FREE_AUDIT_LIMIT } from "@/lib/audit/tier";
 /**
  * Plan pill data for the Navbar (SHL-2, U1.9). Pure resolver over an injected
  * structural prisma client (same pattern as `checkTierLimit`): the pill shows
- * the single FREE plan — `used` is measured by Audit rows in the 30-day
+ * the single FREE plan - `used` is measured by Audit rows in the 30-day
  * moving window (TLM-2) and `limit` is the FREE constant. Returns null when
  * no user row exists. No tier or subscription is consulted (TLM-7/8 removed).
  */

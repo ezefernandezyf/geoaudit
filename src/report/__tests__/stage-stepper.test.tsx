@@ -7,10 +7,10 @@ import {
 } from "@/report/stage-stepper";
 
 /**
- * U5.11 — StageStepper (ARU-10, design U5): Gemini stepper — progress bar +
- * numbered circles — as time-based visual pacing over the atomic audit run.
+ * U5.11 - StageStepper (ARU-10, design U5): Gemini stepper - progress bar +
+ * numbered circles - as time-based visual pacing over the atomic audit run.
  * The engine has NO per-stage progress, so the stepper only advances on a
- * timer — it never claims a real engine state ("sin simulación": the real
+ * timer - it never claims a real engine state ("sin simulación": the real
  * report arrives via the Suspense stream). The pure helpers derive status and
  * progress from elapsed ms; the client component runs the timer and renders.
  */

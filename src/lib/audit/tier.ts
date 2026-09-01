@@ -4,11 +4,11 @@ import type { Prisma } from "@/generated/prisma/client";
  * FREE tier limit (TLM-2, design U3 / decision B).
  *
  * Pure helpers over an injected Prisma client, so the counting logic is
- * unit-testable with a plain mock — no real DB and no Prisma runtime are
+ * unit-testable with a plain mock - no real DB and no Prisma runtime are
  * pulled into the module (type-only import).
  *
  * Sprint 10 (TLM-1/7/8 removed): the tier layer collapses to a SINGLE FREE
- * limit — 10 audits per 30-day moving window. There is no paid-tier type, no
+ * limit - 10 audits per 30-day moving window. There is no paid-tier type, no
  * paid counter, no `getTierLimit`/`isPaidTier`/`resolvePaidCounter`: every
  * authenticated user is measured by `Audit` rows in the window.
  */
@@ -28,7 +28,7 @@ export type AuditCountClient = {
 /** TLM-2: every user gets 10 audits per 30-day moving window. */
 export const FREE_AUDIT_LIMIT = 10;
 
-/** TLM-2: window length — 30 days in milliseconds. */
+/** TLM-2: window length - 30 days in milliseconds. */
 export const FREE_AUDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
@@ -44,7 +44,7 @@ export function hasFreeAuditsLeft(count: number): boolean {
  * ending at `now` (TLM-2 scenario "Counting the moving window").
  *
  * Structural param: only the `count` capability of the audit delegate is
- * required, so tests pass a plain mock — no real Prisma runtime needed.
+ * required, so tests pass a plain mock - no real Prisma runtime needed.
  */
 export function countAuditsInWindow(
   prisma: AuditCountClient,

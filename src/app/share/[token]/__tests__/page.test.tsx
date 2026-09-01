@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
 
 const sharedRow = {
   id: "audit-1",
-  // Private fields present on the row — SHR-5: none of these may surface.
+  // Private fields present on the row - SHR-5: none of these may surface.
   userId: "user-1",
   user: { id: "user-1", email: "owner@example.com", tier: "PRO" },
   url: "https://example.com/",
@@ -46,7 +46,7 @@ beforeEach(() => {
 });
 
 /**
- * U5.10 — public share page (SHR-2/5/6/7/8/9, design U5). Gemini SharePage
+ * U5.10 - public share page (SHR-2/5/6/7/8/9, design U5). Gemini SharePage
  * composition over the persisted row: "Verificado" pill (SHR-7), token ID in
  * the verification banner (SHR-8), footer CTA (SHR-9). Reachable WITHOUT
  * auth; zero re-runs; zero private fields; unknown token → 404.
@@ -75,7 +75,7 @@ describe("SharePage (SHR-2)", () => {
     expect(findUniqueMock).toHaveBeenCalledWith({
       where: { shareToken: "tok-1" },
     });
-    // findUnique is the ONLY delegate call — no re-run, no writes (SHR-2).
+    // findUnique is the ONLY delegate call - no re-run, no writes (SHR-2).
     expect(findUniqueMock).toHaveBeenCalledTimes(1);
   });
 
@@ -91,7 +91,7 @@ describe("SharePage (SHR-2)", () => {
     render(await SharePage({ params }));
 
     // The legacy GeoAudit wordmark (and its "G" tile) are gone from the
-    // public share shell — the Relevy brand wordmark renders instead.
+    // public share shell - the Relevy brand wordmark renders instead.
     expect(screen.getByText("Relevy")).toBeInTheDocument();
     expect(screen.queryByText("GeoAudit")).not.toBeInTheDocument();
   });

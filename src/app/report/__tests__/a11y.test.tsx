@@ -8,7 +8,7 @@ import {
   focusableElements,
 } from "@/test/a11y-helpers";
 
-// The valid-URL branch streams AuditRunner (async RSC, own tests) — the a11y
+// The valid-URL branch streams AuditRunner (async RSC, own tests) - the a11y
 // scan covers the Empty state, which renders the real inline audit form.
 vi.mock("@/report/audit-runner", () => ({
   AuditRunner: ({ url }: { url: string }) => <div>AuditRunner:{url}</div>,
@@ -31,7 +31,7 @@ async function renderShell(page: React.ReactNode) {
 }
 
 /**
- * C14 — report accessibility (A11Y-2/4/5): axe scan of the Empty state (the
+ * C14 - report accessibility (A11Y-2/4/5): axe scan of the Empty state (the
  * inline audit form, ARU-5) and the full shell, landmark regions and logical
  * focus order.
  */

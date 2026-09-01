@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { InMemoryStore } from "@/lib/rate-limit/store";
 
 /**
- * U5.T1/U5.T2 — RateLimitStore + InMemoryStore (RTL-2, design U5). The store is
+ * U5.T1/U5.T2 - RateLimitStore + InMemoryStore (RTL-2, design U5). The store is
  * a dumb Map-backed counter: the limiter owns window logic, the store only
  * records `{ count, windowStart }` per key.
  *
@@ -11,7 +11,7 @@ import { InMemoryStore } from "@/lib/rate-limit/store";
  * InMemoryStore adapts with trivial `async` wrappers.
  */
 describe("InMemoryStore (RTL-2)", () => {
-  it("exposes an async interface — every method returns a Promise", () => {
+  it("exposes an async interface - every method returns a Promise", () => {
     const store = new InMemoryStore();
     expect(store.get("1.2.3.4")).toBeInstanceOf(Promise);
     expect(store.increment("1.2.3.4", 1_000)).toBeInstanceOf(Promise);

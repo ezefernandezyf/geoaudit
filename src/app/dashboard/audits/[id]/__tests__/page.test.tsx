@@ -56,10 +56,10 @@ beforeEach(() => {
 });
 
 /**
- * U5.9 — Audit detail page (ADP-6/7/8, design U5). `/dashboard/audits/[id]`
+ * U5.9 - Audit detail page (ADP-6/7/8, design U5). `/dashboard/audits/[id]`
  * renders the persisted report through the shared `<AuditReport>` (adapter at
  * the boundary, Gemini composition) plus the Gemini action bar: ShareModal
- * with the real share actions and the real Export PDF download — available to
+ * with the real share actions and the real Export PDF download - available to
  * every authenticated owner (ADP-7/8, no tier gate).
  */
 describe("AuditDetailPage (ADP-1/ADP-2)", () => {
@@ -117,7 +117,7 @@ describe("AuditDetailPage (ADP-3 + ADP-6)", () => {
     // The persisted date surfaces via the adapter ctx (APT-9).
     expect(screen.getAllByText(/2026-08-10/).length).toBeGreaterThanOrEqual(1);
 
-    // findFirst is the only audit delegate call — no re-run, no writes.
+    // findFirst is the only audit delegate call - no re-run, no writes.
     expect(findFirstMock).toHaveBeenCalledTimes(1);
   });
 });
@@ -285,7 +285,7 @@ describe("AuditDetailPage multi-page drill-down (A3, MPU-7/8)", () => {
 });
 
 describe("AuditDetailPage share + export (ADP-7/8)", () => {
-  it("renders share + export for every authenticated owner — no tier lookup (ADP-7/8)", async () => {
+  it("renders share + export for every authenticated owner - no tier lookup (ADP-7/8)", async () => {
     render(await AuditDetailPage({ params }));
 
     expect(

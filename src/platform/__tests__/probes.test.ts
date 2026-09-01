@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { probeResource, probeSite } from "@/platform/probes";
 import type { ProbeFn } from "@/platform/probes";
 
-/** Injected probe fetcher keyed by URL — never touches the network. */
+/** Injected probe fetcher keyed by URL - never touches the network. */
 function probeFetch(statuses: Record<string, number>): ProbeFn {
   return async (input) => {
     const status = statuses[String(input)] ?? 404;
@@ -30,7 +30,7 @@ describe("probeResource (RPL-6, RPL-7)", () => {
     expect(result.statusCode).toBe(404);
   });
 
-  it("never throws when the fetch fails — records the error instead", async () => {
+  it("never throws when the fetch fails - records the error instead", async () => {
     const failing: ProbeFn = async () => {
       throw new Error("network down");
     };

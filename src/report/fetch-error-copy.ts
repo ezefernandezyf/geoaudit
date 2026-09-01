@@ -16,7 +16,7 @@ const FETCH_FAILURE_CODES = Object.keys(FETCH_ERROR_COPY) as FetchFailureCode[];
  * Detects the fetch failure code embedded in the `runAudit` throw message
  * (format: `audit page fetch failed for <url>: <CODE>: <detail>`; the
  * unsupported reason uses `<reason> (<contentType>)`). Returns null when the
- * error is not a known fetch failure — callers then rethrow to the boundary.
+ * error is not a known fetch failure - callers then rethrow to the boundary.
  */
 export function detectFetchFailureCode(
   message: string,

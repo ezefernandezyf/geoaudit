@@ -11,7 +11,7 @@ type ReportErrorProps = {
 
 /**
  * Report route error boundary (U3.T3, ARU-4): friendly message + "Reintentar"
- * wired to Next's `reset()`. Fetch failures never reach this boundary — the
+ * wired to Next's `reset()`. Fetch failures never reach this boundary - the
  * AuditRunner maps them to specific copy (ARU-6); this catches the unexpected.
  */
 export default function ReportError({ reset }: ReportErrorProps) {

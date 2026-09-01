@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import LoginPage from "@/app/login/page";
 
 /**
- * U2 — ATH-6/8/9: /login renders the Gemini centered auth card with neutral
+ * U2 - ATH-6/8/9: /login renders the Gemini centered auth card with neutral
  * copy (no default NextAuth styling, direct hex). The shared card needs mocked
  * useSearchParams + signIn; the page wiring itself is what's under test.
  */

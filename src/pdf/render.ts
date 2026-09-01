@@ -18,12 +18,12 @@ import chromium from "@sparticuz/chromium-min";
  *   origin, so a `<base>` points the browser at the traced `public/` bundle
  *   (PDF-8) and the fonts resolve OFFLINE (no network, no CDN).
  * - Threat: any launch/render rejection is wrapped in the typed
- *   `PdfRenderError` — the route maps it to a 5xx, never an uncaught throw —
+ *   `PdfRenderError` - the route maps it to a 5xx, never an uncaught throw -
  *   and the browser is always closed (finally), so a failed render leaks no
  *   subprocess. `deps` is injected so tests mock the launch chain.
  */
 
-/** Typed render failure — the route maps this to a 5xx (PDF-9). */
+/** Typed render failure - the route maps this to a 5xx (PDF-9). */
 export class PdfRenderError extends Error {
   constructor(message: string) {
     super(message);
@@ -49,7 +49,7 @@ export type PdfBrowserLike = {
   close(): Promise<void>;
 };
 
-/** Injected launch capability — the default wires puppeteer-core + chromium-min. */
+/** Injected launch capability - the default wires puppeteer-core + chromium-min. */
 export type PdfRenderDeps = {
   launch: () => Promise<PdfBrowserLike>;
 };
@@ -57,7 +57,7 @@ export type PdfRenderDeps = {
 /** Serverless-safe Chrome flags (threat matrix: Chromium subprocess). */
 export const CHROMIUM_ARGS = ["--no-sandbox"];
 
-/** Pinned chromium-min release pack — same Chromium major as the pin (149). */
+/** Pinned chromium-min release pack - same Chromium major as the pin (149). */
 export const CHROMIUM_PACK_URL =
   "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.tar";
 
@@ -69,7 +69,7 @@ async function resolveLaunchConfig(): Promise<{
 }> {
   if (process.env.NODE_ENV !== "production") {
     // Local dev: the full `puppeteer` dev dep ships its own bundled Chrome
-    // (installed via the approved postinstall) — no 50MB+ remote download.
+    // (installed via the approved postinstall) - no 50MB+ remote download.
     const devPuppeteer = await import("puppeteer");
     return {
       executablePath: await devPuppeteer.default.executablePath(),
@@ -98,7 +98,7 @@ const defaultDeps: PdfRenderDeps = {
 
 /**
  * Renders `html` to PDF bytes (PDF-4). `deps` defaults to the chromium-min
- * launch; tests inject a mock chain. Never throws raw puppeteer errors — only
+ * launch; tests inject a mock chain. Never throws raw puppeteer errors - only
  * the typed `PdfRenderError`.
  */
 export async function renderPdf(

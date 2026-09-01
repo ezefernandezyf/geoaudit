@@ -1,6 +1,6 @@
 /**
  * Prebuilt X-Robots-Tag header variants for access-map tests (RCR-5).
- * Headers objects are plain Web Headers — no network involved.
+ * Headers objects are plain Web Headers - no network involved.
  */
 
 export function headersWith(xRobotsTag?: string): Headers {

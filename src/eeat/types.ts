@@ -3,7 +3,7 @@ import { load } from "cheerio";
 /**
  * Engine-local E-E-A-T I/O types (design: engine-local types keep engines
  * self-contained and avoid contract-bloat). Cross-engine shapes live in
- * `src/lib/contracts/` — this engine maps to `ContentResult` there via
+ * `src/lib/contracts/` - this engine maps to `ContentResult` there via
  * `toContractResult` (see index.ts).
  *
  * Every dimension scores 0-25 (REE-1..REE-4); the composite is the plain sum

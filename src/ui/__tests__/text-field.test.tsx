@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { TextField } from "@/ui/text-field";
 
 /**
- * U1.4 — TextField primitive (DNF-8 delta): Gemini verbatim — label uppercase
+ * U1.4 - TextField primitive (DNF-8 delta): Gemini verbatim - label uppercase
  * tracking-wider, useId-generated ids, reserved error slot min-h-[18px],
  * leftIcon/rightElement/helperText/hideLabelVisually, hex border/ring states.
  */

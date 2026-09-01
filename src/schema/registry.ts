@@ -2,7 +2,7 @@
  * Static 8-type Schema.org registry (RSC-3) with required/recommended property
  * tables per type (RSC-4/RSC-5), plus deprecated-schema flags (RSC-7).
  *
- * The registry is intentionally small and static — the same 8 types the
+ * The registry is intentionally small and static - the same 8 types the
  * validator and the business-type templates rely on. `LocalBusiness` accepts
  * a few common concrete subtypes (Restaurant, Store, ...) so real-world
  * pages are not mis-flagged as unknown.

@@ -2,11 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { checkTierLimit } from "@/lib/audit/enforcement";
 
 /**
- * U4.3 — enforcement (TLM-3, design decision B).
+ * U4.3 - enforcement (TLM-3, design decision B).
  *
  * Sprint 10 collapses enforcement to a SINGLE FREE-only gate: `checkTierLimit`
  * counts the user's `Audit` rows in the 30-day moving window and applies
- * `hasFreeAuditsLeft` — no tier lookup, no paid counter, no `recordPaidAudit`
+ * `hasFreeAuditsLeft` - no tier lookup, no paid counter, no `recordPaidAudit`
  * (deleted with the billing capability, TLM-7/8 removed).
  *
  * The tier helpers are mocked so the tests assert the WIRING (window count →

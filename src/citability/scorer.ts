@@ -33,7 +33,7 @@ import { countSentences, countWords, firstSentence } from "./text";
 
 /**
  * Per-block 5-dimension weighted scorer (RCI-3..RCI-8). Pure function over a
- * ContentBlock — the algorithms are documented step by step below and their
+ * ContentBlock - the algorithms are documented step by step below and their
  * constants live in constants.ts. Every dimension returns 0-100.
  */
 
@@ -56,10 +56,10 @@ function round1(value: number): number {
 }
 
 /**
- * RCI-3 — Answer Block Quality (30%) — partial-credit tiers (WU-3).
+ * RCI-3 - Answer Block Quality (30%) - partial-credit tiers (WU-3).
  * Step 1: start from a small structural base (softened floor).
  * Step 2: add the definition-pattern bonus when the content contains
- *         "X is a/an ..." (regex from design) — a definition earns credit
+ *         "X is a/an ..." (regex from design) - a definition earns credit
  *         even when the answer is buried, not all-or-nothing.
  * Step 3: add the answer-first bonus when the FIRST sentence is a complete
  *         sentence (ends in .!?) and contains a copula (is/are/was/were):
@@ -86,9 +86,9 @@ function firstSentenceAnswerBonus(lead: string): number {
 }
 
 /**
- * RCI-4 — Self-Containment (25%).
+ * RCI-4 - Self-Containment (25%).
  * Step 1: a lead that starts with a pronoun (It/This/That/These/Those) or a
- *         conjunction (But/However/And/...) requires external context — score
+ *         conjunction (But/However/And/...) requires external context - score
  *         stays at the bad-lead floor (spec: pronoun-led < 30).
  * Step 2: an explicit-subject lead earns the subject bonus.
  * Step 3: content inside the 50-200 word extraction band earns the band bonus.
@@ -106,7 +106,7 @@ export function scoreSelfContainment(block: ContentBlock): number {
 }
 
 /**
- * RCI-5 — Structural Readability (20%) — partial-credit tiers (WU-3).
+ * RCI-5 - Structural Readability (20%) - partial-credit tiers (WU-3).
  * Step 1: a block that has a heading (H2/H3) is structured (+heading bonus).
  * Step 2: every paragraph with 2-4 sentences earns the full paragraph bonus;
  *         SOME paragraphs in the band earn the partial bonus (wall-of-text
@@ -150,7 +150,7 @@ function hasPartialParagraphBand(block: ContentBlock): boolean {
 }
 
 /**
- * RCI-6 — Statistical Density (15%).
+ * RCI-6 - Statistical Density (15%).
  * Step 1: count concrete stats (percentages, currency, 4-digit years) via the
  *         design regex over the block content.
  * Step 2: normalize per 500 words: per500 = stats / (wordCount / 500).
@@ -164,11 +164,11 @@ export function scoreStats(block: ContentBlock): number {
 }
 
 /**
- * RCI-7 — Uniqueness (10%) — proxy signals.
+ * RCI-7 - Uniqueness (10%) - proxy signals.
  * Step 1: count distinct original-data phrases ("we surveyed", "our analysis",
  *         ...) in the block content.
  * Step 2: a first-person lead (we/our/I) counts as one more hit.
- * Step 3: score = min(100, hits * 35) — three distinct signals cap at 100.
+ * Step 3: score = min(100, hits * 35) - three distinct signals cap at 100.
  */
 export function scoreUniqueness(block: ContentBlock): number {
   const lead = block.paragraphs.join(" ").trim().toLowerCase();
@@ -181,7 +181,7 @@ export function scoreUniqueness(block: ContentBlock): number {
 }
 
 /**
- * RCI-8 — Block composite: weighted average of the five dimensions
+ * RCI-8 - Block composite: weighted average of the five dimensions
  * (30/25/20/15/10), rounded to one decimal.
  */
 export function scoreBlock(block: ContentBlock): ScoredBlock {

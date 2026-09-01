@@ -4,8 +4,8 @@ import { ScoreTrend } from "@/dashboard/score-trend";
 import { auditFixtures, manyAuditFixtures } from "./fixtures";
 
 /**
- * U4.2 — Score trend (DSH-2/DSH-9, design U4). Exactly 12 pure-CSS bars, one
- * per month of the trailing year (Gemini verbatim), no chart library — the
+ * U4.2 - Score trend (DSH-2/DSH-9, design U4). Exactly 12 pure-CSS bars, one
+ * per month of the trailing year (Gemini verbatim), no chart library - the
  * assertions pin the DOM to divs (no svg/canvas could ever load).
  */
 describe("ScoreTrend (DSH-2/DSH-9)", () => {

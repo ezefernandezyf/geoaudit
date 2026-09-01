@@ -33,7 +33,7 @@ const jetBrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: `${BRAND_NAME} — ${BRAND_DESCRIPTOR}`,
+    default: `${BRAND_NAME} - ${BRAND_DESCRIPTOR}`,
     template: `%s | ${BRAND_NAME}`,
   },
   description:
@@ -52,7 +52,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   // U2.1/SHL-1: resolve the session once here and pass it down to the Navbar
-  // (a synchronous server component that cannot itself await auth() — RTL and
+  // (a synchronous server component that cannot itself await auth() - RTL and
   // static prerendering can't await an async component in the tree).
   const session = await auth();
   // SHL-2: the plan pill needs real tier + usage; the layout resolves it once

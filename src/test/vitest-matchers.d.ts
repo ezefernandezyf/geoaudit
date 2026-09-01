@@ -3,7 +3,7 @@ import "vitest";
 /**
  * C14 (A11Y-1): Vitest matcher augmentation for jest-axe. Must import "vitest"
  * so this augments (not shadows) the real module. The `T = any` parameter list
- * is required verbatim — TypeScript only merges interface declarations with
+ * is required verbatim - TypeScript only merges interface declarations with
  * identical type parameters, and both Vitest's own `Assertion` and jest-dom's
  * augmentation declare `T = any` (declaration-file accommodation, not app code).
  */

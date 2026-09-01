@@ -1,7 +1,7 @@
 /**
  * Engine-local crawler I/O types (design: engine-local types keep engines
  * self-contained and avoid contract-bloat). Cross-engine shapes live in
- * `src/lib/contracts/` — the crawler engine maps to `CrawlerResult` there via
+ * `src/lib/contracts/` - the crawler engine maps to `CrawlerResult` there via
  * `toContractResult` (see access-map.ts).
  */
 
@@ -61,7 +61,7 @@ export interface CrawlerAccessComponents {
   aiFiles: number;
 }
 
-/** Engine-local crawler output — richer than the shared contract (RCR-9). */
+/** Engine-local crawler output - richer than the shared contract (RCR-9). */
 export interface CrawlerAccessResult {
   compositeScore: number;
   perBot: BotAccess[];

@@ -1,7 +1,7 @@
 import type { HeaderAnalysis, PlatformFinding } from "./types";
 
 /**
- * HTTP header checks (RPL-1). Pure function over a Web Headers object —
+ * HTTP header checks (RPL-1). Pure function over a Web Headers object -
  * zero network. Validates Content-Type as HTML, records X-Robots-Tag
  * directives, the canonical Link header, HSTS and CSP. Findings are
  * collected, never thrown.
@@ -35,7 +35,7 @@ export function analyzeHeaders(headers: Headers): HeaderAnalysis {
       key: "x_robots_noindex",
       severity: "High",
       message:
-        "X-Robots-Tag contains noindex — the page is excluded from search engines and AI crawlers.",
+        "X-Robots-Tag contains noindex - the page is excluded from search engines and AI crawlers.",
     });
   }
   if (!canonicalLink) {
@@ -43,7 +43,7 @@ export function analyzeHeaders(headers: Headers): HeaderAnalysis {
       key: "missing_canonical_header",
       severity: "Low",
       message:
-        "No canonical Link header — duplicate-content risk for crawlers.",
+        "No canonical Link header - duplicate-content risk for crawlers.",
     });
   }
   if (!hasHsts) {

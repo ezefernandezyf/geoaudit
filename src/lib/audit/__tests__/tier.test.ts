@@ -7,11 +7,11 @@ import {
 } from "@/lib/audit/tier";
 
 /**
- * U3.1 — FREE tier helpers (TLM-2, design U3 / decision B).
+ * U3.1 - FREE tier helpers (TLM-2, design U3 / decision B).
  *
  * Sprint 10 collapses the tier layer to a SINGLE FREE limit: 10 audits per
  * 30-day moving window. There are no paid tiers, no counter selection, no
- * `getTierLimit`/`isPaidTier`/`resolvePaidCounter` — `countAuditsInWindow`
+ * `getTierLimit`/`isPaidTier`/`resolvePaidCounter` - `countAuditsInWindow`
  * and `hasFreeAuditsLeft` are the whole tier surface.
  *
  * countAuditsInWindow is a pure function over an injected Prisma client

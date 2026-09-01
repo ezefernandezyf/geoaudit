@@ -1,7 +1,7 @@
 import type { RobotsTxt, RuleGroup } from "@/lib/contracts/fetch-types";
 
 /**
- * Hand-rolled RFC 9309 subset parser (design D2 — ~150 lines, zero deps,
+ * Hand-rolled RFC 9309 subset parser (design D2 - ~150 lines, zero deps,
  * fully fixture-testable). Returns the shared `RobotsTxt` contract shape;
  * matching semantics (group selection, longest-match, Allow-wins-ties, `$`
  * anchor) are exposed as pure helpers so the access map can compose them.
@@ -11,7 +11,7 @@ import type { RobotsTxt, RuleGroup } from "@/lib/contracts/fetch-types";
  *   task instruction (a deliberate superset of RFC 9309, which is
  *   case-insensitive on user-agents but case-sensitive on paths).
  * - `Content-Signal:` (IETF draft) is informational and NOT part of the
- *   RobotsTxt contract — expose `parseContentSignal` for it.
+ *   RobotsTxt contract - expose `parseContentSignal` for it.
  * - Crawl-delay is not in RFC 9309 (removed from 7231) but is parsed per RCR-7.
  */
 
@@ -22,7 +22,7 @@ const KNOWN_SIGNAL_KEYS = [
   "ai-retrieval",
 ] as const;
 
-/** A parsed Content-Signal entry (RCR-7 — informational). */
+/** A parsed Content-Signal entry (RCR-7 - informational). */
 export interface ContentSignalEntry {
   key: string;
   value: string;
@@ -72,7 +72,7 @@ function collectContentSignalLines(body: string): string[] {
 }
 
 /**
- * Parses `Content-Signal:` directives (IETF draft, RCR-7 — informational only).
+ * Parses `Content-Signal:` directives (IETF draft, RCR-7 - informational only).
  * Each value is a comma-separated list of `key=value` pairs; only `yes`/`no`
  * values for the known keys are considered valid.
  */
@@ -105,7 +105,7 @@ function parseCrawlDelayValue(value: string): number | null {
 
 /**
  * Parses a robots.txt body into the shared `RobotsTxt` contract shape.
- * Empty/comment-only bodies yield an empty structure (RCR-10 — the caller
+ * Empty/comment-only bodies yield an empty structure (RCR-10 - the caller
  * treats "no rules" as all-allowed). Group assembly: consecutive user-agent
  * lines extend the current group; a user-agent line after rules starts a new
  * group; rule lines before any user-agent line are ignored (RFC 9309).

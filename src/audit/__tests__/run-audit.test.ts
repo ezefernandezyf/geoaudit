@@ -14,7 +14,7 @@ import type { FetchImpl } from "@/lib/fetch/redirect";
 import type { LookupFn } from "@/lib/fetch/ssrf";
 
 /**
- * T25 part A — runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11). Zero
+ * T25 part A - runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11). Zero
  * network: the page + robots.txt fetches and the sitemap/llms.txt probes all
  * go through an injected mock fetcher, and DNS goes through an injected public
  * lookup. Assertions are deterministic over the shared rich-page fixture.

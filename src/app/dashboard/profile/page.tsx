@@ -11,9 +11,9 @@ import { PROFILE_COPY } from "@/lib/copy";
  * real `User` row (PRF-2) and shows audit usage against the single FREE limit
  * (PRF-4): `Audit` rows in the 30-day moving window, limit `FREE_AUDIT_LIMIT`.
  *
- * Sprint 10 (PRF-3/5): there is ONE plan — the pill reads "Plan Free",
+ * Sprint 10 (PRF-3/5): there is ONE plan - the pill reads "Plan Free",
  * unified with the navbar pill (SHL-2), and subscription management is
- * REMOVED with the billing capability — no portal action, no upgrade CTA.
+ * REMOVED with the billing capability - no portal action, no upgrade CTA.
  * Support entry (PRF-6) via email (the /pricing link was removed with the
  * route, WU-1).
  */
@@ -65,7 +65,7 @@ export default async function ProfilePage() {
           </p>
         </header>
 
-        {/* Identity card — PRF-2/3: name, email, plan pill + usage bar (PRF-4). */}
+        {/* Identity card - PRF-2/3: name, email, plan pill + usage bar (PRF-4). */}
         <section
           aria-label="Datos de la cuenta"
           className="rounded-xl border border-[#e2e8f0] bg-white p-6"
@@ -124,7 +124,7 @@ export default async function ProfilePage() {
           </div>
         </section>
 
-        {/* Support entry — PRF-6. */}
+        {/* Support entry - PRF-6. */}
         <section
           aria-label="Soporte"
           className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6"

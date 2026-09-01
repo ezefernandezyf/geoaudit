@@ -10,7 +10,7 @@ import type {
 } from "@/lib/audit/share-actions";
 
 /**
- * ShareModal (U5.9, ADP-7, design U5) — Gemini AuditDetailPage modal VERBATIM
+ * ShareModal (U5.9, ADP-7, design U5) - Gemini AuditDetailPage modal VERBATIM
  * (hex surfaces, rounded-2xl panel, emerald icon header) over the REAL share
  * actions: `createShareToken` / `revokeShareToken` are injected as props (the
  * BillingCta → CheckoutButton pattern; the page imports the "use server"

@@ -19,7 +19,7 @@ import { MULTIPAGE_COPY } from "@/lib/copy";
 /**
  * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
  * audit persists the light `{ aggregate, pages }` shape (`multiPageResultSchema`)
- * while single-page audits keep the full `AuditResult`. Structural check — the
+ * while single-page audits keep the full `AuditResult`. Structural check - the
  * persisted JSON is contract-shaped by construction (same cast convention as
  * the write side).
  */
@@ -38,7 +38,7 @@ function isMultiPageResult(value: unknown): value is MultiPageResult {
  * `GeminiView`s. Each row's `result` is cast to `AuditResult` with the SAME
  * convention the write side uses (`result: Json`, contract-shaped by
  * construction) and run through the pure adapter `toGeminiViewModel`. Pure
- * mapping — no I/O; the caller owns the query.
+ * mapping - no I/O; the caller owns the query.
  */
 function pageViewsFromRows(
   rows: Array<{ url: string; result: unknown }>,
@@ -54,18 +54,18 @@ function pageViewsFromRows(
  * renders the persisted audit's report in the Gemini AuditDetailPage
  * composition: back-to-history bar, the full Gemini report (hero with real
  * benchmark + 5-category scorecard + 6-platform matrix + findings with real
- * JSON-LD code), the ShareModal (real actions) and the Export PDF — available
+ * JSON-LD code), the ShareModal (real actions) and the Export PDF - available
  * to every authenticated owner (ADP-7/8, no tier gate).
  *
  * force-dynamic: per-user row, never prerenderable. runtime nodejs: reads
  * Prisma through the pg driver adapter (Node-only).
  *
  * Ownership (ADP-2): `findFirst({ id, userId })` → non-owner and missing
- * audit collapse to `null` → single `notFound()` (404) — no existence leak.
+ * audit collapse to `null` → single `notFound()` (404) - no existence leak.
  * The middleware 307-redirects `/dashboard/*` to /login; the
  * `redirect("/login")` here is the defensive RSC guard.
  *
- * Render (ADP-3): the persisted `result` JSON is the sole source — never
+ * Render (ADP-3): the persisted `result` JSON is the sole source - never
  * re-runs an audit. The persisted date + share token travel through the
  * adapter `ctx` (APT-9).
  */
@@ -147,7 +147,7 @@ export default async function AuditDetailPage({
         {multiPage ? (
           multiPage.pageViews.length === 0 ? (
             /* Honest empty state (MPU-8): legacy multi-page audit with no
-               persisted AuditPage rows — no fabricated pages or metrics. */
+               persisted AuditPage rows - no fabricated pages or metrics. */
             <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
               <Card>
                 <div className="flex items-start gap-4">

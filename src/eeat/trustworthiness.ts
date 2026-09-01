@@ -5,14 +5,14 @@ import { pageText } from "./text";
 /**
  * Trustworthiness dimension (REE-4, 0-25). Proxy signals:
  *
- * - Contact information (mailto/tel/contact links or an <address>) — 5.
- * - Privacy policy link (href/text match) — 4.
- * - Terms of service link (href/text match) — 2.
- * - HTTPS declaration: the page declares an https:// canonical/OG URL — 3
+ * - Contact information (mailto/tel/contact links or an <address>) - 5.
+ * - Privacy policy link (href/text match) - 4.
+ * - Terms of service link (href/text match) - 2.
+ * - HTTPS declaration: the page declares an https:// canonical/OG URL - 3
  *   (DOM-only proxy: TLS itself is not visible from parsed HTML; the fetch
  *   layer already enforces https per SSRF guard).
- * - Review/testimonial patterns in the visible text — 3.
- * - Disclosure patterns (affiliate/sponsored) in the visible text — 3.
+ * - Review/testimonial patterns in the visible text - 3.
+ * - Disclosure patterns (affiliate/sponsored) in the visible text - 3.
  *
  * Missing contact/privacy/terms signals produce explicit `missing_*` findings
  * (REE-10 graceful absence; spec scenario 2).

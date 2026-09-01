@@ -126,7 +126,7 @@ describe("scorePage edge cases (RCI-14)", () => {
 
 /**
  * RCI-10 (sprint 11 fix): bottom3 MUST be derived from the blocks NOT in
- * top3, so the two lists are disjoint on every page size — including pages
+ * top3, so the two lists are disjoint on every page size - including pages
  * with 3, 4 or 5 blocks where the old independent sorts overlapped.
  */
 describe("RCI-10 disjoint top3/bottom3", () => {
@@ -180,7 +180,7 @@ describe("RCI-10 disjoint top3/bottom3", () => {
     expectComplement(result);
   });
 
-  it("returns 3 top + 0 bottom on a 3-block page — fewer shown, never repeated", () => {
+  it("returns 3 top + 0 bottom on a 3-block page - fewer shown, never repeated", () => {
     const result = scorePage(page("page-three-blocks.html"));
     expect(result.top3).toHaveLength(3);
     expect(result.bottom3).toHaveLength(0);

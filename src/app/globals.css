@@ -21,7 +21,7 @@
   --color-border: #e2e8f0;
   --color-border-strong: #cbd5e1;
 
-  /* Typography — variables injected by next/font/google in the root layout */
+  /* Typography - variables injected by next/font/google in the root layout */
   --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-instrument-serif), Georgia, serif;
   /* DNF-10: `font-serif` alias to the display serif (Gemini verbatim uses
@@ -30,7 +30,7 @@
   --font-mono:
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Spacing — 4px grid */
+  /* Spacing - 4px grid */
   --spacing-1: 0.25rem;
   --spacing-2: 0.5rem;
   --spacing-3: 0.75rem;
@@ -47,7 +47,7 @@ body {
 }
 
 /* DNF-11: pulse keyframes for the Skeleton primitive (Gemini index.css
- * verbatim — .skeleton, .animate-pulse-subtle and the reduced-motion guard).
+ * verbatim - .skeleton, .animate-pulse-subtle and the reduced-motion guard).
  * Motion-safe: the pulse is disabled under prefers-reduced-motion. */
 .skeleton {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;

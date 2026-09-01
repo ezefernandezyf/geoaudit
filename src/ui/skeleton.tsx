@@ -14,7 +14,7 @@ type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 /**
- * Skeleton primitive (DNF-11 delta, U1.7): Gemini verbatim — slate-300 block
+ * Skeleton primitive (DNF-11 delta, U1.7): Gemini verbatim - slate-300 block
  * with the app's `animate-pulse-subtle` pulse (globals.css keyframes, disabled
  * under prefers-reduced-motion). Accessible via role="status" + aria-label.
  */

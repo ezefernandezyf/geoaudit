@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ReportSkeleton } from "@/app/report/report-skeleton";
 
 /**
- * U5.11 — Report loading skeleton (ARU-3 + ARU-10, design U5): Gemini
- * LiveReportPage scanning card — spinner + "Auditoría en Progreso" + serif
+ * U5.11 - Report loading skeleton (ARU-3 + ARU-10, design U5): Gemini
+ * LiveReportPage scanning card - spinner + "Auditoría en Progreso" + serif
  * "Analizando <url>" + the animated StageStepper (progress bar + numbered
  * circles) + the AuditReportSkeleton preview. NO simulation: stages pace on
  * the honest timer only; the real report arrives via the Suspense stream.

@@ -19,7 +19,7 @@ import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
  * `render.ts` feeds to headless Chromium. Self-contained means:
  *
  * - Fonts are self-hosted in `public/fonts/` and declared via `@font-face`
- *   (PDF-5) — `next/font` does not apply outside the Next render tree. The
+ *   (PDF-5) - `next/font` does not apply outside the Next render tree. The
  *   route traces `public/fonts/` into the function bundle (PDF-8) and
  *   `render.ts` points a `<base>` at it so they resolve OFFLINE.
  * - The navy/emerald/amber/red design tokens are inlined (PDF-6) and the CSS
@@ -28,13 +28,13 @@ import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
  *
  * Single-page audits render the full report (score hero, domain scorecard,
  * findings, meta). Multi-page master rows (D3) render the aggregate hero plus
- * one row per audited page — per-page PDFs are deferred per proposal scope.
+ * one row per audited page - per-page PDFs are deferred per proposal scope.
  *
  * Every interpolated value is HTML-escaped: the audit data originates from a
  * fetched page, so it is treated as untrusted text, never markup.
  */
 
-/** Escapes HTML special characters — audit content is untrusted text. */
+/** Escapes HTML special characters - audit content is untrusted text. */
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -71,7 +71,7 @@ const BAND_LABEL: Record<SeverityBand, string> = {
   Critical: "Crítico",
 };
 
-/** The four brand tokens inline (PDF-6) — the CSS variables the report uses. */
+/** The four brand tokens inline (PDF-6) - the CSS variables the report uses. */
 const BRAND_CSS = `
   --navy: #0f172a;
   --emerald: #10b981;
@@ -293,7 +293,7 @@ function document(hero: string, body: string, footerUrl: string): string {
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<title>${BRAND_NAME} — ${BRAND_DESCRIPTOR}</title>
+<title>${BRAND_NAME} - ${BRAND_DESCRIPTOR}</title>
 <style>
 :root {${BRAND_CSS}}
 ${FONT_FACES}
@@ -309,7 +309,7 @@ ${PRINT_CSS}
   ${hero}
   ${body}
   <div class="footer">
-    <span>${BRAND_NAME} — Reporte de auditoría GEO</span>
+    <span>${BRAND_NAME} - Reporte de auditoría GEO</span>
     <span>${escapeHtml(footerUrl)}</span>
   </div>
 </div>

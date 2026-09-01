@@ -5,7 +5,7 @@ import { DASHBOARD_COPY } from "@/lib/copy";
 
 /**
  * DSH-4 (WU-4): the empty state MUST render the neutral copy from
- * `DASHBOARD_COPY.empty` — not hardcoded voseo strings. The regression this
+ * `DASHBOARD_COPY.empty` - not hardcoded voseo strings. The regression this
  * guards is a coverage gap: the old test asserted the CONSTANT (copy.test.ts)
  * while the COMPONENT bypassed it with inline voseo ("Aún no hiciste…",
  * "Ejecutá…", "Hacer mi primera…"). These tests assert the rendered component.

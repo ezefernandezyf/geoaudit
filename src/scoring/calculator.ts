@@ -21,9 +21,9 @@ import {
 
 /** One dimension's score as reported by its engine (missing = `null`). */
 export type EngineScores = Partial<Record<DimensionKey, number | null>> & {
-  /** crawler.compositeScore — composes `technical` when it is absent (RGS-2). */
+  /** crawler.compositeScore - composes `technical` when it is absent (RGS-2). */
   crawler?: number | null;
-  /** Engine failure reasons keyed by dimension (RGS-9) — surfaced in notes. */
+  /** Engine failure reasons keyed by dimension (RGS-9) - surfaced in notes. */
   failures?: Partial<Record<DimensionKey, string>>;
 };
 

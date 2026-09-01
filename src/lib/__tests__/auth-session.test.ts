@@ -4,10 +4,10 @@ import type { JWT } from "next-auth/jwt";
 import { exposeUserIdInSession } from "@/lib/auth.config";
 
 /**
- * U3.T3 — session callback enabling the tier checks.
+ * U3.T3 - session callback enabling the tier checks.
  *
  * Auth.js default session callback (JWT strategy) exposes ONLY name/email/
- * image — NO `id` (verified in @auth/core 0.41.3 `lib/init.js`). Without the
+ * image - NO `id` (verified in @auth/core 0.41.3 `lib/init.js`). Without the
  * id, `session.user.id` is undefined and the tier pre-check / persist gate
  * (which filter by `userId`) would silently no-op. The pure helper copies
  * `token.sub` (the User id) into `session.user.id`.

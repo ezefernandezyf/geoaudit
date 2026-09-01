@@ -27,7 +27,7 @@ export type ScoreHeroView = Pick<
 >;
 
 export type ScoreHeroProps = {
-  /** View-model slice — the hero only reads the headline metrics. */
+  /** View-model slice - the hero only reads the headline metrics. */
   view: ScoreHeroView;
 };
 
@@ -60,9 +60,9 @@ const BENCHMARK_SEGMENTS = [
 ] as const;
 
 /**
- * ScoreHero (ARU-11): the complete Gemini hero — big serif GEO Score in a
+ * ScoreHero (ARU-11): the complete Gemini hero - big serif GEO Score in a
  * slate panel, the band chip, the domain + duration + date row, the serif
- * title and summary — plus the benchmark bar that positions the score against
+ * title and summary - plus the benchmark bar that positions the score against
  * the REAL thresholds (68 → Fair 60-74, NOT Gemini's bands). Pure SSR.
  */
 export function ScoreHero({ view }: ScoreHeroProps) {
@@ -111,7 +111,7 @@ export function ScoreHero({ view }: ScoreHeroProps) {
                 </strong>
               </span>
               {auditDate ? (
-                // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA — #64748b (4.76:1),
+                // WU-4 (A11Y-3): #94a3b8 (2.56:1) fallaba AA - #64748b (4.76:1),
                 // el mismo hex del fix del /100 (PERF-3).
                 <span className="hidden font-mono text-xs text-[#64748b] sm:inline">
                   • {auditDate}

@@ -9,7 +9,7 @@ import { buildReportHtml } from "@/pdf/report-template";
 import { renderPdf } from "@/pdf/render";
 
 /**
- * PDF export route (U4, PDF-1/2/7/9, design D3 — "PDF/detail render from
+ * PDF export route (U4, PDF-1/2/7/9, design D3 - "PDF/detail render from
  * aggregate"). `GET /api/report/[id]/pdf` returns a client-ready PDF of a
  * persisted audit.
  *
@@ -23,7 +23,7 @@ import { renderPdf } from "@/pdf/render";
  *   ownership (PDF-2) is the sole access check.
  * - Render (PDF-4): `buildReportHtml` (template, PDF-5/6) → `renderPdf`
  *   (chromium-min, PDF-4/6). PDF-9/threat matrix: a failure is ALWAYS a typed
- *   `PdfRenderError` (render.ts) mapped to 5xx here — never an uncaught throw.
+ *   `PdfRenderError` (render.ts) mapped to 5xx here - never an uncaught throw.
  * - PDF-7 response: `application/pdf` + `Content-Disposition` attachment
  *   filename `relevy-{id}.pdf`.
  */
@@ -43,7 +43,7 @@ export async function GET(_request: Request, { params }: PdfRouteContext) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  // PDF-2: ownership scoped query — non-owner and missing collapse to 404.
+  // PDF-2: ownership scoped query - non-owner and missing collapse to 404.
   const audit = await prisma.audit.findFirst({
     where: { id, userId: session.user.id },
   });
@@ -52,7 +52,7 @@ export async function GET(_request: Request, { params }: PdfRouteContext) {
   }
 
   // D3: the master row holds either the full AuditResult or the light
-  // multi-page shape — the template discriminates and renders both.
+  // multi-page shape - the template discriminates and renders both.
   const html = buildReportHtml(
     audit.result as unknown as AuditResult | MultiPageResult,
   );

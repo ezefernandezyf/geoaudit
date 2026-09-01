@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import ReportError from "@/app/report/error";
 
 /**
- * U3.T3 — Error boundary (ARU-4): catches unexpected errors with a friendly
+ * U3.T3 - Error boundary (ARU-4): catches unexpected errors with a friendly
  * message and a "Reintentar" button wired to Next's `reset()`.
  */
 describe("ReportError (ARU-4)", () => {

@@ -6,7 +6,7 @@ import { join } from "node:path";
 
 /**
  * Crawl/AI assets (LND-10, sprint 9): robots.txt, sitemap.xml and llms.txt
- * must be served at the site root — the platform engine probes each with a
+ * must be served at the site root - the platform engine probes each with a
  * HEAD request (probeSite → /sitemap.xml + /llms.txt) and the crawler engine
  * parses /robots.txt, rewarding explicit AI-crawler access.
  */

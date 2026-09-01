@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 /**
  * robots.txt (LND-10, sprint 9). Generated via the Next App Router metadata
- * route so AI crawlers are explicitly allowed — the crawler engine rewards
+ * route so AI crawlers are explicitly allowed - the crawler engine rewards
  * sites whose robots.txt grants access to the AI search surfaces.
  *
  * The allow-list matches the authoritative 17-bot registry in

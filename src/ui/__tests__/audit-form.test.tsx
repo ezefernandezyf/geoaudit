@@ -12,7 +12,7 @@ import { LANDING_COPY } from "@/lib/copy";
 import type { AuditAction, AuditFormState } from "@/lib/audit/actions";
 
 /**
- * U2.3 — AuditForm (ADF-1/2/6/7, LND-1): client island reusing TextField +
+ * U2.3 - AuditForm (ADF-1/2/6/7, LND-1): client island reusing TextField +
  * Button with the Gemini hero composition.
  * - LND-1: the submit button sits INSIDE the URL field (rightElement) and
  *   sample URL chips pre-fill the input.
@@ -170,7 +170,7 @@ describe("AuditForm pending state (ADF-6)", () => {
 
     submitValidUrl(pendingAction);
 
-    // React 19 sets isPending inside a transition — flush it asynchronously.
+    // React 19 sets isPending inside a transition - flush it asynchronously.
     const form = screen.getByRole("form", { name: "Auditoría GEO" });
     await waitFor(() => expect(form).toHaveAttribute("aria-busy", "true"));
     const button = screen.getByRole("button", { name: "Analizando…" });

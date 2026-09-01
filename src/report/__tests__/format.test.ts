@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { formatAuditDate, formatDurationMs } from "@/report/format";
 
 /**
- * U4 — pure presentation formatting for the report domain. Shared by
+ * U4 - pure presentation formatting for the report domain. Shared by
  * ScoreHero (duration, ARU-8) and ReportMeta (date).
  */
 describe("formatDurationMs", () => {

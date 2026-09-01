@@ -11,7 +11,7 @@ import type { GeminiBand } from "@/ui/severity-badge";
 // (unresolvable in vitest), so the module is mocked; the auth behavior itself
 // is covered in src/lib/audit/__tests__/actions.test.ts.
 //
-// LND-6 (sprint 8): the Home page itself resolves auth() to adapt the CTA —
+// LND-6 (sprint 8): the Home page itself resolves auth() to adapt the CTA -
 // an anonymous session (default) keeps the signup CTA; an active session
 // shows "Ir al dashboard". The mock is hoisted and typed as
 // `() => Promise<Session | null>` so the LND-6 scenarios can override it.
@@ -36,13 +36,13 @@ const BAND_LABELS: Record<GeminiBand, string> = {
   critical: "Crítico",
 };
 
-/** Home is an async server component (awaits auth()) — render the resolved JSX. */
+/** Home is an async server component (awaits auth()) - render the resolved JSX. */
 async function renderPage() {
   return render(await Page());
 }
 
 /**
- * U2.T4 — Landing page (LND-1..6, ADF-1/8): full marketing landing that drives
+ * U2.T4 - Landing page (LND-1..6, ADF-1/8): full marketing landing that drives
  * the real audit flow and explains the product with the five real domains, the
  * real severity bands, the six AI platforms, and a final CTA that adapts to
  * the auth session (LND-6). The pricing teaser is gone (LND-6, sprint 10).
@@ -156,7 +156,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       .getByText("GEO Score")
       .closest("div.overflow-hidden");
     expect(scorebox).not.toBeNull();
-    // The score is the DOCUMENTED evidence constant — never a hardcoded fake.
+    // The score is the DOCUMENTED evidence constant - never a hardcoded fake.
     expect(
       within(scorebox as HTMLElement).getByText(
         String(SCOREHERO_EVIDENCE.totalScore),
@@ -166,12 +166,12 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       within(scorebox as HTMLElement).getByText("/100"),
     ).toBeInTheDocument();
     // Domain appears in the mono chip AND as the serif title (the adapter
-    // sets title = domain) — assert at least one, never a hardcoded value.
+    // sets title = domain) - assert at least one, never a hardcoded value.
     expect(
       within(scorebox as HTMLElement).getAllByText(SCOREHERO_EVIDENCE.domain)
         .length,
     ).toBeGreaterThan(0);
-    // The band chip derives from the REAL thresholds (90/75/60/40) — the demo
+    // The band chip derives from the REAL thresholds (90/75/60/40) - the demo
     // can never claim "Excelente" for a score that is not ≥90.
     const expectedBand = severityForScore(
       SCOREHERO_EVIDENCE.totalScore,
@@ -179,7 +179,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(
       within(scorebox as HTMLElement).getByText(BAND_LABELS[expectedBand]),
     ).toBeInTheDocument();
-    // The summary line is the honest one from the evidence — real score + band.
+    // The summary line is the honest one from the evidence - real score + band.
     expect(
       within(scorebox as HTMLElement).getByText(SCOREHERO_EVIDENCE.summary),
     ).toBeInTheDocument();
@@ -189,7 +189,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     await renderPage();
     const header = screen.queryByText("Desglose por categoría");
     if (SCOREHERO_EVIDENCE.categoryScores.length === 0) {
-      // A3.2: evidence pending — no invented per-dimension numbers are shown.
+      // A3.2: evidence pending - no invented per-dimension numbers are shown.
       expect(header).toBeNull();
       return;
     }
@@ -204,7 +204,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       expect(
         within(table as HTMLElement).getByText(String(category.score)),
       ).toBeInTheDocument();
-      // Two dimensions share the 12.5% weight — use the AllBy variant.
+      // Two dimensions share the 12.5% weight - use the AllBy variant.
       expect(
         within(table as HTMLElement).getAllByText(category.weight ?? "").length,
       ).toBeGreaterThan(0);
@@ -269,7 +269,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
 
   it("renders no pricing teaser or /pricing link (LND-6)", async () => {
     await renderPage();
-    // The /pricing route is deleted (WU-1) — the landing must not link it.
+    // The /pricing route is deleted (WU-1) - the landing must not link it.
     const pricingLinks = screen
       .getAllByRole("link")
       .filter((link) => link.getAttribute("href") === "/pricing");
@@ -289,7 +289,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(screen.queryByRole("link", { name: /dashboard/i })).toBeNull();
   });
 
-  // LND-9 (sprint 9): inline Organization + WebSite JSON-LD in the SSR HTML —
+  // LND-9 (sprint 9): inline Organization + WebSite JSON-LD in the SSR HTML -
   // the schema engine only detects blocks in the server-rendered source.
   it("emits inline Organization and WebSite JSON-LD in the SSR HTML (LND-9)", async () => {
     const { container } = await renderPage();
@@ -313,10 +313,10 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(site.potentialAction).toBeDefined();
   });
 
-  // LND-12 (sprint 9): E-E-A-T trust signals — external citations to authority
+  // LND-12 (sprint 9): E-E-A-T trust signals - external citations to authority
   // domains (the authoritativeness engine rewards absolute http(s) links and
   // known authority hosts). The contact link lives in the Footer (tested in
-  // src/ui/__tests__/footer.test.tsx — this render covers <main> only).
+  // src/ui/__tests__/footer.test.tsx - this render covers <main> only).
   it("surfaces external authority citations (LND-12)", async () => {
     await renderPage();
     // Authoritativeness: at least 5 absolute external links, including

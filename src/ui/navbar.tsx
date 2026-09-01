@@ -17,12 +17,12 @@ type NavbarProps = {
 /**
  * Navbar (SHL-1/2/3/4, U1.9): global responsive navigation, Gemini verbatim
  * shell (hex directos). Sync server component that receives `session` (and
- * the `plan` pill data) by prop — the layout resolves `auth()`/prisma because
+ * the `plan` pill data) by prop - the layout resolves `auth()`/prisma because
  * an async server component can't be awaited inside RTL tests. The active-route
  * links live in the client `NavLinks` island (usePathname); logout is the
  * existing client `LogoutButton` island.
  *
- * SHL-2: the plan pill is a STATIC "Free" label + usage (used/limit) — no
+ * SHL-2: the plan pill is a STATIC "Free" label + usage (used/limit) - no
  * `/pricing` href (route deleted), no tier-dependent label. MPU-6: the
  * multi-page link is exposed to every authenticated user.
  */
@@ -44,7 +44,7 @@ export function Navbar({ session, plan }: NavbarProps) {
             href="/"
             // PERF-3: label-content-name-mismatch (WCAG 2.5.3). axe 4.x compara
             // el nombre accesible contra el textContent del link como substring
-            // EXACTO (case-insensitive, sin normalizar espacios) — el em dash
+            // EXACTO (case-insensitive, sin normalizar espacios) - el em dash
             // o un espacio extra rompe el match. El Logo emite solo el
             // wordmark "Relevy" (tagline eliminado, SHL-4), así que el
             // aria-label debe ser EXACTO "Relevy" (y el mark SVG es

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolveReportUrl } from "@/app/report/resolve";
 
 /**
- * U3.T1 — URL resolution logic (ARU-2/ARU-5): the pure decision that turns
+ * U3.T1 - URL resolution logic (ARU-2/ARU-5): the pure decision that turns
  * `searchParams` into either a valid audit URL or the empty state.
  * Extracted from the RSC so the branch logic is testable without rendering.
  */

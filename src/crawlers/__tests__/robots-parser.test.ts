@@ -95,7 +95,7 @@ describe("parseRobotsTxt (RCR-2, RCR-7, RCR-10)", () => {
   });
 });
 
-describe("parseContentSignal (RCR-7 — informational)", () => {
+describe("parseContentSignal (RCR-7 - informational)", () => {
   it("parses valid key=value pairs from a Content-Signal line", () => {
     const entries = parseContentSignal(
       "Content-Signal: ai-train=no, search=yes",
@@ -207,7 +207,7 @@ describe("matchPath (RCR-3 RFC 9309 subset)", () => {
   });
 });
 
-describe("RCR-3 scenario — exact token group beats wildcard for the same path", () => {
+describe("RCR-3 scenario - exact token group beats wildcard for the same path", () => {
   const body =
     "User-agent: GPTBot\nDisallow: /private\n\nUser-agent: *\nAllow: /private";
 

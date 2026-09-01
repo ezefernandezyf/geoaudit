@@ -25,7 +25,7 @@ export type AuditAction = (
  *
  * Rate limit first (ADF-9, RTL-4/5): the client key is derived from the
  * request headers (RTL-3) and checked against the in-memory fixed-window
- * limiter BEFORE any processing — an over-limit request returns the friendly
+ * limiter BEFORE any processing - an over-limit request returns the friendly
  * inline error instead of redirecting. The limiter is best-effort: in
  * serverless the in-memory store is per-instance, so the effective budget
  * scales with the instance count and is not shared across instances (RTL-6);
@@ -37,7 +37,7 @@ export type AuditAction = (
  * `/report?url=<normalized>`. NEVER runs the audit: the report page re-runs
  * `runAudit` under Suspense, so executing it here would double the work.
  *
- * Validation failures return inline state — never throw — so the form can
+ * Validation failures return inline state - never throw - so the form can
  * render them with `role="alert"` (ADF-7).
  */
 export async function auditAction(
@@ -67,7 +67,7 @@ export async function auditAction(
 
   // Limit pre-check (TLM-3, design U4): a signed-in user who reached the FREE
   // limit is blocked BEFORE the redirect (the report page re-runs the audit,
-  // so this prevents the work). Cheap gate — ONE indexed COUNT of Audit rows
+  // so this prevents the work). Cheap gate - ONE indexed COUNT of Audit rows
   // in the 30-day window via the SHARED `checkTierLimit`, so this pre-check
   // and the authoritative re-check in the report page always agree. Anonymous
   // requests skip the limit entirely (TLM-6). TOCTOU is accepted and closed

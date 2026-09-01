@@ -1,7 +1,7 @@
 import type { ProbeResult, SiteProbes } from "./types";
 
 /**
- * Sitemap.xml / llms.txt presence probes (RPL-6, RPL-7) — informational
+ * Sitemap.xml / llms.txt presence probes (RPL-6, RPL-7) - informational
  * only (P5). Each probe issues a single HEAD request and reports
  * present/absent; the response body is never read or parsed. The fetcher is
  * injectable so tests never touch the network; probe failures are recorded
@@ -9,7 +9,7 @@ import type { ProbeResult, SiteProbes } from "./types";
  *
  * An optional `signal` bounds the worst-case latency (ARU-9): a hung host
  * aborts instead of hanging past the function timeout. When the signal fires
- * the probe records a controlled error — it is never left pending.
+ * the probe records a controlled error - it is never left pending.
  */
 
 export type ProbeFn = (

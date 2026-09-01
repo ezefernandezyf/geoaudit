@@ -10,11 +10,11 @@ import {
 /**
  * Expertise dimension (REE-2, 0-25). Proxy signals:
  *
- * - Visible author byline (`.byline, [rel="author"], .author, author`) — 5.
- * - Author Person JSON-LD schema — 5; plus 2 when it carries `sameAs` links.
+ * - Visible author byline (`.byline, [rel="author"], .author, author`) - 5.
+ * - Author Person JSON-LD schema - 5; plus 2 when it carries `sameAs` links.
  * - Technical depth proxy (partial credit without any author, REE-2 scenario 3):
- *   code/pre blocks — 3; >= 3 external citations — 2; >= 3 distinct
- *   domain-specific terms — 5.
+ *   code/pre blocks - 3; >= 3 external citations - 2; >= 3 distinct
+ *   domain-specific terms - 5.
  *
  * A page with none of the author signals gets finding `no_author_detected`.
  */

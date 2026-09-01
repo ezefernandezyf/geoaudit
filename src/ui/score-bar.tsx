@@ -1,7 +1,7 @@
 import type { GeminiBand } from "@/ui/severity-badge";
 
 /**
- * ScoreBar category — the adapter (U5) builds these from real AuditResult
+ * ScoreBar category - the adapter (U5) builds these from real AuditResult
  * data. `status` is the lowercase Gemini band; the fill color derives from it
  * (real thresholds 90/75/60/40 via severityForScore) instead of Gemini's
  * numeric getBarColor (80/65/45/25). `name`/weight/keyMetric/description are
@@ -39,7 +39,7 @@ const STATUS_FILL: Record<GeminiBand, string> = {
  * with ONE change per design decision: the fill color derives from
  * `category.status` (the real band), never from the numeric 80/65/45/25 map.
  * Keeps the `data-score-fill` test hook so existing report tests stay green.
- * Note: unlike Gemini, the band badge is NOT embedded — composition-level
+ * Note: unlike Gemini, the band badge is NOT embedded - composition-level
  * consumers (ScoreHero, multi-page rows) already render it, avoiding
  * duplicated band text in pages with several bars.
  */
@@ -84,7 +84,7 @@ export function ScoreBar({
             <span className="text-base font-bold text-[#0f172a]">
               {category.score}
             </span>
-            {/* PERF-3: #64748b (4.76:1) cumple AA 4.5:1 — #94a3b8 (2.56:1) fallaba. */}
+            {/* PERF-3: #64748b (4.76:1) cumple AA 4.5:1 - #94a3b8 (2.56:1) fallaba. */}
             <span className="text-xs text-[#64748b]">/100</span>
           </div>
         </div>

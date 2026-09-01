@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 /**
- * U1.T2 — Tailwind 4 @theme tokens (DNF-2).
+ * U1.T2 - Tailwind 4 @theme tokens (DNF-2).
  * jsdom cannot compile Tailwind, so the "class test" verifies the source of
  * truth: every token declared under `@theme` in globals.css generates a
  * compile-time utility class (e.g. `--color-navy` → `bg-navy`/`text-navy`).

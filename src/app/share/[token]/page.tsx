@@ -39,7 +39,7 @@ function hostnameOf(url: string): string {
 
 /**
  * Public share page (U5.10, SHR-2/5/6/7/8/9, design U5). `/share/[token]`
- * renders a revocable, read-only report — deliberately OUTSIDE the auth
+ * renders a revocable, read-only report - deliberately OUTSIDE the auth
  * middleware matcher (`/dashboard/*` only): no `auth()`, no ownership check.
  *
  * Gemini SharePage composition VERBATIM over the real persisted row:
@@ -47,15 +47,15 @@ function hostnameOf(url: string): string {
  * - SHR-8: the share token ID (mono) in the verification banner.
  * - SHR-9: footer CTA inviting the visitor to run their own audit.
  *
- * Lookup (SHR-6): `findUnique({ shareToken })` — a missing, null or unknown
+ * Lookup (SHR-6): `findUnique({ shareToken })` - a missing, null or unknown
  * token returns `null` → single `notFound()` (404) path.
  *
  * Render (SHR-2): the persisted `result` JSON is rendered through the shared
- * report components — the audit is NEVER re-run. The persisted date + token
+ * report components - the audit is NEVER re-run. The persisted date + token
  * travel through the adapter `ctx` (APT-9).
  *
  * Exposure (SHR-5): the query selects the audit row only (no user relation)
- * and the page passes ONLY the result + shareToken/date to the report —
+ * and the page passes ONLY the result + shareToken/date to the report -
  * `userId`, email and tier never reach the payload or the DOM.
  */
 export const dynamic = "force-dynamic";
@@ -78,7 +78,7 @@ export default async function SharePage({ params }: SharePageProps) {
 
   return (
     <div className="min-h-dvh bg-[#f8fafc] pb-16 font-sans text-[#0f172a]">
-      {/* Minimalist public header — no app chrome, no billing buttons. */}
+      {/* Minimalist public header - no app chrome, no billing buttons. */}
       <header className="sticky top-0 z-30 border-b border-[#e2e8f0] bg-white px-4 py-3.5 sm:px-8">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">

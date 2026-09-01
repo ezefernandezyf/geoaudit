@@ -19,11 +19,11 @@ const ipv4Matrix: Array<[string, IpClassification]> = [
   ["10.255.255.255", "private_ip_range"],
   // private 192.168/16 (D6)
   ["192.168.1.1", "private_ip_range"],
-  // private 172.16/12 (D6) — exact bounds
+  // private 172.16/12 (D6) - exact bounds
   ["172.16.0.1", "private_ip_range"],
   ["172.31.255.255", "private_ip_range"],
   ["172.32.0.1", "public"],
-  // CGNAT 100.64/10 (D6) — exact bounds
+  // CGNAT 100.64/10 (D6) - exact bounds
   ["100.64.0.1", "cg_nat"],
   ["100.127.255.254", "cg_nat"],
   ["100.128.0.1", "public"],

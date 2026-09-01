@@ -32,7 +32,7 @@ async function renderShell(page: React.ReactNode) {
 }
 
 /**
- * C14 — login accessibility (A11Y-2/4/5): axe scan of the auth card and the
+ * C14 - login accessibility (A11Y-2/4/5): axe scan of the auth card and the
  * full shell, landmark regions and logical focus order. The GitHub OAuth
  * button relies on the browser default focus outline (visible focus).
  */

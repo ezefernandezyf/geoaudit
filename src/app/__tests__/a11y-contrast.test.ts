@@ -5,7 +5,7 @@
  * (jest-axe disables `cat.color`), so WCAG 2.2 AA contrast is verified here.
  *
  * WU-4 extends the original landing-only contrast scan to the three measured
- * pages (landing/report — PERF-3; the pricing page was removed in sprint 10)
+ * pages (landing/report - PERF-3; the pricing page was removed in sprint 10)
  * and to the rules behind the PERF-3
  * deviations: `aria-progressbar-name` (ScoreBar fill), `color-contrast`
  * (ScoreBar /100 + "Recomendado" badge) and `label-content-name-mismatch`
@@ -15,7 +15,7 @@
  * The test SKIPS when no server is reachable at BASE_URL (the repo convention
  * for env-gated flows): in CI the unit gate stays green without a server, and
  * locally it runs automatically whenever `pnpm dev` is up. Accepted contrast
- * exceptions, if any, are documented in docs/performance.md — never silently
+ * exceptions, if any, are documented in docs/performance.md - never silently
  * ignored (A11Y-3).
  *
  * Run manually against any URL:
@@ -27,7 +27,7 @@ import { describe, expect, it } from "vitest";
 
 const BASE_URL = process.env.A11Y_CONTRAST_URL ?? "http://localhost:3000";
 
-/** Fast TCP reachability probe — keeps the skipped path (CI, no server) cheap. */
+/** Fast TCP reachability probe - keeps the skipped path (CI, no server) cheap. */
 async function isReachable(url: string, timeoutMs = 500): Promise<boolean> {
   try {
     const { hostname, port } = new URL(url);
@@ -75,7 +75,7 @@ const A11Y_PAGES = [
   {
     name: "report",
     // Full URL with protocol: resolveReportUrl parses searchParams.url with
-    // urlInputSchema (z.url) — a bare hostname falls back to the empty state.
+    // urlInputSchema (z.url) - a bare hostname falls back to the empty state.
     url: `${BASE_URL}/report?url=${encodeURIComponent("https://example.com")}`,
     // The live audit streams under Suspense: wait for the first real
     // progressbar (ScoreBar fill) before scanning.
@@ -107,7 +107,7 @@ describe.skipIf(!reachable)(
           });
           try {
             // @axe-core/playwright requires a page from an explicit context
-            // (browser.newContext) — the default newPage context is rejected.
+            // (browser.newContext) - the default newPage context is rejected.
             const context = await browser.newContext();
             const pageHandle = await context.newPage();
             // Static pages: networkidle guarantees the Tailwind CSS is applied
@@ -129,7 +129,7 @@ describe.skipIf(!reachable)(
               .analyze();
             await context.close();
 
-            // A11Y-3: violations MUST be caught — or documented in
+            // A11Y-3: violations MUST be caught - or documented in
             // docs/performance.md with justification, never silently ignored.
             const violations = results.violations.filter((v) =>
               A11Y_RULES.includes(v.id),

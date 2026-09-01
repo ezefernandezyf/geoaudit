@@ -9,7 +9,7 @@ import type { FetchImpl } from "@/lib/fetch/redirect";
 import type { LookupFn } from "@/lib/fetch/ssrf";
 
 /**
- * T7 — fetchAuditResource composition tests (RFL-1, RFL-4/5, RFL-8, RFL-11,
+ * T7 - fetchAuditResource composition tests (RFL-1, RFL-4/5, RFL-8, RFL-11,
  * RFL-12). Zero network: every fetch uses a mocked FetchImpl and every DNS
  * resolution uses an injected lookup.
  */
