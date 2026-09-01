@@ -24,7 +24,7 @@ import {
 } from "@/report/fetch-error-copy";
 
 /**
- * U2.1/U2.2 — centralized neutral-Spanish copy (ATH-9, LGL-4).
+ * U2.1/U2.2 - centralized neutral-Spanish copy (ATH-9, LGL-4).
  * Every user-facing string lives in src/lib/copy.ts with voseo migrated to
  * neutral Spanish ("Esperá"→"Espere", "Alcanzaste"→"Alcanzó",
  * "Verificá"→"Verifique", "Probá"→"Pruebe", "Necesitás"→"Necesita",
@@ -42,7 +42,7 @@ import {
 const VOSEO_PATTERN =
   /Verificá|Probá|Esperá|Alcanzaste|Necesitás|Mejorá|Iniciá|Creá|Accedé|Auditá|tenés|Comenzá|obtené|Ingresá|Analizá|Copiá|Compartí|Descargá|Podés|Querés|Mirá|Fijate|Registrate|Logueáte|Pega|obtén|Comienza|Ingresa|te citan|Inicia sesión|Crea cuenta|Crea tu|prueba/;
 
-describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
+describe("COPY - neutral Spanish (ATH-9, LGL-4)", () => {
   it("keeps AUDIT_FORM_ERRORS neutral", () => {
     expect(AUDIT_FORM_ERRORS.invalidUrl).toBe("Formato de URL inválido");
     expect(AUDIT_FORM_ERRORS.protocol).toBe("Solo URLs http/https");
@@ -89,7 +89,7 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
     expect(SHARE_MODAL_ERROR_COPY.failed).toBe(
       "No pudimos generar el link. Pruebe de nuevo en unos minutos.",
     );
-    // The "upgrade" code is gone — sharing is FREE (SHR-3, TLM-5).
+    // The "upgrade" code is gone - sharing is FREE (SHR-3, TLM-5).
     expect(SHARE_MODAL_ERROR_COPY.upgrade).toBeUndefined();
   });
 
@@ -123,15 +123,13 @@ describe("COPY — neutral Spanish (ATH-9, LGL-4)", () => {
 
   it("keeps the landing copy neutral (B10: no voseo, no tuteo)", () => {
     expect(LANDING_COPY.hero.badge).toBe("GEO Engine");
-    expect(LANDING_COPY.hero.title).toBe(
-      "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
-    );
+    expect(LANDING_COPY.hero.title).toBe("¿Cómo lo citan los motores de IA?");
     expect(LANDING_COPY.hero.subtitleLead).toBe(
       "Relevy es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.",
     );
     expect(LANDING_COPY.hero.sampleLabel).toBe("O pruebe un ejemplo real:");
     // LND-6 (sprint 10): the final CTA is "Auditar gratis" (anonymous) or
-    // "Ir al dashboard" (authenticated) — the pricing teaser copy is gone.
+    // "Ir al dashboard" (authenticated) - the pricing teaser copy is gone.
     expect(LANDING_COPY.sections.ctaPrimary).toBe("Auditar gratis");
     expect(LANDING_COPY.sections.ctaLoggedIn).toBe("Ir al dashboard");
   });
@@ -220,7 +218,7 @@ describe("REPORT_COPY / SHARE_COPY (U5, neutral Spanish)", () => {
   });
 });
 
-describe("COPY — single source of truth (U2.2)", () => {
+describe("COPY - single source of truth (U2.2)", () => {
   it("url-policy re-exports the same AUDIT_FORM_ERRORS object", () => {
     expect(URL_POLICY_ERRORS).toBe(AUDIT_FORM_ERRORS);
   });

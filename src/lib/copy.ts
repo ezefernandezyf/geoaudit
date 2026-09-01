@@ -17,7 +17,7 @@ import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 /** Fetch failure codes the fetch layer can emit (shared with report domain). */
 type FetchFailureCode = FetchErrorCode | "unsupported_content_type";
 
-/** Free audit form errors (ADF-7) — neutral Spanish (ATH-9). */
+/** Free audit form errors (ADF-7) - neutral Spanish (ATH-9). */
 export const AUDIT_FORM_ERRORS = {
   invalidUrl: "Formato de URL inválido",
   protocol: "Solo URLs http/https",
@@ -27,13 +27,13 @@ export const AUDIT_FORM_ERRORS = {
     "Alcanzó el límite de 10 auditorías gratuitas. El contador se reinicia 30 días después de cada auditoría.",
 } as const;
 
-/** Anonymous audit limit state (TLM-11, RTL-8) — neutral Spanish (LGL-4). */
+/** Anonymous audit limit state (TLM-11, RTL-8) - neutral Spanish (LGL-4). */
 export const ANONYMOUS_AUDIT_LIMIT_COPY = {
   title: "Alcanzó el límite de auditorías anónimas",
   body: "Sin una cuenta puede realizar 3 auditorías cada 30 días por IP. Inicie sesión para acceder a 10 auditorías gratuitas por ventana de 30 días, con historial y exportación a PDF.",
 } as const;
 
-/** FetchErrorCode → user-facing Spanish copy (ARU-6) — neutral (LGL-4). */
+/** FetchErrorCode → user-facing Spanish copy (ARU-6) - neutral (LGL-4). */
 export const FETCH_ERROR_COPY: Record<FetchFailureCode, string> = {
   SSRF_BLOCKED: "El sitio bloqueó el acceso automatizado al contenido.",
   TIMEOUT:
@@ -64,7 +64,7 @@ type AuthMode = "login" | "signup";
 type AuthCopy = {
   heading: string;
   description: string;
-  /** Primary action label — MUST read "Continuar con GitHub" (ATH-8). */
+  /** Primary action label - MUST read "Continuar con GitHub" (ATH-8). */
   buttonLabel: string;
   /** Question before the switch link (Gemini card footer). */
   switchPrompt: string;
@@ -73,11 +73,11 @@ type AuthCopy = {
   termsNote: string;
   /** Signup-only benefits list (ATH-7). */
   benefits?: { label: string; items: string[] };
-  /** Signup-only developer/marketer eyebrow (B10, neutral — no tuteo). */
+  /** Signup-only developer/marketer eyebrow (B10, neutral - no tuteo). */
   developerEyebrow?: string;
 };
 
-/** GitHub auth card copy (ATH-8, ATH-9) — neutral Spanish, Gemini wording. */
+/** GitHub auth card copy (ATH-8, ATH-9) - neutral Spanish, Gemini wording. */
 export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
   login: {
     heading: "Inicie sesión",
@@ -113,7 +113,7 @@ export const AUTH_COPY: Record<AuthMode, AuthCopy> = {
 };
 
 /**
- * Shell copy (SHL-6, B10) — global navbar/footer strings in NEUTRAL Spanish
+ * Shell copy (SHL-6, B10) - global navbar/footer strings in NEUTRAL Spanish
  * (usted), centralized here so the shell never hardcodes tuteo/voseo.
  */
 export const SHELL_COPY = {
@@ -125,16 +125,15 @@ export const SHELL_COPY = {
 } as const;
 
 /**
- * Landing page copy (LND-1..5, LND-11) — Gemini wording, neutral Spanish.
+ * Landing page copy (LND-1..5, LND-11) - Gemini wording, neutral Spanish.
  */
 export const LANDING_COPY = {
   hero: {
     badge: "GEO Engine",
     badgeDivider: "|",
     badgeSuffix: "Auditoría de visibilidad en motores de IA",
-    title:
-      "¿Cómo citan los motores de IA su producto cuando los usuarios buscan su categoría?",
-    // LND-11 (sprint 9): answer-first subtitle with a concrete stat — the
+    title: "¿Cómo lo citan los motores de IA?",
+    // LND-11 (sprint 9): answer-first subtitle with a concrete stat - the
     // first sentence states the claim so the passage is self-contained. The
     // stats are REAL product facts (6 engines, 5 dimensions, weights sum 100).
     subtitleLead: `${BRAND_NAME} es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.`,
@@ -150,7 +149,7 @@ export const LANDING_COPY = {
     formAriaLabel: "Auditoría GEO",
   },
   // LND-11 (sprint 9): feature cards are answer-first passages (claim in the
-  // first sentence) with concrete stats and 50-200 self-contained words — the
+  // first sentence) with concrete stats and 50-200 self-contained words - the
   // extraction band the citability engine rewards. Every figure is a REAL
   // product fact: engine registry (17 agents), scoring weights, rubric counts.
   features: [
@@ -187,14 +186,14 @@ export const LANDING_COPY = {
     scorecardTitle: "El GEO Score: un estándar de 0 a 100",
     scorecardLead:
       "Cada puntuación se traduce en una banda de severidad con impacto directo en la visibilidad.",
-    // LND-7 (sprint 8): the ScoreHero shows a REAL verified audit — the
+    // LND-7 (sprint 8): the ScoreHero shows a REAL verified audit - the
     // category breakdown renders only from the evidence (score-hero-evidence.ts).
     scorecardCategoryTitle: "Desglose por categoría",
     scorecardBandsTitle: "Escala de Bandas y Criterios Técnicos",
     platformsEyebrow: "Ecosistema de Búsqueda de IA",
     platformsTitle: "6 plataformas de búsqueda generativa auditadas",
     platformsLead: `${BRAND_NAME} analiza la interacción de cada crawler y motor de respuesta con el contenido web en las 6 plataformas que concentran la búsqueda asistida por IA en 2026.`,
-    // LND-6 (sprint 10): final CTA — the /pricing teaser is gone (route
+    // LND-6 (sprint 10): final CTA - the /pricing teaser is gone (route
     // deleted). Anonymous → signup/audit ("Auditar gratis"); authenticated →
     // dashboard ("Ir al dashboard").
     ctaEyebrow: "Comience gratis",
@@ -207,7 +206,7 @@ export const LANDING_COPY = {
 } as const;
 
 /**
- * Dashboard copy (DSH-8..DSH-11, design U4) — Gemini runner bar + history
+ * Dashboard copy (DSH-8..DSH-11, design U4) - Gemini runner bar + history
  * wording, neutral Spanish.
  */
 export const DASHBOARD_COPY = {
@@ -247,7 +246,7 @@ export const DASHBOARD_COPY = {
 } as const;
 
 /**
- * Profile page copy (PRF-1..6, design U4) — account surface on
+ * Profile page copy (PRF-1..6, design U4) - account surface on
  * /dashboard/profile, neutral Spanish, Gemini shell wording.
  */
 export const PROFILE_COPY = {
@@ -261,7 +260,7 @@ export const PROFILE_COPY = {
     usageCaption: "del límite de su plan",
   },
   // WU-5 (sprint 10): `manage` (billing portal: portalCta/portalBlurb) and the
-  // upgrade texts (upgradeCta/upgradeBlurb) are gone — everything is FREE.
+  // upgrade texts (upgradeCta/upgradeBlurb) are gone - everything is FREE.
   support: {
     title: "Soporte",
     blurb:
@@ -272,7 +271,7 @@ export const PROFILE_COPY = {
 } as const;
 
 /**
- * Legal page copy (LGL-1..4, design U4) — /terms + /privacy static content,
+ * Legal page copy (LGL-1..4, design U4) - /terms + /privacy static content,
  * neutral Spanish (no voseo, LGL-4). Keyed by page; each entry carries the
  * Gemini header block and the body sections rendered as heading + paragraph.
  */
@@ -344,7 +343,7 @@ export const LEGAL_COPY = {
 } as const;
 
 /**
- * Report copy (U5, ARU-10/11/12, design U5) — Gemini verbatim section
+ * Report copy (U5, ARU-10/11/12, design U5) - Gemini verbatim section
  * wording, neutral Spanish. Consumed by the pure report presenters
  * (ScoreHero, DomainScorecard, PlatformMatrix, TopFindings) and the live
  * report skeleton.
@@ -403,7 +402,7 @@ export const REPORT_COPY = {
 } as const;
 
 /**
- * Public share page copy (U5.10, SHR-7..9, design U5) — Gemini SharePage
+ * Public share page copy (U5.10, SHR-7..9, design U5) - Gemini SharePage
  * verbatim, neutral Spanish (usted).
  */
 export const SHARE_COPY = {
@@ -424,7 +423,7 @@ export const SHARE_COPY = {
 } as const;
 
 /**
- * Multi-page audit copy (U6, MPU-1/3, design U6) — Gemini trigger page
+ * Multi-page audit copy (U6, MPU-1/3, design U6) - Gemini trigger page
  * wording, neutral Spanish (usted). `MultiPageErrorCode` → neutral copy for
  * the `useActionState` trigger form (MPU-3). Multi-page is FREE (MPU-2
  * removed): no gate/upgrade copy (TLM-5).
