@@ -45,13 +45,25 @@ export const auditResultFixture: AuditResult = {
         url: "https://example.com/",
       },
     ],
-    issues: ["Organization missing sameAs"],
+    issues: [
+      "Organization missing sameAs",
+      "Block 0: JSON-LD missing @context",
+      "Organization missing logo",
+      "Organization missing description",
+      "Organization missing contactPoint",
+      "Organization missing founder",
+      "Organization missing address",
+      "Block 0: unrecognized @type WebSite",
+      "Block 0: invalid sameAs URL",
+    ],
     generated: {
       "@type": "Organization",
       name: "Example Corp",
       url: "https://example.com/",
     },
     businessType: "saas",
+    // RSC-14: the real engine rubric score, NOT the 100 - issues*10 proxy.
+    score: 61,
   },
   platform: {
     headers: [

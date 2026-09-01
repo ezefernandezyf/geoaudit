@@ -43,6 +43,8 @@ export const schemaResultSchema = z.object({
   issues: z.array(z.string()),
   generated: z.record(z.string(), z.unknown()).nullable(),
   businessType: z.string(),
+  /** Rubric score (0-100) from the schema engine (RSC-14). */
+  score: z.number().min(0).max(100),
 });
 
 export type SchemaResult = z.infer<typeof schemaResultSchema>;

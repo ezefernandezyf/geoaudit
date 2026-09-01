@@ -364,5 +364,7 @@ export function toContractResult(result: SchemaEngineResult): SchemaResult {
     ],
     generated: result.generated,
     businessType: result.businessType,
+    // RSC-14: carry the real engine rubric score so every consumer renders it.
+    score: result.score,
   };
 }

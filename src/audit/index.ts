@@ -138,7 +138,14 @@ function emptyCitabilityResult(): CitabilityResult {
 }
 
 function emptySchemaResult(): SchemaResult {
-  return { detected: [], issues: [], generated: null, businessType: "hybrid" };
+  return {
+    detected: [],
+    issues: [],
+    generated: null,
+    businessType: "hybrid",
+    // RSC-14: degraded engine path defaults to 0, never a reconstructed proxy.
+    score: 0,
+  };
 }
 
 function emptyPlatformResult(): PlatformResult {
