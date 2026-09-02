@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import {
+  auditResultFixture,
+  auditResultV3Fixture,
+} from "@/lib/contracts/__fixtures__/audit-result";
 import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
+import { brandErrorResult, brandZeroResult } from "@/report/__tests__/variants";
 
 /**
  * U5.2 - Pure adapter `toGeminiViewModel` (APT-2..APT-6, APT-9, APT-10).
@@ -37,9 +41,9 @@ describe("toGeminiViewModel", () => {
     expect(view.durationSeconds).toBe(3);
   });
 
-  it("produces exactly five category scores with real row scores + weights (APT-6)", () => {
+  it("produces exactly six category scores with real row scores + v3 weights (APT-6)", () => {
     const view = toGeminiViewModel(auditResultFixture);
-    expect(view.categoryScores).toHaveLength(5);
+    expect(view.categoryScores).toHaveLength(6);
 
     const names = view.categoryScores.map((c) => c.name);
     expect(names).toEqual([
@@ -48,27 +52,39 @@ describe("toGeminiViewModel", () => {
       "E-E-A-T",
       "Datos estructurados",
       "Plataforma",
+      "Autoridad de marca",
     ]);
 
     const byId = Object.fromEntries(view.categoryScores.map((c) => [c.id, c]));
-    // crawler.compositeScore 71 → fair; v2 weight 20%
+    // crawler.compositeScore 71 → fair; v3 technical weight 16%
     expect(byId.crawler.score).toBe(71);
-    expect(byId.crawler.weight).toBe("20%");
+    expect(byId.crawler.weight).toBe("16%");
     expect(byId.crawler.status).toBe("fair");
-    // citability.pageScore 62 → fair; v2 weight 28%
+    // citability.pageScore 62 → fair; v3 weight 22.4%
     expect(byId.citability.score).toBe(62);
-    expect(byId.citability.weight).toBe("28%");
-    // content.composite 65 → fair; v2 weight 24%
+    expect(byId.citability.weight).toBe("22.4%");
+    // content.composite 65 → fair; v3 weight 19.2%
     expect(byId.content.score).toBe(65);
-    expect(byId.content.weight).toBe("24%");
-    // schema: engine score 61 (fixture) → fair; v2 weight 14%
+    expect(byId.content.weight).toBe("19.2%");
+    // schema: engine score 61 (fixture) → fair; v3 weight 11.2%
     expect(byId.schema.score).toBe(61);
-    expect(byId.schema.weight).toBe("14%");
-    expect(byId.schema.status).toBe("fair");
-    // platform: aio 70 → fair (60-74 real band); v2 weight 14%
+    expect(byId.schema.weight).toBe("11.2%");
+    // platform: aio 70 → fair (60-74 real band); v3 weight 11.2%
     expect(byId.platform.score).toBe(70);
-    expect(byId.platform.weight).toBe("14%");
-    expect(byId.platform.status).toBe("fair");
+    expect(byId.platform.weight).toBe("11.2%");
+    // Legacy fixture has no brandAuthority → honest "No medido" (null), 20%.
+    expect(byId.brand.score).toBeNull();
+    expect(byId.brand.status).toBeNull();
+    expect(byId.brand.weight).toBe("20%");
+  });
+
+  it("shows the six v3 weights summing to 100% (APT-6)", () => {
+    const view = toGeminiViewModel(auditResultFixture);
+    const sum = view.categoryScores.reduce(
+      (total, c) => total + Number.parseFloat(c.weight),
+      0,
+    );
+    expect(sum).toBe(100);
   });
 
   it("keeps keyMetric null and maxScore 100 for every category (APT-10)", () => {
@@ -95,5 +111,43 @@ describe("toGeminiViewModel", () => {
     expect(view).not.toHaveProperty("citationRate");
     expect(view).not.toHaveProperty("impactScore");
     expect(view).not.toHaveProperty("lastCrawled");
+  });
+});
+
+describe("brand row honesty (APT-11)", () => {
+  it("keeps a measured brand 0 as a real 0 with the no-presence note", () => {
+    const view = toGeminiViewModel(brandZeroResult);
+    const brand = view.categoryScores.find((c) => c.id === "brand")!;
+    expect(brand.score).toBe(0);
+    expect(brand.status).toBe("critical");
+    expect(brand.weight).toBe("20%");
+    expect(brand.description).toBe("Sin presencia externa.");
+  });
+
+  it("renders an absent brand (legacy 2.0.0) as No medido, weight still shown", () => {
+    const view = toGeminiViewModel(auditResultFixture);
+    const brand = view.categoryScores.find((c) => c.id === "brand")!;
+    expect(brand.score).toBeNull();
+    expect(brand.status).toBeNull();
+    expect(brand.weight).toBe("20%");
+    expect(brand.description).toBe(
+      "Presencia externa de la marca en fuentes que citan las IA.",
+    );
+  });
+
+  it("renders a failed brand engine as No medido, never a fabricated 0", () => {
+    const view = toGeminiViewModel(brandErrorResult);
+    const brand = view.categoryScores.find((c) => c.id === "brand")!;
+    expect(brand.score).toBeNull();
+    expect(brand.status).toBeNull();
+    expect(brand.weight).toBe("20%");
+  });
+
+  it("maps a real v3 brand score with its honest band (90/75/60/40)", () => {
+    const view = toGeminiViewModel(auditResultV3Fixture);
+    const brand = view.categoryScores.find((c) => c.id === "brand")!;
+    expect(brand.score).toBe(84);
+    expect(brand.status).toBe("good");
+    expect(brand.weight).toBe("20%");
   });
 });

@@ -55,8 +55,9 @@ describe("AuditReport (ARU-10)", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
     expect(screen.getByText("Claude")).toBeInTheDocument();
-    // Claude has no perPlatform measurement → "No medido".
-    expect(screen.getByText("No medido")).toBeInTheDocument();
+    // Claude has no perPlatform measurement → "No medido"; on this legacy
+    // fixture the brand row in the DomainScorecard is "No medido" too (APT-11).
+    expect(screen.getAllByText("No medido").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders the real generated JSON-LD code snippet (ADP-6)", () => {

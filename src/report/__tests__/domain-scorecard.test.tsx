@@ -2,7 +2,11 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import { DomainScorecard } from "@/report/domain-scorecard";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import {
+  auditResultFixture,
+  auditResultV3Fixture,
+} from "@/lib/contracts/__fixtures__/audit-result";
+import { brandErrorResult, brandZeroResult } from "@/report/__tests__/variants";
 import {
   degradedViewFixture,
   geminiViewFixture,
@@ -109,5 +113,38 @@ describe("DomainScorecard score derivation via the adapter", () => {
     // Score 61 (schema) → "fair" → amber fill; score 62 → "fair" → amber.
     expect(fillOf(61).className).toContain("bg-[#f59e0b]");
     expect(fillOf(62).className).toContain("bg-[#f59e0b]");
+  });
+});
+
+describe("DomainScorecard brand row (APT-11)", () => {
+  it("renders six bars for a v3 audit with a measured brand score", () => {
+    render(<DomainScorecard view={toGeminiViewModel(auditResultV3Fixture)} />);
+    expect(screen.getByText("Autoridad de marca")).toBeInTheDocument();
+    const bars = screen.getAllByRole("progressbar");
+    expect(bars).toHaveLength(6);
+    // crawler 71 · citability 62 · content 65 · schema 61 · platform 70 · brand 84
+    const values = bars.map((b) => Number(b.getAttribute("aria-valuenow")));
+    expect(values).toEqual([71, 62, 65, 61, 70, 84]);
+    expect(fillOf(84)).toHaveStyle({ width: "84%" });
+  });
+
+  it("renders a measured brand 0 as a real 0 bar with its honest note", () => {
+    render(<DomainScorecard view={toGeminiViewModel(brandZeroResult)} />);
+    expect(fillOf(0)).toHaveStyle({ width: "0%" });
+    expect(screen.getByText("Sin presencia externa.")).toBeInTheDocument();
+  });
+
+  it("renders an unmeasured brand row as No medido without a bar (legacy)", () => {
+    render(<DomainScorecard view={geminiViewFixture} />);
+    expect(screen.getByText("Autoridad de marca")).toBeInTheDocument();
+    expect(screen.getByText("No medido")).toBeInTheDocument();
+    // The five measured engines render bars; the brand row renders none.
+    expect(screen.getAllByRole("progressbar")).toHaveLength(5);
+  });
+
+  it("renders a failed brand engine as No medido, never a fabricated 0", () => {
+    render(<DomainScorecard view={toGeminiViewModel(brandErrorResult)} />);
+    expect(screen.getByText("No medido")).toBeInTheDocument();
+    expect(screen.getAllByRole("progressbar")).toHaveLength(5);
   });
 });

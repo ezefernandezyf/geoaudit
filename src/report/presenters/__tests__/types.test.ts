@@ -99,4 +99,20 @@ describe("GeminiView shape (APT-1)", () => {
     // All three satisfy their interfaces at compile time (no type errors above).
     expect([cat, finding, platform]).toHaveLength(3);
   });
+
+  it("accepts a not-measured category with null score and status (APT-11)", () => {
+    const notMeasured: CategoryScore = {
+      id: "brand",
+      name: "Autoridad de marca",
+      score: null,
+      maxScore: 100,
+      weight: "20%",
+      status: null,
+      keyMetric: null,
+      description: "Presencia externa de la marca en fuentes que citan las IA.",
+    };
+    expect(notMeasured.score).toBeNull();
+    expect(notMeasured.status).toBeNull();
+    expect(notMeasured.weight).toBe("20%");
+  });
 });

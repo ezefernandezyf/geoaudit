@@ -1,5 +1,8 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import {
+  auditResultFixture,
+  auditResultV3Fixture,
+} from "@/lib/contracts/__fixtures__/audit-result";
 
 /**
  * Shared degraded/unsupported AuditResult variants for the U4 report render
@@ -73,4 +76,45 @@ export const unsupportedPageResult: AuditResult = {
       "platform: unsupported_content_type",
     ],
   },
+};
+
+/** RAO-16: v3 row with a MEASURED brand 0 (RGS-11 real 20% penalty, APT-11). */
+export const brandZeroResult: AuditResult = {
+  ...auditResultV3Fixture,
+  brandAuthority: {
+    status: "success",
+    reason: null,
+    score: 0,
+    signals: {
+      entityPresence: false,
+      entityConsistency: false,
+      wikidataCompleteness: 0,
+    },
+    entity: {
+      wikipediaTitle: null,
+      wikidataId: null,
+      wikidataLabel: null,
+    },
+  },
+};
+
+/** RAO-15: v3 row where the brand engine failed (BRA-7) - "No medido", never 0. */
+export const brandErrorResult: AuditResult = {
+  ...auditResultV3Fixture,
+  brandAuthority: {
+    status: "error",
+    reason: "rate_limit",
+    score: 0,
+    signals: {
+      entityPresence: false,
+      entityConsistency: false,
+      wikidataCompleteness: 0,
+    },
+    entity: {
+      wikipediaTitle: null,
+      wikidataId: null,
+      wikidataLabel: null,
+    },
+  },
+  meta: { ...auditResultV3Fixture.meta, errors: ["brand: rate_limit"] },
 };

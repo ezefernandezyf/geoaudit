@@ -450,14 +450,16 @@ export default async function Home() {
                 >
                   <div className="flex min-w-[200px] items-center gap-3">
                     <span className="w-10 font-mono text-xs font-bold text-[#0f172a]">
-                      {c.score}
+                      {c.score === null ? "No medido" : c.score}
                     </span>
                     <span className="text-sm font-medium text-[#0f172a]">
                       {c.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <SeverityBadge band={c.status} size="sm" />
+                    {c.status ? (
+                      <SeverityBadge band={c.status} size="sm" />
+                    ) : null}
                     <span className="w-12 text-right font-mono text-xs text-[#64748b]">
                       {c.weight}
                     </span>

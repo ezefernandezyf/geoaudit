@@ -15,20 +15,28 @@
 /** Lowercase Gemini severity band (normalized from the Capitalized contract). */
 export type GeminiBand = "excellent" | "good" | "fair" | "poor" | "critical";
 
-/** One of the five report category rows, with its real score and weight. */
+/** One of the six report category rows, with its real score and weight. */
 export interface CategoryScore {
   /** Stable id (the domain-metrics engine key). */
   id: string;
   /** Display name (Spanish UI). */
   name: string;
-  /** Real engine score 0-100 (rowScore derivation). */
-  score: number;
+  /**
+   * Real engine score 0-100, or `null` when the row was not measured (legacy
+   * 2.0.0 without `brandAuthority`, or a failed engine, RAO-16/APT-11). `null`
+   * renders "No medido" - the adapter never fabricates a 0 for it (APT-10).
+   * A MEASURED 0 (brand without external presence, RGS-11) is a real 0.
+   */
+  score: number | null;
   /** Always 100 (all dimensions are scored out of 100). */
   maxScore: 100;
-  /** Real weight from SPRINT_1_WEIGHTS, formatted as a percent string. */
+  /** Real weight from the v3.0.0 weights, formatted as a percent string. */
   weight: string;
-  /** Lowercase band of the real score (90/75/60/40 thresholds). */
-  status: GeminiBand;
+  /**
+   * Lowercase band of the real score (90/75/60/40 thresholds), or `null` when
+   * the score is `null` - a "No medido" row carries no band (APT-11).
+   */
+  status: GeminiBand | null;
   /** Always null - the engine does not expose a key metric (APT-10). */
   keyMetric: string | null;
   /** Concise honest description of the category. */
@@ -96,7 +104,7 @@ export interface GeminiView {
   durationSeconds: number;
   /** Persisted audit date - provided by the caller, null by default. */
   auditDate: string | null;
-  /** Exactly five category scores (Acceso de bots / Citabilidad / E-E-A-T / Datos estructurados / Plataforma). */
+  /** Exactly six category scores (Acceso de bots / Citabilidad / E-E-A-T / Datos estructurados / Plataforma / Autoridad de marca). */
   categoryScores: CategoryScore[];
   /** Findings derived from real citability + schema + crawler data. */
   findings: Finding[];

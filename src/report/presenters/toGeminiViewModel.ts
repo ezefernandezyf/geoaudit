@@ -1,7 +1,7 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { DOMAIN_ROWS, rowScore } from "@/report/domain-metrics";
 import { severityForScore } from "@/scoring/calculator";
-import { GEO_SCORE_V2_WEIGHTS } from "@/scoring/weights";
+import { GEO_SCORE_V3_WEIGHTS } from "@/scoring/weights";
 import { deriveFindings } from "./findings";
 import { buildPlatformRows } from "./platforms";
 import type { GeminiBand, GeminiView } from "./types";
@@ -44,13 +44,14 @@ function extractHostname(url: string): string {
   }
 }
 
-/** Weight (GEO_SCORE_V2_WEIGHTS) for a domain-metrics engine key (design §Adapter). */
+/** Weight (GEO_SCORE_V3_WEIGHTS, design D6/APT-6) for a domain-metrics engine key. */
 const ENGINE_WEIGHT: Record<string, number> = {
-  crawler: GEO_SCORE_V2_WEIGHTS.weights.technical ?? 0, // 20
-  citability: GEO_SCORE_V2_WEIGHTS.weights.citability ?? 0, // 28
-  content: GEO_SCORE_V2_WEIGHTS.weights.eeat ?? 0, // 24
-  schema: GEO_SCORE_V2_WEIGHTS.weights.schema ?? 0, // 14
-  platform: GEO_SCORE_V2_WEIGHTS.weights.platform ?? 0, // 14
+  crawler: GEO_SCORE_V3_WEIGHTS.weights.technical ?? 0, // 16
+  citability: GEO_SCORE_V3_WEIGHTS.weights.citability ?? 0, // 22.4
+  content: GEO_SCORE_V3_WEIGHTS.weights.eeat ?? 0, // 19.2
+  schema: GEO_SCORE_V3_WEIGHTS.weights.schema ?? 0, // 11.2
+  platform: GEO_SCORE_V3_WEIGHTS.weights.platform ?? 0, // 11.2
+  brand: GEO_SCORE_V3_WEIGHTS.weights.brand_authority ?? 0, // 20
 };
 
 /** Concise, honest description per category (Spanish UI). */
@@ -60,7 +61,11 @@ const CATEGORY_DESCRIPTION: Record<string, string> = {
   content: "Calidad del contenido según E-E-A-T.",
   schema: "Marcado de datos estructurados.",
   platform: "Preparación de la plataforma para IA.",
+  brand: "Presencia externa de la marca en fuentes que citan las IA.",
 };
+
+/** APT-11: a MEASURED brand 0 is honest about what it means (RGS-11). */
+const BRAND_ZERO_DESCRIPTION = "Sin presencia externa.";
 
 /** Lowercase Gemini band from a real score. */
 function bandFor(score: number): GeminiBand {
@@ -98,9 +103,14 @@ export function toGeminiViewModel(
       score,
       maxScore: 100 as const,
       weight: `${weight}%`,
-      status: bandFor(score),
+      // APT-11: a "No medido" row (null score) carries no band; a measured
+      // score derives its real band (90/75/60/40).
+      status: score === null ? null : bandFor(score),
       keyMetric: null,
-      description: CATEGORY_DESCRIPTION[row.engine] ?? "",
+      description:
+        row.engine === "brand" && score === 0
+          ? BRAND_ZERO_DESCRIPTION
+          : (CATEGORY_DESCRIPTION[row.engine] ?? ""),
     };
   });
 
