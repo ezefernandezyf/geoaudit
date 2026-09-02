@@ -10,6 +10,8 @@ import { pageText, paragraphTexts } from "./text";
  * - Case-study phrasing anywhere in the visible text (phrase list) - 5 points
  *   per distinct phrase, capped at 10.
  * - A "Case Study:"-style heading - 5 points.
+ * - A changelog/release-notes/what's-new heading - 10 points (proxy for
+ *   hands-on product operation, design D7: partial credit, never a fake 0).
  *
  * Heuristic calibration per design R3 (single-page proxy; labeled downstream).
  */
@@ -37,6 +39,18 @@ export const EXPERIENCE_MAX = 25;
 
 const CASE_HEADING_PATTERN = /\bcase\s*study\b/i;
 
+/**
+ * Changelog/release-notes/what's-new heading signals (REE-1, design D7): a
+ * page publishing release notes demonstrates hands-on product operation, so
+ * the heading earns partial experience credit (proxy, not a 0) without
+ * requiring first-person or case-study phrasing. Version strings in the body
+ * ("v18.2.0") reinforce the signal through the citability semver stat (RCI-6).
+ */
+export const CHANGELOG_HEADING_PATTERN =
+  /\b(release notes?|changelog|what'?s new|whats new)\b/i;
+/** Partial credit for a detected changelog/release-notes heading (REE-1). */
+export const EXPERIENCE_CHANGELOG_PROXY_BONUS = 10;
+
 /** Distinct case-study phrases present in the text (deduped). */
 function distinctCasePhrases(text: string): string[] {
   const lower = text.toLowerCase();
@@ -53,8 +67,11 @@ export function scoreExperience($: CheerioAPI): DimensionResult {
   // headings without separators ("chain" + "Case Study" -> "chainCase"),
   // which breaks the word-boundary in CASE_HEADING_PATTERN.
   let caseHeading = false;
+  let changelogHeading = false;
   $("h1, h2, h3, h4").each((_index, element) => {
-    if (CASE_HEADING_PATTERN.test($(element).text())) caseHeading = true;
+    const headingText = $(element).text();
+    if (CASE_HEADING_PATTERN.test(headingText)) caseHeading = true;
+    if (CHANGELOG_HEADING_PATTERN.test(headingText)) changelogHeading = true;
   });
 
   let score = 0;
@@ -85,6 +102,13 @@ export function scoreExperience($: CheerioAPI): DimensionResult {
     findings.push({
       key: "case_study_heading",
       label: "Case Study section heading present",
+    });
+  }
+  if (changelogHeading) {
+    score += EXPERIENCE_CHANGELOG_PROXY_BONUS;
+    findings.push({
+      key: "changelog_proxy",
+      label: "Changelog/release notes detected",
     });
   }
   return { score: Math.min(EXPERIENCE_MAX, score), findings };
