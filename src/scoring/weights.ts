@@ -16,6 +16,10 @@
  * - `GEO_SCORE_V3_WEIGHTS` (3.0.0): citability 22.4 / eeat 19.2 / technical 16 /
  *   schema 11.2 / platform 11.2 / brand_authority 20 - Brand Authority
  *   re-enters at its brief §8.1 weight (design D5, RGS-1/8).
+ * - `GEO_SCORE_V3_1_WEIGHTS` (3.1.0): citability 24 / eeat 23 / technical 15 /
+ *   schema 12 / platform 14 / brand_authority 12 - sprint 14 calibration:
+ *   brand drops 20% → 12% (measures visibility, not fame), citability stays
+ *   dominant (RGS-1/7/8). Default of `computeGeoScore`.
  */
 
 export type DimensionKey =
@@ -85,4 +89,26 @@ export const GEO_SCORE_V3_WEIGHTS: GeoScoreWeights = {
   },
   renormalizationNote:
     "Brand Authority re-enters in v3.0.0 at 20% (brief §8.1); six-dimension distribution re-calibrated, citability stays dominant",
+};
+
+/**
+ * v3.1.0 calibrated weights (RGS-1/7/8, sprint 14). Brand Authority drops from
+ * 20% (v3.0.0) to 12% so the score measures GEO visibility, not brand fame:
+ * the benchmark showed the 20% weight fixed a ~74 ceiling on sites without a
+ * Wikipedia entity. Citability stays dominant (24%); the six weights sum to
+ * 100. `GEO_SCORE_V3_WEIGHTS` above is left intact for v3.0.0 regression
+ * tests and consumers that pin the historical config (D1).
+ */
+export const GEO_SCORE_V3_1_WEIGHTS: GeoScoreWeights = {
+  version: "3.1.0",
+  weights: {
+    citability: 24,
+    eeat: 23,
+    technical: 15,
+    schema: 12,
+    platform: 14,
+    brand_authority: 12,
+  },
+  renormalizationNote:
+    "Brand Authority re-entered in v3.0.0 at 20% (brief §8.1) and is recalibrated to 12% in v3.1.0 so the score measures GEO visibility, not brand fame",
 };

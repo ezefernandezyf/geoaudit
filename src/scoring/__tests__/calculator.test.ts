@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   GEO_SCORE_V2_WEIGHTS,
   GEO_SCORE_V3_WEIGHTS,
+  GEO_SCORE_V3_1_WEIGHTS,
   SPRINT_1_WEIGHTS,
 } from "@/scoring/weights";
+import { GEO_SCORE_V3_1_WEIGHTS as RE_EXPORTED_V3_1 } from "@/scoring/index";
 import {
   computeGeoScore,
   DIMENSIONS,
@@ -426,5 +428,64 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
     expect(result.scoringModelVersion).toBe("2.0.0");
     expect(result.dimensions.brand_authority).toBeNull();
     expect(result.geoScore).toBe(80);
+  });
+
+  // --- T1: scoring v3.1 calibration (RGS-1/7/8, sprint 14) ---
+
+  it("RGS-1: v3.1 all engines at 80 (incl. brand_authority) → composite 80", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 80 },
+      GEO_SCORE_V3_1_WEIGHTS,
+    );
+    expect(result.geoScore).toBe(80);
+  });
+
+  it("RGS-1: v3.1 uneven scores apply weights exactly (60×.24+90×.23+50×.15+100×.12+40×.14+70×.12 = 68.6 → 69)", () => {
+    const result = computeGeoScore(
+      {
+        citability: 60,
+        eeat: 90,
+        technical: 50,
+        schema: 100,
+        platform: 40,
+        brand_authority: 70,
+      },
+      GEO_SCORE_V3_1_WEIGHTS,
+    );
+    expect(result.geoScore).toBe(69);
+  });
+
+  it("RGS-1: v3.1 weights keep citability dominant and sum to 100", () => {
+    const { weights } = GEO_SCORE_V3_1_WEIGHTS;
+    const sum = Object.values(weights).reduce((acc, w) => acc + (w ?? 0), 0);
+    expect(sum).toBe(100);
+    const entries = Object.entries(weights);
+    const max = Math.max(...entries.map(([, w]) => w ?? 0));
+    const dominant = entries.find(([, w]) => (w ?? 0) === max)?.[0];
+    expect(dominant).toBe("citability");
+  });
+
+  it("RGS-7/RGS-8: v3.1 surfaces version 3.1.0, 24/23/15/12/14/12 weights and the brand 20% → 12% recalibration note", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 80 },
+      GEO_SCORE_V3_1_WEIGHTS,
+    );
+    expect(result.scoringModelVersion).toBe("3.1.0");
+    expect(result.weights.version).toBe("3.1.0");
+    expect(result.weights.weights).toEqual({
+      citability: 24,
+      eeat: 23,
+      technical: 15,
+      schema: 12,
+      platform: 14,
+      brand_authority: 12,
+    });
+    expect(result.weights.renormalizationNote).toContain("20%");
+    expect(result.weights.renormalizationNote).toContain("12%");
+  });
+
+  it("T3: GEO_SCORE_V3_1_WEIGHTS is re-exported from @/scoring (orchestrator import path)", () => {
+    expect(RE_EXPORTED_V3_1.version).toBe("3.1.0");
+    expect(RE_EXPORTED_V3_1.weights.brand_authority).toBe(12);
   });
 });

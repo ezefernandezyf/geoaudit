@@ -6,6 +6,7 @@
 export {
   GEO_SCORE_V2_WEIGHTS,
   GEO_SCORE_V3_WEIGHTS,
+  GEO_SCORE_V3_1_WEIGHTS,
   SPRINT_1_WEIGHTS,
 } from "./weights";
 export type { DimensionKey, GeoScoreWeights } from "./weights";
