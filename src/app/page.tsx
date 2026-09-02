@@ -343,6 +343,22 @@ export default async function Home() {
                   </p>
                 </div>
               </div>
+
+              {/* Dominio 06 - Autoridad de marca (LND-2, sprint 13): la sexta
+                  dimensión del engine, presente también en el Scorecard. */}
+              <div className="flex flex-col items-start gap-6 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-6 sm:flex-row">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f172a] font-mono text-sm font-bold text-white">
+                  {LANDING_COPY.features[5].number}
+                </div>
+                <div>
+                  <h3 className="mb-1 font-serif text-xl tracking-tight text-[#0f172a]">
+                    {LANDING_COPY.features[5].title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[#475569]">
+                    {LANDING_COPY.features[5].body}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
           <div className="mt-8 rounded-xl border border-[#e2e8f0] bg-white p-5">
@@ -546,7 +562,63 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
+      {/* 5. TABLA COMPARATIVA (LND-14) - Relevy vs auditoría manual, celdas
+          con datos reales (nunca placeholders). <table> semántica: gana
+          puntos de estructura (RCI-5) y extracción (RPL-10). */}
+      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {LANDING_COPY.comparison.eyebrow}
+          </span>
+          <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+            {LANDING_COPY.comparison.title}
+          </h2>
+          <p className="mt-2 text-sm text-[#475569] sm:text-base">
+            {LANDING_COPY.comparison.lead}
+          </p>
+        </div>
+        <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+          <table className="w-full text-left text-sm">
+            <caption className="sr-only">
+              {LANDING_COPY.comparison.caption}
+            </caption>
+            <thead>
+              <tr className="border-b border-[#e2e8f0] bg-[#f8fafc]">
+                {LANDING_COPY.comparison.header.map((header) => (
+                  <th
+                    key={header}
+                    scope="col"
+                    className="px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-[#475569]"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#e2e8f0]">
+              {LANDING_COPY.comparison.rows.map((row) => (
+                <tr
+                  key={row.criterion}
+                  className="transition-colors hover:bg-[#f8fafc]"
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-3.5 font-medium text-[#0f172a]"
+                  >
+                    {row.criterion}
+                  </th>
+                  <td className="px-6 py-3.5 text-[#047857]">{row.relevy}</td>
+                  <td className="px-6 py-3.5 text-[#475569]">
+                    {row.alternative}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* 6. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
           descuenta FAQPage como deprecado, RSC-7) */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         <div className="mb-10 text-center">
@@ -592,7 +664,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 6. CTA FINAL - adaptado a la sesión (LND-6): sin teaser de precios
+      {/* 7. CTA FINAL - adaptado a la sesión (LND-6): sin teaser de precios
           (la ruta /pricing se eliminó en WU-1) */}
       <section className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
         <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm sm:p-12">

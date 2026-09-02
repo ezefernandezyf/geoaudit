@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Session } from "next-auth";
 import Page, { metadata as landingMetadata } from "@/app/page";
 import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
+import { LANDING_COPY } from "@/lib/copy";
 import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand } from "@/ui/severity-badge";
 
@@ -65,19 +66,20 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     ).toBeInTheDocument();
   });
 
-  it("presents the five real audit domains (LND-2)", async () => {
+  it("presents the six real audit domains (LND-2)", async () => {
     await renderPage();
     const section = screen
       .getByText("Metodología de análisis")
       .closest("section");
     expect(section).not.toBeNull();
-    // The five real domains, none invented.
+    // The six real domains, none invented.
     for (const domain of [
       "Acceso de bots",
       "Citabilidad",
       "E-E-A-T",
       "Datos estructurados",
       "Plataforma",
+      "Autoridad de marca",
     ]) {
       expect(
         within(section as HTMLElement).getByText(domain),
@@ -89,14 +91,14 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows five numbered contrast cards with Gemini hex surfaces (LND-2)", async () => {
+  it("shows six numbered contrast cards with Gemini hex surfaces (LND-2)", async () => {
     await renderPage();
     const section = screen
       .getByText("Metodología de análisis")
       .closest("section");
     expect(section).not.toBeNull();
-    const numbers = within(section as HTMLElement).getAllByText(/^0[1-5]$/);
-    expect(numbers).toHaveLength(5);
+    const numbers = within(section as HTMLElement).getAllByText(/^0[1-6]$/);
+    expect(numbers).toHaveLength(6);
     // Light cards use the Gemini muted surface directly (no tokens).
     expect(
       section?.querySelectorAll("div[class*='#f8fafc']").length,
@@ -199,12 +201,21 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(table).not.toBeNull();
     for (const category of SCOREHERO_EVIDENCE.categoryScores) {
       expect(
-        within(table as HTMLElement).getByText(category.name),
-      ).toBeInTheDocument();
-      expect(
-        within(table as HTMLElement).getByText(String(category.score)),
-      ).toBeInTheDocument();
-      // Two dimensions share the 12.5% weight - use the AllBy variant.
+        within(table as HTMLElement).getAllByText(category.name).length,
+      ).toBeGreaterThan(0);
+      if (category.score !== null) {
+        // Two categories may share a score - use the AllBy variant.
+        expect(
+          within(table as HTMLElement).getAllByText(String(category.score))
+            .length,
+        ).toBeGreaterThan(0);
+      } else {
+        // APT-11: a null row renders honestly as "No medido".
+        expect(
+          within(table as HTMLElement).getAllByText("No medido").length,
+        ).toBeGreaterThan(0);
+      }
+      // Two dimensions share the 11.2% weight - use the AllBy variant.
       expect(
         within(table as HTMLElement).getAllByText(category.weight ?? "").length,
       ).toBeGreaterThan(0);
@@ -433,6 +444,70 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       expect(alt).toBeTruthy();
       expect(alt!.trim()).not.toBe("");
     }
+  });
+
+  // LND-13 (sprint 13): the visible FAQ must carry at least five recognizable
+  // questions - every item renders, and each question is query-matchable.
+  it("renders at least five recognizable FAQ questions (LND-13)", async () => {
+    await renderPage();
+    for (const item of LANDING_COPY.faq.items) {
+      expect(screen.getByText(item.question)).toBeInTheDocument();
+      expect(screen.getByText(item.answer)).toBeInTheDocument();
+    }
+    expect(LANDING_COPY.faq.items.length).toBeGreaterThanOrEqual(5);
+  });
+
+  // LND-14 (sprint 13): a real <table> with at least 3 rows of real Relevy
+  // facts - the bands section is a div composition, so getByRole("table")
+  // resolves uniquely to the comparison table.
+  it("renders the comparison table with at least three real rows (LND-14)", async () => {
+    await renderPage();
+    const table = screen.getByRole("table");
+    expect(table).toBeInTheDocument();
+    const rows = within(table).getAllByRole("row");
+    // Header row + at least 3 data rows.
+    expect(rows.length).toBeGreaterThanOrEqual(4);
+    // Real cells render - never placeholders.
+    expect(
+      within(table).getByText("Menos de 30 segundos por URL"),
+    ).toBeInTheDocument();
+    expect(
+      within(table).getByText("Gratis: 10 auditorías por ventana de 30 días"),
+    ).toBeInTheDocument();
+  });
+
+  // LND-13 (sprint 13): the key content headings are phrased as questions
+  // (query-matchable, RCI-5/RPL-8) - not just the hero H1.
+  it("phrases the key section headings as questions (LND-13)", async () => {
+    await renderPage();
+    expect(
+      screen.getByRole("heading", {
+        level: 2,
+        name: "¿Cómo analiza Relevy su visibilidad en los motores de IA?",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 2, name: "¿Qué es el GEO Score?" }),
+    ).toBeInTheDocument();
+  });
+
+  // T9 (sprint 13): the ScoreHero evidence must carry the six v3 rows,
+  // brand included - the breakdown renders only from this evidence (LND-7).
+  it("fixes six category rows in the ScoreHero evidence, brand included (T9)", async () => {
+    expect(SCOREHERO_EVIDENCE.categoryScores).toHaveLength(6);
+    expect(SCOREHERO_EVIDENCE.categoryScores.map((c) => c.id)).toEqual([
+      "crawler",
+      "citability",
+      "content",
+      "schema",
+      "platform",
+      "brand",
+    ]);
+    const brand = SCOREHERO_EVIDENCE.categoryScores.find(
+      (c) => c.id === "brand",
+    );
+    expect(brand?.name).toBe("Autoridad de marca");
+    expect(brand?.weight).toBe("20%");
   });
 });
 
