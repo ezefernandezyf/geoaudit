@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, beforeEach, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { runAudit } from "@/audit/index";
@@ -13,12 +13,15 @@ import type { LookupFn } from "@/lib/fetch/ssrf";
  * engines) so the test can assert reference identity across engine boundaries.
  */
 
-const { citabilitySpy, eeatSpy, schemaSpy, platformSpy } = vi.hoisted(() => ({
-  citabilitySpy: vi.fn(),
-  eeatSpy: vi.fn(),
-  schemaSpy: vi.fn(),
-  platformSpy: vi.fn(),
-}));
+const { citabilitySpy, eeatSpy, schemaSpy, platformSpy, brandSpy } = vi.hoisted(
+  () => ({
+    citabilitySpy: vi.fn(),
+    eeatSpy: vi.fn(),
+    schemaSpy: vi.fn(),
+    platformSpy: vi.fn(),
+    brandSpy: vi.fn(),
+  }),
+);
 
 vi.mock("@/citability", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/citability")>();
@@ -46,6 +49,14 @@ vi.mock("@/platform", async (importOriginal) => {
   return {
     ...actual,
     scorePlatform: platformSpy.mockImplementation(actual.scorePlatform),
+  };
+});
+
+vi.mock("@/brand", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/brand")>();
+  return {
+    ...actual,
+    scoreBrand: brandSpy.mockImplementation(actual.scoreBrand),
   };
 });
 
@@ -93,6 +104,10 @@ function mockAuditFetch(): FetchImpl {
 }
 
 describe("runAudit (RAO-3 shared parsed DOM)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("passes the SAME Cheerio instance to citability, E-E-A-T, schema and platform", async () => {
     await runAudit("https://example.com/", {
       fetcher: mockAuditFetch(),
@@ -113,5 +128,15 @@ describe("runAudit (RAO-3 shared parsed DOM)", () => {
     expect(citability$).toBe(eeat$);
     expect(eeat$).toBe(schema$);
     expect(schema$).toBe(platform$);
+  });
+
+  it("RAO-3/RAO-15: invokes the brand engine with the hostname, never the shared DOM", async () => {
+    await runAudit("https://example.com/", {
+      fetcher: mockAuditFetch(),
+      lookup: PUBLIC_LOOKUP,
+    });
+
+    expect(brandSpy).toHaveBeenCalledTimes(1);
+    expect(brandSpy.mock.calls[0][0]).toBe("example.com");
   });
 });

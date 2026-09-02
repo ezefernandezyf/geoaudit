@@ -52,6 +52,18 @@ function mockAuditFetch(): FetchImpl {
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
+    const parsed = new URL(url);
+    // Brand probes hit a rate-limited Wikipedia/Wikidata (BRA-7) so the
+    // engine degrades deterministically in the edge-case tests.
+    if (
+      parsed.hostname === "en.wikipedia.org" ||
+      parsed.hostname === "www.wikidata.org"
+    ) {
+      return new Response("{}", {
+        status: 429,
+        headers: { "content-type": "application/json; charset=utf-8" },
+      });
+    }
     return new Response(PAGE_HTML, {
       status: 200,
       headers: { "content-type": "text/html; charset=utf-8" },
@@ -159,17 +171,25 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.schema.detected).toEqual([]);
     expect(result.platform.perPlatform).toEqual({});
 
+    // The brand engine still runs (RAO-15) but the non-JSON mock body makes
+    // it degrade to the empty error shape instead of fabricating presence.
+    expect(result.brandAuthority?.status).toBe("error");
+    expect(result.brandAuthority?.reason).toBe("invalid_json");
+
     // The crawler engine still ran over the parsed robots.txt.
     expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
     const headers = new Headers({ "content-type": "text/html; charset=utf-8" });
     const expected = scoreAccess(parseRobotsTxt(ROBOTS_TXT), headers, load(""));
     expect(result.crawlers.compositeScore).toBe(expected.compositeScore);
 
-    // meta.errors records the shared unsupported reason for all four engines.
-    expect(result.meta.errors).toHaveLength(4);
-    for (const entry of result.meta.errors) {
-      expect(entry).toContain("unsupported_content_type");
-    }
+    // meta.errors records the shared unsupported reason for the four content
+    // engines plus the isolated brand failure (RAO-12).
+    expect(result.meta.errors).toHaveLength(5);
+    const unsupported = result.meta.errors.filter((entry) =>
+      entry.includes("unsupported_content_type"),
+    );
+    expect(unsupported).toHaveLength(4);
+    expect(result.meta.errors).toContain("brand: invalid_json");
 
     // Crawler-only input cannot compose the technical dimension (RGS-2 needs
     // platform) → GEO Score 0 / Critical, and the result stays Zod-valid.
@@ -209,6 +229,63 @@ describe("runAudit edge cases (T25 part B)", () => {
     // excluded, weights rebalanced - RGS-9).
     expect(result.summary.geoScore).toBeGreaterThan(0);
     expect(result.summary.geoScore).toBeLessThanOrEqual(100);
+    expect(auditResultSchema.safeParse(result).success).toBe(true);
+  });
+
+  it("RAO-12/RAO-15: a rate-limited brand API isolates brand - 5 engines valid + meta.errors brand:", async () => {
+    const fetcher: FetchImpl = async (input, init) => {
+      const url = String(input);
+      if (init?.method === "HEAD") {
+        return new Response(null, { status: 200 });
+      }
+      if (url.endsWith("/robots.txt")) {
+        return new Response(ROBOTS_TXT, {
+          status: 200,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        });
+      }
+      const parsed = new URL(url);
+      if (
+        parsed.hostname === "en.wikipedia.org" ||
+        parsed.hostname === "www.wikidata.org"
+      ) {
+        return new Response("{}", {
+          status: 429,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        });
+      }
+      return new Response(PAGE_HTML, {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    };
+
+    const result = await runAudit("https://example.com/", {
+      fetcher,
+      lookup: PUBLIC_LOOKUP,
+      now: () => NOW,
+    });
+
+    // brandAuthority holds the empty error shape (BRA-7/RAO-15 fallback).
+    expect(result.brandAuthority?.status).toBe("error");
+    expect(result.brandAuthority?.reason).toBe("rate_limit");
+    expect(result.brandAuthority?.score).toBe(0);
+
+    // The 5 other engines produced valid results.
+    expect(result.crawlers.compositeScore).toBe(80);
+    expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
+    expect(result.citability.pageScore).toBe(40);
+    expect(result.content.composite).toBe(5);
+    expect(result.schema.detected.length).toBeGreaterThan(0);
+    expect(result.platform.perPlatform["aio"]).toBeDefined();
+
+    // meta.errors records the brand failure with its stable reason.
+    expect(result.meta.errors).toContain("brand: rate_limit");
+
+    // Brand excluded from the composite (RGS-9): the 5 remaining dimensions
+    // rebalance over 80% and yield 45 / Poor on this fixture.
+    expect(result.summary.geoScore).toBe(45);
+    expect(result.summary.severityBand).toBe("Poor");
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });
 });

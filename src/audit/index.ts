@@ -39,9 +39,16 @@ import {
   toContractResult as platformToContract,
 } from "@/platform/index";
 import type { PlatformEngineResult } from "@/platform/types";
+import { applyBrandCriteria } from "@/platform/per-platform";
+import {
+  scoreBrand,
+  toContractResult as brandToContract,
+  emptyBrandResult,
+} from "@/brand/index";
+import type { BrandEngineResult } from "@/brand/types";
 import {
   computeGeoScore,
-  GEO_SCORE_V2_WEIGHTS,
+  GEO_SCORE_V3_WEIGHTS,
   type DimensionKey,
 } from "@/scoring/index";
 
@@ -49,8 +56,8 @@ import {
  * Audit orchestrator (T25) - the core product behavior. `runAudit(url)` runs
  * the whole pipeline: Zod-validate the URL (RAO-1), normalize http -> https,
  * parallel bounded fetches (RAO-2), a single shared Cheerio load passed to
- * every engine (RAO-3), all five engines (RAO-4..RAO-8), the weighted GEO
- * Score (RAO-9), and a fully typed `AuditResult` (RAO-10).
+ * every content engine (RAO-3), all six engines (RAO-4..RAO-8 + RAO-15), the
+ * weighted GEO Score (RAO-9), and a fully typed `AuditResult` (RAO-10).
  *
  * Testability (RAO-11): `fetcher`, `lookup`, `now` and every engine entry
  * point are injectable so each fetch, DNS resolution, timing and engine can
@@ -65,7 +72,10 @@ import {
  *   still complete - never rethrown.
  * - RAO-13: a non-HTML page (`unsupported_content_type`) skips the HTML parse
  *   and the four content engines report unsupported (zeroed sections + shared
- *   reason in `meta.errors`), while the crawler engine still runs.
+ *   reason in `meta.errors`), while the crawler and brand engines still run.
+ * - RAO-15: the brand engine runs on every audit (anonymous included) with the
+ *   audited domain, never the DOM; a failure degrades to `emptyBrandResult`
+ *   and is recorded as `brand: {reason}` in `meta.errors`.
  */
 
 export const AUDIT_VERSION = "0.1.0";
@@ -88,10 +98,12 @@ export interface AuditDeps {
   scoreEeat?: typeof scoreEeat;
   scoreSchema?: typeof scoreSchema;
   scorePlatform?: typeof scorePlatform;
+  scoreBrand?: typeof scoreBrand;
 }
 
-/** The five engines run by the orchestrator, keyed by their AuditResult section. */
-type EngineName = "crawler" | "citability" | "content" | "schema" | "platform";
+/** The six engines run by the orchestrator, keyed by their AuditResult section. */
+type EngineName =
+  "crawler" | "citability" | "content" | "schema" | "platform" | "brand";
 
 /** Rich engine results keyed by engine; a missing key means that engine failed. */
 interface EngineRun {
@@ -100,6 +112,7 @@ interface EngineRun {
   content?: EeatResult;
   schema?: SchemaEngineResult;
   platform?: PlatformEngineResult;
+  brand?: BrandEngineResult;
 }
 
 /** RCR-10: a missing/404/gated robots.txt means every bot is allowed. */
@@ -186,6 +199,7 @@ export async function runAudit(
   const scoreEeatEngine = deps.scoreEeat ?? scoreEeat;
   const scoreSchemaEngine = deps.scoreSchema ?? scoreSchema;
   const scorePlatformEngine = deps.scorePlatform ?? scorePlatform;
+  const scoreBrandEngine = deps.scoreBrand ?? scoreBrand;
 
   // RAO-1: shared Zod contract. Part B decision: an invalid URL is NOT thrown.
   // The orchestrator returns a degraded AuditResult (score 0 / Critical) with
@@ -267,6 +281,8 @@ export async function runAudit(
       pagePath,
       robotsResult,
       scoreAccessEngine,
+      scoreBrandEngine,
+      brandDeps: { fetcher: deps.fetcher, lookup: deps.lookup },
       startedAt,
       clock,
     });
@@ -330,6 +346,38 @@ export async function runAudit(
   } catch (error) {
     engineFailures.platform = errorMessage(error);
   }
+  // RAO-3/RAO-15: the brand engine consumes the audited DOMAIN, never the
+  // shared DOM. BRA-7 guarantees it never throws (probe failures return a
+  // typed error result), but the try/catch still isolates unexpected bugs
+  // (RAO-12) - a throwing brand degrades exactly like a probe failure.
+  try {
+    engines.brand = await scoreBrandEngine(target.hostname, {
+      fetcher: deps.fetcher,
+      lookup: deps.lookup,
+    });
+  } catch (error) {
+    engineFailures.brand = errorMessage(error);
+  }
+  // RAO-15: a status "error" brand result (rate_limit/timeout/block, BRA-7)
+  // is a failure for scoring purposes - same isolation as a throw.
+  if (engines.brand !== undefined && engines.brand.status === "error") {
+    engineFailures.brand = engines.brand.reason ?? "brand engine error";
+  }
+
+  // RPL-11/design D8: wire the brand signals into the per-platform rubrics
+  // BEFORE platformToContract so the contract carries the measured
+  // Wikipedia/Wikidata criteria. Only a successful brand run flips the 4
+  // keys; a failed brand leaves them not_measured (honest).
+  if (engines.platform !== undefined && engines.brand?.status === "success") {
+    engines.platform.perPlatform.platforms = applyBrandCriteria(
+      engines.platform.perPlatform.platforms,
+      {
+        entityPresence: engines.brand.signals.entityPresence,
+        entityConsistency: engines.brand.signals.entityConsistency,
+        wikidataId: engines.brand.entity.wikidataId,
+      },
+    );
+  }
 
   const errors = Object.entries(engineFailures).map(
     ([name, message]) => `${name}: ${message}`,
@@ -350,7 +398,17 @@ export async function runAudit(
     failures.schema = engineFailures.schema;
   if (engineFailures.platform !== undefined)
     failures.platform = engineFailures.platform;
+  if (engineFailures.brand !== undefined)
+    failures.brand_authority = engineFailures.brand;
 
+  // RAO-9/RAO-15: composite the GEO Score with the six dimensions (v3.0.0).
+  // `platform` onPageScore decision: the Google AI Overviews per-platform
+  // score represents the most representative AI-answer surface and its rubric
+  // carries the most measured on-page criteria (70/100), so the AIO score is
+  // wired as the platform dimension (RGS-2 composes the technical dimension
+  // from crawler + platform from these values). Brand Authority passes its
+  // measured score - a real measured 0 penalizes the 20% weight (RGS-11), a
+  // failed brand passes null so the calculator rebalances (RGS-9).
   const scored = computeGeoScore(
     {
       citability: engines.citability ? engines.citability.pageScore : null,
@@ -360,17 +418,19 @@ export async function runAudit(
       platform: engines.platform
         ? engines.platform.perPlatform.platforms.aio.score
         : null,
+      brand_authority:
+        engines.brand?.status === "success" ? engines.brand.score : null,
       failures,
     },
-    GEO_SCORE_V2_WEIGHTS,
+    GEO_SCORE_V3_WEIGHTS,
   );
 
   const completedAt = clock();
 
   // RAO-10: assemble the fully typed contract shape. `scored.scoringModelVersion`
-  // is the GEO_SCORE_V2_WEIGHTS version string, which the contract pins to the
-  // literal "2.0.0" (RAO-10 scenario) - narrowed here for the return type.
-  const scoringModelVersion = scored.scoringModelVersion as "2.0.0";
+  // is the GEO_SCORE_V3_WEIGHTS version string, which the contract pins to the
+  // literal "3.0.0" (RAO-10 scenario) - narrowed here for the return type.
+  const scoringModelVersion = scored.scoringModelVersion as "3.0.0";
 
   return {
     summary: {
@@ -394,6 +454,13 @@ export async function runAudit(
     content: engines.content
       ? eeatToContract(engines.content)
       : emptyContentResult(),
+    // RAO-15: a successful brand maps to the contract; a failed brand (probe
+    // error or throw) falls back to the empty error shape - never absent in a
+    // v3 audit (absence is reserved for legacy 2.0.0 rows, RAO-16).
+    brandAuthority:
+      engines.brand?.status === "success"
+        ? brandToContract(engines.brand)
+        : emptyBrandResult(engineFailures.brand ?? "brand engine error"),
     scoringModelVersion,
     meta: {
       auditVersion: AUDIT_VERSION,
@@ -409,6 +476,9 @@ interface UnsupportedPageArgs {
   pagePath: string;
   robotsResult: PromiseSettledResult<FetchResult>;
   scoreAccessEngine: typeof scoreAccess;
+  scoreBrandEngine: typeof scoreBrand;
+  /** Brand network deps (RAO-11): flows the audit fetcher/lookup through. */
+  brandDeps: { fetcher?: FetchImpl; lookup?: LookupFn };
   startedAt: number;
   clock: () => number;
 }
@@ -418,17 +488,25 @@ interface UnsupportedPageArgs {
  * so they report unsupported - zeroed contract sections + one `meta.errors`
  * entry each with the shared reason. The crawler engine still runs over the
  * independent robots.txt: it receives an empty DOM and empty headers so the
- * page-level signals (meta robots, llms.txt link) default to absent. The GEO
- * Score is computed from the available engines only; with crawler alone the
- * technical dimension cannot be composed (RGS-2 needs platform), so the score
- * is 0 / Critical - an honest outcome for a non-HTML target.
+ * page-level signals (meta robots, llms.txt link) default to absent.
+ *
+ * The brand engine also still runs (RAO-15): it only consumes the audited
+ * DOMAIN, so a non-HTML page does not stop it. A successful brand run enters
+ * the composite (a brand with external presence keeps the score honest even
+ * when the page cannot be parsed); a failed brand degrades to the empty
+ * error shape like any other engine. The GEO Score is computed from the
+ * available engines only (RGS-9).
  */
-function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
+async function auditUnsupportedPage(
+  args: UnsupportedPageArgs,
+): Promise<AuditResult> {
   const {
     pageUrl,
     pagePath,
     robotsResult,
     scoreAccessEngine,
+    scoreBrandEngine,
+    brandDeps,
     startedAt,
     clock,
   } = args;
@@ -447,6 +525,21 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
     pagePath,
   );
 
+  // RAO-15: run the brand engine on the audited domain with the same failure
+  // isolation as the main pipeline (BRA-7 never throws, but catch anyway).
+  let brandRun: BrandEngineResult | null = null;
+  let brandFailure: string | null = null;
+  try {
+    const result = await scoreBrandEngine(new URL(pageUrl).hostname, brandDeps);
+    if (result.status === "error") {
+      brandFailure = result.reason ?? "brand engine error";
+    } else {
+      brandRun = result;
+    }
+  } catch (error) {
+    brandFailure = errorMessage(error);
+  }
+
   const scored = computeGeoScore(
     {
       citability: null,
@@ -454,14 +547,16 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
       schema: null,
       crawler: crawlerRich.compositeScore,
       platform: null,
+      brand_authority: brandRun?.score ?? null,
       failures: {
         citability: "unsupported_content_type",
         eeat: "unsupported_content_type",
         schema: "unsupported_content_type",
         platform: "unsupported_content_type",
+        ...(brandFailure !== null ? { brand_authority: brandFailure } : {}),
       },
     },
-    GEO_SCORE_V2_WEIGHTS,
+    GEO_SCORE_V3_WEIGHTS,
   );
 
   const completedAt = clock();
@@ -478,7 +573,11 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
     schema: emptySchemaResult(),
     platform: emptyPlatformResult(),
     content: emptyContentResult(),
-    scoringModelVersion: scored.scoringModelVersion as "2.0.0",
+    brandAuthority:
+      brandRun !== null
+        ? brandToContract(brandRun)
+        : emptyBrandResult(brandFailure ?? "brand engine error"),
+    scoringModelVersion: scored.scoringModelVersion as "3.0.0",
     meta: {
       auditVersion: AUDIT_VERSION,
       startedAt,
@@ -488,6 +587,7 @@ function auditUnsupportedPage(args: UnsupportedPageArgs): AuditResult {
         "schema: unsupported_content_type",
         "content: unsupported_content_type",
         "platform: unsupported_content_type",
+        ...(brandFailure !== null ? [`brand: ${brandFailure}`] : []),
       ],
     },
   };
