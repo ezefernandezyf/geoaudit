@@ -248,7 +248,7 @@ describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
    */
   const STAT_PATTERN = /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b/;
   const ANSWER_FIRST_PATTERN =
-    /^(?:Relevy|El GEO Score|La citabilidad|La plataforma|El engine|Los motores|Los pasajes)/;
+    /^(?:Relevy|El GEO Score|La citabilidad|La plataforma|La autoridad de marca|El engine|Los motores|Los pasajes)/;
 
   it("hero subtitle is answer-first and carries at least one concrete stat", () => {
     const subtitle =
@@ -273,5 +273,79 @@ describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
   it("the platforms lead names the six audited AI engines with a stat", () => {
     expect(LANDING_COPY.sections.platformsLead).toMatch(/\b6\b/);
     expect(LANDING_COPY.sections.platformsLead).toMatch(STAT_PATTERN);
+  });
+});
+
+describe("LANDING_COPY six-dimension polish (LND-11/13/14, sprint 13)", () => {
+  it("lists six features ending with Autoridad de marca (LND-11)", () => {
+    expect(LANDING_COPY.features).toHaveLength(6);
+    const last = LANDING_COPY.features[5];
+    expect(last.title).toBe("Autoridad de marca");
+    // The new passage must sit in the 50-200 word extraction band too (LND-11).
+    const words = last.body.trim().split(/\s+/).length;
+    expect(words).toBeGreaterThanOrEqual(50);
+    expect(words).toBeLessThanOrEqual(200);
+    // 20% is the v3 brand_authority weight (RGS-1) - a real product fact.
+    expect(last.body).toMatch(/20 %/);
+  });
+
+  it("quotes the v3 weights on the feature passages (RGS-1)", () => {
+    const bodies = LANDING_COPY.features.map((f) => f.body).join(" ");
+    expect(bodies).toMatch(/22,4 %/); // citability
+    expect(bodies).toMatch(/19,2 %/); // E-E-A-T
+    expect(bodies).toMatch(/16 %/); // technical (acceso de bots)
+    expect(bodies).toMatch(/11,2 %/); // schema + platform
+    expect(bodies).toMatch(/20 %/); // brand_authority
+  });
+
+  it("keeps the hero subtitle in the 50-200 word band with six dimensions (LND-11)", () => {
+    const subtitle =
+      `${LANDING_COPY.hero.subtitleLead}${LANDING_COPY.hero.subtitleHighlight}${LANDING_COPY.hero.subtitleTail}`.trim();
+    const words = subtitle.trim().split(/\s+/).length;
+    expect(words).toBeGreaterThanOrEqual(50);
+    expect(words).toBeLessThanOrEqual(200);
+    expect(subtitle).toMatch(/6 dimensiones/);
+    expect(subtitle).toMatch(/20 %/);
+  });
+
+  it("renders at least five recognizable FAQ questions with v3 weights (LND-13)", () => {
+    expect(LANDING_COPY.faq.items.length).toBeGreaterThanOrEqual(5);
+    for (const item of LANDING_COPY.faq.items) {
+      // Recognizable question form (what is / how to / …?) - LND-13.
+      expect(item.question).toMatch(/^\u00bf/);
+      expect(item.question.endsWith("?")).toBe(true);
+      expect(item.answer.length).toBeGreaterThan(40);
+    }
+    // The score question quotes the six v3 weights - never the v2 list.
+    const score = LANDING_COPY.faq.items[0];
+    expect(score.answer).toMatch(/6 dimensiones/);
+    expect(score.answer).toMatch(/22,4 %/);
+    expect(score.answer).toMatch(/20 %/);
+  });
+
+  it("provides comparison table copy with at least three real rows (LND-14)", () => {
+    expect(LANDING_COPY.comparison).toBeDefined();
+    expect(LANDING_COPY.comparison.header).toHaveLength(3);
+    expect(LANDING_COPY.comparison.rows.length).toBeGreaterThanOrEqual(3);
+    for (const row of LANDING_COPY.comparison.rows) {
+      // No placeholder or fabricated cells (LND-14 "No invented cells").
+      for (const cell of [row.criterion, row.relevy, row.alternative]) {
+        expect(cell).toBeTruthy();
+        expect(cell).not.toMatch(/\b(TODO|TBD|lorem)\b|XXX|placeholder/);
+      }
+    }
+  });
+
+  it("phrases the key section headings as questions (LND-13)", () => {
+    const headings = [
+      LANDING_COPY.sections.howItWorksTitle,
+      LANDING_COPY.sections.scorecardTitle,
+      LANDING_COPY.comparison.title,
+    ];
+    for (const heading of headings) {
+      // Query-matchable question form (RCI-5/RPL-8).
+      expect(heading).toMatch(/^\u00bf/);
+      expect(heading.endsWith("?")).toBe(true);
+    }
   });
 });
