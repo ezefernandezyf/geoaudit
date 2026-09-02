@@ -4,6 +4,7 @@ import path from "node:path";
 import { load } from "cheerio";
 import { platformResultSchema } from "@/lib/contracts/audit-result";
 import { scorePlatform, toContractResult } from "@/platform/index";
+import { rescaleAioScore } from "@/platform/per-platform";
 import { PROBE_TIMEOUT_MS } from "@/lib/fetch";
 import type { ProbeFn } from "@/platform/probes";
 import {
@@ -126,6 +127,26 @@ describe("toContractResult (PlatformResult contract)", () => {
     expect(platformResultSchema.safeParse(contract).success).toBe(true);
     expect(contract.perPlatform["aio"]).toBeDefined();
     expect(contract.ssr["status"]).toBe("ssr_present");
+  });
+
+  it("flows the rescaled AIO score to the contract without re-rescaling (RPL-12 single-source)", async () => {
+    const { $, html } = page("page-ssr-rich.html");
+    const result = await scorePlatform(
+      { $, html, headers: HEADERS_COMPLETE, origin: "https://example.com" },
+      { fetcher: ALL_PRESENT },
+    );
+    const aio = result.perPlatform.platforms.aio;
+    // Raw = measured on-page points only (not_measured criteria excluded).
+    const raw = aio.criteria.reduce(
+      (sum, criterion) =>
+        sum + (criterion.status === "measured" ? criterion.points : 0),
+      0,
+    );
+    // The engine rescales exactly once: the engine score is the rescaled raw
+    // value, and the contract row carries the SAME value (no second rescale).
+    expect(aio.score).toBe(rescaleAioScore(raw));
+    const contract = toContractResult(result);
+    expect(contract.perPlatform["aio"].score).toBe(aio.score);
   });
 
   it("produces a Zod-valid contract for the empty shell with absent probes", async () => {

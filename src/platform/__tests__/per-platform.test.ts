@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   NOT_MEASURED_NOTE,
   applyBrandCriteria,
+  rescaleAioScore,
   scorePlatforms,
 } from "@/platform/per-platform";
 import type { PlatformScore, PlatformStructure } from "@/platform/types";
@@ -127,7 +128,7 @@ describe("applyBrandCriteria (RPL-11 split, design D8)", () => {
     });
 
     expect(result.aio).toBe(base.aio);
-    expect(result.aio.score).toBe(70);
+    expect(result.aio.score).toBe(100);
     const wikipedia = findCriterion(result.aio, "top10_rank");
     expect(wikipedia.status).toBe("not_measured");
   });
@@ -192,5 +193,31 @@ describe("applyBrandCriteria (RPL-11 split, design D8)", () => {
     expect(findCriterion(base.chatgpt, "wikipedia").note).toBe(
       before.wikipediaNote,
     );
+  });
+});
+
+describe("AIO measured-ceiling rescale (RPL-12, design D2)", () => {
+  it("rescales the fully-measured AIO score 70 → 100", () => {
+    expect(rescaleAioScore(70)).toBe(100);
+    expect(scorePlatforms(STRUCTURE).aio.score).toBe(100);
+  });
+
+  it("rescales partial AIO signals proportionally (35 → 50)", () => {
+    expect(rescaleAioScore(35)).toBe(50);
+  });
+
+  it("caps the rescale at 100 and floors at 0", () => {
+    expect(rescaleAioScore(100)).toBe(100);
+    expect(rescaleAioScore(0)).toBe(0);
+  });
+
+  it("never rescales the other four platform rubrics (distinct ceilings)", () => {
+    const platforms = scorePlatforms(STRUCTURE);
+    // chatgpt 10, perplexity 40, gemini 35, copilot 30 - the raw measured sums
+    // of their on-page criteria (RPL-12: only AIO has the ×100/70 ceiling).
+    expect(platforms.chatgpt.score).toBe(10);
+    expect(platforms.perplexity.score).toBe(40);
+    expect(platforms.gemini.score).toBe(35);
+    expect(platforms.copilot.score).toBe(30);
   });
 });

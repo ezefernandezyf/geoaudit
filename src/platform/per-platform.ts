@@ -166,6 +166,24 @@ function sumMeasured(criteria: PlatformCriterion[]): number {
   );
 }
 
+/**
+ * Measured-only ceiling of the AIO rubric (RPL-12): 70 measured on-page points
+ * + 30 not_measured external points. The other four rubrics have different
+ * measured ceilings (chatgpt 20, perplexity 40, gemini 40, copilot 30), so the
+ * ×100/70 rescale applies to AIO alone - never to the rest.
+ */
+export const AIO_MEASURED_MAX = 70;
+
+/**
+ * RPL-12: rescales a measured-only AIO score onto the 0-100 scale
+ * (×100/70), capped at 100. Applied exactly once, in `scorePlatforms`; every
+ * downstream consumer (platform dimension, composeTechnical, contract row)
+ * reads the rescaled value and never re-scales it.
+ */
+export function rescaleAioScore(score: number): number {
+  return Math.min(100, Math.round((score * 100) / AIO_MEASURED_MAX));
+}
+
 function buildScore(
   platform: PlatformId,
   criteria: PlatformCriterion[],
@@ -355,7 +373,17 @@ export function scorePlatforms(
     notMeasured("bing_places", "Bing Places configured", 5),
   ]);
 
-  return { aio, chatgpt, perplexity, gemini, copilot };
+  // RPL-12: the AIO rubric's 30 not_measured external points flatten every
+  // site; rescale the measured-only AIO score to the 0-100 scale exactly once,
+  // here at the source. The rescaled value flows to the contract, the report
+  // row, the `platform` dimension (14%) and `composeTechnical` (40% of
+  // technical) - no downstream consumer re-scales it.
+  const aioRescaled: PlatformScore = {
+    ...aio,
+    score: rescaleAioScore(aio.score),
+  };
+
+  return { aio: aioRescaled, chatgpt, perplexity, gemini, copilot };
 }
 
 /**

@@ -142,8 +142,9 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
 
     expect(result.summary.url).toBe("https://example.com/");
     // v3.1 composite over the fixture: citability 40, eeat 5, schema 53,
-    // technical 76 (crawler 80 x .6 + aio 70 x .4), platform 70, brand 100.
-    expect(result.summary.geoScore).toBe(50);
+    // technical 88 (crawler 80 x .6 + aio 100 x .4, AIO rescaled RPL-12),
+    // platform 100, brand 100.
+    expect(result.summary.geoScore).toBe(56);
     expect(result.summary.severityBand).toBe("Fair");
     expect(result.summary.durationMs).toBe(0);
     expect(result.scoringModelVersion).toBe("3.1.0");
@@ -162,7 +163,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
     expect(result.platform.perPlatform["aio"]).toBeDefined();
     expect(
       (result.platform.perPlatform["aio"] as { score?: number }).score,
-    ).toBe(70);
+    ).toBe(100);
 
     // The brand engine ran and its full-presence result is mapped (RAO-15).
     expect(result.brandAuthority?.status).toBe("success");

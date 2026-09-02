@@ -286,9 +286,10 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.meta.errors).toContain("brand: rate_limit");
 
     // Brand excluded from the composite (RGS-9): the 5 remaining dimensions
-    // rebalance over 88% (v3.1) and yield 44 / Poor on this fixture.
-    expect(result.summary.geoScore).toBe(44);
-    expect(result.summary.severityBand).toBe("Poor");
+    // rebalance over 88% (v3.1) and yield 50 / Fair on this fixture (AIO
+    // rescaled to 100, RPL-12).
+    expect(result.summary.geoScore).toBe(50);
+    expect(result.summary.severityBand).toBe("Fair");
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });
 });
