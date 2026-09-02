@@ -46,11 +46,11 @@ function extractHostname(url: string): string {
 
 /** Weight (GEO_SCORE_V2_WEIGHTS) for a domain-metrics engine key (design §Adapter). */
 const ENGINE_WEIGHT: Record<string, number> = {
-  crawler: GEO_SCORE_V2_WEIGHTS.weights.technical, // 20
-  citability: GEO_SCORE_V2_WEIGHTS.weights.citability, // 28
-  content: GEO_SCORE_V2_WEIGHTS.weights.eeat, // 24
-  schema: GEO_SCORE_V2_WEIGHTS.weights.schema, // 14
-  platform: GEO_SCORE_V2_WEIGHTS.weights.platform, // 14
+  crawler: GEO_SCORE_V2_WEIGHTS.weights.technical ?? 0, // 20
+  citability: GEO_SCORE_V2_WEIGHTS.weights.citability ?? 0, // 28
+  content: GEO_SCORE_V2_WEIGHTS.weights.eeat ?? 0, // 24
+  schema: GEO_SCORE_V2_WEIGHTS.weights.schema ?? 0, // 14
+  platform: GEO_SCORE_V2_WEIGHTS.weights.platform ?? 0, // 14
 };
 
 /** Concise, honest description per category (Spanish UI). */

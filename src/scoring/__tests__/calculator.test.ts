@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { GEO_SCORE_V2_WEIGHTS, SPRINT_1_WEIGHTS } from "@/scoring/weights";
-import { computeGeoScore, type EngineScores } from "@/scoring/calculator";
+import {
+  GEO_SCORE_V2_WEIGHTS,
+  GEO_SCORE_V3_WEIGHTS,
+  SPRINT_1_WEIGHTS,
+} from "@/scoring/weights";
+import {
+  computeGeoScore,
+  DIMENSIONS,
+  type EngineScores,
+} from "@/scoring/calculator";
 
 /**
- * T24 RED fixtures (RGS-1..RGS-10). Pure math over the renormalized weight
- * config - no fixtures, no network. Every assertion derives from the spec's
- * own numbers (RGS-1 uneven: 68.125 → 68; RGS-5 bands; RGS-9 rebalance).
+ * T24 RED fixtures (RGS-1..RGS-10) + T5 v3 cases (RGS-1/7/8/9/10/11). Pure
+ * math over the renormalized weight config - no fixtures, no network. Every
+ * assertion derives from the spec's own numbers (RGS-1 uneven v2: 68.125 → 68;
+ * v3: 68.4 → 68; RGS-11 brand=0: 64; RGS-5 bands; RGS-9 rebalance).
  */
 
 const FULL: EngineScores = {
@@ -242,9 +251,9 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
     });
   });
 
-  it("weights config defaults to GEO_SCORE_V2_WEIGHTS when omitted (RGS-1)", () => {
+  it("weights config defaults to GEO_SCORE_V3_WEIGHTS when omitted (RGS-1)", () => {
     const result = computeGeoScore(FULL);
-    expect(result.scoringModelVersion).toBe("2.0.0");
+    expect(result.scoringModelVersion).toBe("3.0.0");
     expect(result.geoScore).toBe(80);
   });
 
@@ -274,5 +283,148 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
       );
       expect(result.severityBand).toBe(expected);
     }
+  });
+
+  // --- T5: scoring v3 (RGS-1/7/8/9/10/11) ---
+
+  it("RGS-1: v3 all engines at 80 (incl. brand_authority) → composite 80", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 80 },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    expect(result.geoScore).toBe(80);
+  });
+
+  it("RGS-1: v3 uneven scores apply weights exactly (60×.224+90×.192+50×.16+100×.112+40×.112+70×.20 = 68.4 → 68)", () => {
+    const result = computeGeoScore(
+      {
+        citability: 60,
+        eeat: 90,
+        technical: 50,
+        schema: 100,
+        platform: 40,
+        brand_authority: 70,
+      },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    expect(result.geoScore).toBe(68);
+  });
+
+  it("RGS-1: v3 weights keep citability dominant and sum to 100", () => {
+    const { weights } = GEO_SCORE_V3_WEIGHTS;
+    const sum = Object.values(weights).reduce((acc, w) => acc + (w ?? 0), 0);
+    expect(sum).toBe(100);
+    const entries = Object.entries(weights);
+    const max = Math.max(...entries.map(([, w]) => w ?? 0));
+    const dominant = entries.find(([, w]) => (w ?? 0) === max)?.[0];
+    expect(dominant).toBe("citability");
+  });
+
+  it("RGS-7/RGS-8: v3 surfaces version 3.0.0, 6-dim weights and re-entry note", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 80 },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    expect(result.scoringModelVersion).toBe("3.0.0");
+    expect(result.weights.version).toBe("3.0.0");
+    expect(result.weights.weights).toEqual({
+      citability: 22.4,
+      eeat: 19.2,
+      technical: 16,
+      schema: 11.2,
+      platform: 11.2,
+      brand_authority: 20,
+    });
+    expect(result.weights.renormalizationNote).toMatch(/re-enters|re-entra/);
+    expect(result.weights.renormalizationNote).toContain("20%");
+  });
+
+  it("RGS-11: DIMENSIONS registers 6 entries including brand_authority", () => {
+    expect(DIMENSIONS).toHaveLength(6);
+    expect(DIMENSIONS).toContain("brand_authority");
+  });
+
+  it("RGS-11: brand_authority score is mapped into dimensions when provided", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 55 },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    expect(result.dimensions.brand_authority).toBe(55);
+  });
+
+  it("RGS-9: schema fails with v3 → rebalanced among remaining 5 (incl. brand) with reason", () => {
+    const result = computeGeoScore(
+      {
+        citability: 70,
+        eeat: 65,
+        technical: 55,
+        platform: 80,
+        brand_authority: 50,
+        failures: { schema: "unsupported_content_type" },
+      },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    // (70×22.4 + 65×19.2 + 55×16 + 80×11.2 + 50×20) / (22.4+19.2+16+11.2+20) = 5592/88.8 = 62.97 → 63
+    expect(result.geoScore).toBe(63);
+    expect(result.dimensions.schema).toBeNull();
+    expect(result.notes.join(" ")).toContain("schema");
+    expect(result.notes.join(" ")).toContain("unsupported_content_type");
+    expect(result.notes.join(" ")).toMatch(/rebalanc/);
+  });
+
+  it("RGS-11: brand fails (wikidata_rate_limit) → excluded, weights rebalanced among 5", () => {
+    const result = computeGeoScore(
+      {
+        citability: 70,
+        eeat: 65,
+        technical: 55,
+        platform: 80,
+        failures: { brand_authority: "wikidata_rate_limit" },
+      },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    // (70×22.4 + 65×19.2 + 55×16 + 80×11.2) / (22.4+19.2+16+11.2) = 4592/68.8 = 66.74 → 67
+    expect(result.dimensions.brand_authority).toBeNull();
+    expect(result.geoScore).toBe(67);
+    expect(result.notes.join(" ")).toContain("brand_authority");
+    expect(result.notes.join(" ")).toContain("wikidata_rate_limit");
+    expect(result.notes.join(" ")).toMatch(/rebalanc/);
+  });
+
+  it("RGS-11: brand measured 0 penalizes → all-80 + brand 0 = 64 with note", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 0 },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    // 80×(0.224+0.192+0.16+0.112+0.112) + 0×0.20 = 80×0.8 = 64
+    expect(result.geoScore).toBe(64);
+    expect(result.dimensions.brand_authority).toBe(0);
+    expect(result.notes.join(" ")).toContain("brand 0: no external presence");
+  });
+
+  it("RGS-10: empty page with brand=0 documents both zero notes", () => {
+    const result = computeGeoScore(
+      {
+        crawler: 60,
+        citability: 0,
+        eeat: 10,
+        schema: 0,
+        platform: 30,
+        brand_authority: 0,
+      },
+      GEO_SCORE_V3_WEIGHTS,
+    );
+    // technical = 60×0.6 + 30×0.4 = 48 → (48×16 + 10×19.2 + 30×11.2)/100 = 12.96 → 13
+    expect(Number.isNaN(result.geoScore)).toBe(false);
+    expect(result.geoScore).toBe(13);
+    expect(result.notes.join(" ")).toContain("no extractable content blocks");
+    expect(result.notes.join(" ")).toContain("brand 0: no external presence");
+  });
+
+  it("v2 5-dim regression: brand_authority absent with V2 config stays excluded (RGS-9)", () => {
+    const result = computeGeoScore(FULL, GEO_SCORE_V2_WEIGHTS);
+    expect(result.scoringModelVersion).toBe("2.0.0");
+    expect(result.dimensions.brand_authority).toBeNull();
+    expect(result.geoScore).toBe(80);
   });
 });
