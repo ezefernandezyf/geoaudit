@@ -58,7 +58,7 @@ describe("SharePage (SHR-2)", () => {
     // Report comes from the persisted result through the adapter: hero score
     // + benchmark + hostname domain.
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getByText("80 - 100")).toBeInTheDocument();
     expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
     // "Regular" appears in the hero + the bottom-passage finding badges.
     expect(screen.getAllByText("Regular").length).toBeGreaterThanOrEqual(1);

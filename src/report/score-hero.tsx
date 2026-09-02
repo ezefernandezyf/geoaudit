@@ -8,7 +8,7 @@ import { SeverityBadge } from "@/ui/severity-badge";
  * Gemini ScoreHero composition VERBATIM (hex directos, radios, sombras) with
  * ONE data-binding change: it consumes the `GeminiView` produced by
  * `toGeminiViewModel` (never `AuditResult`), and the right-side benchmark uses
- * the REAL severity thresholds (90/75/60/40, `severityForScore`) instead of
+ * the REAL severity thresholds (80/65/50/30, `severityForScore`) instead of
  * Gemini's 80/65/45/25 (design D1).
  *
  * The benchmark is a "benchmark bar": the five real bands rendered as a
@@ -31,39 +31,39 @@ export type ScoreHeroProps = {
   view: ScoreHeroView;
 };
 
-/** Real threshold rows (severityForScore: 90/75/60/40). Text hexes are the
- * darkest-nearest that pass WCAG 2.2 AA (4.5:1) on white (A11Y-3/C14):
- * emerald-700 #047857, amber-700 #b45309, red-600 #dc2626. */
+/** Real threshold rows (severityForScore: 80/65/50/30, single source D8).
+ * Text hexes are the darkest-nearest that pass WCAG 2.2 AA (4.5:1) on white
+ * (A11Y-3/C14): emerald-700 #047857, amber-700 #b45309, red-600 #dc2626. */
 const BENCHMARK_ROWS = [
-  { range: "90 - 100", label: "Excelente (Top 10%)", color: "text-[#047857]" },
-  { range: "75 - 89", label: "Bueno (Promedio B2B)", color: "text-[#047857]" },
+  { range: "80 - 100", label: "Excelente (Top 10%)", color: "text-[#047857]" },
+  { range: "65 - 79", label: "Bueno (Promedio B2B)", color: "text-[#047857]" },
   {
-    range: "60 - 74",
+    range: "50 - 64",
     label: "Regular (Riesgo omisión)",
     color: "text-[#b45309]",
   },
   {
-    range: "40 - 59",
+    range: "30 - 49",
     label: "Deficiente (Riesgo crítico)",
     color: "text-[#dc2626]",
   },
-  { range: "< 40", label: "Crítico", color: "text-[#dc2626]" },
+  { range: "< 30", label: "Crítico", color: "text-[#dc2626]" },
 ] as const;
 
 /** Benchmark bar segments (left→right), real band widths on the 0-100 scale. */
 const BENCHMARK_SEGMENTS = [
-  { width: "10%", className: "bg-[#10b981]" }, // 90-100 excellent
-  { width: "15%", className: "bg-[#10b981]/80" }, // 75-89 good
-  { width: "15%", className: "bg-[#f59e0b]" }, // 60-74 fair
-  { width: "20%", className: "bg-[#f59e0b]/90" }, // 40-59 poor
-  { width: "40%", className: "bg-[#ef4444]" }, // 0-39 critical
+  { width: "20%", className: "bg-[#10b981]" }, // 80-100 excellent
+  { width: "15%", className: "bg-[#10b981]/80" }, // 65-79 good
+  { width: "15%", className: "bg-[#f59e0b]" }, // 50-64 fair
+  { width: "20%", className: "bg-[#f59e0b]/90" }, // 30-49 poor
+  { width: "30%", className: "bg-[#ef4444]" }, // 0-29 critical
 ] as const;
 
 /**
  * ScoreHero (ARU-11): the complete Gemini hero - big serif GEO Score in a
  * slate panel, the band chip, the domain + duration + date row, the serif
  * title and summary - plus the benchmark bar that positions the score against
- * the REAL thresholds (68 → Fair 60-74, NOT Gemini's bands). Pure SSR.
+ * the REAL thresholds (68 → Good 65-79, NOT Gemini's bands). Pure SSR.
  */
 export function ScoreHero({ view }: ScoreHeroProps) {
   const {

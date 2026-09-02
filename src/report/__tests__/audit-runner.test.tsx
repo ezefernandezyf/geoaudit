@@ -100,7 +100,7 @@ describe("AuditRunner report render (U4.T1)", () => {
 
     // ScoreHero (view model): score + benchmark + hostname domain + band chip.
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getByText("80 - 100")).toBeInTheDocument();
     expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Regular").length).toBeGreaterThanOrEqual(1);
 

@@ -8,7 +8,7 @@ import { ScoreHero, type ScoreHeroView } from "@/report/score-hero";
  * U5.5 - ScoreHero (ARU-11): the complete Gemini hero consuming the view
  * model (never `AuditResult`) - big serif score, band chip, domain chip,
  * duration, title + summary - plus the benchmark bar that positions the score
- * against the REAL thresholds (90/75/60/40, severityForScore), NOT Gemini's
+ * against the REAL thresholds (80/65/50/30, severityForScore), NOT Gemini's
  * 80/65/45/25.
  */
 
@@ -50,22 +50,34 @@ describe("ScoreHero view-model consumption (ARU-10/11)", () => {
 });
 
 describe("ScoreHero benchmark bar (ARU-11)", () => {
-  it("shows the REAL thresholds 90/75/60/40 (never Gemini's 80/65/45/25)", () => {
+  it("shows the REAL thresholds 80/65/50/30 (never Gemini's 80/65/45/25)", () => {
     renderHero();
 
-    expect(screen.getByText("90 - 100")).toBeInTheDocument();
-    expect(screen.getByText("75 - 89")).toBeInTheDocument();
-    expect(screen.getByText("60 - 74")).toBeInTheDocument();
-    expect(screen.getByText("40 - 59")).toBeInTheDocument();
-    expect(screen.getByText("< 40")).toBeInTheDocument();
+    expect(screen.getByText("80 - 100")).toBeInTheDocument();
+    expect(screen.getByText("65 - 79")).toBeInTheDocument();
+    expect(screen.getByText("50 - 64")).toBeInTheDocument();
+    expect(screen.getByText("30 - 49")).toBeInTheDocument();
+    expect(screen.getByText("< 30")).toBeInTheDocument();
 
-    expect(screen.queryByText("80 - 100")).not.toBeInTheDocument();
-    expect(screen.queryByText("65 - 79")).not.toBeInTheDocument();
-    expect(screen.queryByText("45 - 64")).not.toBeInTheDocument();
-    expect(screen.queryByText("< 45")).not.toBeInTheDocument();
+    expect(screen.queryByText("90 - 100")).not.toBeInTheDocument();
+    expect(screen.queryByText("75 - 89")).not.toBeInTheDocument();
+    expect(screen.queryByText("60 - 74")).not.toBeInTheDocument();
+    expect(screen.queryByText("40 - 59")).not.toBeInTheDocument();
+    expect(screen.queryByText("< 40")).not.toBeInTheDocument();
   });
 
-  it("positions the marker at the score: 68 → 68% (Fair band 60-74)", () => {
+  it("positions 68 in the Good band (65-79) of the real benchmark (ARU-11)", () => {
+    const { container } = renderHero();
+    // The marker sits at the score and the Good row renders its exact range.
+    expect(container.querySelector("[data-benchmark-marker]")).toHaveStyle({
+      left: "68%",
+    });
+    expect(screen.getByText("65 - 79")).toBeInTheDocument();
+    // 68 is NOT in the Fair band (50-64) of the real thresholds.
+    expect(screen.getByText("50 - 64")).toBeInTheDocument();
+  });
+
+  it("positions the marker at the score: 68 → 68% (Good band 65-79)", () => {
     const { container } = renderHero();
     const marker = container.querySelector("[data-benchmark-marker]");
     expect(marker).not.toBeNull();

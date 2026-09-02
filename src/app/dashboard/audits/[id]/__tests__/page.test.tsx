@@ -103,7 +103,7 @@ describe("AuditDetailPage (ADP-3 + ADP-6)", () => {
 
     // Gemini hero: score + benchmark (real thresholds) + hostname domain.
     expect(screen.getByText("68")).toBeInTheDocument();
-    expect(screen.getByText("90 - 100")).toBeInTheDocument();
+    expect(screen.getByText("80 - 100")).toBeInTheDocument();
     expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
 
     // Scorecard (6 categories) + matrix (6 platforms, Claude "No medido").

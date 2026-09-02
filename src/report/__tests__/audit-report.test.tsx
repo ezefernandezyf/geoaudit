@@ -20,8 +20,8 @@ describe("AuditReport (ARU-10)", () => {
     expect(screen.getAllByText("Regular").length).toBeGreaterThanOrEqual(1);
 
     // Benchmark with the REAL thresholds (ARU-11).
-    expect(screen.getByText("90 - 100")).toBeInTheDocument();
-    expect(screen.getByText("60 - 74")).toBeInTheDocument();
+    expect(screen.getByText("80 - 100")).toBeInTheDocument();
+    expect(screen.getByText("50 - 64")).toBeInTheDocument();
 
     // DomainScorecard rows (view-model categoryScores). The names also appear
     // as findings category chips → assert presence, not uniqueness.
