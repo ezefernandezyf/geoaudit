@@ -20,6 +20,27 @@ describe("toGeminiViewModel", () => {
     expect(view.band).toBe("good");
   });
 
+  it("maps 74 to good with the real v3.1 thresholds (APT-2)", () => {
+    // Real 80/65/50/30: 74 → Good (65-79). Gemini's 80/65/45/25 would also
+    // give good - the discriminator is 47 (next test).
+    const view = toGeminiViewModel({
+      ...auditResultFixture,
+      summary: { ...auditResultFixture.summary, geoScore: 74 },
+    });
+    expect(view.totalScore).toBe(74);
+    expect(view.band).toBe("good");
+  });
+
+  it("maps 47 to poor, discriminating from Gemini's thresholds (APT-2)", () => {
+    // Real 30-49 band → "poor"; Gemini's 80/65/45/25 would map 47 to "fair".
+    const view = toGeminiViewModel({
+      ...auditResultFixture,
+      summary: { ...auditResultFixture.summary, geoScore: 47 },
+    });
+    expect(view.totalScore).toBe(47);
+    expect(view.band).toBe("poor");
+  });
+
   it("derives domain and falls title back to the domain (APT-3)", () => {
     const view = toGeminiViewModel(auditResultFixture);
     expect(view.domain).toBe("example.com");
@@ -57,26 +78,26 @@ describe("toGeminiViewModel", () => {
     ]);
 
     const byId = Object.fromEntries(view.categoryScores.map((c) => [c.id, c]));
-    // crawler.compositeScore 71 → good (v3.1 65-79); v3 technical weight 16%
+    // crawler.compositeScore 71 → good (v3.1 65-79); v3.1 technical weight 15%
     expect(byId.crawler.score).toBe(71);
-    expect(byId.crawler.weight).toBe("16%");
+    expect(byId.crawler.weight).toBe("15%");
     expect(byId.crawler.status).toBe("good");
-    // citability.pageScore 62 → fair; v3 weight 22.4%
+    // citability.pageScore 62 → fair; v3.1 weight 24%
     expect(byId.citability.score).toBe(62);
-    expect(byId.citability.weight).toBe("22.4%");
-    // content.composite 65 → fair; v3 weight 19.2%
+    expect(byId.citability.weight).toBe("24%");
+    // content.composite 65 → good (v3.1 65-79); v3.1 weight 23%
     expect(byId.content.score).toBe(65);
-    expect(byId.content.weight).toBe("19.2%");
-    // schema: engine score 61 (fixture) → fair; v3 weight 11.2%
+    expect(byId.content.weight).toBe("23%");
+    // schema: engine score 61 (fixture) → fair; v3.1 weight 12%
     expect(byId.schema.score).toBe(61);
-    expect(byId.schema.weight).toBe("11.2%");
-    // platform: aio 70 → fair (60-74 real band); v3 weight 11.2%
+    expect(byId.schema.weight).toBe("12%");
+    // platform: aio 70 → good (v3.1 65-79); v3.1 weight 14%
     expect(byId.platform.score).toBe(70);
-    expect(byId.platform.weight).toBe("11.2%");
-    // Legacy fixture has no brandAuthority → honest "No medido" (null), 20%.
+    expect(byId.platform.weight).toBe("14%");
+    // Legacy fixture has no brandAuthority → honest "No medido" (null), 12%.
     expect(byId.brand.score).toBeNull();
     expect(byId.brand.status).toBeNull();
-    expect(byId.brand.weight).toBe("20%");
+    expect(byId.brand.weight).toBe("12%");
   });
 
   it("shows the six v3 weights summing to 100% (APT-6)", () => {
@@ -121,7 +142,7 @@ describe("brand row honesty (APT-11)", () => {
     const brand = view.categoryScores.find((c) => c.id === "brand")!;
     expect(brand.score).toBe(0);
     expect(brand.status).toBe("critical");
-    expect(brand.weight).toBe("20%");
+    expect(brand.weight).toBe("12%");
     expect(brand.description).toBe("Sin presencia externa.");
   });
 
@@ -130,7 +151,7 @@ describe("brand row honesty (APT-11)", () => {
     const brand = view.categoryScores.find((c) => c.id === "brand")!;
     expect(brand.score).toBeNull();
     expect(brand.status).toBeNull();
-    expect(brand.weight).toBe("20%");
+    expect(brand.weight).toBe("12%");
     expect(brand.description).toBe(
       "Presencia externa de la marca en fuentes que citan las IA.",
     );
@@ -141,7 +162,7 @@ describe("brand row honesty (APT-11)", () => {
     const brand = view.categoryScores.find((c) => c.id === "brand")!;
     expect(brand.score).toBeNull();
     expect(brand.status).toBeNull();
-    expect(brand.weight).toBe("20%");
+    expect(brand.weight).toBe("12%");
   });
 
   it("maps a real v3 brand score with its honest band (80/65/50/30)", () => {
@@ -149,6 +170,6 @@ describe("brand row honesty (APT-11)", () => {
     const brand = view.categoryScores.find((c) => c.id === "brand")!;
     expect(brand.score).toBe(84);
     expect(brand.status).toBe("excellent"); // 84 → Excellent (v3.1 80+)
-    expect(brand.weight).toBe("20%");
+    expect(brand.weight).toBe("12%");
   });
 });

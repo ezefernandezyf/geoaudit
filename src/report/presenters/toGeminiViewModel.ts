@@ -1,7 +1,7 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { DOMAIN_ROWS, rowScore } from "@/report/domain-metrics";
 import { severityForScore } from "@/scoring/calculator";
-import { GEO_SCORE_V3_WEIGHTS } from "@/scoring/weights";
+import { GEO_SCORE_V3_1_WEIGHTS } from "@/scoring/weights";
 import { deriveFindings } from "./findings";
 import { buildPlatformRows } from "./platforms";
 import type { GeminiBand, GeminiView } from "./types";
@@ -18,7 +18,7 @@ import type { GeminiBand, GeminiView } from "./types";
  * Pure: no I/O, no state, deterministic - fully unit-testable with fixtures.
  *
  * Notes on the binding decisions:
- * - Score + band use the REAL `severityForScore` thresholds (90/75/60/40),
+ * - Score + band use the REAL `severityForScore` thresholds (80/65/50/30),
  *   never Gemini's 80/65/45/25. The Capitalized contract band is normalized to
  *   lowercase here (APT-2).
  * - The `AuditResult` contract does not carry `shareToken` or `createdAt`
@@ -44,14 +44,14 @@ function extractHostname(url: string): string {
   }
 }
 
-/** Weight (GEO_SCORE_V3_WEIGHTS, design D6/APT-6) for a domain-metrics engine key. */
+/** Weight (GEO_SCORE_V3_1_WEIGHTS, design D1/APT-6) for a domain-metrics engine key. */
 const ENGINE_WEIGHT: Record<string, number> = {
-  crawler: GEO_SCORE_V3_WEIGHTS.weights.technical ?? 0, // 16
-  citability: GEO_SCORE_V3_WEIGHTS.weights.citability ?? 0, // 22.4
-  content: GEO_SCORE_V3_WEIGHTS.weights.eeat ?? 0, // 19.2
-  schema: GEO_SCORE_V3_WEIGHTS.weights.schema ?? 0, // 11.2
-  platform: GEO_SCORE_V3_WEIGHTS.weights.platform ?? 0, // 11.2
-  brand: GEO_SCORE_V3_WEIGHTS.weights.brand_authority ?? 0, // 20
+  crawler: GEO_SCORE_V3_1_WEIGHTS.weights.technical ?? 0, // 15
+  citability: GEO_SCORE_V3_1_WEIGHTS.weights.citability ?? 0, // 24
+  content: GEO_SCORE_V3_1_WEIGHTS.weights.eeat ?? 0, // 23
+  schema: GEO_SCORE_V3_1_WEIGHTS.weights.schema ?? 0, // 12
+  platform: GEO_SCORE_V3_1_WEIGHTS.weights.platform ?? 0, // 14
+  brand: GEO_SCORE_V3_1_WEIGHTS.weights.brand_authority ?? 0, // 12
 };
 
 /** Concise, honest description per category (Spanish UI). */
@@ -104,7 +104,7 @@ export function toGeminiViewModel(
       maxScore: 100 as const,
       weight: `${weight}%`,
       // APT-11: a "No medido" row (null score) carries no band; a measured
-      // score derives its real band (90/75/60/40).
+      // score derives its real band (80/65/50/30).
       status: score === null ? null : bandFor(score),
       keyMetric: null,
       description:
