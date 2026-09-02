@@ -1,0 +1,28 @@
+{
+  "entities": {
+    "Q111": {
+      "id": "Q111",
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q5" } }
+            }
+          }
+        ]
+      }
+    },
+    "Q222": {
+      "id": "Q222",
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q43229" } }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

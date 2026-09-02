@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "ratelimited",
+    "info": "Too many requests. Please wait a while and try again."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "query": {
+    "search": [
+      { "title": "Relevy" },
+      { "title": "Relevy (disambiguation)" }
+    ]
+  }
+}

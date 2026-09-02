@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "Q111": {
+      "id": "Q111",
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q5" } }
+            }
+          }
+        ]
+      }
+    },
+    "Q222": {
+      "id": "Q222",
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q43229" } }
+            }
+          }
+        ]
+      }
+    },
+    "Q333": {
+      "id": "Q333",
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q43229" } }
+            }
+          }
+        ],
+        "P856": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": "https://relevy.app" }
+            }
+          }
+        ],
+        "P17": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q212" } }
+            }
+          }
+        ],
+        "P571": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "time": "+2025-01-01T00:00:00Z" } }
+            }
+          }
+        ],
+        "P159": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q148" } }
+            }
+          }
+        ],
+        "P452": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "id": "Q112" } }
+            }
+          }
+        ],
+        "P1128": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "amount": "+40" } }
+            }
+          }
+        ],
+        "P213": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": "0000-0000-0000-0000" }
+            }
+          }
+        ],
+        "P214": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": "0000-0000-0000" }
+            }
+          }
+        ],
+        "P646": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": "/m/0000" }
+            }
+          }
+        ],
+        "P1448": [
+          {
+            "mainsnak": {
+              "datavalue": { "value": { "text": "Relevy" } }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
