@@ -1,6 +1,6 @@
 # Audit Presenters Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-12-dogfood-geo-score` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-12-dogfood-geo-score` + `sprint-13-brand-authority` · **Type**: New capability (ADDED) + Delta (MODIFIED)
 
 ## Purpose
 
@@ -15,11 +15,12 @@ The pure adapter `toGeminiViewModel(result)` in `src/report/presenters/` that ma
 | APT-3 | Domain + title fallback | New | MUST | Derive `domain` from `summary.url`; `title` falls back to the domain when absent |
 | APT-4 | Summary template | New | MUST | Build `summary` from real metrics only; never fabricate numbers |
 | APT-5 | Duration seconds | New | MUST | Map `summary.durationMs`→`durationSeconds` |
-| APT-6 | Category scores (5) | New | MUST | Derive `categoryScores[5]` from the real engines — Datos estructurados uses `schema.score` (shared derivation, never a proxy) |
+| APT-6 | Category scores (6) | New | MUST | Derive `categoryScores[6]` from the real engines — Datos estructurados uses `schema.score`, Autoridad de marca uses the brand engine score via the shared `rowScore` `brand` case (shared derivation, never a proxy) |
 | APT-7 | Findings derivation | New | MUST | Derive `findings[]` from real citability + schema + crawler data |
 | APT-8 | Platforms (6) | New | MUST | Derive `platforms[6]` from `perPlatform` + `perBot`; Claude = "No medido" |
 | APT-9 | Share token | New | MUST | Pass through `shareToken` when present |
 | APT-10 | Data honesty | New | MUST | Omit / "No medido" for any metric without a real source — never invent |
+| APT-11 | Brand row honesty | ADDED | MUST | Distinguish a measured 0 ("sin presencia externa") from an absent measurement (legacy → "No medido"); never fall back to `rowScore`'s default 0 |
 
 ### Requirement: View Model Shape (APT-1)
 
@@ -79,15 +80,15 @@ When mapping duration, then the adapter MUST convert `summary.durationMs` (ms) t
 
 ### Requirement: Category Scores (APT-6)
 
-When deriving category scores, then the adapter MUST produce exactly five entries (Acceso de bots, Citabilidad, E-E-A-T, Datos estructurados, Plataforma) using the real engine outputs (`crawlers.compositeScore`, `citability.pageScore`, `content.composite`, `schema.score`, `derivePlatformScore(perPlatform)`), the same derivation as `rowScore`.
-(Previously: the Datos estructurados row used `deriveSchemaScore(schema)` reconstructing `100 - issues*10`; the fixture had 1 issue and showed 90 instead of the engine value.)
+When deriving category scores, then the adapter MUST produce exactly six entries (Acceso de bots, Citabilidad, E-E-A-T, Datos estructurados, Plataforma, Autoridad de marca) using the real engine outputs (`crawlers.compositeScore`, `citability.pageScore`, `content.composite`, `schema.score`, `derivePlatformScore(perPlatform)`, brand engine score via the shared `rowScore` `brand` case), the same derivation as `rowScore`.
+(Previously: five entries; no brand row.)
 
-#### Scenario: Five real category scores
+#### Scenario: Six real category scores
 
-- GIVEN an `AuditResult` with all five engines present
+- GIVEN an `AuditResult` with all six engines present
 - WHEN the adapter maps
-- THEN `categoryScores` has length 5 and each score equals the corresponding engine value
-- AND the Datos estructurados entry equals `schema.score` of the contract (e.g. fixture with `issues: ["Organization missing sameAs"]` shows the fixture score, not 90)
+- THEN `categoryScores` has length 6 and each score equals the corresponding engine value
+- AND the Autoridad de marca entry equals the `brandAuthority` score of the contract
 
 #### Scenario: Derivation is shared across web, PDF, and findings
 
@@ -95,6 +96,24 @@ When deriving category scores, then the adapter MUST produce exactly five entrie
 - WHEN `deriveSchemaScore(schema)` runs (single source in `domain-metrics`)
 - THEN the row, the PDF template, and the findings severity all use 61, never the `100 - 9*10 = 10` proxy
 - AND findings tests no longer assert the derived proxy
+
+### Requirement: Brand Row Honesty (APT-11)
+
+When deriving the brand row, the adapter MUST distinguish a measured zero from an absent measurement: `brandAuthority` present with score 0 (measured "no external presence") MUST render 0 with the description "sin presencia externa"; `brandAuthority` absent (legacy 2.0.0 rows) MUST render "No medido". The derivation MUST NOT fall back to `rowScore`'s default 0, which would fabricate a measured value.
+
+#### Scenario: Measured zero renders 0
+
+- GIVEN a v3 result with `brandAuthority.score = 0`
+- WHEN the adapter maps the brand row
+- THEN the row shows 0
+- AND its description reads "sin presencia externa"
+
+#### Scenario: Legacy row without brandAuthority renders No medido
+
+- GIVEN a 2.0.0 result without `brandAuthority`
+- WHEN the adapter maps the brand row
+- THEN the row renders "No medido" (never 0)
+- AND the row still shows its 20% weight
 
 ### Requirement: Findings Derivation (APT-7)
 
@@ -145,8 +164,9 @@ When any metric has no real source (`citationRate`, `presenceInPrompts`, `impact
 | APT-3 | Title falls back to domain | Covered |
 | APT-4 | Summary uses real metrics | Covered |
 | APT-5 | Milliseconds to seconds | Covered |
-| APT-6 | Five real category scores, Derivation is shared across web/PDF/findings | Covered |
+| APT-6 | Six real category scores, Derivation is shared across web/PDF/findings | Covered |
 | APT-7 | Findings from real sources only | Covered |
 | APT-8 | Claude not measured | Covered |
 | APT-9 | Token passthrough | Covered |
 | APT-10 | Missing metric is not fabricated | Covered |
+| APT-11 | Measured zero renders 0, Legacy row without brandAuthority renders No medido | Covered |
