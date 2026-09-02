@@ -146,7 +146,9 @@ describe("toContractResult (PlatformResult contract)", () => {
     // value, and the contract row carries the SAME value (no second rescale).
     expect(aio.score).toBe(rescaleAioScore(raw));
     const contract = toContractResult(result);
-    expect(contract.perPlatform["aio"].score).toBe(aio.score);
+    expect((contract.perPlatform["aio"] as { score?: number }).score).toBe(
+      aio.score,
+    );
   });
 
   it("produces a Zod-valid contract for the empty shell with absent probes", async () => {
