@@ -106,10 +106,11 @@ describe("AuditDetailPage (ADP-3 + ADP-6)", () => {
     expect(screen.getByText("90 - 100")).toBeInTheDocument();
     expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
 
-    // Scorecard (5 categories) + matrix (6 platforms, Claude "No medido").
+    // Scorecard (6 categories) + matrix (6 platforms, Claude "No medido").
+    // "No medido" also appears on the legacy brand row of the scorecard.
     expect(screen.getByText("Scorecard por Categoría")).toBeInTheDocument();
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
-    expect(screen.getByText("No medido")).toBeInTheDocument();
+    expect(screen.getAllByText("No medido").length).toBeGreaterThanOrEqual(1);
 
     // Findings with the real generated JSON-LD code (ADP-6).
     expect(screen.getByText(/"@type": "Organization"/)).toBeInTheDocument();

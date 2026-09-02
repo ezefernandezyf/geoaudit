@@ -114,11 +114,12 @@ describe("AuditRunner report render (U4.T1)", () => {
       screen.getAllByText("Datos estructurados").length,
     ).toBeGreaterThanOrEqual(1);
 
-    // Platform matrix is part of the shared report (ARU-12).
+    // Platform matrix is part of the shared report (ARU-12). "No medido"
+    // appears twice on a legacy row: Claude (matrix) + brand row (scorecard).
     expect(
       screen.getByRole("region", { name: "Matriz de plataformas de IA" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("No medido")).toBeInTheDocument();
+    expect(screen.getAllByText("No medido").length).toBeGreaterThanOrEqual(1);
 
     // TopFindings: blocked bot + schema issue (derived from real data).
     expect(screen.getByText("Bots de IA bloqueados")).toBeInTheDocument();
