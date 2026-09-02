@@ -64,12 +64,14 @@ describe("scorePlatform (RPL-10, RPL-6, RPL-7)", () => {
     const perplexity = result.perPlatform.platforms.perplexity;
     const reddit = perplexity.criteria.find((c) => c.key === "reddit");
     expect(reddit?.status).toBe("not_measured");
-    expect(reddit?.note).toBe("Requires brand-mention scanner (future sprint)");
+    expect(reddit?.note).toBe(
+      "Requires brand-mention scanner (TODO: YouTube/Reddit/Bing API keys, real backlinks)",
+    );
     const gemini = result.perPlatform.platforms.gemini;
     const youtube = gemini.criteria.find((c) => c.key === "youtube");
     expect(youtube?.status).toBe("not_measured");
     expect(youtube?.note).toBe(
-      "Requires brand-mention scanner (future sprint)",
+      "Requires brand-mention scanner (TODO: YouTube/Reddit/Bing API keys, real backlinks)",
     );
   });
 

@@ -4,6 +4,8 @@ import { PROBE_TIMEOUT_MS } from "@/lib/fetch";
 import { analyzeHeaders } from "./headers";
 import { analyzeMeta, analyzeOpenGraph, analyzeTwitter } from "./meta";
 import { extractStructure, scorePlatforms } from "./per-platform";
+export { applyBrandCriteria, NOT_MEASURED_NOTE } from "./per-platform";
+export type { BrandCriteriaSignals } from "./per-platform";
 import { probeSite } from "./probes";
 import type { ProbeFn } from "./probes";
 import { analyzeSsr } from "./ssr";

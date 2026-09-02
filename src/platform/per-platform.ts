@@ -21,7 +21,7 @@ import type {
  */
 
 export const NOT_MEASURED_NOTE =
-  "Requires brand-mention scanner (future sprint)";
+  "Requires brand-mention scanner (TODO: YouTube/Reddit/Bing API keys, real backlinks)";
 
 const FAQ_SELECTOR = '[id*="faq"], [class*="faq"], [itemtype*="FAQPage"]';
 const BYLINE_SELECTOR =
@@ -356,4 +356,85 @@ export function scorePlatforms(
   ]);
 
   return { aio, chatgpt, perplexity, gemini, copilot };
+}
+
+/**
+ * Brand signals consumed by the four Wikipedia/Wikidata criteria (RPL-11,
+ * design D8). Engine-decoupled structural shape: the orchestrator bridges the
+ * brand engine result into this (entityPresence/entityConsistency from
+ * `signals`, wikidataId from `entity`) so the platform engine never imports
+ * another engine's types.
+ */
+export interface BrandCriteriaSignals {
+  /** A Wikipedia article was resolved for the audited brand (BRA-1). */
+  entityPresence: boolean;
+  /** Wikipedia title AND Wikidata label both match the brand (BRA-3). */
+  entityConsistency: boolean;
+  /** Accepted Wikidata Q-number, or null when no entity passed (BRA-2). */
+  wikidataId: string | null;
+}
+
+/** A brand-sourced update for one external criterion (RPL-11). */
+interface BrandCriterionUpdate {
+  key: string;
+  points: number;
+}
+
+/**
+ * Re-labels one platform's external criteria as "measured" with brand-sourced
+ * points and recomputes the platform score (pure - never mutates the input).
+ */
+function withBrandCriteria(
+  platform: PlatformScore,
+  updates: BrandCriterionUpdate[],
+): PlatformScore {
+  const criteria = platform.criteria.map((criterion) => {
+    const update = updates.find((candidate) => candidate.key === criterion.key);
+    if (!update) return criterion;
+    return {
+      ...criterion,
+      status: "measured" as const,
+      points: update.points,
+      note: null,
+    };
+  });
+  return {
+    platform: platform.platform,
+    score: sumMeasured(criteria),
+    criteria,
+  };
+}
+
+/**
+ * Wires the brand engine signals into the per-platform rubrics (RPL-11 split,
+ * design D8): `chatgpt.wikipedia` (15), `chatgpt.wikidata` (10),
+ * `chatgpt.entity_consistency` (5) and `perplexity.wikipedia_wikidata` (5)
+ * flip to "measured" with points sourced from the brand signals - 0 when the
+ * brand has no external presence. The remaining external criteria (YouTube,
+ * Reddit, Bing, backlinks, LinkedIn, GitHub, ...) stay "not_measured" with
+ * the pending-TODO note. Brand points land ONLY on chatgpt/perplexity -
+ * never on AIO (which feeds the platform dimension) so the 20% brand weight
+ * is not double-counted. Pure function: the input record is never mutated;
+ * the orchestrator calls it on the rich `PlatformEngineResult` before
+ * `platformToContract`.
+ */
+export function applyBrandCriteria(
+  platforms: Record<PlatformId, PlatformScore>,
+  brandSignals: BrandCriteriaSignals,
+): Record<PlatformId, PlatformScore> {
+  const chatgpt = withBrandCriteria(platforms.chatgpt, [
+    { key: "wikipedia", points: brandSignals.entityPresence ? 15 : 0 },
+    { key: "wikidata", points: brandSignals.wikidataId !== null ? 10 : 0 },
+    {
+      key: "entity_consistency",
+      points: brandSignals.entityConsistency ? 5 : 0,
+    },
+  ]);
+  const perplexity = withBrandCriteria(platforms.perplexity, [
+    {
+      key: "wikipedia_wikidata",
+      points: brandSignals.entityPresence ? 5 : 0,
+    },
+  ]);
+  return { ...platforms, chatgpt, perplexity };
 }
