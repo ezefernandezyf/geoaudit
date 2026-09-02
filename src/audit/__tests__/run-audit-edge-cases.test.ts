@@ -277,7 +277,7 @@ describe("runAudit edge cases (T25 part B)", () => {
     // The 5 other engines produced valid results.
     expect(result.crawlers.compositeScore).toBe(80);
     expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
-    expect(result.citability.pageScore).toBe(40);
+    expect(result.citability.pageScore).toBe(43.5);
     expect(result.content.composite).toBe(5);
     expect(result.schema.detected.length).toBeGreaterThan(0);
     expect(result.platform.perPlatform["aio"]).toBeDefined();
@@ -286,9 +286,9 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.meta.errors).toContain("brand: rate_limit");
 
     // Brand excluded from the composite (RGS-9): the 5 remaining dimensions
-    // rebalance over 88% (v3.1) and yield 50 / Fair on this fixture (AIO
-    // rescaled to 100, RPL-12).
-    expect(result.summary.geoScore).toBe(50);
+    // rebalance over 88% (v3.1) and yield 51 / Fair on this fixture (AIO
+    // rescaled to 100 RPL-12 + citability uniqueness floor).
+    expect(result.summary.geoScore).toBe(51);
     expect(result.summary.severityBand).toBe("Fair");
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });

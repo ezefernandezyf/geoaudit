@@ -24,6 +24,7 @@ import {
   STRUCTURE_PARAGRAPH_BONUS,
   STRUCTURE_PARTIAL_PARAGRAPH_BONUS,
   STRUCTURE_QUESTION_BONUS,
+  UNIQUENESS_FLOOR,
   UNIQUENESS_PER_HIT,
   UNIQUENESS_PHRASES,
   WORD_BAND_MAX,
@@ -168,7 +169,9 @@ export function scoreStats(block: ContentBlock): number {
  * Step 1: count distinct original-data phrases ("we surveyed", "our analysis",
  *         ...) in the block content.
  * Step 2: a first-person lead (we/our/I) counts as one more hit.
- * Step 3: score = min(100, hits * 35) - three distinct signals cap at 100.
+ * Step 3: score = min(100, FLOOR + hits * 35) - the 35 base floor credits every
+ *         extractable self-contained passage; hits add 35 each, capped at 100
+ *         (design D4 - previously zero hits scored 0, compressing the dimension).
  */
 export function scoreUniqueness(block: ContentBlock): number {
   const lead = block.paragraphs.join(" ").trim().toLowerCase();
@@ -177,7 +180,7 @@ export function scoreUniqueness(block: ContentBlock): number {
     if (lead.includes(phrase)) hits += 1;
   }
   if (FIRST_PERSON_LEAD.test(lead)) hits += 1;
-  return Math.min(100, hits * UNIQUENESS_PER_HIT);
+  return Math.min(100, UNIQUENESS_FLOOR + hits * UNIQUENESS_PER_HIT);
 }
 
 /**

@@ -4,8 +4,14 @@ import path from "node:path";
 import { load } from "cheerio";
 import { extractMainContent } from "@/citability/extract";
 import { segmentBlocks } from "@/citability/segment";
-import { scoreBlock, type DimensionScores } from "@/citability/scorer";
-import { CITABILITY_WEIGHTS } from "@/citability/constants";
+import {
+  scoreBlock,
+  scoreStats,
+  scoreUniqueness,
+  type DimensionScores,
+} from "@/citability/scorer";
+import { CITABILITY_WEIGHTS, STAT_PATTERN } from "@/citability/constants";
+import type { ContentBlock } from "@/citability/types";
 
 const fixturesDir = path.join(__dirname, "..", "__fixtures__");
 
@@ -19,6 +25,25 @@ function scoreFirstBlock(name: string) {
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+/** Builds a ContentBlock directly so uniqueness/stats logic is unit-testable. */
+function blockWith(paragraphs: string[], statsContent?: string): ContentBlock {
+  const text = paragraphs.join(" ");
+  const content = statsContent ?? text;
+  return {
+    id: "1",
+    heading: "",
+    headingLevel: 0,
+    content,
+    text,
+    paragraphs,
+    wordCount: content.split(/\s+/).filter(Boolean).length,
+    sentenceCount: 1,
+    hasTable: false,
+    hasList: false,
+    hasQuestionHeading: false,
+  };
 }
 
 describe("Answer Block Quality (RCI-3, 30%)", () => {
@@ -105,6 +130,24 @@ describe("Statistical Density (RCI-6, 15%)", () => {
     expect(scores.stats).toBeGreaterThan(10);
     expect(scores.stats).toBeLessThan(100);
   });
+
+  it("counts semver strings (vX.Y.Z) as concrete stats (RCI-6, design D5)", () => {
+    const filler = "filler ".repeat(397).trimEnd();
+    const block = blockWith(
+      ["placeholder paragraph"],
+      `we released v18.2.0 ${filler}`,
+    );
+    // Exactly one stat (the version) across a 400-word block: one per 500
+    // words gives 70; at 400 words the density is 1.25 → 87.5, intermediate.
+    expect(STAT_PATTERN.test("we released v18.2.0")).toBe(true);
+    expect(scoreStats(block)).toBeGreaterThan(10);
+    expect(scoreStats(block)).toBe(87.5);
+  });
+
+  it("matches bare and multi-part versions but not two-part decimals (RCI-6)", () => {
+    expect("API 18.2.0 stable".match(STAT_PATTERN)).toEqual(["18.2.0"]);
+    expect("v1.0".match(STAT_PATTERN)).toBeNull();
+  });
 });
 
 describe("Uniqueness (RCI-7, 10%)", () => {
@@ -112,6 +155,39 @@ describe("Uniqueness (RCI-7, 10%)", () => {
     const { scores } = scoreFirstBlock("page-unique.html");
     expect(scores.uniqueness).toBe(100);
     expect(scores.uniqueness).toBeGreaterThanOrEqual(70);
+  });
+});
+
+describe("Uniqueness base floor (RCI-7, design D4)", () => {
+  it("earns the 35 base floor for a self-contained block with no first-party phrases", () => {
+    const block = blockWith([
+      "This passage is self-contained and names its subject explicitly.",
+    ]);
+    expect(scoreUniqueness(block)).toBe(35);
+    expect(scoreUniqueness(block)).toBeGreaterThanOrEqual(35);
+  });
+
+  it("adds 35 per unique-data phrase hit (floor 35 + 35 = 70)", () => {
+    const block = blockWith([
+      "The report covers this year.",
+      "Our data shows conversion improved after the redesign.",
+    ]);
+    expect(scoreUniqueness(block)).toBe(70);
+  });
+
+  it("adds 35 for a first-person lead (floor 35 + 35 = 70)", () => {
+    const block = blockWith([
+      "We tested this approach across the whole fleet.",
+    ]);
+    expect(scoreUniqueness(block)).toBe(70);
+  });
+
+  it("caps at 100 when the floor plus hits exceed the scale", () => {
+    const block = blockWith([
+      "The company shared results publicly.",
+      "We surveyed customers and our data shows a clear trend.",
+    ]);
+    expect(scoreUniqueness(block)).toBe(100);
   });
 });
 
@@ -126,7 +202,7 @@ describe("Block composite (RCI-8 weighted average 30/25/20/15/10)", () => {
         scores.uniqueness * CITABILITY_WEIGHTS.uniqueness,
     );
     expect(composite).toBe(expected);
-    expect(composite).toBe(81);
+    expect(composite).toBe(84.5);
     // A definition-driven block is a strong block overall
     expect(composite).toBeGreaterThanOrEqual(70);
   });

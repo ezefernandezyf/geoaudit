@@ -59,8 +59,10 @@ export const PARAGRAPH_SENTENCE_MIN = 2;
 export const PARAGRAPH_SENTENCE_MAX = 4;
 
 // RCI-6 - Statistical Density
-/** Percentages, currency amounts and 4-digit years (design stat regex). */
-export const STAT_PATTERN = /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b/g;
+/** Percentages, currency amounts, 4-digit years and semver version strings
+ * (vX.Y.Z - changelog/release-note blocks, design D5). */
+export const STAT_PATTERN =
+  /[\d,.]+?\s*%|\$\s*[\d,]+|\b(?:20\d{2}|19\d{2})\b|\bv?\d+\.\d+\.\d+\b/g;
 /** Score reached at exactly one concrete stat per 500 words. */
 export const STATS_FULL_SCORE_AT_ONE_PER_500 = 70;
 
@@ -79,9 +81,13 @@ export const UNIQUENESS_PHRASES = [
   "in our experience",
 ] as const;
 export const UNIQUENESS_PER_HIT = 35;
+/** Base uniqueness credit every scored block earns for being an extractable,
+ * self-contained passage (RCI-7, design D4): score = min(100, FLOOR + hits×35). */
+export const UNIQUENESS_FLOOR = 35;
 
 // RCI-9 / RCI-11 - page aggregation
-/** Blocks scoring at or above this count toward citability coverage (RCI-11). */
-export const COVERAGE_THRESHOLD = 70;
+/** Blocks scoring at or above this count toward citability coverage (RCI-11,
+ * threshold lowered 70 → 60 in v3.1 - 0% coverage was universal at 70). */
+export const COVERAGE_THRESHOLD = 60;
 /** Blocks below this composite receive rewrite suggestions (RCI-12). */
 export const REWRITE_THRESHOLD = 60;

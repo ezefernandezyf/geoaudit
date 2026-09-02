@@ -141,10 +141,10 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
     expect(auditResultSchema.safeParse(result).success).toBe(true);
 
     expect(result.summary.url).toBe("https://example.com/");
-    // v3.1 composite over the fixture: citability 40, eeat 5, schema 53,
-    // technical 88 (crawler 80 x .6 + aio 100 x .4, AIO rescaled RPL-12),
-    // platform 100, brand 100.
-    expect(result.summary.geoScore).toBe(56);
+    // v3.1 composite over the fixture: citability 43.5 (uniqueness floor),
+    // eeat 5, schema 53, technical 88 (crawler 80 x .6 + aio 100 x .4, AIO
+    // rescaled RPL-12), platform 100, brand 100.
+    expect(result.summary.geoScore).toBe(57);
     expect(result.summary.severityBand).toBe("Fair");
     expect(result.summary.durationMs).toBe(0);
     expect(result.scoringModelVersion).toBe("3.1.0");
@@ -157,7 +157,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
     // All six engine sections carry real, deterministic output.
     expect(result.crawlers.compositeScore).toBe(80);
     expect(result.crawlers.perBot["GPTBot"]).toBe("blocked");
-    expect(result.citability.pageScore).toBe(40);
+    expect(result.citability.pageScore).toBe(43.5);
     expect(result.content.composite).toBe(5);
     expect(result.schema.detected.length).toBeGreaterThan(0);
     expect(result.platform.perPlatform["aio"]).toBeDefined();

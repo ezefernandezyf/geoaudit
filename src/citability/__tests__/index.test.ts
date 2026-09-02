@@ -19,9 +19,8 @@ function page(name: string) {
 describe("scorePage aggregate (RCI-9, RCI-10, RCI-11)", () => {
   it("computes page score as the mean of block composites (RCI-9)", () => {
     const result = scorePage(page("page-five-blocks.html"));
-    // v2.0.0 partial-credit tiers (WU-3): answer base 20 + intermediate
-    // structure tiers lift the composites → 344 / 6 = 57.3
-    expect(result.pageScore).toBe(57.3);
+    // v3.1 uniqueness floor (35) lifts the six composites → 365 / 6 = 60.8
+    expect(result.pageScore).toBe(60.8);
   });
 
   it("returns the exact top 3 and bottom 3 blocks (RCI-10)", () => {
@@ -43,10 +42,17 @@ describe("scorePage aggregate (RCI-9, RCI-10, RCI-11)", () => {
     }
   });
 
-  it("computes coverage as the percentage of blocks scoring >= 70 (RCI-11)", () => {
+  it("computes coverage as the percentage of blocks scoring >= 60 (RCI-11)", () => {
     const result = scorePage(page("page-five-blocks.html"));
-    // 3 of 6 blocks (audit process, methodology, pricing) score >= 70
+    // 3 of 6 blocks (audit process, methodology, pricing) score >= 60
     expect(result.coverage).toBe(50);
+  });
+
+  it("counts a 60-69 block toward coverage (threshold 70 → 60, RCI-11)", () => {
+    const result = scorePage(page("page-coverage-threshold.html"));
+    // 3 blocks: pricing (>=70) + audit process (60-69, would NOT count at 70)
+    // score >= 60 → 2 of 3 → 67%.
+    expect(result.coverage).toBe(67);
   });
 });
 
@@ -85,7 +91,7 @@ describe("toContractResult (shared CitabilityResult shape)", () => {
   it("maps the engine output to the AuditResult contract and Zod-validates", () => {
     const result = scorePage(page("page-five-blocks.html"));
     const contract = toContractResult(result);
-    expect(contract.pageScore).toBe(57.3);
+    expect(contract.pageScore).toBe(60.8);
     expect(contract.coverage).toBe(50);
     expect(contract.top3).toEqual([
       "What is the audit process?",
