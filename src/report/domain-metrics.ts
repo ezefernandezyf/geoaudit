@@ -8,13 +8,14 @@ import type { AuditResult } from "@/lib/contracts/audit-result";
  * No React, no presentation: functions only, fully unit-testable.
  */
 
-/** The five report rows. `engine` is the meta.errors prefix used by RAO-12/13. */
+/** The six report rows. `engine` is the meta.errors prefix used by RAO-12/13. */
 export const DOMAIN_ROWS = [
   { engine: "crawler", label: "Acceso de bots" },
   { engine: "citability", label: "Citabilidad" },
   { engine: "content", label: "E-E-A-T" },
   { engine: "schema", label: "Datos estructurados" },
   { engine: "platform", label: "Plataforma" },
+  { engine: "brand", label: "Autoridad de marca" },
 ] as const;
 
 /** RAO-12/RAO-13 degraded detection: `meta.errors` entries use the engine key. */
@@ -56,8 +57,26 @@ export function derivePlatformScore(
   return 0;
 }
 
-/** Row score for a given engine key, mirroring the UI scorecard. */
-export function rowScore(result: AuditResult, engine: string): number {
+/**
+ * Brand row score (APT-11, design D6): the real engine score when measured,
+ * `null` when absent (legacy 2.0.0 rows without `brandAuthority`, RAO-16) or
+ * failed (`status !== "success"`, BRA-7/RAO-12). `null` renders "No medido" -
+ * it must never fall through to the `rowScore` `return 0` default, which
+ * would fabricate a measured value (APT-10/11). A MEASURED 0 is a real
+ * penalty (RGS-11) and is returned as-is. The defensive shape check mirrors
+ * the platform derivation: persisted rows are read as `unknown as AuditResult`
+ * without Zod re-parse, so a malformed score also reads as "No medido".
+ */
+export function deriveBrandScore(
+  brandAuthority: AuditResult["brandAuthority"],
+): number | null {
+  if (!brandAuthority || brandAuthority.status !== "success") return null;
+  const { score } = brandAuthority;
+  return typeof score === "number" && score >= 0 && score <= 100 ? score : null;
+}
+
+/** Row score for a given engine key; `null` = row not measured (APT-11). */
+export function rowScore(result: AuditResult, engine: string): number | null {
   switch (engine) {
     case "crawler":
       return result.crawlers.compositeScore;
@@ -69,6 +88,10 @@ export function rowScore(result: AuditResult, engine: string): number {
       return deriveSchemaScore(result.schema);
     case "platform":
       return derivePlatformScore(result.platform.perPlatform);
+    // APT-11: the brand case MUST sit before the default so an unmeasured
+    // brand row returns null ("No medido"), never the default's fabricated 0.
+    case "brand":
+      return deriveBrandScore(result.brandAuthority);
     default:
       return 0;
   }
