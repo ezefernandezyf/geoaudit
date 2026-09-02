@@ -86,6 +86,9 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.summary.url).toBe("not a url");
     expect(result.summary.geoScore).toBe(0);
     expect(result.summary.severityBand).toBe("Critical");
+    // RAO-16: the degraded path keeps writing "2.0.0" - it is not a real
+    // audit, so the v3.1 write only applies to successful/unscored runs.
+    expect(result.scoringModelVersion).toBe("2.0.0");
     expect(result.meta.errors.length).toBeGreaterThan(0);
     expect(result.meta.errors[0]).toContain("Invalid URL format");
     expect(result.meta.startedAt).toBe(NOW);
@@ -283,8 +286,8 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.meta.errors).toContain("brand: rate_limit");
 
     // Brand excluded from the composite (RGS-9): the 5 remaining dimensions
-    // rebalance over 80% and yield 45 / Poor on this fixture.
-    expect(result.summary.geoScore).toBe(45);
+    // rebalance over 88% (v3.1) and yield 44 / Poor on this fixture.
+    expect(result.summary.geoScore).toBe(44);
     expect(result.summary.severityBand).toBe("Poor");
     expect(auditResultSchema.safeParse(result).success).toBe(true);
   });

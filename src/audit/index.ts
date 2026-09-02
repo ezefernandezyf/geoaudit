@@ -48,7 +48,7 @@ import {
 import type { BrandEngineResult } from "@/brand/types";
 import {
   computeGeoScore,
-  GEO_SCORE_V3_WEIGHTS,
+  GEO_SCORE_V3_1_WEIGHTS,
   type DimensionKey,
 } from "@/scoring/index";
 
@@ -401,7 +401,7 @@ export async function runAudit(
   if (engineFailures.brand !== undefined)
     failures.brand_authority = engineFailures.brand;
 
-  // RAO-9/RAO-15: composite the GEO Score with the six dimensions (v3.0.0).
+  // RAO-9/RAO-15: composite the GEO Score with the six dimensions (v3.1.0).
   // `platform` onPageScore decision: the Google AI Overviews per-platform
   // score represents the most representative AI-answer surface and its rubric
   // carries the most measured on-page criteria (70/100), so the AIO score is
@@ -422,15 +422,15 @@ export async function runAudit(
         engines.brand?.status === "success" ? engines.brand.score : null,
       failures,
     },
-    GEO_SCORE_V3_WEIGHTS,
+    GEO_SCORE_V3_1_WEIGHTS,
   );
 
   const completedAt = clock();
 
   // RAO-10: assemble the fully typed contract shape. `scored.scoringModelVersion`
-  // is the GEO_SCORE_V3_WEIGHTS version string, which the contract pins to the
-  // literal "3.0.0" (RAO-10 scenario) - narrowed here for the return type.
-  const scoringModelVersion = scored.scoringModelVersion as "3.0.0";
+  // is the GEO_SCORE_V3_1_WEIGHTS version string, which the contract pins to
+  // the literal "3.1.0" (RGS-7 scenario) - narrowed here for the return type.
+  const scoringModelVersion = scored.scoringModelVersion as "3.1.0";
 
   return {
     summary: {
@@ -556,7 +556,7 @@ async function auditUnsupportedPage(
         ...(brandFailure !== null ? { brand_authority: brandFailure } : {}),
       },
     },
-    GEO_SCORE_V3_WEIGHTS,
+    GEO_SCORE_V3_1_WEIGHTS,
   );
 
   const completedAt = clock();
@@ -577,7 +577,7 @@ async function auditUnsupportedPage(
       brandRun !== null
         ? brandToContract(brandRun)
         : emptyBrandResult(brandFailure ?? "brand engine error"),
-    scoringModelVersion: scored.scoringModelVersion as "3.0.0",
+    scoringModelVersion: scored.scoringModelVersion as "3.1.0",
     meta: {
       auditVersion: AUDIT_VERSION,
       startedAt,

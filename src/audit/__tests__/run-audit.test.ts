@@ -4,7 +4,7 @@ import path from "node:path";
 import { load } from "cheerio";
 import { runAudit } from "@/audit/index";
 import { auditResultSchema } from "@/lib/contracts/audit-result";
-import { computeGeoScore, GEO_SCORE_V3_WEIGHTS } from "@/scoring/index";
+import { computeGeoScore, GEO_SCORE_V3_1_WEIGHTS } from "@/scoring/index";
 import { parseRobotsTxt, scoreAccess } from "@/crawlers/index";
 import { scorePage } from "@/citability/index";
 import { scoreEeat } from "@/eeat/index";
@@ -141,12 +141,12 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
     expect(auditResultSchema.safeParse(result).success).toBe(true);
 
     expect(result.summary.url).toBe("https://example.com/");
-    // v3 composite over the fixture: citability 40, eeat 5, schema 53,
+    // v3.1 composite over the fixture: citability 40, eeat 5, schema 53,
     // technical 76 (crawler 80 x .6 + aio 70 x .4), platform 70, brand 100.
-    expect(result.summary.geoScore).toBe(56);
-    expect(result.summary.severityBand).toBe("Poor");
+    expect(result.summary.geoScore).toBe(50);
+    expect(result.summary.severityBand).toBe("Fair");
     expect(result.summary.durationMs).toBe(0);
-    expect(result.scoringModelVersion).toBe("3.0.0");
+    expect(result.scoringModelVersion).toBe("3.1.0");
 
     expect(result.meta.auditVersion).toBe("0.1.0");
     expect(result.meta.startedAt).toBe(NOW);
@@ -185,7 +185,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
     expect(wikipedia?.status).toBe("measured");
   });
 
-  it("computes the GEO Score per GEO_SCORE_V3_WEIGHTS from the wired 6-engine scores", async () => {
+  it("computes the GEO Score per GEO_SCORE_V3_1_WEIGHTS from the wired 6-engine scores", async () => {
     const fetcher = mockAuditFetch();
     const result = await runAudit("https://example.com/", {
       fetcher,
@@ -216,7 +216,7 @@ describe("runAudit happy path (RAO-1, RAO-3, RAO-10, RAO-11, RAO-15)", () => {
         platform: platforms.aio.score,
         brand_authority: brand.score,
       },
-      GEO_SCORE_V3_WEIGHTS,
+      GEO_SCORE_V3_1_WEIGHTS,
     );
 
     expect(result.summary.geoScore).toBe(expected.geoScore);
