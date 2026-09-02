@@ -220,10 +220,23 @@ describe("acceptsCandidate (BRA-2 disambiguation)", () => {
 });
 
 describe("brandFromDomain (BRA-1 brand derivation)", () => {
-  it("derives the brand from the audited hostname", () => {
-    expect(brandFromDomain("relevy.app")).toBe("relevy");
-    expect(brandFromDomain("www.acme.co.uk")).toBe("acme");
-    expect(brandFromDomain("blog.example.com")).toBe("blog");
+  it("derives the brand from the registrable domain (eTLD+1)", () => {
+    expect(brandFromDomain("relevy.app")).toBe("Relevy");
+    expect(brandFromDomain("www.acme.co.uk")).toBe("Acme");
+    expect(brandFromDomain("blog.example.com")).toBe("Example");
+  });
+
+  it("resolves a subdomain to the registrable brand (docs.anthropic.com → Anthropic)", () => {
+    expect(brandFromDomain("docs.anthropic.com")).toBe("Anthropic");
+  });
+
+  it("strips www and capitalizes the registrable label (www.moz.com → Moz)", () => {
+    expect(brandFromDomain("www.moz.com")).toBe("Moz");
+  });
+
+  it("takes three labels for two-part TLDs (.com.ar, .com.au)", () => {
+    expect(brandFromDomain("www.example.com.ar")).toBe("Example");
+    expect(brandFromDomain("blog.acme.com.au")).toBe("Acme");
   });
 });
 

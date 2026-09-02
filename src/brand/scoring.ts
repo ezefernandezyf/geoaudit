@@ -68,7 +68,43 @@ export function normalizeBrand(name: string): string {
     .join(" ");
 }
 
-/** Derives the brand name from the audited hostname (BRA-1, "relevy.app" → "relevy"). */
+/**
+ * Two-part public suffixes that must be treated as the registrable TLD
+ * (BRA-1, design D3): the eTLD+1 heuristic takes the last 2 labels for common
+ * TLDs, or the last 3 when the last 2 form a two-part suffix like `.co.uk`.
+ * Hand-maintained short list (no psl dependency - zero-dep repo); compound
+ * TLDs not listed here fall back to the 2-label rule (documented limitation).
+ */
+const MULTI_PART_TLDS = new Set([
+  "co.uk",
+  "com.au",
+  "co.nz",
+  "co.jp",
+  "com.br",
+  "com.ar",
+  "com.mx",
+  "co.za",
+  "com.sg",
+  "com.cn",
+  "co.in",
+  "com.tr",
+  "co.kr",
+  "com.co",
+]);
+
+/** Capitalizes the first letter of the registrable brand label (BRA-1). */
+function capitalizeBrand(label: string): string {
+  return label.length > 0 ? label[0].toUpperCase() + label.slice(1) : label;
+}
+
+/**
+ * Derives the brand name from the audited hostname via the registrable domain
+ * (BRA-1, design D3): `docs.anthropic.com` → `anthropic.com` → "Anthropic",
+ * never the first subdomain label ("docs"). `www.` is stripped first; two-part
+ * TLDs (`.co.uk`, `.com.ar`, ...) take the last 3 labels instead of 2.
+ * normalizeBrand lowercases for the Wikipedia/Wikidata match, so the
+ * capitalization here never affects entity matching.
+ */
 export function brandFromDomain(domain: string): string {
   const host = domain
     .toLowerCase()
@@ -76,7 +112,14 @@ export function brandFromDomain(domain: string): string {
     .split("/")[0]
     .split(":")[0]
     .replace(/^www\./, "");
-  return host.split(".")[0] ?? host;
+  const labels = host.split(".").filter(Boolean);
+  if (labels.length === 0) return capitalizeBrand(host);
+  const suffix = labels.slice(-2).join(".");
+  const brandLabel =
+    labels.length >= 3 && MULTI_PART_TLDS.has(suffix)
+      ? labels[labels.length - 3]
+      : (labels[labels.length - 2] ?? labels[0]);
+  return capitalizeBrand(brandLabel);
 }
 
 /** Detects Wikipedia disambiguation titles (design D2: no +20 presence). */

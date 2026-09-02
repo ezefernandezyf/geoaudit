@@ -145,10 +145,13 @@ async function searchWikipedia(
     const title = isRecord(item) ? asString(item["title"]) : null;
     // BRA-1: match the article for the brand. Disambiguation pages count as
     // presence too (scoring strips the +20 via isDisambiguationTitle).
+    // Casing-insensitive: brandFromDomain capitalizes (BRA-1, design D3) and
+    // Wikipedia titles are normalized to lowercase before comparing.
+    const normalizedBrand = brand.toLowerCase();
     if (
       title !== null &&
-      (title.toLowerCase() === brand ||
-        title.toLowerCase() === `${brand} (disambiguation)`)
+      (title.toLowerCase() === normalizedBrand ||
+        title.toLowerCase() === `${normalizedBrand} (disambiguation)`)
     ) {
       return title;
     }
