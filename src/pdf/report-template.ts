@@ -203,6 +203,14 @@ function domainScorecard(result: AuditResult): string {
         <span class="unavailable">No disponible</span>
       </div>`;
     }
+    if (score === null) {
+      // APT-11: a row the engine did not measure (legacy 2.0.0 without
+      // brandAuthority, RAO-16) prints "No medido" - never a fabricated 0.
+      return `<div class="row">
+        <span class="row-label">${escapeHtml(label)}</span>
+        <span class="unavailable">No medido</span>
+      </div>`;
+    }
     const band = severityForScore(score);
     return `<div class="row">
         <span class="row-label">${escapeHtml(label)}</span>

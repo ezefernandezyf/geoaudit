@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { buildReportHtml } from "@/pdf/report-template";
 import type { MultiPageResult } from "@/lib/contracts/audit-result";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import {
+  auditResultFixture,
+  auditResultV3Fixture,
+} from "@/lib/contracts/__fixtures__/audit-result";
 import { BRAND_DESCRIPTOR, BRAND_NAME } from "@/lib/brand";
 
 /**
@@ -77,7 +80,7 @@ describe("buildReportHtml single-page report (PDF-4)", () => {
     expect(html).toContain("Regular");
   });
 
-  it("renders the five domain rows with their derived scores", () => {
+  it("renders the six domain rows with their derived scores", () => {
     const html = buildReportHtml(auditResultFixture);
 
     for (const label of [
@@ -86,6 +89,7 @@ describe("buildReportHtml single-page report (PDF-4)", () => {
       "E-E-A-T",
       "Datos estructurados",
       "Plataforma",
+      "Autoridad de marca",
     ]) {
       expect(html).toContain(label);
     }
@@ -93,6 +97,19 @@ describe("buildReportHtml single-page report (PDF-4)", () => {
     expect(html).toContain("71");
     expect(html).toContain("61");
     expect(html).toContain("70");
+  });
+
+  it("renders the unmeasured brand row as No medido on legacy 2.0.0 rows (APT-11)", () => {
+    const html = buildReportHtml(auditResultFixture);
+    // Legacy rows have no brandAuthority (RAO-16): the row prints "No medido",
+    // never a fabricated 0.
+    expect(html).toContain("No medido");
+  });
+
+  it("renders a measured brand row with its real v3 score (APT-6/11)", () => {
+    const html = buildReportHtml(auditResultV3Fixture);
+    // brandAuthority.score 84 from the v3 fixture.
+    expect(html).toContain("84");
   });
 
   it("renders findings: top passages, suggestions, schema issues and blocked bots", () => {
