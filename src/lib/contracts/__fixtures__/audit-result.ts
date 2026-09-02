@@ -134,3 +134,14 @@ export const auditResultV3Fixture: AuditResult = {
     },
   },
 };
+
+/**
+ * Sprint 14 v3.1 AuditResult fixture (RGS-7, T5): the v3 shape with
+ * `scoringModelVersion` bumped to "3.1.0" - the version new audits write.
+ * The v3.0.0 and legacy 2.0.0 fixtures above stay untouched so the widened
+ * read union (2.0.0 | 3.0.0 | 3.1.0) keeps validating them.
+ */
+export const auditResultV31Fixture: AuditResult = {
+  ...auditResultV3Fixture,
+  scoringModelVersion: "3.1.0",
+};

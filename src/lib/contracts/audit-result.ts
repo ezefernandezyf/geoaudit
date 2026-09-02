@@ -115,8 +115,13 @@ export const auditResultSchema = z.object({
   content: contentResultSchema,
   /** Optional so legacy 2.0.0 rows validate (RAO-16); written by v3 audits. */
   brandAuthority: brandAuthorityResultSchema.optional(),
-  /** RAO-16: legacy rows keep "2.0.0"; new audits write "3.0.0". */
-  scoringModelVersion: z.union([z.literal("2.0.0"), z.literal("3.0.0")]),
+  /** RAO-16/RGS-7: legacy rows keep "2.0.0"; new audits write "3.1.0". The
+   * read union widens to 2.0.0 | 3.0.0 | 3.1.0 - no DB migration. */
+  scoringModelVersion: z.union([
+    z.literal("2.0.0"),
+    z.literal("3.0.0"),
+    z.literal("3.1.0"),
+  ]),
   meta: z.object({
     auditVersion: z.string(),
     startedAt: z.number(),

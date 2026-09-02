@@ -8,6 +8,7 @@ import {
 import {
   auditResultFixture,
   auditResultV3Fixture,
+  auditResultV31Fixture,
 } from "@/lib/contracts/__fixtures__/audit-result";
 
 /** D3 master light shape - aggregate + per-page summaries (MPA-6). */
@@ -84,7 +85,7 @@ describe("auditResultSchema (RAO-10 typed output)", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a scoringModelVersion other than 2.0.0/3.0.0 (RAO-16)", () => {
+  it("rejects a scoringModelVersion outside the 2.0.0/3.0.0/3.1.0 union (RGS-7)", () => {
     for (const version of ["1.0.0", "9.9.9"]) {
       const result = auditResultSchema.safeParse({
         ...auditResultFixture,
@@ -101,6 +102,17 @@ describe("auditResultSchema (RAO-10 typed output)", () => {
       expect(result.data.scoringModelVersion).toBe("3.0.0");
       expect(result.data.brandAuthority).toEqual(
         auditResultV3Fixture.brandAuthority,
+      );
+    }
+  });
+
+  it("accepts a v3.1 audit writing scoringModelVersion 3.1.0 (RGS-7, T5)", () => {
+    const result = auditResultSchema.safeParse(auditResultV31Fixture);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scoringModelVersion).toBe("3.1.0");
+      expect(result.data.brandAuthority).toEqual(
+        auditResultV31Fixture.brandAuthority,
       );
     }
   });
