@@ -4,7 +4,7 @@ import type { GeminiBand } from "@/ui/severity-badge";
 /**
  * ScoreBar category - the adapter (U5) builds these from real AuditResult
  * data. `status` is the lowercase Gemini band; the fill color derives from it
- * (real thresholds 90/75/60/40 via severityForScore) instead of Gemini's
+ * (real thresholds 80/65/50/30 via severityForScore) instead of Gemini's
  * numeric getBarColor (80/65/45/25). `name`/weight/keyMetric/description are
  * optional so interim consumers never invent data the report doesn't provide.
  *

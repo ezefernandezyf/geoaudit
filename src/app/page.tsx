@@ -25,7 +25,7 @@ import { SCOREHERO_EVIDENCE } from "./score-hero-evidence";
  * (hex directos, font-serif, surfaces contrastadas) sobre el flujo REAL:
  * hero con AuditForm (botón dentro del input + sample URLs, LND-1), cards
  * 01-05 con la 03 navy y número emerald (LND-2), ScoreHero con evidencia
- * REAL del motor + bandas reales 90/75/60/40 (LND-3/LND-7), seis plataformas
+ * REAL del motor + bandas reales 80/65/50/30 (LND-3/LND-7), seis plataformas
  * (LND-4) y CTA final adaptado a la sesión (LND-6). El copy de usuario viene
  * de src/lib/copy.ts (neutro, ATH-9).
  *
@@ -119,7 +119,7 @@ export const metadata = buildOgMetadata({
   path: "/",
 });
 
-/** Real severity bands 90/75/60/40 (LND-3) - Gemini table composition. */
+/** Real severity bands 80/65/50/30 (LND-3) - Gemini table composition. */
 const BAND_ROWS: {
   band: GeminiBand;
   range: string;
@@ -127,28 +127,28 @@ const BAND_ROWS: {
 }[] = [
   {
     band: "excellent",
-    range: "90 - 100",
+    range: "80 - 100",
     description:
       "Visibilidad sobresaliente en buscadores con IA y citas frecuentes.",
   },
   {
     band: "good",
-    range: "75 - 89",
+    range: "65 - 79",
     description: "Buena base, con oportunidades puntuales de mejora.",
   },
   {
     band: "fair",
-    range: "60 - 74",
+    range: "50 - 64",
     description: "Presencia parcial que conviene reforzar en varios dominios.",
   },
   {
     band: "poor",
-    range: "40 - 59",
+    range: "30 - 49",
     description: "Baja citabilidad; hay trabajo estructural por delante.",
   },
   {
     band: "critical",
-    range: "0 - 39",
+    range: "0 - 29",
     description:
       "Problemas de acceso o contenido que bloquean a los motores de IA.",
   },
@@ -421,7 +421,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 3. SCORECARD - ScoreHero con evidencia REAL (LND-7) + bandas reales 90/75/60/40 (LND-3) */}
+      {/* 3. SCORECARD - ScoreHero con evidencia REAL (LND-7) + bandas reales 80/65/50/30 (LND-3) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
@@ -486,7 +486,7 @@ export default async function Home() {
           </div>
         ) : null}
 
-        {/* Tabla de bandas - thresholds reales 90/75/60/40 */}
+        {/* Tabla de bandas - thresholds reales 80/65/50/30 */}
         <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
           <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#475569]">

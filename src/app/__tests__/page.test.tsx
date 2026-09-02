@@ -133,18 +133,18 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
-  it("shows the real band thresholds 90/75/60/40 (LND-3)", async () => {
+  it("shows the real band thresholds 80/65/50/30 (LND-3)", async () => {
     await renderPage();
     const table = screen
       .getByText("Escala de Bandas y Criterios Técnicos")
       .closest("div.overflow-hidden");
     expect(table).not.toBeNull();
     for (const range of [
-      "90 - 100",
-      "75 - 89",
-      "60 - 74",
-      "40 - 59",
-      "0 - 39",
+      "80 - 100",
+      "65 - 79",
+      "50 - 64",
+      "30 - 49",
+      "0 - 29",
     ]) {
       expect(within(table as HTMLElement).getByText(range)).toBeInTheDocument();
     }
@@ -173,8 +173,8 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       within(scorebox as HTMLElement).getAllByText(SCOREHERO_EVIDENCE.domain)
         .length,
     ).toBeGreaterThan(0);
-    // The band chip derives from the REAL thresholds (90/75/60/40) - the demo
-    // can never claim "Excelente" for a score that is not ≥90.
+    // The band chip derives from the REAL thresholds (80/65/50/30) - the demo
+    // can never claim "Excelente" for a score that is not ≥80.
     const expectedBand = severityForScore(
       SCOREHERO_EVIDENCE.totalScore,
     ).toLowerCase() as GeminiBand;

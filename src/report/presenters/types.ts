@@ -30,10 +30,10 @@ export interface CategoryScore {
   score: number | null;
   /** Always 100 (all dimensions are scored out of 100). */
   maxScore: 100;
-  /** Real weight from the v3.0.0 weights, formatted as a percent string. */
+  /** Real weight from the v3.1.0 weights, formatted as a percent string. */
   weight: string;
   /**
-   * Lowercase band of the real score (90/75/60/40 thresholds), or `null` when
+   * Lowercase band of the real score (80/65/50/30 thresholds), or `null` when
    * the score is `null` - a "No medido" row carries no band (APT-11).
    */
   status: GeminiBand | null;
@@ -92,7 +92,7 @@ export interface PlatformRow {
 export interface GeminiView {
   /** Real GEO Score, rounded to the nearest integer. */
   totalScore: number;
-  /** Lowercase band of the real score (90/75/60/40 thresholds). */
+  /** Lowercase band of the real score (80/65/50/30 thresholds). */
   band: GeminiBand;
   /** Hostname of the audited URL. */
   domain: string;
