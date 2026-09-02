@@ -109,3 +109,28 @@ export const auditResultFixture: AuditResult = {
     errors: [],
   },
 };
+
+/**
+ * Sprint 13 v3 AuditResult fixture (RAO-16): adds `brandAuthority` and writes
+ * scoringModelVersion "3.0.0". The legacy fixture above (2.0.0, no
+ * brandAuthority) must keep validating - contract tolerance, never fabricated.
+ */
+export const auditResultV3Fixture: AuditResult = {
+  ...auditResultFixture,
+  scoringModelVersion: "3.0.0",
+  brandAuthority: {
+    status: "success",
+    reason: null,
+    score: 84,
+    signals: {
+      entityPresence: true,
+      entityConsistency: true,
+      wikidataCompleteness: 80,
+    },
+    entity: {
+      wikipediaTitle: "Relevy",
+      wikidataId: "Q123456789",
+      wikidataLabel: "Relevy",
+    },
+  },
+};

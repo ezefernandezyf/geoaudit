@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   auditResultSchema,
+  brandAuthorityResultSchema,
   multiPageResultSchema,
   severityBandSchema,
 } from "@/lib/contracts/audit-result";
-import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
+import {
+  auditResultFixture,
+  auditResultV3Fixture,
+} from "@/lib/contracts/__fixtures__/audit-result";
 
 /** D3 master light shape - aggregate + per-page summaries (MPA-6). */
 const multiPageFixture = {
@@ -80,13 +84,33 @@ describe("auditResultSchema (RAO-10 typed output)", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a scoringModelVersion other than 2.0.0 (RGS-7)", () => {
-    for (const version of ["1.0.0", "0.9.0"]) {
+  it("rejects a scoringModelVersion other than 2.0.0/3.0.0 (RAO-16)", () => {
+    for (const version of ["1.0.0", "9.9.9"]) {
       const result = auditResultSchema.safeParse({
         ...auditResultFixture,
         scoringModelVersion: version,
       });
       expect(result.success).toBe(false);
+    }
+  });
+
+  it("accepts a v3 audit with brandAuthority (RAO-16, T3)", () => {
+    const result = auditResultSchema.safeParse(auditResultV3Fixture);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scoringModelVersion).toBe("3.0.0");
+      expect(result.data.brandAuthority).toEqual(
+        auditResultV3Fixture.brandAuthority,
+      );
+    }
+  });
+
+  it("validates a legacy 2.0.0 row without brandAuthority (RAO-16 tolerance)", () => {
+    const result = auditResultSchema.safeParse(auditResultFixture);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.scoringModelVersion).toBe("2.0.0");
+      expect(result.data.brandAuthority).toBeUndefined();
     }
   });
 
@@ -111,6 +135,84 @@ describe("severityBandSchema (RGS-5 bands)", () => {
       expect(severityBandSchema.safeParse(band).success).toBe(true);
     }
     expect(severityBandSchema.safeParse("Amazing").success).toBe(false);
+  });
+});
+
+describe("brandAuthorityResultSchema (BRA-6, design D4)", () => {
+  it("parses a success result with signals and entity identifiers", () => {
+    const result = brandAuthorityResultSchema.safeParse({
+      status: "success",
+      reason: null,
+      score: 84,
+      signals: {
+        entityPresence: true,
+        entityConsistency: true,
+        wikidataCompleteness: 80,
+      },
+      entity: {
+        wikipediaTitle: "Relevy",
+        wikidataId: "Q123456789",
+        wikidataLabel: "Relevy",
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("parses an error result with a reason (BRA-7 failure isolation)", () => {
+    const result = brandAuthorityResultSchema.safeParse({
+      status: "error",
+      reason: "rate_limit",
+      score: 0,
+      signals: {
+        entityPresence: false,
+        entityConsistency: false,
+        wikidataCompleteness: 0,
+      },
+      entity: {
+        wikipediaTitle: null,
+        wikidataId: null,
+        wikidataLabel: null,
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a score outside 0-100", () => {
+    const result = brandAuthorityResultSchema.safeParse({
+      status: "success",
+      reason: null,
+      score: 101,
+      signals: {
+        entityPresence: true,
+        entityConsistency: true,
+        wikidataCompleteness: 80,
+      },
+      entity: {
+        wikipediaTitle: "Relevy",
+        wikidataId: "Q123456789",
+        wikidataLabel: "Relevy",
+      },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an unknown status", () => {
+    const result = brandAuthorityResultSchema.safeParse({
+      status: "pending",
+      reason: null,
+      score: 0,
+      signals: {
+        entityPresence: false,
+        entityConsistency: false,
+        wikidataCompleteness: 0,
+      },
+      entity: {
+        wikipediaTitle: null,
+        wikidataId: null,
+        wikidataLabel: null,
+      },
+    });
+    expect(result.success).toBe(false);
   });
 });
 

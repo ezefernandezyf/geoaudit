@@ -75,6 +75,32 @@ export const contentResultSchema = z.object({
 
 export type ContentResult = z.infer<typeof contentResultSchema>;
 
+/**
+ * Brand Authority engine result (BRA-6, design D4). Six engines as of v3.0.0:
+ * status "success" with a measured score (0 = no external presence, a real
+ * penalty) or "error" with a reason (BRA-7 failure isolation - rate_limit,
+ * timeout, ... never a throw).
+ */
+export const brandAuthorityResultSchema = z.object({
+  status: z.enum(["success", "error"]),
+  /** Null on success; rate-limit/timeout/block reason on error (BRA-7). */
+  reason: z.string().nullable(),
+  score: z.number().min(0).max(100),
+  signals: z.object({
+    entityPresence: z.boolean(),
+    entityConsistency: z.boolean(),
+    wikidataCompleteness: z.number().min(0).max(100),
+  }),
+  entity: z.object({
+    wikipediaTitle: z.string().nullable(),
+    /** Q-number or null. */
+    wikidataId: z.string().nullable(),
+    wikidataLabel: z.string().nullable(),
+  }),
+});
+
+export type BrandAuthorityResult = z.infer<typeof brandAuthorityResultSchema>;
+
 export const auditResultSchema = z.object({
   summary: z.object({
     url: z.url("Invalid URL format"),
@@ -87,7 +113,10 @@ export const auditResultSchema = z.object({
   schema: schemaResultSchema,
   platform: platformResultSchema,
   content: contentResultSchema,
-  scoringModelVersion: z.literal("2.0.0"),
+  /** Optional so legacy 2.0.0 rows validate (RAO-16); written by v3 audits. */
+  brandAuthority: brandAuthorityResultSchema.optional(),
+  /** RAO-16: legacy rows keep "2.0.0"; new audits write "3.0.0". */
+  scoringModelVersion: z.union([z.literal("2.0.0"), z.literal("3.0.0")]),
   meta: z.object({
     auditVersion: z.string(),
     startedAt: z.number(),
