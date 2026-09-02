@@ -14,26 +14,30 @@ import type { GeminiBand, GeminiView } from "@/report/presenters/types";
  * score + band per URL. The best REAL result is copied below as a `GeminiView`
  * (the exact shape `toGeminiViewModel` produces), with its provenance.
  *
- * A3.2 (sprint 13, 2026-09-02): evidence VERIFIED with the real script against
- * the real network, with the brand engine active (v3.0.0). Best real
- * candidate: moz.com - GEO Score 53 (poor). Category scores below are the REAL
+ * A3.2 (sprint 14, 2026-09-02): evidence regenerated with the REAL script and
+ * engine v3.1.0 (calibration sprint 14). Best real candidate: relevy.app -
+ * GEO Score 62 (fair). The dogfooding target (A3.2) now audits well because
+ * the live deploy runs the calibrated engine; the batch average was 42.4
+ * (gate 40-60) and moz.com measured 57. Category scores below are the REAL
  * `toGeminiViewModel` output of that run, copied verbatim (crawler 95,
- * citability 36.9, E-E-A-T 54, schema 60, platform 44). Weights are the v3
- * distribution (RGS-1): crawler 16, citability 22.4, content 19.2, schema
- * 11.2, platform 11.2, brand 20.
+ * citability 54.5, E-E-A-T 46, schema 72, platform 70). Weights are the v3.1.0
+ * distribution (RGS-1): crawler 15, citability 24, content 23, schema 12,
+ * platform 14, brand 12.
  *
- * Brand row honesty (APT-11/RAO-12): the moz.com brand probe hit Wikipedia's
- * rate limit during the batch, so `brandAuthority.status` is "error" - the
- * row renders "No medido" (null), never a fabricated 0, and the composite
- * rebalances without the dimension (RGS-9, 53 stays the real v3 score).
+ * Brand row honesty (APT-11/RAO-12): Wikipedia rate-limited the batch, so the
+ * relevy.app brand probe returned `rate_limit` and `brandAuthority.status` is
+ * "error" - the row renders "No medido" (null), never a fabricated 0, and the
+ * composite rebalances without the dimension (RGS-9, 62 stays the real v3.1
+ * score). Probe verificado aparte: probeBrand("Anthropic") → "Anthropic"
+ * (BRA-1, docs.anthropic.com).
  */
-const VERIFIED_TOTAL_SCORE = 53;
-const VERIFIED_DOMAIN = "moz.com";
+const VERIFIED_TOTAL_SCORE = 62;
+const VERIFIED_DOMAIN = "relevy.app";
 const VERIFIED_DATE = "2026-09-02";
 
 export const SCOREHERO_EVIDENCE: GeminiView = {
   totalScore: VERIFIED_TOTAL_SCORE,
-  // Band derived from the REAL thresholds (90/75/60/40) - never hand-written,
+  // Band derived from the REAL thresholds (80/65/50/30) - never hand-written,
   // so the chip can not claim a band the score does not deserve.
   band: severityForScore(VERIFIED_TOTAL_SCORE).toLowerCase() as GeminiBand,
   domain: VERIFIED_DOMAIN,
@@ -45,16 +49,17 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
   // Real audit date of the verified run (A3.2) - no longer null.
   auditDate: VERIFIED_DATE,
   // Real categoryScores from `pnpm verify:scorehero` (2026-09-02) - the exact
-  // `toGeminiViewModel` output for moz.com, copied verbatim. Six rows with the
-  // v3 weights; brand is honestly null ("No medido", APT-11) because the
-  // probe hit a rate limit (BRA-7/RAO-12) - the composite rebalances (RGS-9).
+  // `toGeminiViewModel` output for relevy.app, copied verbatim. Six rows with
+  // the v3.1 weights; brand is honestly null ("No medido", APT-11) because the
+  // probe hit Wikipedia's rate limit (BRA-7/RAO-12) - the composite rebalances
+  // (RGS-9).
   categoryScores: [
     {
       id: "crawler",
       name: "Acceso de bots",
       score: 95,
       maxScore: 100,
-      weight: "16%",
+      weight: "15%",
       status: "excellent",
       keyMetric: null,
       description: "Acceso de los crawlers de IA al sitio.",
@@ -62,19 +67,19 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
     {
       id: "citability",
       name: "Citabilidad",
-      score: 36.9,
+      score: 54.5,
       maxScore: 100,
-      weight: "22.4%",
-      status: "critical",
+      weight: "24%",
+      status: "fair",
       keyMetric: null,
       description: "Probabilidad de que los asistentes citen los pasajes.",
     },
     {
       id: "content",
       name: "E-E-A-T",
-      score: 54,
+      score: 46,
       maxScore: 100,
-      weight: "19.2%",
+      weight: "23%",
       status: "poor",
       keyMetric: null,
       description: "Calidad del contenido según E-E-A-T.",
@@ -82,20 +87,20 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
     {
       id: "schema",
       name: "Datos estructurados",
-      score: 60,
+      score: 72,
       maxScore: 100,
-      weight: "11.2%",
-      status: "fair",
+      weight: "12%",
+      status: "good",
       keyMetric: null,
       description: "Marcado de datos estructurados.",
     },
     {
       id: "platform",
       name: "Plataforma",
-      score: 44,
+      score: 70,
       maxScore: 100,
-      weight: "11.2%",
-      status: "poor",
+      weight: "14%",
+      status: "good",
       keyMetric: null,
       description: "Preparación de la plataforma para IA.",
     },
@@ -106,7 +111,7 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
       // row is honestly "No medido" and the landing renders no bar for it.
       score: null,
       maxScore: 100,
-      weight: "20%",
+      weight: "12%",
       status: null,
       keyMetric: null,
       description: "Presencia externa de la marca en fuentes que citan las IA.",

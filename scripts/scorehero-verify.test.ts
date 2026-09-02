@@ -134,12 +134,12 @@ export async function runVerify(
 }
 
 describe("lógica de verificación (sin red, runner mockeado)", () => {
-  it("resume un AuditResult real en score + band honesta (umbrales 90/75/60/40)", () => {
+  it("resume un AuditResult real en score + band honesta (umbrales 80/65/50/30)", () => {
     const entry = toVerifyEntry("https://example.com/", auditResultFixture);
-    // auditResultFixture: GEO Score 68 → band "fair" (60-74), nunca inventada.
+    // auditResultFixture: GEO Score 68 → band "good" (65-79), nunca inventada.
     expect(entry.score).toBe(68);
-    expect(entry.band).toBe("fair");
-    expect(entry.summary).toContain("GEO Score 68 (fair)");
+    expect(entry.band).toBe("good");
+    expect(entry.summary).toContain("GEO Score 68 (good)");
   });
 
   it("desglosa el resultado real en 6 categorías con id, nombre, score y band", () => {
@@ -169,8 +169,8 @@ describe("lógica de verificación (sin red, runner mockeado)", () => {
       {
         url: "https://a.example",
         score: 68,
-        band: "fair",
-        summary: "a — GEO Score 68 (fair)",
+        band: "good",
+        summary: "a — GEO Score 68 (good)",
         categories: [],
       },
       {
@@ -197,16 +197,17 @@ describe("lógica de verificación (sin red, runner mockeado)", () => {
     expect(pickBest(tie)?.url).toBe("https://a.example");
   });
 
-  it("la evidencia fijada del ScoreHero tiene 6 filas con pesos v3 (T9)", () => {
-    // T9 (sprint 13): la evidencia regenerada debe reflejar las 6 dimensiones
-    // del engine v3 - brand incluido con su peso del 20 % (RGS-1/APT-6).
+  it("la evidencia fijada del ScoreHero tiene 6 filas con pesos v3.1 (T9)", () => {
+    // T9 (sprint 13) + sprint 14: la evidencia regenerada debe reflejar las 6
+    // dimensiones del engine v3.1 - brand incluido con su peso del 12 %
+    // (RGS-1/APT-6, recalibración v3.1.0).
     expect(SCOREHERO_EVIDENCE.categoryScores).toHaveLength(6);
     const brand = SCOREHERO_EVIDENCE.categoryScores.find(
       (c) => c.id === "brand",
     );
     expect(brand?.name).toBe("Autoridad de marca");
-    expect(brand?.weight).toBe("20%");
-    // Los seis pesos v3 suman 100.
+    expect(brand?.weight).toBe("12%");
+    // Los seis pesos v3.1 suman 100.
     const total = SCOREHERO_EVIDENCE.categoryScores.reduce(
       (sum, c) => sum + Number.parseFloat(c.weight.replace("%", "")),
       0,

@@ -215,7 +215,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
           within(table as HTMLElement).getAllByText("No medido").length,
         ).toBeGreaterThan(0);
       }
-      // Two dimensions share the 11.2% weight - use the AllBy variant.
+      // Every v3.1 weight is distinct - assert presence, not uniqueness.
       expect(
         within(table as HTMLElement).getAllByText(category.weight ?? "").length,
       ).toBeGreaterThan(0);
@@ -507,7 +507,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       (c) => c.id === "brand",
     );
     expect(brand?.name).toBe("Autoridad de marca");
-    expect(brand?.weight).toBe("20%");
+    expect(brand?.weight).toBe("12%");
   });
 });
 
