@@ -4,6 +4,7 @@ import { auditResultFixture } from "@/lib/contracts/__fixtures__/audit-result";
 import type { AuditResult } from "@/lib/contracts/audit-result";
 import { toGeminiViewModel } from "@/report/presenters/toGeminiViewModel";
 import type { GeminiBand } from "@/report/presenters/types";
+import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
 
 /**
  * ScoreHero verification script (A3.1, LND-7, design sprint 8 §A6).
@@ -194,6 +195,23 @@ describe("lógica de verificación (sin red, runner mockeado)", () => {
       { ...entries[0], url: "https://d.example" },
     ];
     expect(pickBest(tie)?.url).toBe("https://a.example");
+  });
+
+  it("la evidencia fijada del ScoreHero tiene 6 filas con pesos v3 (T9)", () => {
+    // T9 (sprint 13): la evidencia regenerada debe reflejar las 6 dimensiones
+    // del engine v3 - brand incluido con su peso del 20 % (RGS-1/APT-6).
+    expect(SCOREHERO_EVIDENCE.categoryScores).toHaveLength(6);
+    const brand = SCOREHERO_EVIDENCE.categoryScores.find(
+      (c) => c.id === "brand",
+    );
+    expect(brand?.name).toBe("Autoridad de marca");
+    expect(brand?.weight).toBe("20%");
+    // Los seis pesos v3 suman 100.
+    const total = SCOREHERO_EVIDENCE.categoryScores.reduce(
+      (sum, c) => sum + Number.parseFloat(c.weight.replace("%", "")),
+      0,
+    );
+    expect(total).toBeCloseTo(100, 1);
   });
 });
 

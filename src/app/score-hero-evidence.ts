@@ -14,21 +14,22 @@ import type { GeminiBand, GeminiView } from "@/report/presenters/types";
  * score + band per URL. The best REAL result is copied below as a `GeminiView`
  * (the exact shape `toGeminiViewModel` produces), with its provenance.
  *
- * A3.2 (sprint 12): evidence VERIFIED on 2026-09-01 with the real script
- * against the real network. Best real candidate: moz.com - GEO Score 53
- * (poor). Category scores below are the REAL `toGeminiViewModel` output of
- * that run, copied verbatim (crawler 95, citability 36.9, E-E-A-T 54,
- * schema 60, platform 44) - schema now carries the engine's rubric score
- * (RSC-14), not the old 100 - issues*10 proxy.
+ * A3.2 (sprint 13, 2026-09-02): evidence VERIFIED with the real script against
+ * the real network, with the brand engine active (v3.0.0). Best real
+ * candidate: moz.com - GEO Score 53 (poor). Category scores below are the REAL
+ * `toGeminiViewModel` output of that run, copied verbatim (crawler 95,
+ * citability 36.9, E-E-A-T 54, schema 60, platform 44). Weights are the v3
+ * distribution (RGS-1): crawler 16, citability 22.4, content 19.2, schema
+ * 11.2, platform 11.2, brand 20.
  *
- * Sprint 12 dogfood baseline: the landing itself (relevy.app) audited at GEO
- * Score 47 (poor) with schema 61 (fair) - the schema row now shows the real
- * engine value, confirming the RSC-14 propagation. The ScoreHero shows the
- * best REAL candidate (moz.com), per the honesty rule (LND-7).
+ * Brand row honesty (APT-11/RAO-12): the moz.com brand probe hit Wikipedia's
+ * rate limit during the batch, so `brandAuthority.status` is "error" - the
+ * row renders "No medido" (null), never a fabricated 0, and the composite
+ * rebalances without the dimension (RGS-9, 53 stays the real v3 score).
  */
 const VERIFIED_TOTAL_SCORE = 53;
 const VERIFIED_DOMAIN = "moz.com";
-const VERIFIED_DATE = "2026-09-01";
+const VERIFIED_DATE = "2026-09-02";
 
 export const SCOREHERO_EVIDENCE: GeminiView = {
   totalScore: VERIFIED_TOTAL_SCORE,
@@ -43,15 +44,17 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
   durationSeconds: 1,
   // Real audit date of the verified run (A3.2) - no longer null.
   auditDate: VERIFIED_DATE,
-  // Real categoryScores from `pnpm verify:scorehero` (2026-09-01) - the exact
-  // `toGeminiViewModel` output for moz.com, copied verbatim.
+  // Real categoryScores from `pnpm verify:scorehero` (2026-09-02) - the exact
+  // `toGeminiViewModel` output for moz.com, copied verbatim. Six rows with the
+  // v3 weights; brand is honestly null ("No medido", APT-11) because the
+  // probe hit a rate limit (BRA-7/RAO-12) - the composite rebalances (RGS-9).
   categoryScores: [
     {
       id: "crawler",
       name: "Acceso de bots",
       score: 95,
       maxScore: 100,
-      weight: "20%",
+      weight: "16%",
       status: "excellent",
       keyMetric: null,
       description: "Acceso de los crawlers de IA al sitio.",
@@ -61,7 +64,7 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
       name: "Citabilidad",
       score: 36.9,
       maxScore: 100,
-      weight: "28%",
+      weight: "22.4%",
       status: "critical",
       keyMetric: null,
       description: "Probabilidad de que los asistentes citen los pasajes.",
@@ -71,7 +74,7 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
       name: "E-E-A-T",
       score: 54,
       maxScore: 100,
-      weight: "24%",
+      weight: "19.2%",
       status: "poor",
       keyMetric: null,
       description: "Calidad del contenido según E-E-A-T.",
@@ -81,7 +84,7 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
       name: "Datos estructurados",
       score: 60,
       maxScore: 100,
-      weight: "14%",
+      weight: "11.2%",
       status: "fair",
       keyMetric: null,
       description: "Marcado de datos estructurados.",
@@ -91,10 +94,22 @@ export const SCOREHERO_EVIDENCE: GeminiView = {
       name: "Plataforma",
       score: 44,
       maxScore: 100,
-      weight: "14%",
+      weight: "11.2%",
       status: "poor",
       keyMetric: null,
       description: "Preparación de la plataforma para IA.",
+    },
+    {
+      id: "brand",
+      name: "Autoridad de marca",
+      // APT-11: no fabricated value - the probe errored (rate_limit), so the
+      // row is honestly "No medido" and the landing renders no bar for it.
+      score: null,
+      maxScore: 100,
+      weight: "20%",
+      status: null,
+      keyMetric: null,
+      description: "Presencia externa de la marca en fuentes que citan las IA.",
     },
   ],
   // The landing renders only the headline + categoryScores (page.tsx gates the
