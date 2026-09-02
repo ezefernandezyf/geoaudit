@@ -87,6 +87,20 @@ describe("ScoreBar (DNF-9)", () => {
     expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
+  it("renders No medido instead of a fabricated score or bar (APT-11)", () => {
+    const { container } = render(
+      <ScoreBar
+        category={category({ score: null, status: null, weight: "20%" })}
+      />,
+    );
+    expect(screen.getByText("No medido")).toBeInTheDocument();
+    // No progressbar: a 0% bar would imply a measured 0 (APT-11 trap).
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(container.querySelector("[data-score-fill]")).toBeNull();
+    // The weight stays visible: 20% shows for measured AND unmeasured rows.
+    expect(screen.getByText(/Peso: 20%/)).toBeInTheDocument();
+  });
+
   describe("interactive mode", () => {
     it("calls onClick when isInteractive and clicked", () => {
       const onClick = vi.fn();

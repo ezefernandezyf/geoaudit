@@ -1,3 +1,4 @@
+import { REPORT_COPY } from "@/lib/copy";
 import type { GeminiBand } from "@/ui/severity-badge";
 
 /**
@@ -6,16 +7,23 @@ import type { GeminiBand } from "@/ui/severity-badge";
  * (real thresholds 90/75/60/40 via severityForScore) instead of Gemini's
  * numeric getBarColor (80/65/45/25). `name`/weight/keyMetric/description are
  * optional so interim consumers never invent data the report doesn't provide.
+ *
+ * Honest-nullable (APT-10/11): `score: null` means the row was NOT measured
+ * (legacy 2.0.0 without brandAuthority, or a failed engine) - the bar renders
+ * "No medido" with no progressbar, because a 0% bar would fabricate a measured
+ * value. A measured 0 is a real 0 with its bar (RGS-11).
  */
 export type ScoreCategory = {
   id: string;
   /** Row label shown above the bar (omitted when the row already shows it). */
   name?: string;
-  score: number;
+  /** Real engine score 0-100, or null when the row was not measured. */
+  score: number | null;
   maxScore: number;
   weight?: string;
   keyMetric?: string;
-  status: GeminiBand;
+  /** Real band of the score, or null when score is null. */
+  status: GeminiBand | null;
   description?: string;
 };
 
@@ -48,10 +56,10 @@ export function ScoreBar({
   onClick,
   isInteractive = false,
 }: ScoreBarProps) {
-  const percentage = Math.min(
-    100,
-    Math.max(0, (category.score / category.maxScore) * 100),
-  );
+  const percentage =
+    category.score === null
+      ? 0
+      : Math.min(100, Math.max(0, (category.score / category.maxScore) * 100));
 
   return (
     <div
@@ -80,29 +88,40 @@ export function ScoreBar({
               {category.keyMetric}
             </span>
           ) : null}
-          <div className="flex items-center gap-1.5 font-mono">
-            <span className="text-base font-bold text-[#0f172a]">
-              {category.score}
+          {category.score === null ? (
+            // APT-11: a not-measured row shows "No medido" (mirrors
+            // PlatformRow.readiness), never a fabricated number.
+            <span className="text-xs font-sans text-[#64748b]">
+              {REPORT_COPY.matrix.notMeasured}
             </span>
-            {/* PERF-3: #64748b (4.76:1) cumple AA 4.5:1 - #94a3b8 (2.56:1) fallaba. */}
-            <span className="text-xs text-[#64748b]">/100</span>
-          </div>
+          ) : (
+            <div className="flex items-center gap-1.5 font-mono">
+              <span className="text-base font-bold text-[#0f172a]">
+                {category.score}
+              </span>
+              {/* PERF-3: #64748b (4.76:1) cumple AA 4.5:1 - #94a3b8 (2.56:1) fallaba. */}
+              <span className="text-xs text-[#64748b]">/100</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Progress Track */}
-      <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden mb-2">
-        <div
-          data-score-fill
-          className={`h-full ${STATUS_FILL[category.status]} transition-all duration-500 rounded-full`}
-          style={{ width: `${percentage}%` }}
-          role="progressbar"
-          aria-label={`Score ${category.score}/${category.maxScore}`}
-          aria-valuenow={category.score}
-          aria-valuemin={0}
-          aria-valuemax={category.maxScore}
-        />
-      </div>
+      {/* Progress Track - only for a MEASURED score: a 0% bar would fabricate
+          a measured 0 for a row the engine never measured (APT-11). */}
+      {category.score !== null && category.status !== null ? (
+        <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden mb-2">
+          <div
+            data-score-fill
+            className={`h-full ${STATUS_FILL[category.status]} transition-all duration-500 rounded-full`}
+            style={{ width: `${percentage}%` }}
+            role="progressbar"
+            aria-label={`Score ${category.score}/${category.maxScore}`}
+            aria-valuenow={category.score}
+            aria-valuemin={0}
+            aria-valuemax={category.maxScore}
+          />
+        </div>
+      ) : null}
 
       {category.description ? (
         <p className="text-xs text-[#475569] font-sans leading-relaxed">

@@ -59,10 +59,10 @@ describe("DomainScorecard valid audit (ARU-10)", () => {
     expect(fillOf(61)).toHaveStyle({ width: "61%" });
   });
 
-  it("shows the Gemini section header with the 5-categories chip", () => {
+  it("shows the Gemini section header with the 6-categories chip", () => {
     render(<DomainScorecard view={geminiViewFixture} />);
     expect(screen.getByText("Scorecard por Categoría")).toBeInTheDocument();
-    expect(screen.getByText("5 categorías analizadas")).toBeInTheDocument();
+    expect(screen.getByText("6 categorías analizadas")).toBeInTheDocument();
   });
 });
 

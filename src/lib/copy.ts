@@ -397,8 +397,8 @@ export const REPORT_COPY = {
   },
   scorecard: {
     title: "Scorecard por Categoría",
-    subtitle: "Evaluación detallada en las 5 dimensiones del algoritmo GEO",
-    chip: "5 categorías analizadas",
+    subtitle: "Evaluación detallada en las 6 dimensiones del algoritmo GEO",
+    chip: "6 categorías analizadas",
   },
   matrix: {
     title: "Matriz de Visibilidad por Plataforma de IA",
