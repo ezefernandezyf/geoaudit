@@ -45,18 +45,18 @@ function fixtureFetcher(
   return { fetcher, requests };
 }
 
-function options(fetcher: FetchImpl, requests: string[]): BrandProbeOptions {
+function options(fetcher: FetchImpl): BrandProbeOptions {
   return { fetcher, lookup: PUBLIC_IP };
 }
 
 describe("probeBrand (BRA-1 entity presence)", () => {
   it("resolves the Wikipedia article title when the brand has an article", async () => {
-    const { fetcher, requests } = fixtureFetcher({
+    const { fetcher } = fixtureFetcher({
       "action=query": wikipediaArticleExists,
       "action=wbsearchentities": wikidataSearchSameName,
       "action=wbgetentities": wikidataEntitiesSameName,
     });
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
@@ -67,7 +67,7 @@ describe("probeBrand (BRA-1 entity presence)", () => {
     const { fetcher, requests } = fixtureFetcher({
       "action=query": wikipediaNoArticle,
     });
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
@@ -78,12 +78,12 @@ describe("probeBrand (BRA-1 entity presence)", () => {
   });
 
   it("keeps a disambiguation title as presence (scoring strips the +20)", async () => {
-    const { fetcher, requests } = fixtureFetcher({
+    const { fetcher } = fixtureFetcher({
       "action=query": wikipediaDisambiguation,
       "action=wbsearchentities": wikidataSearchSameName,
       "action=wbgetentities": wikidataEntitiesSameName,
     });
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
@@ -98,7 +98,7 @@ describe("probeBrand (BRA-2 disambiguation)", () => {
       "action=wbsearchentities": wikidataSearchSameName,
       "action=wbgetentities": wikidataEntitiesSameName,
     });
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
@@ -113,12 +113,12 @@ describe("probeBrand (BRA-2 disambiguation)", () => {
   });
 
   it("returns no Wikidata entity when no candidate passes disambiguation", async () => {
-    const { fetcher, requests } = fixtureFetcher({
+    const { fetcher } = fixtureFetcher({
       "action=query": wikipediaArticleExists,
       "action=wbsearchentities": wikidataSearchNoMatch,
       "action=wbgetentities": wikidataEntitiesNoMatch,
     });
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
@@ -129,14 +129,14 @@ describe("probeBrand (BRA-2 disambiguation)", () => {
 
 describe("probeBrand (BRA-7 failure isolation)", () => {
   it("returns rate_limit on HTTP 429 from Wikidata without throwing", async () => {
-    const { fetcher, requests } = fixtureFetcher(
+    const { fetcher } = fixtureFetcher(
       {
         "action=query": wikipediaArticleExists,
         "action=wbsearchentities": wikidataRateLimit,
       },
       { "action=wbsearchentities": 429 },
     );
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
@@ -175,11 +175,11 @@ describe("probeBrand (BRA-7 failure isolation)", () => {
   });
 
   it("returns http_status on a non-429 non-2xx response", async () => {
-    const { fetcher, requests } = fixtureFetcher(
+    const { fetcher } = fixtureFetcher(
       { "action=query": wikipediaArticleExists },
       { "action=query": 503 },
     );
-    const outcome = await probeBrand("relevy.app", options(fetcher, requests));
+    const outcome = await probeBrand("relevy.app", options(fetcher));
 
     expect(outcome.ok).toBe(false);
     if (outcome.ok) return;
@@ -194,7 +194,7 @@ describe("probeBrand (BRA-8 request budget)", () => {
       "action=wbsearchentities": wikidataSearchSameName,
       "action=wbgetentities": wikidataEntitiesSameName,
     });
-    await probeBrand("relevy.app", options(fetcher, requests));
+    await probeBrand("relevy.app", options(fetcher));
 
     expect(requests).toHaveLength(3);
     expect(requests.every((url) => url.startsWith("https://"))).toBe(true);
@@ -206,7 +206,7 @@ describe("probeBrand (BRA-8 request budget)", () => {
       "action=wbsearchentities": wikidataSearchSameName,
       "action=wbgetentities": wikidataEntitiesSameName,
     });
-    await probeBrand("relevy.app", options(fetcher, requests));
+    await probeBrand("relevy.app", options(fetcher));
 
     for (const url of requests) {
       expect(
