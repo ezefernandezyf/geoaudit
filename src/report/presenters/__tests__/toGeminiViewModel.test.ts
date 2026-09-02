@@ -9,14 +9,15 @@ import { brandErrorResult, brandZeroResult } from "@/report/__tests__/variants";
 /**
  * U5.2 - Pure adapter `toGeminiViewModel` (APT-2..APT-6, APT-9, APT-10).
  * Maps a real AuditResult into the Gemini-shaped view model. Band thresholds
- * are the REAL 90/75/60/40 (`severityForScore`), never Gemini's 80/65/45/25.
+ * are the REAL single-source v3.1 bands 80/65/50/30 (`severityForScore`),
+ * never Gemini's 80/65/45/25.
  */
 describe("toGeminiViewModel", () => {
   it("maps score + band using real thresholds (APT-2)", () => {
     const view = toGeminiViewModel(auditResultFixture);
-    // geoScore 68 → real band "Fair" → lowercase "fair" (not Gemini's 65→"good").
+    // geoScore 68 → real band "Good" (v3.1 65-79) → lowercase "good".
     expect(view.totalScore).toBe(68);
-    expect(view.band).toBe("fair");
+    expect(view.band).toBe("good");
   });
 
   it("derives domain and falls title back to the domain (APT-3)", () => {
@@ -56,10 +57,10 @@ describe("toGeminiViewModel", () => {
     ]);
 
     const byId = Object.fromEntries(view.categoryScores.map((c) => [c.id, c]));
-    // crawler.compositeScore 71 → fair; v3 technical weight 16%
+    // crawler.compositeScore 71 → good (v3.1 65-79); v3 technical weight 16%
     expect(byId.crawler.score).toBe(71);
     expect(byId.crawler.weight).toBe("16%");
-    expect(byId.crawler.status).toBe("fair");
+    expect(byId.crawler.status).toBe("good");
     // citability.pageScore 62 → fair; v3 weight 22.4%
     expect(byId.citability.score).toBe(62);
     expect(byId.citability.weight).toBe("22.4%");
@@ -143,11 +144,11 @@ describe("brand row honesty (APT-11)", () => {
     expect(brand.weight).toBe("20%");
   });
 
-  it("maps a real v3 brand score with its honest band (90/75/60/40)", () => {
+  it("maps a real v3 brand score with its honest band (80/65/50/30)", () => {
     const view = toGeminiViewModel(auditResultV3Fixture);
     const brand = view.categoryScores.find((c) => c.id === "brand")!;
     expect(brand.score).toBe(84);
-    expect(brand.status).toBe("good");
+    expect(brand.status).toBe("excellent"); // 84 → Excellent (v3.1 80+)
     expect(brand.weight).toBe("20%");
   });
 });

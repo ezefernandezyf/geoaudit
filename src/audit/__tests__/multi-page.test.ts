@@ -269,7 +269,7 @@ describe("runMultiPageAudit (MPA-1 reuse + isolation)", () => {
 
     expect(result.aggregate.url).toBe("https://example.com/");
     expect(result.aggregate.geoScore).toBe(80); // (60+80+100)/3
-    expect(result.aggregate.severityBand).toBe("Good");
+    expect(result.aggregate.severityBand).toBe("Excellent"); // v3.1 bands: 80+
     expect(result.aggregate.durationMs).toBe(0); // fixed clock
   });
 

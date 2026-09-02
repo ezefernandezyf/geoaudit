@@ -1,6 +1,6 @@
 import type { SeverityBand } from "@/lib/contracts/audit-result";
 import {
-  GEO_SCORE_V3_WEIGHTS,
+  GEO_SCORE_V3_1_WEIGHTS,
   type DimensionKey,
   type GeoScoreWeights,
 } from "./weights";
@@ -9,15 +9,18 @@ import {
  * GEO Score calculator (RGS-1..RGS-11).
  *
  * `computeGeoScore(engineScores, weights)` computes the weighted composite of
- * the six dimension scores (v3.0.0) - citability, E-E-A-T, technical, schema,
+ * the six dimension scores (v3.1.0) - citability, E-E-A-T, technical, schema,
  * platform and brand_authority (RGS-1/11) - rounds to the nearest integer,
  * caps at 100, and assigns the P3 severity band. Missing engines are excluded
  * and the remaining weights are re-balanced among the available dimensions
- * (RGS-9). Brand Authority re-enters at 20% in v3.0.0 (RGS-8): a measured 0 is
- * a real penalty documented in the notes (RGS-11), a failed brand engine is
- * excluded like any other failure (RGS-9). The Technical dimension is composed
- * from `crawler.compositeScore × 0.6 + platform.onPageScore × 0.4` when no
- * standalone technical score is provided (RGS-2, design `src/scoring/`).
+ * (RGS-9). Brand Authority recalibrates to 12% in v3.1.0 (RGS-8): a measured
+ * 0 is a real penalty documented in the notes (RGS-11), a failed brand engine
+ * is excluded like any other failure (RGS-9). The Technical dimension is
+ * composed from `crawler.compositeScore × 0.6 + platform.onPageScore × 0.4`
+ * when no standalone technical score is provided (RGS-2, design `src/scoring/`).
+ * The severity bands are single source (D8): 80-100 Excellent / 65-79 Good /
+ * 50-64 Fair / 30-49 Poor / 0-29 Critical, shared by findings, PDF, multi-page
+ * and score-hero (RGS-5).
  *
  * Pure function: deterministic, no side effects, no I/O.
  */
@@ -54,12 +57,16 @@ export const DIMENSIONS: readonly DimensionKey[] = [
   "brand_authority",
 ];
 
-/** P3 severity band mapping: 90-100 Excellent / 75-89 Good / 60-74 Fair / 40-59 Poor / 0-39 Critical. */
+/**
+ * P3 severity band mapping - single source for the whole product (D8, RGS-5):
+ * 80-100 Excellent / 65-79 Good / 50-64 Fair / 30-49 Poor / 0-29 Critical.
+ * v3.1.0 bands replace the unreachable 90/75/60/40 (sprint 14 calibration).
+ */
 export function severityForScore(score: number): SeverityBand {
-  if (score >= 90) return "Excellent";
-  if (score >= 75) return "Good";
-  if (score >= 60) return "Fair";
-  if (score >= 40) return "Poor";
+  if (score >= 80) return "Excellent";
+  if (score >= 65) return "Good";
+  if (score >= 50) return "Fair";
+  if (score >= 30) return "Poor";
   return "Critical";
 }
 
@@ -73,7 +80,7 @@ export function composeTechnical(
 
 export function computeGeoScore(
   engineScores: EngineScores = {},
-  weights: GeoScoreWeights = GEO_SCORE_V3_WEIGHTS,
+  weights: GeoScoreWeights = GEO_SCORE_V3_1_WEIGHTS,
 ): GeoScoreResult {
   const notes: string[] = [];
 
@@ -147,8 +154,8 @@ export function computeGeoScore(
     notes.push("citability 0: no extractable content blocks");
   }
 
-  // RGS-11: a measured brand 0 is a real 20%-weighted penalty, documented -
-  // distinct from a missing/failed brand engine (excluded, RGS-9).
+  // RGS-11: a measured brand 0 is a real 12%-weighted penalty (v3.1.0),
+  // documented - distinct from a missing/failed brand engine (excluded, RGS-9).
   if (dimensions.brand_authority === 0) {
     notes.push("brand 0: no external presence");
   }

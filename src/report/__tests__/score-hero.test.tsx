@@ -24,8 +24,8 @@ describe("ScoreHero view-model consumption (ARU-10/11)", () => {
 
     expect(screen.getByText("68")).toBeInTheDocument();
     expect(screen.getByText("/100")).toBeInTheDocument();
-    // Fixture band "Fair" → lowercase view band → ES label "Regular".
-    expect(screen.getByText("Regular")).toBeInTheDocument();
+    // Fixture band "Good" (68 → v3.1 65-79) → lowercase view band → ES "Bueno".
+    expect(screen.getByText("Bueno")).toBeInTheDocument();
     // The hostname, not the raw URL (view model domain field): it appears in
     // the domain chip AND as the title fallback (title = domain, APT-3).
     expect(screen.getAllByText("example.com").length).toBeGreaterThanOrEqual(1);
@@ -36,7 +36,7 @@ describe("ScoreHero view-model consumption (ARU-10/11)", () => {
   it("renders the one-line summary from the view model", () => {
     renderHero();
     expect(
-      screen.getByText("example.com - GEO Score 68 (fair) en ~3s"),
+      screen.getByText("example.com - GEO Score 68 (good) en ~3s"),
     ).toBeInTheDocument();
   });
 

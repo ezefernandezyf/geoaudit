@@ -9,6 +9,7 @@ import { GEO_SCORE_V3_1_WEIGHTS as RE_EXPORTED_V3_1 } from "@/scoring/index";
 import {
   computeGeoScore,
   DIMENSIONS,
+  severityForScore,
   type EngineScores,
 } from "@/scoring/calculator";
 
@@ -130,7 +131,7 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
     expect(result.severityBand).toBe("Excellent");
   });
 
-  it("RGS-4/RGS-5: 73.8 → rounds to 74 → Fair", () => {
+  it("RGS-4/RGS-5: 73.8 → rounds to 74 → Good (v3.1 bands 65-79)", () => {
     const result = computeGeoScore(
       {
         citability: 73.8,
@@ -142,10 +143,10 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
       SPRINT_1_WEIGHTS,
     );
     expect(result.geoScore).toBe(74);
-    expect(result.severityBand).toBe("Fair");
+    expect(result.severityBand).toBe("Good");
   });
 
-  it("RGS-5: 39 → Critical", () => {
+  it("RGS-5: 39 → Poor (v3.1 bands 30-49)", () => {
     const result = computeGeoScore(
       {
         citability: 39,
@@ -157,7 +158,7 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
       SPRINT_1_WEIGHTS,
     );
     expect(result.geoScore).toBe(39);
-    expect(result.severityBand).toBe("Critical");
+    expect(result.severityBand).toBe("Poor");
   });
 
   it("RGS-4: 103 → capped at 100 → Excellent", () => {
@@ -253,23 +254,31 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
     });
   });
 
-  it("weights config defaults to GEO_SCORE_V3_WEIGHTS when omitted (RGS-1)", () => {
+  it("weights config defaults to GEO_SCORE_V3_1_WEIGHTS when omitted (RGS-1, sprint 14)", () => {
     const result = computeGeoScore(FULL);
-    expect(result.scoringModelVersion).toBe("3.0.0");
+    expect(result.scoringModelVersion).toBe("3.1.0");
+    expect(result.weights.version).toBe("3.1.0");
     expect(result.geoScore).toBe(80);
   });
 
-  it("RGS-6 severity band boundaries follow P3 (90/75/60/40)", () => {
+  it("RGS-5: severityForScore maps the v3.1 single-source bands (92/74/39/100 exact)", () => {
+    expect(severityForScore(92)).toBe("Excellent");
+    expect(severityForScore(74)).toBe("Good");
+    expect(severityForScore(39)).toBe("Poor");
+    expect(severityForScore(100)).toBe("Excellent");
+  });
+
+  it("RGS-5 severity band boundaries follow the v3.1 single-source bands (80/65/50/30)", () => {
     const bands = [
       [100, "Excellent"],
-      [90, "Excellent"],
-      [89, "Good"],
-      [75, "Good"],
-      [74, "Fair"],
-      [60, "Fair"],
-      [59, "Poor"],
-      [40, "Poor"],
-      [39, "Critical"],
+      [80, "Excellent"],
+      [79, "Good"],
+      [65, "Good"],
+      [64, "Fair"],
+      [50, "Fair"],
+      [49, "Poor"],
+      [30, "Poor"],
+      [29, "Critical"],
       [0, "Critical"],
     ] as const;
     for (const [value, expected] of bands) {
@@ -487,5 +496,35 @@ describe("computeGeoScore (RGS-1..RGS-10)", () => {
   it("T3: GEO_SCORE_V3_1_WEIGHTS is re-exported from @/scoring (orchestrator import path)", () => {
     expect(RE_EXPORTED_V3_1.version).toBe("3.1.0");
     expect(RE_EXPORTED_V3_1.weights.brand_authority).toBe(12);
+  });
+
+  it("RGS-11: brand measured 0 with v3.1 → all-80 + brand 0 = 70 with note (12% penalty)", () => {
+    const result = computeGeoScore(
+      { ...FULL, brand_authority: 0 },
+      GEO_SCORE_V3_1_WEIGHTS,
+    );
+    // 80×(0.24+0.23+0.15+0.12+0.14) + 0×0.12 = 80×0.88 = 70.4 → 70
+    expect(result.geoScore).toBe(70);
+    expect(result.dimensions.brand_authority).toBe(0);
+    expect(result.notes.join(" ")).toContain("brand 0: no external presence");
+  });
+
+  it("RGS-11: brand 0 no longer caps the top band → all-100 + brand 0 = 88 Excellent", () => {
+    const result = computeGeoScore(
+      {
+        citability: 100,
+        eeat: 100,
+        technical: 100,
+        schema: 100,
+        platform: 100,
+        brand_authority: 0,
+      },
+      GEO_SCORE_V3_1_WEIGHTS,
+    );
+    // 100×0.88 = 88 → Excellent: a perfect on-page site without Wikipedia
+    // reaches the 80+ band (unreachable ceiling removed).
+    expect(result.geoScore).toBe(88);
+    expect(result.severityBand).toBe("Excellent");
+    expect(result.notes.join(" ")).toContain("brand 0: no external presence");
   });
 });
