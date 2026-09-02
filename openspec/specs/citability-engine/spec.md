@@ -15,12 +15,12 @@ Analyze the main textual content of a page to determine how likely AI systems (C
 | RCI-3 | Answer Block Quality (30%) | MUST | Score each block for answer-block patterns; award partial credit for partial matches, not binary |
 | RCI-4 | Self-Containment (25%) | MUST | Score each block: explicit subject mention, no pronoun-first lead, 50-200 word length band |
 | RCI-5 | Structural Readability (20%) | MUST | Score structural readability with partial credit for partial compliance, not binary |
-| RCI-6 | Statistical Density (15%) | MUST | Award intermediate points per stat density level (percentages, currency, dates, named sources) |
-| RCI-7 | Uniqueness (10%) | MUST | Score each block: original-data phrases ("we surveyed…", "our data shows…"), first-person voice — proxy signal |
+| RCI-6 | Statistical Density (15%) | MUST | Award intermediate points per stat density level (percentages, currency, dates, named sources); semver strings (`vX.Y.Z`) count as concrete stats |
+| RCI-7 | Uniqueness (10%) | MUST | Score each block: original-data phrases ("we surveyed…", "our data shows…"), first-person voice — proxy signal; every scored block earns a base floor of 35, +35 per unique-data hit, capped at 100 |
 | RCI-8 | Block composite score | MUST | Compute per-block weighted average of the 5 dimensions (30/25/20/15/10) |
 | RCI-9 | Page aggregate score | MUST | Compute page citability score as mean of all validated block scores |
 | RCI-10 | Top/bottom block output | MUST | Return top 3 and bottom 3 blocks with individual dimension scores and excerpts; bottom 3 MUST be disjoint from top 3 (fewer bottoms shown when <3 non-overlapping blocks remain) |
-| RCI-11 | Citability coverage | MUST | Return citability coverage as percentage of blocks scoring ≥ 70 |
+| RCI-11 | Citability coverage | MUST | Return citability coverage as percentage of blocks scoring ≥ 60 |
 | RCI-12 | Rewrite suggestions | MUST | For bottom blocks, generate template-based rewrite suggestions (definition pattern, answer-first, stat injection) |
 | RCI-13 | Single-block fallback | MUST | Pages with no H2/H3 headings MUST treat the entire extracted content as one block |
 | RCI-14 | Malformed HTML tolerance | MUST | Malformed HTML MUST NOT throw; engine MUST produce best-effort scores on recoverable content |
@@ -114,8 +114,8 @@ The system MUST score structural readability with partial credit for partial com
 
 ### Requirement: Statistical Density (RCI-6)
 
-The system MUST award intermediate points by stat-density level (percentages, currency, dates, named sources) rather than a binary rich/poor split. Exact tiers follow the WU-2 calibration decision.
-(Previously: binary — ≥1 stat/500 words full credit, else ≤ 10.)
+The system MUST award intermediate points by stat-density level (percentages, currency, dates, named sources) rather than a binary rich/poor split. Semantic-version strings (`vX.Y.Z`, e.g. "v18.2.0") MUST count as concrete stats in `STAT_PATTERN` so changelog/release-note blocks earn density credit. Exact tiers follow the WU-2 calibration decision.
+(Previously: `STAT_PATTERN` matched only percentages, currency amounts, and 4-digit years.)
 
 #### Scenario: Stats-rich block
 
@@ -134,6 +134,36 @@ The system MUST award intermediate points by stat-density level (percentages, cu
 - GIVEN a 400-word block with no numbers, percentages, dollar amounts, or named sources
 - WHEN Statistical Density is scored
 - THEN the score is ≤ 10
+
+#### Scenario: Semver counts as a stat
+
+- GIVEN a 400-word block containing "we released v18.2.0" and no other stat-like tokens
+- WHEN Statistical Density is scored
+- THEN the version string matches `STAT_PATTERN`
+- AND the block earns intermediate credit (not ≤ 10)
+
+### Requirement: Uniqueness (RCI-7)
+
+The system MUST score each block on original-data phrases ("we surveyed…", "our data shows…") and first-person voice — proxy signal. Every scored block MUST earn a base uniqueness credit of 35 (floor) for being an extractable, self-contained passage; each unique-data hit adds 35, capped at 100.
+(Previously: score = min(100, hits × 35) — zero hits scored 0, compressing the dimension in 100% of benchmark blocks.)
+
+#### Scenario: Self-contained block earns the floor
+
+- GIVEN a 120-word block with explicit subject and no first-party phrases
+- WHEN Uniqueness is scored
+- THEN the score is ≥ 35 (base floor), never 0
+
+#### Scenario: One unique-data phrase adds credit
+
+- GIVEN a block containing "our data shows" (one hit)
+- WHEN Uniqueness is scored
+- THEN the score is ≥ 70 (floor 35 + 35 per hit)
+
+#### Scenario: First-person lead adds credit
+
+- GIVEN a block starting with "We analyzed…" (first-person lead)
+- WHEN Uniqueness is scored
+- THEN the score is ≥ 70
 
 ### Requirement: Top/Bottom Block Output (RCI-10)
 
@@ -164,6 +194,18 @@ The system MUST return the top 3 and bottom 3 blocks with individual dimension s
 - WHEN top/bottom output is computed
 - THEN the bottom list contains only the 1 block not in the top 3, with no duplication
 
+### Requirement: Citability Coverage (RCI-11)
+
+The system MUST return citability coverage as the percentage of blocks scoring ≥ 60.
+(Previously: table-only — coverage counted blocks scoring ≥ 70; 0% coverage in 100% of benchmark sites.)
+
+#### Scenario: Block at 65 counts toward coverage
+
+- GIVEN scored blocks with composites 82, 65, and 40
+- WHEN coverage is computed
+- THEN 2 of 3 blocks count (82 and 65)
+- AND coverage is 67%
+
 ### Requirement: Malformed HTML Tolerance (RCI-14)
 
 The system MUST handle malformed HTML without throwing exceptions.
@@ -191,12 +233,12 @@ The system MUST handle malformed HTML without throwing exceptions.
 | RCI-3 | Definition pattern detected, No answer pattern, Partial answer pattern earns intermediate credit | Covered |
 | RCI-4 | Self-contained block, Pronoun-led block | Covered |
 | RCI-5 | Partial structure earns intermediate credit | Covered |
-| RCI-6 | Stats-rich block, Partial stat block earns intermediate credit, Stats-poor block | Covered |
-| RCI-7 | (tested via RCI-8 composite + first-person fixtures) | Implicit |
+| RCI-6 | Stats-rich block, Partial stat block earns intermediate credit, Stats-poor block, Semver counts as a stat | Covered |
+| RCI-7 | Self-contained block earns the floor, One unique-data phrase adds credit, First-person lead adds credit | Covered |
 | RCI-8 | (tested via all dimension scenarios — composite assertion) | Implicit |
 | RCI-9 | (tested via RCI-10 top/bottom output + score assertion) | Implicit |
 | RCI-10 | Disjoint on long pages, Five blocks → 3 top + 2 bottom, Three blocks → 3 top + 0 bottom, Four blocks → 3 top + 1 bottom | Covered |
-| RCI-11 | (fixture with mixed scores → coverage % assertion) | Covered |
+| RCI-11 | Block at 65 counts toward coverage | Covered |
 | RCI-12 | (bottom block fixture → template key present in suggestion) | Covered |
 | RCI-13 | (no-heading fixture → single block with full text) | Covered |
 | RCI-14 | Unclosed tags, Empty body | Covered |

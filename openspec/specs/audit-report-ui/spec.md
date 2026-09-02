@@ -20,7 +20,7 @@
 | ARU-8 | MVP report render | MUST | ScoreHero (score+band+url+duration), DomainScorecard (5 domains, mini-bars, chips), TopFindings (top3/bottom3 citability + schema issues + blocked bots), ReportMeta (errors) |
 | ARU-9 | AbortSignal on probes | SHOULD | `probeSite` MUST accept optional `AbortSignal` to prevent hung probes exceeding function timeout |
 | ARU-10 | Presenter of view model | MUST | `<AuditReport>` MUST render from `toGeminiViewModel(result)`, not `AuditResult` |
-| ARU-11 | Complete ScoreHero + benchmark | MUST | ScoreHero MUST render the full Gemini hero including a benchmark bar with real thresholds |
+| ARU-11 | Complete ScoreHero + benchmark | MUST | ScoreHero MUST render the full Gemini hero including a benchmark bar whose rows/segments match `severityForScore`'s real 80/65/50/30 thresholds (single source, no drift) |
 | ARU-12 | Six-platform matrix | MUST | The platform matrix MUST render six platforms (Claude "No medido") in Gemini style |
 | ARU-13 | Structured-data dedup | MUST | Collapse `schema.issues` into ONE finding listing missing properties; JSON-LD shown once |
 | ARU-14 | Crawler dedup | MUST | Emit ONE "blocked AI bots" finding with the list of bots |
@@ -125,13 +125,20 @@ When the report renders, then `<AuditReport>` MUST take the view model produced 
 
 ### Requirement: Complete ScoreHero + Benchmark (ARU-11)
 
-When the report's hero renders, then it MUST show the full Gemini ScoreHero — big score, band chip, URL, duration — plus a benchmark bar that places the score against the **real** thresholds (90/75/60/40).
+When the report's hero renders, then it MUST show the full Gemini ScoreHero — big score, band chip, URL, duration — plus a benchmark bar that places the score against the **real** v3.1.0 thresholds (80/65/50/30). The benchmark rows (`BENCHMARK_ROWS`) and segments (`BENCHMARK_SEGMENTS`) in `score-hero.tsx` MUST match `severityForScore` band-for-band: 80-100 Excellent, 65-79 Good, 50-64 Fair, 30-49 Poor, <30 Critical.
+(Previously: 90/75/60/40 thresholds in rows and segments.)
 
 #### Scenario: Benchmark uses real thresholds
 
 - GIVEN a score of 68
 - WHEN the hero renders
-- THEN the benchmark positions 68 in the Fair band (60-74), not Gemini's bands
+- THEN the benchmark positions 68 in the Good band (65-79), not Gemini's bands
+
+#### Scenario: Benchmark rows match severityForScore
+
+- GIVEN any score
+- WHEN the hero's benchmark rows/segments and the calculator's band assignment are both rendered
+- THEN `BENCHMARK_ROWS`/`BENCHMARK_SEGMENTS` boundaries equal `severityForScore`'s 80/65/50/30 (single source, no drift)
 
 ### Requirement: Six-Platform Matrix (ARU-12)
 
@@ -191,7 +198,7 @@ When crawler-access findings are derived, then the system MUST emit a single "bl
 | ARU-8 | (via ARU-3 + ARU-7 scenarios) | Implicit |
 | ARU-9 | Probe with AbortSignal | Covered |
 | ARU-10 | Components consume the view model | Covered |
-| ARU-11 | Benchmark uses real thresholds | Covered |
+| ARU-11 | Benchmark uses real thresholds, Benchmark rows match severityForScore | Covered |
 | ARU-12 | Claude not measured | Covered |
 | ARU-13 | Missing properties grouped into one finding, No missing properties | Covered |
 | ARU-14 | Blocked bots grouped into one card, No blocked bots | Covered |

@@ -19,6 +19,7 @@ Evaluate a page's on-page readiness for the five major AI search platforms (Goog
 | RPL-9 | Direct answer detection | MUST | Detect paragraph text immediately after a question heading (first <p> sibling) |
 | RPL-10 | Per-platform scoring | MUST | Score on-page readiness for each platform (AIO, ChatGPT, Perplexity, Gemini, Copilot) using platform-specific criteria subsets |
 | RPL-11 | External criteria labeling | MUST | Split external-presence criteria: Wikipedia/Wikidata/entity-consistency labeled "measured" (points from brand engine signals); the rest (YouTube, Reddit, Bing, backlinks, etc.) labeled "not_measured" with a TODO note |
+| RPL-12 | Measured-only ceiling rescale | ADDED | MUST | Rescale each per-platform score by ×100/70 (the AIO rubric's measured maximum), applied once at per-platform computation; the rescaled value flows to the contract, report, `platform` dimension (14%), and `composeTechnical` — no downstream re-scale |
 
 ### Requirement: HTTP Header Checks (RPL-1)
 
@@ -132,6 +133,30 @@ External-presence criteria MUST be split into two groups: (a) the Wikipedia/Wiki
 - THEN they report status "not_measured"
 - AND the note references the pending TODO (YouTube/Reddit/Bing API keys, real backlinks)
 
+### Requirement: Measured-Only Ceiling Rescale (RPL-12)
+
+The platform engine MUST rescale each per-platform score to the measured-only ceiling by the factor ×100/70 (the AIO rubric's measured maximum: 70 measured points + 30 not_measured external points), applied once at per-platform score computation. The rescaled AIO score MUST be the value that flows to the contract, the report row, the `platform` dimension (14% weight), and `composeTechnical` (40% of the technical dimension); no downstream consumer MAY re-scale it.
+(Reason: the 30 not_measured points flattened every site in the sprint-14 benchmark (+1-3/site correction); rescaling at the source keeps all consumers consistent and prevents double-counting the rescale. The pre-existing double ENTRY of platform into the composite — direct weight + technical composition, RGS-2 — is unchanged; only the value is honest.)
+
+#### Scenario: Fully-measured AIO reaches 100
+
+- GIVEN all AIO measured on-page signals max out (raw score 70)
+- WHEN the per-platform score is rescaled
+- THEN the AIO score is 100 (70 × 100/70)
+
+#### Scenario: Partial measured signals rescale proportionally
+
+- GIVEN an AIO raw score of 35 (half of the measured maximum)
+- WHEN the per-platform score is rescaled
+- THEN the AIO score is 50
+
+#### Scenario: Rescale is single-sourced
+
+- GIVEN a v3.1 audit with a rescaled AIO score
+- WHEN the composite is computed
+- THEN the `platform` dimension (14%) and `composeTechnical` both consume the SAME rescaled value
+- AND no other stage of the pipeline re-scales the platform score
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -147,3 +172,4 @@ External-presence criteria MUST be split into two groups: (a) the Wikipedia/Wiki
 | RPL-9 | (fixture with answer-after-heading → detected) | Covered |
 | RPL-10 | AI Overviews ready, External criteria split | Covered |
 | RPL-11 | Migrated criteria measured from brand signals, Remaining external criteria stay not_measured | Covered |
+| RPL-12 | Fully-measured AIO reaches 100, Partial measured signals rescale proportionally, Rescale is single-sourced | Covered |

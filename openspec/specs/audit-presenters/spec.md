@@ -11,7 +11,7 @@ The pure adapter `toGeminiViewModel(result)` in `src/report/presenters/` that ma
 | # | Requirement | Status | Strength | Summary |
 |---|-------------|--------|----------|---------|
 | APT-1 | View model shape | New | MUST | `toGeminiViewModel(result)` returns a Gemini-shaped view model with all fields the components need |
-| APT-2 | Score + band normalization | New | MUST | Map `summary.geoScore`→`totalScore`, `severityBand` (Capitalized)→`band` (lowercase) |
+| APT-2 | Score + band normalization | New | MUST | Map `summary.geoScore`→`totalScore`, `severityBand` (Capitalized)→`band` (lowercase); the band always comes from the calculator's real 80/65/50/30 thresholds |
 | APT-3 | Domain + title fallback | New | MUST | Derive `domain` from `summary.url`; `title` falls back to the domain when absent |
 | APT-4 | Summary template | New | MUST | Build `summary` from real metrics only; never fabricate numbers |
 | APT-5 | Duration seconds | New | MUST | Map `summary.durationMs`→`durationSeconds` |
@@ -34,7 +34,8 @@ When the adapter runs, then it MUST return a single view model object whose fiel
 
 ### Requirement: Score + Band Normalization (APT-2)
 
-When mapping the score, then the adapter MUST copy `summary.geoScore` to `totalScore` unchanged and MUST convert the Capitalized `severityBand` to its lowercase equivalent (`Excellent`→`excellent`, `Good`→`good`, `Fair`→`fair`, `Poor`→`poor`, `Critical`→`critical`).
+When mapping the score, then the adapter MUST copy `summary.geoScore` to `totalScore` unchanged and MUST convert the Capitalized `severityBand` to its lowercase equivalent (`Excellent`→`excellent`, `Good`→`good`, `Fair`→`fair`, `Poor`→`poor`, `Critical`→`critical`). The band itself always comes from the calculator's `severityForScore` — the adapter never recomputes thresholds.
+(Previously: fixtures asserted the 90/75/60/40 real thresholds.)
 
 #### Scenario: Band lowercased
 
@@ -44,9 +45,15 @@ When mapping the score, then the adapter MUST copy `summary.geoScore` to `totalS
 
 #### Scenario: Thresholds are the real ones
 
-- GIVEN a score of `74`
+- GIVEN a score of 74
 - WHEN the adapter maps
-- THEN `band === "fair"` (real 90/75/60/40 thresholds — never Gemini's 80/65/45/25)
+- THEN `band === "good"` (real v3.1.0 thresholds 80/65/50/30 — never Gemini's 80/65/45/25)
+
+#### Scenario: Band boundaries discriminate from Gemini
+
+- GIVEN a score of 47
+- WHEN the adapter maps
+- THEN `band === "poor"` (real 30-49 band; Gemini's 80/65/45/25 would map 47 to fair)
 
 ### Requirement: Domain + Title Fallback (APT-3)
 
@@ -160,7 +167,7 @@ When any metric has no real source (`citationRate`, `presenceInPrompts`, `impact
 | Requirement | Scenarios | Coverage |
 |-------------|-----------|----------|
 | APT-1 | Shape is complete | Covered |
-| APT-2 | Band lowercased, Thresholds are the real ones | Covered |
+| APT-2 | Band lowercased, Thresholds are the real ones, Band boundaries discriminate from Gemini | Covered |
 | APT-3 | Title falls back to domain | Covered |
 | APT-4 | Summary uses real metrics | Covered |
 | APT-5 | Milliseconds to seconds | Covered |

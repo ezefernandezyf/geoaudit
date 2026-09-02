@@ -8,7 +8,7 @@ Assess a single page's Experience, Expertise, Authoritativeness, and Trustworthi
 
 | # | Requirement | Strength | Summary |
 |---|-------------|----------|---------|
-| REE-1 | Experience score (0-25) | MUST | Score first-person language, case-study patterns, and hands-on operational indicators |
+| REE-1 | Experience score (0-25) | MUST | Score first-person language, case-study patterns, and changelog/release-notes/what's-new signals as proxies for first-hand experience |
 | REE-2 | Expertise score (0-25) | MUST | Score author byline/bio presence, author Person schema, and technical-depth proxy (domain terms, code blocks, citation density) |
 | REE-3 | Authoritativeness score (0-25) | MUST | Score authority-domain citations and author `sameAs`; award partial credit for partial signals, not binary |
 | REE-4 | Trustworthiness score (0-25) | MUST | Score contact info, privacy/ToS links, HTTPS, and review/testimonial patterns with disclosure |
@@ -21,7 +21,8 @@ Assess a single page's Experience, Expertise, Authoritativeness, and Trustworthi
 
 ### Requirement: Experience Score (REE-1)
 
-The system MUST detect first-person language and case-study patterns.
+The system MUST detect first-person language, case-study patterns, and changelog/release-notes/what's-new signals as proxies for first-hand experience. A page publishing release notes or a changelog MUST earn experience credit even without first-person or case-study phrasing; the finding key MUST be "changelog_proxy".
+(Previously: first-person + case-study only — the benchmark scored 0/25 in 6 of 9 sites.)
 
 #### Scenario: Rich first-person case-study content
 
@@ -30,9 +31,16 @@ The system MUST detect first-person language and case-study patterns.
 - THEN the score is ≥ 15 (first-person + case-study indicators)
 - AND the detected patterns are enumerated in the dimension breakdown
 
+#### Scenario: Changelog proxy earns experience credit
+
+- GIVEN a page with a "Release notes" heading and version entries ("v18.2.0", "v18.3.0") but no first-person text and no case-study phrasing
+- WHEN the Experience dimension is scored
+- THEN the score is ≥ 10 (changelog proxy)
+- AND a finding with key "changelog_proxy" is present
+
 #### Scenario: Impersonal third-party content
 
-- GIVEN a page with exclusively third-person voice ("The company reported…", "Users can…") and no case-study patterns
+- GIVEN a page with exclusively third-person voice ("The company reported…", "Users can…"), no case-study patterns, and no changelog/release-notes/what's-new signals
 - WHEN the Experience dimension is scored
 - THEN the score is ≤ 5
 
@@ -145,7 +153,7 @@ The system MUST explicitly report topicalAuthority as "not_measured".
 
 | Requirement | Scenarios | Coverage |
 |-------------|-----------|----------|
-| REE-1 | Rich first-person case-study, Impersonal third-party | Covered |
+| REE-1 | Rich first-person case-study, Changelog proxy earns experience credit, Impersonal third-party | Covered |
 | REE-2 | Author with byline and schema, No author signals, Technical depth | Covered |
 | REE-3 | Partial authority earns intermediate credit, Full authority signals | Covered |
 | REE-4 | Full trust signals, No legal links/contact | Covered |

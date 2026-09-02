@@ -10,7 +10,7 @@ Sixth GEO engine (MVP: Wikipedia + Wikidata). Measures external brand presence �
 
 | # | Requirement | Strength | Summary |
 |---|-------------|----------|---------|
-| BRA-1 | Entity presence (Wikipedia) | MUST | Resolve the brand from the audited URL's domain and query the Wikipedia action API for a matching article |
+| BRA-1 | Entity presence (Wikipedia) | MUST | Derive the brand from the audited URL's registrable domain (eTLD+1) and query the Wikipedia action API for a matching article |
 | BRA-2 | Entity disambiguation | MUST | Accept `wbsearchentities` candidates only on label/description or official-website match — no false positives from same-name entities |
 | BRA-3 | Entity consistency | MUST | Compare the Wikipedia title / Wikidata label against the audited brand and report match or mismatch |
 | BRA-4 | Wikidata completeness | MUST | Report properties present on the matched entity (description, official website, claims) |
@@ -21,7 +21,8 @@ Sixth GEO engine (MVP: Wikipedia + Wikidata). Measures external brand presence �
 
 ### Requirement: Entity Presence (BRA-1)
 
-The engine MUST derive the brand name from the audited URL's domain and MUST query the Wikipedia action API to determine whether a matching article exists.
+The engine MUST derive the brand name from the audited URL's registrable domain (eTLD+1 — the last two labels for common TLDs, e.g. `docs.anthropic.com` → `anthropic.com` → "Anthropic"), not from the first subdomain label, and MUST query the Wikipedia action API to determine whether a matching article exists.
+(Previously: brand = first hostname label after stripping scheme/www/port — `docs.anthropic.com` → "docs".)
 
 #### Scenario: Article exists
 
@@ -36,6 +37,19 @@ The engine MUST derive the brand name from the audited URL's domain and MUST que
 - WHEN the brand engine queries Wikipedia
 - THEN `entityPresence` is false
 - AND the composite score is 0 (BRA-5)
+
+#### Scenario: Subdomain resolves to the registrable brand
+
+- GIVEN an audited URL "https://docs.anthropic.com/en/docs/welcome"
+- WHEN the brand is derived from the domain
+- THEN the brand is "Anthropic" (never "docs")
+- AND Wikipedia is queried for "Anthropic"
+
+#### Scenario: www subdomain resolves to the registrable brand
+
+- GIVEN an audited URL "https://www.moz.com/blog"
+- WHEN the brand is derived from the domain
+- THEN the brand is "Moz" (single subdomain stripped, registrable label capitalized)
 
 ### Requirement: Entity Disambiguation (BRA-2)
 
@@ -132,7 +146,7 @@ The engine MUST use only the keyless Wikipedia and Wikidata endpoints and MUST i
 
 | Requirement | Scenarios | Coverage |
 |-------------|-----------|----------|
-| BRA-1 | Article exists, No article | Covered |
+| BRA-1 | Article exists, No article, Subdomain resolves to the registrable brand, www subdomain resolves to the registrable brand | Covered |
 | BRA-2 | Same-name entities rejected, No candidate matches | Covered |
 | BRA-3 | Consistent entity, Mismatched label | Covered |
 | BRA-4 | Rich entity, Bare entity | Covered |
