@@ -25,9 +25,9 @@ import type { GeminiBand } from "@/report/presenters/types";
  * stale (design sprint 8 §A6).
  *
  * Sprint 9 WU-2 (port from `diag/scorehero-breakdown`): the script now prints
- * a PER-CATEGORY breakdown (crawler / citability / content / schema / platform)
- * for every URL, so the calibration diagnostic (WU-2) can see which dimension
- * crushes the total before the weights/rubrics are rebalanced (WU-3).
+ * a PER-CATEGORY breakdown (crawler / citability / content / schema / platform
+ * / brand) for every URL, so the calibration diagnostic (WU-2) can see which
+ * dimension crushes the total before the weights/rubrics are rebalanced (WU-3).
  */
 
 /**
@@ -69,12 +69,14 @@ export type VerifyEntry = {
   score: number;
   band: GeminiBand;
   summary: string;
-  /** Per-category breakdown (id → score) to diagnose what drags the total. */
+  /** Per-category breakdown (id → score) to diagnose what drags the total.
+   *  Score/band are nullable: a row the engine did not measure (legacy
+   *  brandAuthority) is honestly null, "No medido" (APT-11). */
   categories: Array<{
     id: string;
     name: string;
-    score: number;
-    band: GeminiBand;
+    score: number | null;
+    band: GeminiBand | null;
   }>;
 };
 
@@ -139,22 +141,25 @@ describe("lógica de verificación (sin red, runner mockeado)", () => {
     expect(entry.summary).toContain("GEO Score 68 (fair)");
   });
 
-  it("desglosa el resultado real en 5 categorías con id, nombre, score y band", () => {
+  it("desglosa el resultado real en 6 categorías con id, nombre, score y band", () => {
     const entry = toVerifyEntry("https://example.com/", auditResultFixture);
-    expect(entry.categories).toHaveLength(5);
+    expect(entry.categories).toHaveLength(6);
     expect(entry.categories.map((c) => c.id)).toEqual([
       "crawler",
       "citability",
       "content",
       "schema",
       "platform",
+      "brand",
     ]);
     for (const c of entry.categories) {
       expect(c.name).not.toBe("");
-      expect(typeof c.score).toBe("number");
-      expect(["excellent", "good", "fair", "poor", "critical"]).toContain(
-        c.band,
-      );
+      // Una fila no medida (brand en legacy 2.0.0) es null honesto (APT-11).
+      if (c.score !== null) expect(typeof c.score).toBe("number");
+      if (c.band !== null)
+        expect(["excellent", "good", "fair", "poor", "critical"]).toContain(
+          c.band,
+        );
     }
   });
 
