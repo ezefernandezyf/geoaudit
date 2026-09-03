@@ -4,7 +4,7 @@
 
 ## Purpose
 
-The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10). Since Sprint 12, the Organization JSON-LD carries the full recommended property set (`knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` — LND-9), and the landing shows a visible FAQ with real questions plus `datePublished`/byline/alt (LND-13; FAQPage JSON-LD intentionally omitted as a product decision — the schema engine docks FAQPage as deprecated under RSC-7). Since Sprint 13, the landing copy describes the six GEO dimensions with their v3.0.0 weights (LND-11 adds the 50-200 word band), the feature grid gains a 6th "Autoridad de marca" card (20%), the FAQ reaches 6 recognizable questions with question-form H2/H3 headings (LND-13), and a comparison table with real Relevy facts (LND-14) renders between the platforms and the FAQ.
+The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10). Since Sprint 12, the Organization JSON-LD carries the full recommended property set (`knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` — LND-9), and the landing shows a visible FAQ with real questions plus `datePublished`/byline/alt (LND-13; FAQPage JSON-LD intentionally omitted as a product decision — the schema engine docks FAQPage as deprecated under RSC-7). Since Sprint 13, the landing copy describes the six GEO dimensions with their weights (LND-11 adds the 50-200 word band), the feature grid gains a 6th "Autoridad de marca" card (20%), the FAQ reaches 6 recognizable questions with question-form H2/H3 headings (LND-13), and a comparison table with real Relevy facts (LND-14) renders between the platforms and the FAQ. Since Sprint 15, the copy weight references are synced to v3.1.0 (24/23/15/12/14/12, brand "12 %"/"octava parte" — LND-15), the hero subtitle lists the six dimensions by name without percentages (LND-11), and the comparison table scrolls horizontally on mobile while preserving semantic `<table>` markup (LND-14).
 
 ## Requirements
 
@@ -20,10 +20,11 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
 | LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` (real data) |
 | LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt (Relevy brand, `relevy.app`, accurate 10/30d limit) |
-| LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats and each passage in the 50-200 word band |
+| LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats, each passage in the 50-200 word band, hero subtitle names-only (no percentages) |
 | LND-12 | E-E-A-T signals | New | MUST | Landing MUST surface author/org trust signals (legal links, contact, HTTPS) |
 | LND-13 | Content signals: FAQ, dates, byline, alt | New | MUST | Landing MUST expose a visible FAQ with 5+ recognizable questions (FAQPage JSON-LD intentionally omitted — product decision, RSC-7), question-form H2/H3 headings, `datePublished` on content, author byline, and alt text on images |
-| LND-14 | Comparative table | ADDED | MUST | Landing MUST render a comparison table with ≥3 rows of real Relevy facts, no invented cells |
+| LND-14 | Comparative table | ADDED | MUST | Landing MUST render a comparison table with ≥3 rows of real Relevy facts, semantic `<table>` preserved with horizontal scroll on mobile (`overflow-x-auto` + `min-w`), no invented cells |
+| LND-15 | Weight copy accuracy v3.1.0 | ADDED | MUST | Landing weight copy MUST match v3.1.0 (24/23/15/12/14/12); brand "12 %"/"octava parte"; no stale v3.0.0; "24 puntos"/"12 criterios" intact |
 
 ### Requirement: Hero Form Inline (LND-1)
 
@@ -163,8 +164,8 @@ When the site serves static assets, then the landing MUST expose `robots.txt`, `
 
 ### Requirement: Citable Passages (LND-11)
 
-When the hero and feature sections render, then the copy MUST be answer-first (definition/claim in the first 1-2 sentences), MUST include concrete statistics, and each passage MUST sit in the 50-200 word band (the citability engine's extraction band) so passages are self-contained and citable.
-(Previously: answer-first with stats; no word-band requirement.)
+When the hero and feature sections render, then the copy MUST be answer-first (definition/claim in the first 1-2 sentences), MUST include concrete statistics, and each passage MUST sit in the 50-200 word band (the citability engine's extraction band) so passages are self-contained and citable. The hero subtitle MUST list the six dimensions by NAME only, without percentages, and the full hero passage MUST remain at or above the 50-word floor of the band after the subtitle is shortened.
+(Previously: hero subtitle listed the six v3.0.0 weights with percentages.)
 
 #### Scenario: Answer-first copy with stats
 
@@ -177,7 +178,14 @@ When the hero and feature sections render, then the copy MUST be answer-first (d
 - GIVEN each hero/feature passage
 - WHEN its word count is measured
 - THEN it contains between 50 and 200 words
-- AND the claim is fully stated in the first 1-2 sentences (no dangling references)
+- AND the hero passage remains ≥50 words with the shortened subtitle
+
+#### Scenario: Hero subtitle is names-only
+
+- GIVEN the hero subtitle
+- WHEN its content is inspected
+- THEN it names the six dimensions without percentages (e.g. "citabilidad, E-E-A-T, acceso de bots, autoridad de marca, datos estructurados y plataforma")
+- AND no percentage value appears in the subtitle
 
 ### Requirement: E-E-A-T Signals (LND-12)
 
@@ -222,19 +230,50 @@ When the landing renders, then it MUST surface structured content signals: a vis
 
 ### Requirement: Comparative Table (LND-14)
 
-The landing MUST render a comparison table (product vs alternatives / feature comparison) whose cells carry real Relevy facts — tables earn citability structure points (RCI-5) and AI extraction (RPL-10).
+The landing MUST render a comparison table (product vs alternatives / feature comparison) whose cells carry real Relevy facts — tables earn citability structure points (RCI-5) and AI extraction (RPL-10). The table MUST keep semantic `<table>` markup; on viewports narrower than the table's content width the section MUST remain horizontally scrollable (`overflow-x-auto` wrapper + a `min-w` on the table) so columns stay legible instead of squeezing.
+(Previously: table rendered at full width inside an `overflow-hidden` wrapper — illegible on mobile.)
 
 #### Scenario: Comparison table present
 
 - GIVEN the landing page
-- WHEN the comparison section renders
-- THEN a `<table>` with at least 3 rows of real comparison data is present
+- WHEN the comparison section renders at a 360px viewport
+- THEN a semantic `<table>` with at least 3 rows of real comparison data is present
+- AND the section is horizontally scrollable with a min-width table (columns keep legible width, no cell squeeze)
 
 #### Scenario: No invented cells
 
 - GIVEN the comparison table
 - WHEN its cells are inspected
 - THEN every value traces to real product facts (no placeholder or fabricated numbers)
+
+### Requirement: Weight Copy Accuracy v3.1.0 (LND-15)
+
+When the landing copy references dimension weights, then every percentage MUST match the v3.1.0 engine weights: citability 24%, E-E-A-T 23%, acceso de bots 15%, datos estructurados 12%, plataforma 14%, autoridad de marca 12%. The brand authority references MUST read "12 %" and "octava parte" — never "20 %" or "quinta parte". The copy MUST NOT contain any stale v3.0.0 value (22,4 / 19,2 / 16 / 20 / 11,2). The "24 puntos" (E-E-A-T rubric, not a weight) and "12 criterios" (schema criteria count, not a weight) references MUST remain unchanged. `copy.test.ts` MUST be co-updated in the same change.
+
+#### Scenario: All weight references match v3.1.0
+
+- GIVEN the hero, features[01-06], and FAQ copy
+- WHEN every weight reference is inspected
+- THEN each matches 24/23/15/12/14/12
+- AND no stale v3.0.0 value (22,4/19,2/16/20/11,2) appears anywhere
+
+#### Scenario: Brand reads octava parte
+
+- GIVEN features[06] and faq[4] (brand authority)
+- WHEN their weight copy is inspected
+- THEN they read "12 %" and "octava parte" (no "20 %" / "quinta parte")
+
+#### Scenario: Rubric and criteria counts untouched
+
+- GIVEN the E-E-A-T and schema feature cards
+- WHEN their non-weight copy is inspected
+- THEN "24 puntos" (E-E-A-T rubric) and "12 criterios" (schema) remain unchanged
+
+#### Scenario: copy.test.ts passes with v3.1.0
+
+- GIVEN the co-updated assertions
+- WHEN `pnpm test` runs
+- THEN `copy.test.ts` passes asserting the v3.1.0 values (no stale 20% / "quinta parte")
 
 ## Compliance Matrix
 
@@ -250,7 +289,8 @@ The landing MUST render a comparison table (product vs alternatives / feature co
 | LND-8 | OG + Twitter tags present | Covered |
 | LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data | Covered |
 | LND-10 | Assets served at root, llms.txt is Relevy-accurate | Covered |
-| LND-11 | Answer-first copy with stats, Passages in the 50-200 word band | Covered |
+| LND-11 | Answer-first copy with stats, Passages in the 50-200 word band, Hero subtitle is names-only | Covered |
 | LND-12 | Trust signals present | Covered |
 | LND-13 | FAQ 5+ recognizable (FAQPage JSON-LD omitted by product decision), Question-form H2/H3, Dates and byline on content, Every image has alt text | Covered |
 | LND-14 | Comparison table present, No invented cells | Covered |
+| LND-15 | All weight references match v3.1.0, Brand reads octava parte, Rubric and criteria counts untouched, copy.test.ts passes with v3.1.0 | Covered |

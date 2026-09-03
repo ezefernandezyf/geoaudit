@@ -20,10 +20,11 @@
 | ARU-8 | MVP report render | MUST | ScoreHero (score+band+url+duration), DomainScorecard (5 domains, mini-bars, chips), TopFindings (top3/bottom3 citability + schema issues + blocked bots), ReportMeta (errors) |
 | ARU-9 | AbortSignal on probes | SHOULD | `probeSite` MUST accept optional `AbortSignal` to prevent hung probes exceeding function timeout |
 | ARU-10 | Presenter of view model | MUST | `<AuditReport>` MUST render from `toGeminiViewModel(result)`, not `AuditResult` |
-| ARU-11 | Complete ScoreHero + benchmark | MUST | ScoreHero MUST render the full Gemini hero including a benchmark bar whose rows/segments match `severityForScore`'s real 80/65/50/30 thresholds (single source, no drift) |
+| ARU-11 | Complete ScoreHero + benchmark | MUST | ScoreHero MUST render the full Gemini hero including a benchmark bar whose rows/segments match `severityForScore`'s real 80/65/50/30 thresholds (single source, no drift); segments render critical→excellent (red `#ef4444` left, green `#10b981` right) |
 | ARU-12 | Six-platform matrix | MUST | The platform matrix MUST render six platforms (Claude "No medido") in Gemini style |
 | ARU-13 | Structured-data dedup | MUST | Collapse `schema.issues` into ONE finding listing missing properties; JSON-LD shown once |
 | ARU-14 | Crawler dedup | MUST | Emit ONE "blocked AI bots" finding with the list of bots |
+| ARU-15 | Unclipped three-digit score | ADDED | MUST | Score values up to 100 and the `/100` indicator MUST render fully visible (no clip); `/100` MAY stack below the number; keeps AA hex `#047857` |
 
 ### ARU-1: Async RSC page with Node runtime
 
@@ -125,8 +126,8 @@ When the report renders, then `<AuditReport>` MUST take the view model produced 
 
 ### Requirement: Complete ScoreHero + Benchmark (ARU-11)
 
-When the report's hero renders, then it MUST show the full Gemini ScoreHero — big score, band chip, URL, duration — plus a benchmark bar that places the score against the **real** v3.1.0 thresholds (80/65/50/30). The benchmark rows (`BENCHMARK_ROWS`) and segments (`BENCHMARK_SEGMENTS`) in `score-hero.tsx` MUST match `severityForScore` band-for-band: 80-100 Excellent, 65-79 Good, 50-64 Fair, 30-49 Poor, <30 Critical.
-(Previously: 90/75/60/40 thresholds in rows and segments.)
+When the report's hero renders, then it MUST show the full Gemini ScoreHero — big score, band chip, URL, duration — plus a benchmark bar that places the score against the **real** v3.1.0 thresholds (80/65/50/30). The benchmark rows (`BENCHMARK_ROWS`) and segments (`BENCHMARK_SEGMENTS`) in `score-hero.tsx` MUST match `severityForScore` band-for-band: 80-100 Excellent, 65-79 Good, 50-64 Fair, 30-49 Poor, <30 Critical. The segments MUST render left→right in severity order critical → poor → fair → good → excellent (red `#ef4444` left, green `#10b981` right), so the score marker's `left` position (0-100 scale) always lands inside the band it belongs to. This applies to every surface rendering ScoreHero (report, multi-page, landing scorecard).
+(Previously: segments rendered left→right excellent → good → fair → poor → critical — green left, red right — contradicting the 0-100 marker scale.)
 
 #### Scenario: Benchmark uses real thresholds
 
@@ -139,6 +140,14 @@ When the report's hero renders, then it MUST show the full Gemini ScoreHero — 
 - GIVEN any score
 - WHEN the hero's benchmark rows/segments and the calculator's band assignment are both rendered
 - THEN `BENCHMARK_ROWS`/`BENCHMARK_SEGMENTS` boundaries equal `severityForScore`'s 80/65/50/30 (single source, no drift)
+
+#### Scenario: Segments ordered critical-to-excellent
+
+- GIVEN the ScoreHero benchmark bar renders
+- WHEN the segment order is inspected left→right
+- THEN the order is critical 30% → poor 20% → fair 15% → good 15% → excellent 20%
+- AND the leftmost segment uses `#ef4444` (red) and the rightmost uses `#10b981` (green)
+- AND the widths sum to 100% and the marker still positions at `left: score%`
 
 ### Requirement: Six-Platform Matrix (ARU-12)
 
@@ -184,6 +193,22 @@ When crawler-access findings are derived, then the system MUST emit a single "bl
 - WHEN findings are derived
 - THEN no blocked-bot finding is emitted
 
+### Requirement: Unclipped Three-Digit Score (ARU-15)
+
+When the ScoreHero renders a score value of up to 100, then the number and its `/100` indicator MUST both render fully visible inside the score box — never clipped by the wrapper's overflow. The `/100` indicator MAY stack below the number (or the row MAY wrap) to fit 3 digits at `text-6xl`/`text-7xl`; the `/100` MUST keep its AA-contrast hex `#047857`. This applies to report, multi-page, and landing surfaces.
+
+#### Scenario: Score 100 renders unclipped
+
+- GIVEN a report with `totalScore` 100
+- WHEN the ScoreHero renders at mobile and sm widths
+- THEN the "100" and "/100" are both fully visible (no clipping, no horizontal overflow of the box)
+
+#### Scenario: /100 stacks below the number
+
+- GIVEN a 3-digit score at `text-6xl`/`text-7xl`
+- WHEN the score row renders with `/100` stacked under the number
+- THEN both elements are visible and the `/100` keeps the hex `#047857`
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -198,7 +223,8 @@ When crawler-access findings are derived, then the system MUST emit a single "bl
 | ARU-8 | (via ARU-3 + ARU-7 scenarios) | Implicit |
 | ARU-9 | Probe with AbortSignal | Covered |
 | ARU-10 | Components consume the view model | Covered |
-| ARU-11 | Benchmark uses real thresholds, Benchmark rows match severityForScore | Covered |
+| ARU-11 | Benchmark uses real thresholds, Benchmark rows match severityForScore, Segments ordered critical-to-excellent | Covered |
 | ARU-12 | Claude not measured | Covered |
 | ARU-13 | Missing properties grouped into one finding, No missing properties | Covered |
 | ARU-14 | Blocked bots grouped into one card, No blocked bots | Covered |
+| ARU-15 | Score 100 renders unclipped, /100 stacks below the number | Covered |

@@ -17,13 +17,13 @@ Compose the complete audit pipeline as a pure, testable function: validate the i
 | RAO-7 | E-E-A-T engine invocation | MUST | Invoke E-E-A-T engine with shared parsed DOM + HTTP headers |
 | RAO-8 | Platform engine invocation | MUST | Invoke platform engine with page HTTP headers + parsed DOM + probe results |
 | RAO-9 | GEO Score computation | MUST | Compute weighted composite from all engine scores via the GEO Score calculator |
-| RAO-10 | Typed AuditResult output | MUST | Return fully typed `AuditResult` matching D3 contract shape with all sub-results including `brandAuthority` and `scoringModelVersion: "3.0.0"` |
+| RAO-10 | Typed AuditResult output | MUST | Return fully typed `AuditResult` matching D3 contract shape with all sub-results including `brandAuthority` and `scoringModelVersion: "3.1.0"` |
 | RAO-11 | Injectable fetcher | MUST | Accept optional injectable `fetcher` parameter; use native fetch as default |
 | RAO-12 | Per-engine failure isolation | MUST | If one engine throws or returns an error, other engines MUST still produce results; the failed engine is noted in `meta.errors` |
 | RAO-13 | Non-HTML response handling | MUST | If the page fetch returns "unsupported_content_type", all content engines MUST produce "unsupported" results with shared reason |
 | RAO-14 | P99 latency target | SHOULD | Complete audit (fetch + parsing + all 6 engines + composite, including ~2-4 Wikipedia/Wikidata requests) in under 8 seconds on representative hardware |
 | RAO-15 | Brand engine invocation | ADDED | MUST | Invoke the brand engine on every audit (authenticated and anonymous) with the audited URL's domain; fall back to `emptyBrandResult()` on failure |
-| RAO-16 | Persistence version migration | ADDED | MUST | Accept "2.0.0" and "3.0.0" on read; write "3.0.0" + `brandAuthority`; legacy rows without `brandAuthority` render "No medido" |
+| RAO-16 | Persistence version migration | ADDED | MUST | Accept "2.0.0" \| "3.0.0" \| "3.1.0" on read; write "3.1.0" + `brandAuthority` (incl. degraded invalid-URL branch); legacy rows without `brandAuthority` render "No medido" |
 
 ### Requirement: URL Validation (RAO-1)
 
@@ -115,8 +115,8 @@ The system MUST return the D3-contract shape.
 - THEN the returned object matches the Zod AuditResult schema
 - AND it includes fields: `summary`, `crawlers`, `citability`, `schema`, `platform`, `content`, `brandAuthority`, `scoringModelVersion`, `meta`
 - AND `summary.geoScore` is a number 0-100
-- AND `scoringModelVersion` is "3.0.0"
-(Previously: fields list had no `brandAuthority`; the scenario asserted the stale "1.0.0".)
+- AND `scoringModelVersion` is "3.1.0"
+(Previously: the scenario asserted the stale "3.0.0" — the engine has written "3.1.0" since sprint 14, RGS-7.)
 
 ### Requirement: Non-HTML Response Handling (RAO-13)
 
@@ -175,15 +175,23 @@ The orchestrator MUST invoke the brand engine on every audit — authenticated a
 
 ### Requirement: Persistence Version Migration (RAO-16)
 
-The contract MUST accept both `scoringModelVersion` literals "2.0.0" and "3.0.0" on read (legacy persisted rows keep their version); new audits MUST be written as "3.0.0" with a `brandAuthority` section. Reads of legacy 2.0.0 rows without `brandAuthority` MUST NOT fail: consumers MUST treat the section as absent (rendered "No medido"), never fabricated.
+The contract MUST accept the `scoringModelVersion` literals "2.0.0", "3.0.0", and "3.1.0" on read (legacy persisted rows keep their version); new audits MUST be written as "3.1.0" with a `brandAuthority` section — including the degraded invalid-URL branch (`src/audit/index.ts`), which MUST write "3.1.0" instead of "2.0.0". Reads of legacy 2.0.0 rows without `brandAuthority` MUST NOT fail: consumers MUST treat the section as absent (rendered "No medido"), never fabricated.
+(Previously: new audits written as "3.0.0"; the degraded invalid-URL branch wrote "2.0.0".)
 
-#### Scenario: New audit persists v3
+#### Scenario: New audit persists v3.1
 
-- GIVEN a completed v3 audit
+- GIVEN a completed v3.1 audit
 - WHEN its result is validated and persisted (dashboard, share, PDF)
-- THEN `scoringModelVersion` is "3.0.0"
+- THEN `scoringModelVersion` is "3.1.0"
 - AND `brandAuthority` is present
 - AND Zod validation accepts the result
+
+#### Scenario: Degraded invalid-URL branch writes the current version
+
+- GIVEN an audit that follows the degraded invalid-URL path
+- WHEN its result is produced
+- THEN `scoringModelVersion` is "3.1.0" (not "2.0.0")
+- AND the edge-case test co-update asserts "3.1.0"
 
 #### Scenario: Legacy 2.0.0 row still reads
 
@@ -212,4 +220,4 @@ The contract MUST accept both `scoringModelVersion` literals "2.0.0" and "3.0.0"
 | RAO-13 | PDF page → all content engines unsupported | Covered |
 | RAO-14 | (benchmark fixture — wall-clock assertion on known fixture) | Covered |
 | RAO-15 | Runs on every audit, Failure falls back to emptyBrandResult | Covered |
-| RAO-16 | New audit persists v3, Legacy 2.0.0 row still reads | Covered |
+| RAO-16 | New audit persists v3.1, Degraded invalid-URL branch writes the current version, Legacy 2.0.0 row still reads | Covered |
