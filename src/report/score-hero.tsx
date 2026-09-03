@@ -50,13 +50,16 @@ const BENCHMARK_ROWS = [
   { range: "< 30", label: "Crítico", color: "text-[#dc2626]" },
 ] as const;
 
-/** Benchmark bar segments (left→right), real band widths on the 0-100 scale. */
+/** Benchmark bar segments (left→right, ARU-11 sprint 15): severity order
+ * critical → poor → fair → good → excellent (red `#ef4444` left, green
+ * `#10b981` right) so the marker's `left: score%` (0-100 scale) always lands
+ * inside the band it belongs to. Real band widths, unchanged colors. */
 const BENCHMARK_SEGMENTS = [
-  { width: "20%", className: "bg-[#10b981]" }, // 80-100 excellent
-  { width: "15%", className: "bg-[#10b981]/80" }, // 65-79 good
-  { width: "15%", className: "bg-[#f59e0b]" }, // 50-64 fair
-  { width: "20%", className: "bg-[#f59e0b]/90" }, // 30-49 poor
   { width: "30%", className: "bg-[#ef4444]" }, // 0-29 critical
+  { width: "20%", className: "bg-[#f59e0b]/90" }, // 30-49 poor
+  { width: "15%", className: "bg-[#f59e0b]" }, // 50-64 fair
+  { width: "15%", className: "bg-[#10b981]/80" }, // 65-79 good
+  { width: "20%", className: "bg-[#10b981]" }, // 80-100 excellent
 ] as const;
 
 /**
@@ -82,11 +85,14 @@ export function ScoreHero({ view }: ScoreHeroProps) {
       <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
         {/* Left Side: Score & Context */}
         <div className="flex items-start gap-6 sm:items-center">
-          <div className="flex min-w-[130px] flex-col justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 sm:min-w-[160px]">
+          <div className="flex min-w-[104px] flex-col justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 sm:min-w-[128px]">
             <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-[#475569]">
               {REPORT_COPY.hero.scoreLabel}
             </p>
-            <div className="flex items-baseline gap-2">
+            {/* ARU-15 (sprint 15): /100 stacks UNDER the number (flex-col) so a
+                3-digit score at text-6xl/7xl never overflows the box; the /100
+                keeps its AA-contrast hex #047857 (PERF-3). */}
+            <div className="flex flex-col items-start gap-1">
               <span className="font-serif text-6xl leading-tight text-[#0f172a] sm:text-7xl">
                 {totalScore}
               </span>
