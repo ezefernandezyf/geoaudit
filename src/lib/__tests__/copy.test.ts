@@ -254,7 +254,11 @@ describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
     const subtitle =
       `${LANDING_COPY.hero.subtitleLead}${LANDING_COPY.hero.subtitleHighlight}${LANDING_COPY.hero.subtitleTail}`.trim();
     expect(subtitle).toMatch(ANSWER_FIRST_PATTERN);
-    expect(subtitle).toMatch(STAT_PATTERN);
+    // LND-11 (sprint 15): the names-only subtitle keeps real stats - the 6
+    // audited engines and the 0-100 scale - without any percentage (D7).
+    expect(subtitle).toMatch(/6 motores de búsqueda con IA/);
+    expect(subtitle).toMatch(/0 a 100/);
+    expect(subtitle).not.toMatch(/%/);
     expect(subtitle.length).toBeGreaterThan(80);
   });
 
@@ -276,7 +280,7 @@ describe("LANDING_COPY citable passages (LND-11, sprint 9)", () => {
   });
 });
 
-describe("LANDING_COPY six-dimension polish (LND-11/13/14, sprint 13)", () => {
+describe("LANDING_COPY six-dimension polish (LND-11/13/14/15, sprint 13/15)", () => {
   it("lists six features ending with Autoridad de marca (LND-11)", () => {
     expect(LANDING_COPY.features).toHaveLength(6);
     const last = LANDING_COPY.features[5];
@@ -285,30 +289,43 @@ describe("LANDING_COPY six-dimension polish (LND-11/13/14, sprint 13)", () => {
     const words = last.body.trim().split(/\s+/).length;
     expect(words).toBeGreaterThanOrEqual(50);
     expect(words).toBeLessThanOrEqual(200);
-    // 20% is the v3 brand_authority weight (RGS-1) - a real product fact.
-    expect(last.body).toMatch(/20 %/);
+    // LND-15 (sprint 15): 12% is the v3.1.0 brand_authority weight - the copy
+    // reads "12 %" / "octava parte", never "20 %" / "quinta parte".
+    expect(last.body).toMatch(/12 %/);
+    expect(last.body).toMatch(/octava parte/);
+    expect(last.body).not.toMatch(/20 %|quinta parte/);
   });
 
-  it("quotes the v3 weights on the feature passages (RGS-1)", () => {
+  it("quotes the v3.1 weights on the feature passages (LND-15)", () => {
     const bodies = LANDING_COPY.features.map((f) => f.body).join(" ");
-    expect(bodies).toMatch(/22,4 %/); // citability
-    expect(bodies).toMatch(/19,2 %/); // E-E-A-T
-    expect(bodies).toMatch(/16 %/); // technical (acceso de bots)
-    expect(bodies).toMatch(/11,2 %/); // schema + platform
-    expect(bodies).toMatch(/20 %/); // brand_authority
+    expect(bodies).toMatch(/24 %/); // citability
+    expect(bodies).toMatch(/23 %/); // E-E-A-T
+    expect(bodies).toMatch(/15 %/); // technical (acceso de bots)
+    expect(bodies).toMatch(/12 %/); // schema + brand_authority
+    expect(bodies).toMatch(/14 %/); // platform
+    // No stale v3.0.0 weight survives anywhere (LND-15).
+    expect(bodies).not.toMatch(/22,4 %|19,2 %|16 %|11,2 %|20 %/);
   });
 
-  it("keeps the hero subtitle in the 50-200 word band with six dimensions (LND-11)", () => {
+  it("keeps the non-weight counts: 24 puntos (E-E-A-T) and 12 criterios (schema) (LND-15)", () => {
+    const bodies = LANDING_COPY.features.map((f) => f.body).join(" ");
+    // The E-E-A-T rubric count and the schema criteria count are NOT weights.
+    expect(bodies).toContain("24 puntos");
+    expect(bodies).toContain("12 criterios");
+  });
+
+  it("keeps the hero subtitle in the 50-200 word band, names-only (LND-11)", () => {
     const subtitle =
       `${LANDING_COPY.hero.subtitleLead}${LANDING_COPY.hero.subtitleHighlight}${LANDING_COPY.hero.subtitleTail}`.trim();
     const words = subtitle.trim().split(/\s+/).length;
     expect(words).toBeGreaterThanOrEqual(50);
     expect(words).toBeLessThanOrEqual(200);
-    expect(subtitle).toMatch(/6 dimensiones/);
-    expect(subtitle).toMatch(/20 %/);
+    // D7 (sprint 15): the six dimensions by NAME only - no percentages.
+    expect(subtitle).toMatch(/seis dimensiones/);
+    expect(subtitle).not.toMatch(/%/);
   });
 
-  it("renders at least five recognizable FAQ questions with v3 weights (LND-13)", () => {
+  it("renders at least five recognizable FAQ questions with v3.1 weights (LND-13/15)", () => {
     expect(LANDING_COPY.faq.items.length).toBeGreaterThanOrEqual(5);
     for (const item of LANDING_COPY.faq.items) {
       // Recognizable question form (what is / how to / …?) - LND-13.
@@ -316,11 +333,16 @@ describe("LANDING_COPY six-dimension polish (LND-11/13/14, sprint 13)", () => {
       expect(item.question.endsWith("?")).toBe(true);
       expect(item.answer.length).toBeGreaterThan(40);
     }
-    // The score question quotes the six v3 weights - never the v2 list.
+    // The score question quotes the six v3.1 weights - never the v2 list.
     const score = LANDING_COPY.faq.items[0];
     expect(score.answer).toMatch(/6 dimensiones/);
-    expect(score.answer).toMatch(/22,4 %/);
-    expect(score.answer).toMatch(/20 %/);
+    expect(score.answer).toMatch(/24 %/);
+    expect(score.answer).toMatch(/12 %/);
+    // The brand question reads "12 %" / "octava parte" (LND-15).
+    const brand = LANDING_COPY.faq.items[4];
+    expect(brand.answer).toMatch(/12 %/);
+    expect(brand.answer).toMatch(/octava parte/);
+    expect(brand.answer).not.toMatch(/20 %|quinta parte/);
   });
 
   it("provides comparison table copy with at least three real rows (LND-14)", () => {
