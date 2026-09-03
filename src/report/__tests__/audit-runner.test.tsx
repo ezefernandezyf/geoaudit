@@ -311,7 +311,9 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
   it("passes the persisted audit id to the report as exportPdfHref (PDF-10)", async () => {
     runAuditMock.mockResolvedValue(auditResultFixture);
     authMock.mockResolvedValue(session());
-    auditCreateMock.mockResolvedValue({ id: "audit-123" });
+    auditCreateMock.mockResolvedValue({
+      id: "audit-123",
+    } as unknown as Awaited<ReturnType<typeof prisma.audit.create>>);
 
     render(await AuditRunner({ url: "https://example.com/" }));
 

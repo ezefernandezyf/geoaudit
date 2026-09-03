@@ -24,8 +24,7 @@ vi.mock("next/link", () => ({
     href: string;
     children: React.ReactNode;
     onClick?: (e: React.MouseEvent) => void;
-    "aria-current"?: string;
-  }) => (
+  } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a href={href} onClick={onClick} {...rest}>
       {children}
     </a>
