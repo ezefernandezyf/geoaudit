@@ -33,6 +33,12 @@ export type ViewModelContext = {
   shareToken?: string | null;
   /** Persisted audit date - passed through when present. */
   auditDate?: string | null;
+  /** D1/PDF-10 (sprint 15): direct /api/report/{id}/pdf when the live audit
+   * persisted (best-effort). `null`/absent → no export entry (no dead link). */
+  exportPdfHref?: string | null;
+  /** D1/PDF-10 (sprint 15): anonymous live report → PDF account-benefit copy
+   * with a signup CTA instead of the export entry. */
+  exportAnonCta?: boolean;
 };
 
 /** Hostname of an audited URL; empty string on any parse failure. */

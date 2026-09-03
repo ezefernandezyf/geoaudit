@@ -79,3 +79,33 @@ describe("AuditReport (ARU-10)", () => {
     expect(screen.getAllByText(/2026-08-10/).length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("AuditReport PDF export entry (PDF-10, sprint 15)", () => {
+  it("renders an 'Exportar PDF' link to /api/report/{id}/pdf when the audit persisted", () => {
+    render(
+      <AuditReport
+        result={auditResultFixture}
+        ctx={{ exportPdfHref: "/api/report/123/pdf" }}
+      />,
+    );
+    const exportLink = screen.getByRole("link", { name: "Exportar PDF" });
+    expect(exportLink).toHaveAttribute("href", "/api/report/123/pdf");
+  });
+
+  it("renders no export entry when persistence failed (no id) - no dead link", () => {
+    render(<AuditReport result={auditResultFixture} ctx={{}} />);
+    expect(screen.queryByRole("link", { name: "Exportar PDF" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /crear cuenta/i })).toBeNull();
+  });
+
+  it("shows PDF account-benefit copy with a signup CTA instead of the export for anonymous users", () => {
+    render(
+      <AuditReport result={auditResultFixture} ctx={{ exportAnonCta: true }} />,
+    );
+    // No export entry - anonymous has no persisted id to link.
+    expect(screen.queryByRole("link", { name: "Exportar PDF" })).toBeNull();
+    // Marketing gate: PDF account-benefit copy with a signup CTA.
+    const cta = screen.getByRole("link", { name: /crear cuenta/i });
+    expect(cta).toHaveAttribute("href", "/signup");
+  });
+});

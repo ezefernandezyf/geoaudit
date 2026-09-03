@@ -502,6 +502,19 @@ export const REPORT_COPY = {
       pending: "En cola",
     },
   },
+  // PDF-10 (sprint 15): live-report export entry - logged-in users with a
+  // persisted id link DIRECTLY to /api/report/{id}/pdf (the route owns auth +
+  // ownership, PDF-2/PDF-9); anonymous users see PDF account-benefit copy with
+  // a signup CTA (marketing gate, not a security one). Neutral Spanish.
+  export: {
+    title: "Exporte el reporte en PDF",
+    body: "Guarde esta auditoría como PDF para compartirla o archivarla.",
+    cta: "Exportar PDF",
+    anonTitle: "Exporte sus reportes como PDF",
+    anonBody:
+      "Cree su cuenta para guardar esta auditoría y exportarla a PDF en cualquier momento.",
+    anonCta: "Crear cuenta gratis",
+  },
 } as const;
 
 /**
