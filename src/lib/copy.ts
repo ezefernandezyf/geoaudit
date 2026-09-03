@@ -133,14 +133,15 @@ export const LANDING_COPY = {
     badgeDivider: "|",
     badgeSuffix: "Auditoría de visibilidad en motores de IA",
     title: "¿Cómo lo citan los motores de IA?",
-    // LND-11 (sprint 9/13): answer-first subtitle with a concrete stat - the
+    // LND-11 (sprint 9/13/15): answer-first subtitle with a concrete stat - the
     // first sentence states the claim so the passage is self-contained. Sprint
-    // 13: six dimensions with the v3 weights (RGS-1) - the passage stays in
+    // 15 (D7): the highlight lists the six dimensions by NAME only (no
+    // percentages - they already live in features/FAQ) and the passage stays in
     // the 50-200 word extraction band. The stats are REAL product facts
     // (6 engines, 6 dimensions, weights sum 100).
     subtitleLead: `${BRAND_NAME} es una plataforma de auditoría GEO que analiza su sitio en 6 motores de búsqueda con IA.`,
     subtitleHighlight:
-      " El GEO Score pondera 6 dimensiones que suman el 100 % del resultado: citabilidad (22,4 %), E-E-A-T (19,2 %), acceso de bots (16 %), autoridad de marca (20 %), datos estructurados (11,2 %) y plataforma (11,2 %).",
+      " El GEO Score pondera seis dimensiones que suman el resultado: citabilidad, E-E-A-T, acceso de bots, autoridad de marca, datos estructurados y plataforma.",
     subtitleTail:
       " Entrega un puntaje de 0 a 100 con diagnóstico accionable en menos de 30 segundos.",
     sampleLabel: "O pruebe un ejemplo real:",
@@ -153,40 +154,40 @@ export const LANDING_COPY = {
   },
   // LND-11 (sprint 9/13): feature cards are answer-first passages (claim in the
   // first sentence) with concrete stats and 50-200 self-contained words - the
-  // extraction band the citability engine rewards. Sprint 13: every weight is
-  // the REAL v3 value (RGS-1) and the sixth dimension (Autoridad de marca)
-  // joins the set. Figures are REAL product facts: engine registry (17
-  // agents), scoring weights, rubric counts.
+  // extraction band the citability engine rewards. Sprint 15: every weight is
+  // the REAL v3.1.0 value (24/23/15/12/14/12, LND-15) and the sixth dimension
+  // (Autoridad de marca, 12 % - "octava parte") joins the set. Figures are REAL
+  // product facts: engine registry (17 agents), scoring weights, rubric counts.
   features: [
     {
       number: "01",
       title: "Acceso de bots",
-      body: `${BRAND_NAME} verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 16 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.`,
+      body: `${BRAND_NAME} verifica si robots.txt, encabezados HTTP y metaetiquetas permiten el acceso de los crawlers de IA. El engine detecta bloqueos en 17 agentes, incluidos GPTBot, ClaudeBot y PerplexityBot, y mide su impacto real en la visibilidad del sitio. El acceso de bots pondera el 15 % del GEO Score y es la puerta de entrada a los motores de búsqueda con IA.`,
     },
     {
       number: "02",
       title: "Citabilidad",
-      body: `La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. ${BRAND_NAME} analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 22,4 % del GEO Score, la dimensión con mayor peso del engine.`,
+      body: `La citabilidad mide qué tan probable es que los motores de IA citen textualmente los pasajes de su página como fuente canónica. ${BRAND_NAME} analiza pasajes answer-first de 50 a 200 palabras con definiciones y cifras concretas, las unidades que los modelos extraen con mayor frecuencia. La citabilidad pondera el 24 % del GEO Score, la dimensión con mayor peso del engine.`,
     },
     {
       number: "03",
       title: "E-E-A-T",
-      body: `${BRAND_NAME} evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 24 puntos por dimensión. E-E-A-T pondera el 19,2 % del GEO Score y favorece al contenido con señales de confianza explícitas.`,
+      body: `${BRAND_NAME} evalúa experiencia, experticia, autoridad y confiabilidad del contenido para la ponderación de fuentes. Señales verificables como autoría, fechas de publicación, enlaces de contacto y citas a dominios de autoridad suman hasta 24 puntos por dimensión. E-E-A-T pondera el 23 % del GEO Score y favorece al contenido con señales de confianza explícitas.`,
     },
     {
       number: "04",
       title: "Datos estructurados",
-      body: `${BRAND_NAME} detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 11,2 % del GEO Score y aportan precisión a las citas de entidades.`,
+      body: `${BRAND_NAME} detecta y valida el JSON-LD y Schema.org que los LLMs usan para corroborar entidades y hechos. El engine puntúa 12 criterios, desde Organization y WebSite hasta SearchAction, y premia el marcado renderizado en el servidor. Los datos estructurados ponderan el 12 % del GEO Score y aportan precisión a las citas de entidades.`,
     },
     {
       number: "05",
       title: "Plataforma",
-      body: `${BRAND_NAME} evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 11,2 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.`,
+      body: `${BRAND_NAME} evalúa readiness, SSR, OpenGraph y headers para cada motor de búsqueda generativa. La dimensión pondera el 14 % del GEO Score y verifica que el sitio sea legible sin JavaScript. Un sitio con SSR y metadatos completos queda preparado para las 6 plataformas auditadas por el engine, sin depender de la ejecución de scripts en el navegador.`,
     },
     {
       number: "06",
       title: "Autoridad de marca",
-      body: `La autoridad de marca mide la presencia externa de su dominio en fuentes que los motores de IA consultan para citar, como Wikipedia y Wikidata. ${BRAND_NAME} verifica si existe un artículo para la marca, si el sitio oficial está registrado y si la entidad es consistente con el dominio auditado, con llamadas públicas y determinísticas. La autoridad de marca pondera el 20 % del GEO Score: una marca sin presencia externa pierde esa quinta parte del resultado.`,
+      body: `La autoridad de marca mide la presencia externa de su dominio en fuentes que los motores de IA consultan para citar, como Wikipedia y Wikidata. ${BRAND_NAME} verifica si existe un artículo para la marca, si el sitio oficial está registrado y si la entidad es consistente con el dominio auditado, con llamadas públicas y determinísticas. La autoridad de marca pondera el 12 % del GEO Score: una marca sin presencia externa pierde esa octava parte del resultado.`,
     },
   ],
   sections: {
@@ -257,9 +258,9 @@ export const LANDING_COPY = {
     ],
   },
   // LND-13 (sprint 12/13): real Q&A pairs backed by the visible FAQ section
-  // (FAQPage JSON-LD intentionally omitted, RSC-7). Sprint 13: six questions
-  // in recognizable question form, with the v3 weights (RGS-1). Real product
-  // questions - nothing invented.
+  // (FAQPage JSON-LD intentionally omitted, RSC-7). Sprint 15: six questions
+  // in recognizable question form, with the v3.1.0 weights (LND-15). Real
+  // product questions - nothing invented.
   faq: {
     eyebrow: "Preguntas frecuentes",
     title: "Respuestas rápidas sobre GEO y visibilidad en IA",
@@ -267,7 +268,7 @@ export const LANDING_COPY = {
       {
         question: "¿Qué es el GEO Score y cómo se calcula?",
         answer:
-          "El GEO Score es un puntaje de 0 a 100 que sintetiza la visibilidad de su sitio en los motores de búsqueda con IA. Se pondera sobre 6 dimensiones: citabilidad (22,4 %), E-E-A-T (19,2 %), acceso de bots (16 %), autoridad de marca (20 %), datos estructurados (11,2 %) y plataforma (11,2 %).",
+          "El GEO Score es un puntaje de 0 a 100 que sintetiza la visibilidad de su sitio en los motores de búsqueda con IA. Se pondera sobre 6 dimensiones: citabilidad (24 %), E-E-A-T (23 %), acceso de bots (15 %), autoridad de marca (12 %), datos estructurados (12 %) y plataforma (14 %).",
       },
       {
         question: "¿Qué motores de búsqueda con IA analiza Relevy?",
@@ -287,7 +288,7 @@ export const LANDING_COPY = {
       {
         question: "¿Qué es la autoridad de marca en el GEO Score?",
         answer:
-          "La autoridad de marca mide la presencia externa de su dominio en fuentes que los motores de IA consultan para citar, como Wikipedia y Wikidata. Relevy verifica si existe un artículo para la marca, si su sitio oficial está registrado en la entidad y si el nombre es consistente con el dominio auditado. Pondera el 20 % del GEO Score: una marca sin presencia externa pierde esa quinta parte del resultado.",
+          "La autoridad de marca mide la presencia externa de su dominio en fuentes que los motores de IA consultan para citar, como Wikipedia y Wikidata. Relevy verifica si existe un artículo para la marca, si su sitio oficial está registrado en la entidad y si el nombre es consistente con el dominio auditado. Pondera el 12 % del GEO Score: una marca sin presencia externa pierde esa octava parte del resultado.",
       },
       {
         question: "¿Cómo se mejora la autoridad de marca de un sitio?",
@@ -500,6 +501,19 @@ export const REPORT_COPY = {
       current: "Analizando…",
       pending: "En cola",
     },
+  },
+  // PDF-10 (sprint 15): live-report export entry - logged-in users with a
+  // persisted id link DIRECTLY to /api/report/{id}/pdf (the route owns auth +
+  // ownership, PDF-2/PDF-9); anonymous users see PDF account-benefit copy with
+  // a signup CTA (marketing gate, not a security one). Neutral Spanish.
+  export: {
+    title: "Exporte el reporte en PDF",
+    body: "Guarde esta auditoría como PDF para compartirla o archivarla.",
+    cta: "Exportar PDF",
+    anonTitle: "Exporte sus reportes como PDF",
+    anonBody:
+      "Cree su cuenta para guardar esta auditoría y exportarla a PDF en cualquier momento.",
+    anonCta: "Crear cuenta gratis",
   },
 } as const;
 

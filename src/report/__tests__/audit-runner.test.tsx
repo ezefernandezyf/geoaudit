@@ -307,6 +307,21 @@ describe("AuditRunner tier persist (TLM-4/5/6)", () => {
 
     expect(screen.getByText("68")).toBeInTheDocument();
   });
+
+  it("passes the persisted audit id to the report as exportPdfHref (PDF-10)", async () => {
+    runAuditMock.mockResolvedValue(auditResultFixture);
+    authMock.mockResolvedValue(session());
+    auditCreateMock.mockResolvedValue({
+      id: "audit-123",
+    } as unknown as Awaited<ReturnType<typeof prisma.audit.create>>);
+
+    render(await AuditRunner({ url: "https://example.com/" }));
+
+    expect(screen.getByRole("link", { name: "Exportar PDF" })).toHaveAttribute(
+      "href",
+      "/api/report/audit-123/pdf",
+    );
+  });
 });
 
 describe("AuditRunner anonymous gate (TLM-6, TLM-11)", () => {
@@ -336,6 +351,12 @@ describe("AuditRunner anonymous gate (TLM-6, TLM-11)", () => {
     expect(anonLimiter.check).toHaveBeenCalledWith("anon:203.0.113.9");
     expect(auditCreateMock).not.toHaveBeenCalled();
     expect(screen.getByText("68")).toBeInTheDocument();
+    // Anonymous report shows the PDF signup CTA, never an export entry (PDF-10).
+    expect(screen.queryByRole("link", { name: "Exportar PDF" })).toBeNull();
+    expect(screen.getByRole("link", { name: /crear cuenta/i })).toHaveAttribute(
+      "href",
+      "/signup",
+    );
   });
 
   it("renders the anonymous limit state and does not persist when the 4th audit is blocked (TLM-11)", async () => {

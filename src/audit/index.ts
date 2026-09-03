@@ -223,7 +223,9 @@ export async function runAudit(
       schema: emptySchemaResult(),
       platform: emptyPlatformResult(),
       content: emptyContentResult(),
-      scoringModelVersion: "2.0.0",
+      // RAO-16 (sprint 15): the degraded invalid-URL branch writes the current
+      // engine version "3.1.0" (previously "2.0.0") - aligned with RGS-7.
+      scoringModelVersion: "3.1.0",
       meta: {
         auditVersion: AUDIT_VERSION,
         startedAt,

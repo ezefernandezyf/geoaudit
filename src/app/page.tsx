@@ -577,8 +577,12 @@ export default async function Home() {
             {LANDING_COPY.comparison.lead}
           </p>
         </div>
-        <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
-          <table className="w-full text-left text-sm">
+        {/* LND-14 (sprint 15): the wrapper scrolls horizontally on narrow
+            viewports (overflow-x-auto) and the <table> keeps a min-width so
+            columns stay legible instead of squeezing; the semantic <table>
+            markup is preserved (RCI-5/RPL-10). */}
+        <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] bg-white">
+          <table className="w-full min-w-[640px] text-left text-sm">
             <caption className="sr-only">
               {LANDING_COPY.comparison.caption}
             </caption>

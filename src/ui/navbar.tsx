@@ -55,10 +55,19 @@ export function Navbar({ session, plan }: NavbarProps) {
             <Logo size={32} decorative />
           </Link>
 
-          <NavLinks showMultiPage={Boolean(user)} />
+          <NavLinks
+            showMultiPage={Boolean(user)}
+            isAuthenticated={Boolean(user)}
+            displayName={user?.name ?? null}
+            initials={initials}
+            plan={plan}
+          />
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* SHL-10 (sprint 15): the desktop actions hide below md - mobile shows
+            only logo + hamburger (the panel inside NavLinks carries the
+            session actions). Above md nothing changes. */}
+        <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <div className="flex items-center gap-3">
               {plan ? (

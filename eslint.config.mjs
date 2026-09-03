@@ -18,6 +18,9 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // R8 (sprint 15): generated coverage artifacts (base.css,
+      // block-navigation.js, favicon.png, ...) are never linted.
+      "coverage/**",
     ],
   },
 ];

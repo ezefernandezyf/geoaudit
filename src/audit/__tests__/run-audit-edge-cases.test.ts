@@ -86,9 +86,9 @@ describe("runAudit edge cases (T25 part B)", () => {
     expect(result.summary.url).toBe("not a url");
     expect(result.summary.geoScore).toBe(0);
     expect(result.summary.severityBand).toBe("Critical");
-    // RAO-16: the degraded path keeps writing "2.0.0" - it is not a real
-    // audit, so the v3.1 write only applies to successful/unscored runs.
-    expect(result.scoringModelVersion).toBe("2.0.0");
+    // RAO-16 (sprint 15): the degraded invalid-URL branch writes the CURRENT
+    // engine version "3.1.0" - aligned with RGS-7 (previously "2.0.0").
+    expect(result.scoringModelVersion).toBe("3.1.0");
     expect(result.meta.errors.length).toBeGreaterThan(0);
     expect(result.meta.errors[0]).toContain("Invalid URL format");
     expect(result.meta.startedAt).toBe(NOW);
