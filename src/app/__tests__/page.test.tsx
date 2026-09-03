@@ -476,6 +476,21 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     ).toBeInTheDocument();
   });
 
+  // LND-14 (sprint 15): at 360px the comparison table must stay legible - the
+  // wrapper scrolls horizontally (overflow-x-auto) instead of clipping
+  // (overflow-hidden) and the <table> keeps a min-width so columns don't
+  // squeeze. The semantic <table> markup is preserved (RCI-5/RPL-10).
+  it("keeps the comparison table scrollable on mobile with a legible min-width (LND-14)", async () => {
+    await renderPage();
+    const table = screen.getByRole("table");
+    // Semantic table with real data survives the responsive change.
+    expect(within(table).getAllByRole("row").length).toBeGreaterThanOrEqual(4);
+    const wrapper = table.parentElement;
+    expect(wrapper?.className).toContain("overflow-x-auto");
+    expect(wrapper?.className).not.toContain("overflow-hidden");
+    expect(table.className).toContain("min-w-[640px]");
+  });
+
   // LND-13 (sprint 13): the key content headings are phrased as questions
   // (query-matchable, RCI-5/RPL-8) - not just the hero H1.
   it("phrases the key section headings as questions (LND-13)", async () => {
