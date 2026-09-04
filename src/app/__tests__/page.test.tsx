@@ -561,6 +561,29 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
       expect(screen.getByText(paragraph)).toBeInTheDocument();
     }
   });
+
+  // LND-17 (sprint 16): Changelog section immediately after the Case Study -
+  // H2 "Changelog" (engine changelog-heading pattern → +10 experience proxy)
+  // plus the three real semver lines in a <ul>.
+  it("renders the Changelog section right after Case Study (LND-17)", async () => {
+    await renderPage();
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Changelog",
+    });
+    expect(heading).toBeInTheDocument();
+    const caseStudy = screen.getByRole("heading", {
+      level: 2,
+      name: "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    });
+    expect(
+      caseStudy.compareDocumentPosition(heading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    for (const line of LANDING_COPY.changelog) {
+      expect(screen.getByText(line)).toBeInTheDocument();
+    }
+  });
 });
 
 describe("landing page metadata (LND-8)", () => {

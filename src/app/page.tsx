@@ -638,6 +638,24 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* 5c. CHANGELOG (LND-17, sprint 16) - H2 "Changelog" (engine
+          changelog-heading pattern, +10 experience proxy) + <ul> with the
+          three real semver lines (semver hits STAT_PATTERN; block 50-200). */}
+      <section className="border-y border-[#e2e8f0] bg-white py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="mb-10 text-center">
+            <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              Changelog
+            </h2>
+          </div>
+          <ul className="space-y-3 text-sm leading-relaxed text-[#475569] sm:text-base">
+            {LANDING_COPY.changelog.map((entry) => (
+              <li key={entry}>{entry}</li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* 6. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
           descuenta FAQPage como deprecado, RSC-7) */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">

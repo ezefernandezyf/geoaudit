@@ -323,6 +323,15 @@ export const LANDING_COPY = {
       "Durante 2026, el GEO Score de Relevy pasó de 47 a 62 puntos aplicando los mismos cambios que recomienda a sus usuarios. Cada auditoría completa el análisis en menos de 30 segundos sobre las 6 plataformas de búsqueda generativa.",
     ],
   },
+  // LND-17 (sprint 16): Changelog section right after the Case Study - three
+  // REAL engine versions in semver, one honest line each (v3.1.0 sprint 14,
+  // v3.0.0 sprint 13, v2.0.0 sprint 9). Semver strings hit the citability
+  // STAT_PATTERN and the block stays in the 50-200 word extraction band.
+  changelog: [
+    "v3.1.0 — Calibración de los pesos de las seis dimensiones (24/23/15/12/14/12), bandas 80/65/50/30 y motor de citabilidad v3.1 con piso de unicidad.",
+    "v3.0.0 — Incorporación de la sexta dimensión de autoridad de marca, con verificación de Wikipedia y Wikidata en cada auditoría.",
+    "v2.0.0 — Primer modelo de puntuación calibrado, con ponderaciones iniciales por dimensión y bandas de severidad definidas.",
+  ],
 } as const;
 
 /**

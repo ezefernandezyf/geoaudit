@@ -416,3 +416,30 @@ describe("LANDING_COPY case study (LND-16, sprint 16)", () => {
     }
   });
 });
+
+describe("LANDING_COPY changelog (LND-17, sprint 16)", () => {
+  it("lists the three real engine versions in semver (LND-17)", () => {
+    expect(LANDING_COPY.changelog).toHaveLength(3);
+    expect(LANDING_COPY.changelog[0]).toMatch(/^v3\.1\.0\b/);
+    expect(LANDING_COPY.changelog[1]).toMatch(/^v3\.0\.0\b/);
+    expect(LANDING_COPY.changelog[2]).toMatch(/^v2\.0\.0\b/);
+  });
+
+  it("keeps each version line in the 16-23 word band and the block in 50-200 (LND-17)", () => {
+    const block = LANDING_COPY.changelog.join(" ");
+    const blockWords = block.trim().split(/\s+/).length;
+    expect(blockWords).toBeGreaterThanOrEqual(50);
+    expect(blockWords).toBeLessThanOrEqual(200);
+    for (const line of LANDING_COPY.changelog) {
+      const words = line.trim().split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(16);
+      expect(words).toBeLessThanOrEqual(23);
+    }
+  });
+
+  it("avoids the '92' ban and voseo forms (LND-17)", () => {
+    const block = LANDING_COPY.changelog.join(" ");
+    expect(block).not.toContain("92");
+    expect(block).not.toMatch(VOSEO_PATTERN);
+  });
+});
