@@ -12,7 +12,7 @@ Generate a client-ready PDF of a persisted audit report via `GET /api/report/[id
 |---|-------------|--------|----------|---------|
 | PDF-1 | PDF route | New | MUST | `GET /api/report/[id]/pdf` MUST return the audit's PDF |
 | PDF-2 | Ownership gate | New | MUST | Only the audit owner MUST be able to export; others get 404 |
-| PDF-4 | Render pipeline | New | MUST | Use `puppeteer-core` + `@sparticuz/chromium-min` to render HTML→PDF |
+| PDF-4 | Render pipeline | New | MUST | Use `puppeteer-core` + `@sparticuz/chromium-min` to render HTML→PDF; in production the chromium-min pack URL MUST resolve by `process.arch` (x64/arm64 suffixed assets pinned to v149.0.0; unsupported arch MUST throw the typed `PdfRenderError`) |
 | PDF-5 | Self-hosted fonts | New | MUST | Fonts MUST be self-hosted in `public/fonts/` via `@font-face` |
 | PDF-6 | Print fidelity | New | MUST | `printBackground: true` so navy/emerald/amber/red print |
 | PDF-7 | Response contract | New | MUST | Response MUST be `application/pdf` with a download filename |
@@ -42,13 +42,35 @@ When the PDF route runs, then the system MUST verify the requester owns the audi
 
 ### Requirement: Render Pipeline (PDF-4)
 
-When a PDF is generated, then the system MUST launch headless Chromium via `puppeteer-core` + `@sparticuz/chromium-min` and render the report template to PDF.
+When a PDF is generated, then the system MUST launch headless Chromium via `puppeteer-core` + `@sparticuz/chromium-min` and render the report template to PDF. In production (`NODE_ENV === "production"`), the chromium-min release pack MUST be resolved from the pinned GitHub release `v149.0.0` by the runtime architecture (`process.arch`): `x64` MUST resolve to `chromium-v149.0.0-pack.x64.tar` and `arm64` MUST resolve to `chromium-v149.0.0-pack.arm64.tar`. An unsupported architecture MUST throw the typed `PdfRenderError` (never a bare 404 download). The bare `chromium-v149.0.0-pack.tar` URL (no arch suffix) MUST NOT be used — it returns HTTP 404 and surfaces as `render_failed`.
+(Previously: a single hardcoded `CHROMIUM_PACK_URL` without an arch suffix — the v149 assets were renamed with arch suffixes, so production downloads 404ed and the PDF route returned `{"error":"render_failed"}`.)
 
 #### Scenario: Template rendered to PDF
 
 - GIVEN a report template for an audit
 - WHEN the render pipeline runs
 - THEN Chromium renders the HTML and returns PDF bytes
+
+#### Scenario: x64 resolves the arch-suffixed pack
+
+- GIVEN a production runtime on `x64`
+- WHEN `resolveChromiumPackUrl("x64")` is called
+- THEN it returns `https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar`
+- AND the mapping is pinned by a unit test in `render.test.ts`
+
+#### Scenario: arm64 resolves the arch-suffixed pack
+
+- GIVEN a production runtime on `arm64`
+- WHEN `resolveChromiumPackUrl("arm64")` is called
+- THEN it returns `https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.arm64.tar`
+- AND the mapping is pinned by a unit test in `render.test.ts`
+
+#### Scenario: Unsupported architecture throws a typed error
+
+- GIVEN an architecture other than `x64` or `arm64`
+- WHEN the resolver runs
+- THEN it throws the typed `PdfRenderError`
+- AND no download attempt is made against GitHub
 
 ### Requirement: Self-Hosted Fonts (PDF-5)
 

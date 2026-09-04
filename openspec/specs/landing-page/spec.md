@@ -4,7 +4,7 @@
 
 ## Purpose
 
-The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10). Since Sprint 12, the Organization JSON-LD carries the full recommended property set (`knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` — LND-9), and the landing shows a visible FAQ with real questions plus `datePublished`/byline/alt (LND-13; FAQPage JSON-LD intentionally omitted as a product decision — the schema engine docks FAQPage as deprecated under RSC-7). Since Sprint 13, the landing copy describes the six GEO dimensions with their weights (LND-11 adds the 50-200 word band), the feature grid gains a 6th "Autoridad de marca" card (20%), the FAQ reaches 6 recognizable questions with question-form H2/H3 headings (LND-13), and a comparison table with real Relevy facts (LND-14) renders between the platforms and the FAQ. Since Sprint 15, the copy weight references are synced to v3.1.0 (24/23/15/12/14/12, brand "12 %"/"octava parte" — LND-15), the hero subtitle lists the six dimensions by name without percentages (LND-11), and the comparison table scrolls horizontally on mobile while preserving semantic `<table>` markup (LND-14). Since Sprint 16, the author byline moved to the global footer with the `.byline` class so the expertise engine detects it over the full DOM (LND-13), the founder Person carries the real `sameAs` profiles (LND-9), the six platform cards carry 2-4 sentence 50-200 word descriptions with concrete verified stats (LND-4), and the landing gains Case Study (LND-16) and Changelog (LND-17) sections between the comparison table and the FAQ.
+The marketing landing page re-implemented 1:1 with Gemini's composition: a hero with the URL input and "Run Audit" button **inside** the field plus sample URLs, a five-card feature row with contrasting backgrounds (card 03 on dark navy with emerald number), a demo ScoreHero + band table using the **real** thresholds (90/75/60/40), and the six AI platforms. It is the anonymous entry point to the free audit flow. Since Sprint 8, the page is session-aware (the primary CTA adapts via `auth()`, Home becomes dynamic), the demo ScoreHero shows a REAL score from `runAudit()` against candidate URLs with its honest band (never an invented number), and OpenGraph/Twitter metadata is emitted (LND-6/LND-7/LND-8). Since Sprint 10, the pricing teaser and "Ver Planes" CTA are removed; the anonymous CTA repoints to signup/audit (e.g. "Auditar gratis"). Since Sprint 11, the JSON-LD `name`/`sameAs`/`url` reference the Relevy brand and the `relevy` repo (LND-9), and `llms.txt` carries the Relevy brand with `relevy.app` and the accurate 10/30-day free limit (LND-10). Since Sprint 12, the Organization JSON-LD carries the full recommended property set (`knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` — LND-9), and the landing shows a visible FAQ with real questions plus `datePublished`/byline/alt (LND-13; FAQPage JSON-LD intentionally omitted as a product decision — the schema engine docks FAQPage as deprecated under RSC-7). Since Sprint 13, the landing copy describes the six GEO dimensions with their weights (LND-11 adds the 50-200 word band), the feature grid gains a 6th "Autoridad de marca" card (20%), the FAQ reaches 6 recognizable questions with question-form H2/H3 headings (LND-13), and a comparison table with real Relevy facts (LND-14) renders between the platforms and the FAQ. Since Sprint 15, the copy weight references are synced to v3.1.0 (24/23/15/12/14/12, brand "12 %"/"octava parte" — LND-15), the hero subtitle lists the six dimensions by name without percentages (LND-11), and the comparison table scrolls horizontally on mobile while preserving semantic `<table>` markup (LND-14). Since Sprint 16, the author byline moved to the global footer with the `.byline` class so the expertise engine detects it over the full DOM (LND-13), the founder Person carries the real `sameAs` profiles (LND-9), the six platform cards carry 2-4 sentence 50-200 word descriptions with concrete verified stats (LND-4), and the landing gains Case Study (LND-16) and Changelog (LND-17) sections between the comparison table and the FAQ. Since Sprint 17, the Organization JSON-LD adds the real `areaServed` "AR" / `industry` "Software" / `numberOfEmployees` 1 values and omits the invented `award` (LND-9, honesty LND-7 — `missing_recommended` drops 4 → 1), and the landing interleaves gray/white section backgrounds that break the four-gray run (S4/S5b white `rounded-2xl` recuadros on the gray base, S5/S6 white `border-y` bands) while keeping exactly 6 `rounded-xl` platform cards and the `overflow-x-auto` table wrapper (LND-18).
 
 ## Requirements
 
@@ -18,7 +18,7 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else signup/audit CTA; no pricing teaser |
 | LND-7 | Veracious ScoreHero | New | MUST | ScoreHero MUST show verified score + `auditDate` + `categoryScores` (no placeholder) |
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
-| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate` (real data); nested founder Person MUST carry `sameAs` = `ORG_SAME_AS` (+2 expertise, no authoritativeness double-count) |
+| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` "AR", `industry` "Software", `numberOfEmployees` 1 (real data from brand constants); nested founder Person MUST carry `sameAs` = `ORG_SAME_AS` (+2 expertise, no authoritativeness double-count); `award` MUST NOT be emitted (honesty LND-7) |
 | LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt (Relevy brand, `relevy.app`, accurate 10/30d limit) |
 | LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats, each passage in the 50-200 word band, hero subtitle names-only (no percentages) |
 | LND-12 | E-E-A-T signals | New | MUST | Landing MUST surface author/org trust signals (legal links, contact, HTTPS) |
@@ -27,6 +27,7 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-15 | Weight copy accuracy v3.1.0 | ADDED | MUST | Landing weight copy MUST match v3.1.0 (24/23/15/12/14/12); brand "12 %"/"octava parte"; no stale v3.0.0; "24 puntos"/"12 criterios" intact |
 | LND-16 | Case Study section | ADDED | MUST | Landing MUST render a Case Study section between the comparison table and the FAQ: locked H2 "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?" (ends in "?", contains "Case Study"), neutral Spanish body in the 50-200 word band with verified numbers only |
 | LND-17 | Changelog section | ADDED | MUST | Landing MUST render a Changelog section immediately after Case Study: H2 "Changelog" + the three real engine versions in semver (v3.1.0/v3.0.0/v2.0.0), block kept in the 50-200 word band |
+| LND-18 | Interleaved section backgrounds | ADDED | MUST | Landing MUST alternate gray/white section surfaces (S4/S5b white `rounded-2xl` recuadros on gray, S5/S6 white `border-y` bands); gray-surface eyebrows `#475569` (AA); platforms grid MUST keep exactly 6 `div.rounded-xl`; table wrapper MUST stay `overflow-x-auto` with `min-w-[640px]` |
 
 ### Requirement: Hero Form Inline (LND-1)
 
@@ -153,8 +154,8 @@ When the landing page renders, then it MUST emit OpenGraph and Twitter card meta
 
 ### Requirement: JSON-LD Organization (LND-9)
 
-When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` "Relevy", `url` the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`. The `Organization` node MUST additionally include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, and `foundingDate`, populated with real Relevy data (nothing invented, LND-7). The nested `founder` Person node MUST carry `sameAs` referencing the same three real profiles as `ORG_SAME_AS` — a distinct expertise signal (+2) even though the authoritativeness engine deduplicates the URLs (no authoritativeness gain, no invented profiles).
-(Previously: the `founder` Person node carried `@type` and `name` only — the +2 expertise sameAs bonus was not detected.)
+When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` "Relevy", `url` the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`. The `Organization` node MUST additionally include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` ("AR"), `industry` ("Software"), and `numberOfEmployees` (1), populated with real Relevy data (nothing invented, LND-7). The nested `founder` Person node MUST carry `sameAs` referencing the same three real profiles as `ORG_SAME_AS` — a distinct expertise signal (+2) even though the authoritativeness engine deduplicates the URLs (no authoritativeness gain, no invented profiles). The Organization node MUST NOT emit an `award` property — no real award exists and inventing one would violate LND-7; the schema engine keeps reporting `missing_recommended` for `award` (accepted honesty-over-score tradeoff).
+(Previously: the Organization node carried the recommended set without `areaServed`, `industry`, or `numberOfEmployees` — the engine flagged 4 `missing_recommended` properties.)
 
 #### Scenario: Relevy Organization + WebSite
 
@@ -166,8 +167,8 @@ When the landing page renders, then it MUST emit `Organization` and `WebSite` st
 
 - GIVEN the landing JSON-LD `Organization` node
 - WHEN it is inspected
-- THEN `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, and `foundingDate` are present
-- AND every value traces to real Relevy data (verified `sameAs` URLs, real founder/address/contact — no placeholders)
+- THEN `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed`, `industry`, and `numberOfEmployees` are present
+- AND every value traces to real Relevy data (verified `sameAs` URLs, real founder/address/contact, country "AR", industry "Software", 1 employee — no placeholders)
 
 #### Scenario: Founder Person carries the real sameAs profiles
 
@@ -181,6 +182,20 @@ When the landing page renders, then it MUST emit `Organization` and `WebSite` st
 - GIVEN the `sameAs` URLs across Organization and Person nodes
 - WHEN `sameAsUrls` collects them
 - THEN the set is deduplicated — the Person `sameAs` add no new URLs, so authoritativeness is unchanged
+
+#### Scenario: Real org attributes trace to brand constants
+
+- GIVEN the `Organization` node
+- WHEN `areaServed`, `industry`, and `numberOfEmployees` are inspected
+- THEN they equal "AR", "Software", and 1 respectively
+- AND each value comes from a `brand.ts` constant (`ORG_AREA_SERVED`, `ORG_INDUSTRY`, `ORG_EMPLOYEES`) — never a hardcoded literal in the page
+
+#### Scenario: No invented award
+
+- GIVEN the `Organization` node
+- WHEN it is inspected
+- THEN no `award` property is present
+- AND the schema engine still reports `missing_recommended` for `award` (honesty over score, LND-7) — the `missing_recommended` count drops from 4 to 1
 
 ### Requirement: Crawl/AI Assets (LND-10)
 
@@ -363,6 +378,43 @@ When the landing renders, then it MUST include a Changelog section immediately a
 - WHEN its word count is measured
 - THEN it contains between 50 and 200 words
 
+### Requirement: Interleaved Section Backgrounds (LND-18)
+
+When the landing renders, then the section backgrounds MUST follow an alternating gray/white rhythm that breaks the former four-gray-section run (S5 Comparativa → S5b Case Study → S6 FAQ → S7 CTA): S4 (Plataformas) MUST render on the gray base with a white `rounded-2xl` recuadro wrapping the platform grid; S5 (Comparativa) MUST render as a `border-y` white band; S5b (Case Study) MUST render on the gray base wrapped in a white `rounded-2xl` recuadro; S6 (FAQ) MUST render as a `border-y` white band; S7 (CTA) keeps the gray base with its existing white `rounded-2xl` recuadro. No two adjacent sections within that run MUST NOT share the same background surface. Any eyebrow rendered on a gray surface MUST use `#475569` or darker (WCAG AA ≥ 4.5:1 on `#f8fafc`); eyebrows on white bands MAY keep `#64748b`. The platforms grid MUST keep EXACTLY 6 `div.rounded-xl` cards — new recuadros MUST use `rounded-2xl`, never `rounded-xl`. The comparison table's horizontal-scroll wrapper MUST remain `overflow-x-auto` (MUST NOT become `overflow-hidden`) with the table keeping `min-w-[640px]`; any recuadro MUST wrap OUTSIDE that wrapper. Background and recuadro changes MUST NOT alter the section content or the extracted citability text.
+
+#### Scenario: Four-gray run broken
+
+- GIVEN the landing sections from S5 (Comparativa) through S7 (CTA)
+- WHEN their background surfaces are inspected
+- THEN S5 and S6 render as white bands, S5b as gray with a white recuadro, and S7 as gray with its white recuadro
+- AND no two adjacent sections in the run share the same background
+
+#### Scenario: Platforms grid keeps exactly 6 rounded-xl cards
+
+- GIVEN the platforms section (S4) with its white `rounded-2xl` recuadro on the gray base
+- WHEN the section is inspected
+- THEN it contains EXACTLY 6 `div.rounded-xl` cards (the recuadro is `rounded-2xl`, not `rounded-xl`)
+
+#### Scenario: Case Study wrapped in a white recuadro
+
+- GIVEN the Case Study section (S5b) on the gray base
+- WHEN it renders
+- THEN its content is wrapped in a white `rounded-2xl` recuadro
+
+#### Scenario: Eyebrow contrast on gray bands
+
+- GIVEN any eyebrow rendered on a gray surface
+- WHEN its text color is inspected
+- THEN it is `#475569` or darker (≥ 4.5:1 on `#f8fafc`)
+- AND no gray-surface eyebrow uses `#64748b`
+
+#### Scenario: Comparison table wrapper stays overflow-x-auto
+
+- GIVEN the comparison section (S5) on the white band
+- WHEN the table renders
+- THEN `table.parentElement` keeps `overflow-x-auto` (never `overflow-hidden`)
+- AND the table keeps `min-w-[640px]`
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -375,7 +427,7 @@ When the landing renders, then it MUST include a Changelog section immediately a
 | LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees audit CTA | Covered |
 | LND-7 | Verified evidence shown, No candidate reaches 90+ | Covered |
 | LND-8 | OG + Twitter tags present | Covered |
-| LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data, Founder Person carries real sameAs, No authoritativeness double-count | Covered |
+| LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data, Founder Person carries real sameAs, No authoritativeness double-count, Real org attributes trace to brand constants, No invented award | Covered |
 | LND-10 | Assets served at root, llms.txt is Relevy-accurate | Covered |
 | LND-11 | Answer-first copy with stats, Passages in the 50-200 word band, Hero subtitle is names-only | Covered |
 | LND-12 | Trust signals present | Covered |
@@ -384,3 +436,4 @@ When the landing renders, then it MUST include a Changelog section immediately a
 | LND-15 | All weight references match v3.1.0, Brand reads octava parte, Rubric and criteria counts untouched, copy.test.ts passes with v3.1.0 | Covered |
 | LND-16 | Section renders between comparison and FAQ, Heading matches locked question form, Spanish neutral body 50-200 words, Verified numbers only | Covered |
 | LND-17 | Changelog heading present, Three real versions in semver, Block in extraction band | Covered |
+| LND-18 | Four-gray run broken, Platforms grid keeps exactly 6 rounded-xl cards, Case Study wrapped in a white recuadro, Eyebrow contrast on gray bands, Comparison table wrapper stays overflow-x-auto | Covered |
