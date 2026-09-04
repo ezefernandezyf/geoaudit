@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import { PdfRenderError, renderPdf } from "@/pdf/render";
+import {
+  PdfRenderError,
+  renderPdf,
+  resolveChromiumPackUrl,
+} from "@/pdf/render";
 import type { PdfRenderDeps } from "@/pdf/render";
 
 /**
@@ -110,5 +114,22 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
       PdfRenderError,
     );
     expect(closeMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("resolveChromiumPackUrl (PDF-4)", () => {
+  const BASE =
+    "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack";
+
+  it("resolves the x64 arch-suffixed pack URL", () => {
+    expect(resolveChromiumPackUrl("x64")).toBe(`${BASE}.x64.tar`);
+  });
+
+  it("resolves the arm64 arch-suffixed pack URL", () => {
+    expect(resolveChromiumPackUrl("arm64")).toBe(`${BASE}.arm64.tar`);
+  });
+
+  it("throws the typed PdfRenderError for an unsupported architecture", () => {
+    expect(() => resolveChromiumPackUrl("ia32")).toThrow(PdfRenderError);
   });
 });

@@ -3,6 +3,7 @@ import type { Session } from "next-auth";
 import { Sparkles } from "lucide-react";
 import { LogoutButton } from "@/ui/logout-button";
 import { Logo } from "@/ui/logo";
+import { MobileMenu } from "@/ui/mobile-menu";
 import { NavLinks } from "@/ui/nav-links";
 import type { NavPlan } from "@/lib/nav-plan";
 import { SHELL_COPY } from "@/lib/copy";
@@ -55,21 +56,16 @@ export function Navbar({ session, plan }: NavbarProps) {
             <Logo size={32} decorative />
           </Link>
 
-          <NavLinks
-            showMultiPage={Boolean(user)}
-            isAuthenticated={Boolean(user)}
-            displayName={user?.name ?? null}
-            initials={initials}
-            plan={plan}
-          />
+          <NavLinks showMultiPage={Boolean(user)} />
         </div>
 
-        {/* SHL-10 (sprint 15): the desktop actions hide below md - mobile shows
-            only logo + hamburger (the panel inside NavLinks carries the
-            session actions). Above md nothing changes. */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Desktop actions hide below md; the mobile drawer island owns the
+            md:hidden toggle on the far right (SHL-10, sprint 17) - the drawer
+            + overlay portal to document.body (the header's backdrop-blur-md
+            is a containing block for fixed descendants). */}
+        <div className="flex items-center gap-3">
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
               {plan ? (
                 <span
                   className="hidden items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857] sm:inline-flex"
@@ -104,7 +100,7 @@ export function Navbar({ session, plan }: NavbarProps) {
               <LogoutButton />
             </div>
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 md:flex">
               <Link
                 href="/login"
                 className="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
@@ -119,6 +115,14 @@ export function Navbar({ session, plan }: NavbarProps) {
               </Link>
             </div>
           )}
+
+          <MobileMenu
+            showMultiPage={Boolean(user)}
+            isAuthenticated={Boolean(user)}
+            displayName={user?.name ?? null}
+            initials={initials}
+            plan={plan}
+          />
         </div>
       </div>
     </header>

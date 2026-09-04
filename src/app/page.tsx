@@ -14,6 +14,9 @@ import {
   FOUNDER,
   FOUNDING_DATE,
   KNOWS_ABOUT,
+  ORG_AREA_SERVED,
+  ORG_EMPLOYEES,
+  ORG_INDUSTRY,
   ORG_SAME_AS,
   SUPPORT_EMAIL,
 } from "@/lib/brand";
@@ -78,6 +81,13 @@ function OrganizationJsonLd() {
           contactPoint: BRAND_CONTACT_POINT,
           email: SUPPORT_EMAIL,
           foundingDate: FOUNDING_DATE,
+          // LND-9 (sprint 17, D6): real org attributes from brand.ts - AR
+          // matches BRAND_ADDRESS, Software industry, solo founder. `award`
+          // stays OMITTED: no real award exists and inventing one would
+          // violate LND-7 (engine keeps reporting missing_recommended).
+          areaServed: ORG_AREA_SERVED,
+          industry: ORG_INDUSTRY,
+          numberOfEmployees: ORG_EMPLOYEES,
         }),
       }}
     />
@@ -430,7 +440,9 @@ export default async function Home() {
       {/* 3. SCORECARD - ScoreHero con evidencia REAL (LND-7) + bandas reales 80/65/50/30 (LND-3) */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mx-auto mb-10 max-w-2xl text-center">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+          {/* LND-18 (sprint 17): #475569 on the gray base - #64748b is 4.49:1
+              on #f8fafc, just below AA; #475569 clears 4.5:1. */}
+          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#475569]">
             {LANDING_COPY.sections.scorecardEyebrow}
           </span>
           <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
@@ -520,11 +532,15 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. PLATAFORMAS - 6 motores de IA (LND-4) */}
-      <section className="border-y border-[#e2e8f0] bg-white py-16">
+      {/* 4. PLATAFORMAS - 6 motores de IA (LND-4). LND-18 (sprint 17): the
+          section drops the white band and sits on the gray base; the grid is
+          wrapped in a white rounded-2xl recuadro (the 6 cards keep their
+          rounded-xl surface - test-pinned at EXACTLY 6). */}
+      <section className="py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+            {/* LND-18: #475569 on the gray base (AA ≥ 4.5:1 on #f8fafc). */}
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#475569]">
               {LANDING_COPY.sections.platformsEyebrow}
             </span>
             <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
@@ -535,96 +551,109 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {PLATFORMS.map((p) => (
-              <div
-                key={p.name}
-                className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 transition-colors hover:border-[#cbd5e1]"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-serif text-xl tracking-tight text-[#0f172a]">
-                    {p.name}
-                  </h3>
-                  <span className="rounded border border-[#e2e8f0] bg-white px-2 py-0.5 font-mono text-[11px] text-[#64748b]">
-                    {p.company}
-                  </span>
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {PLATFORMS.map((p) => (
+                <div
+                  key={p.name}
+                  className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-5 transition-colors hover:border-[#cbd5e1]"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="font-serif text-xl tracking-tight text-[#0f172a]">
+                      {p.name}
+                    </h3>
+                    <span className="rounded border border-[#e2e8f0] bg-white px-2 py-0.5 font-mono text-[11px] text-[#64748b]">
+                      {p.company}
+                    </span>
+                  </div>
+                  <div className="mb-2 font-mono text-xs font-semibold text-[#047857]">
+                    <a
+                      href={p.docs}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline-offset-2 hover:underline"
+                    >
+                      {p.bot}
+                    </a>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[#475569]">
+                    {p.desc}
+                  </p>
                 </div>
-                <div className="mb-2 font-mono text-xs font-semibold text-[#047857]">
-                  <a
-                    href={p.docs}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline-offset-2 hover:underline"
-                  >
-                    {p.bot}
-                  </a>
-                </div>
-                <p className="text-xs leading-relaxed text-[#475569]">
-                  {p.desc}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* 5. TABLA COMPARATIVA (LND-14) - Relevy vs auditoría manual, celdas
           con datos reales (nunca placeholders). <table> semántica: gana
-          puntos de estructura (RCI-5) y extracción (RPL-10). */}
-      <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-        <div className="mx-auto mb-10 max-w-2xl text-center">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-            {LANDING_COPY.comparison.eyebrow}
-          </span>
-          <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
-            {LANDING_COPY.comparison.title}
-          </h2>
-          <p className="mt-2 text-sm text-[#475569] sm:text-base">
-            {LANDING_COPY.comparison.lead}
-          </p>
-        </div>
-        {/* LND-14 (sprint 15): the wrapper scrolls horizontally on narrow
-            viewports (overflow-x-auto) and the <table> keeps a min-width so
-            columns stay legible instead of squeezing; the semantic <table>
-            markup is preserved (RCI-5/RPL-10). */}
-        <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] bg-white">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <caption className="sr-only">
-              {LANDING_COPY.comparison.caption}
-            </caption>
-            <thead>
-              <tr className="border-b border-[#e2e8f0] bg-[#f8fafc]">
-                {LANDING_COPY.comparison.header.map((header) => (
-                  <th
-                    key={header}
-                    scope="col"
-                    className="px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-[#475569]"
-                  >
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#e2e8f0]">
-              {LANDING_COPY.comparison.rows.map((row) => (
-                <tr
-                  key={row.criterion}
-                  className="transition-colors hover:bg-[#f8fafc]"
-                >
-                  <th
-                    scope="row"
-                    className="px-6 py-3.5 font-medium text-[#0f172a]"
-                  >
-                    {row.criterion}
-                  </th>
-                  <td className="px-6 py-3.5 text-[#047857]">{row.relevy}</td>
-                  <td className="px-6 py-3.5 text-[#475569]">
-                    {row.alternative}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          puntos de estructura (RCI-5) y extracción (RPL-10). LND-18
+          (sprint 17): the section becomes a white border-y band with an inner
+          max-w-5xl wrapper; the recuadro wraps OUTSIDE the overflow-x-auto
+          wrapper (test-pinned). */}
+      <section className="border-y border-[#e2e8f0] bg-white py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="mx-auto mb-10 max-w-2xl text-center">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+              {LANDING_COPY.comparison.eyebrow}
+            </span>
+            <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              {LANDING_COPY.comparison.title}
+            </h2>
+            <p className="mt-2 text-sm text-[#475569] sm:text-base">
+              {LANDING_COPY.comparison.lead}
+            </p>
+          </div>
+          {/* LND-14 (sprint 15): the wrapper scrolls horizontally on narrow
+              viewports (overflow-x-auto) and the <table> keeps a min-width so
+              columns stay legible instead of squeezing; the semantic <table>
+              markup is preserved (RCI-5/RPL-10). LND-18 (sprint 17): the white
+              recuadro is OUTSIDE the scroll wrapper (rounded-2xl), which keeps
+              overflow-x-auto. */}
+          <div className="rounded-2xl border border-[#e2e8f0] bg-white">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <caption className="sr-only">
+                  {LANDING_COPY.comparison.caption}
+                </caption>
+                <thead>
+                  <tr className="border-b border-[#e2e8f0] bg-[#f8fafc]">
+                    {LANDING_COPY.comparison.header.map((header) => (
+                      <th
+                        key={header}
+                        scope="col"
+                        className="px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-[#475569]"
+                      >
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e2e8f0]">
+                  {LANDING_COPY.comparison.rows.map((row) => (
+                    <tr
+                      key={row.criterion}
+                      className="transition-colors hover:bg-[#f8fafc]"
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-3.5 font-medium text-[#0f172a]"
+                      >
+                        {row.criterion}
+                      </th>
+                      <td className="px-6 py-3.5 text-[#047857]">
+                        {row.relevy}
+                      </td>
+                      <td className="px-6 py-3.5 text-[#475569]">
+                        {row.alternative}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -632,22 +661,28 @@ export default async function Home() {
           question-form bonuses), NEUTRAL ES body with verified numbers only,
           placed between the comparison table and the FAQ. */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <div className="mb-10 text-center">
-          <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
-            {LANDING_COPY.caseStudy.heading}
-          </h2>
-        </div>
-        <div className="space-y-4 text-sm leading-relaxed text-[#475569] sm:text-base">
-          {LANDING_COPY.caseStudy.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+        {/* LND-18 (sprint 17): the Case Study sits on the gray base wrapped
+            in a white rounded-2xl recuadro (breaks the S5→S7 gray run). */}
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 sm:p-8">
+          <div className="mb-10 text-center">
+            <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              {LANDING_COPY.caseStudy.heading}
+            </h2>
+          </div>
+          <div className="space-y-4 text-sm leading-relaxed text-[#475569] sm:text-base">
+            {LANDING_COPY.caseStudy.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* 5c. CHANGELOG (LND-17, sprint 16) - H2 "Changelog" (engine
           changelog-heading pattern, +10 experience proxy) + <ul> with the
-          three real semver lines (semver hits STAT_PATTERN; block 50-200). */}
-      <section className="border-y border-[#e2e8f0] bg-white py-16">
+          three real semver lines (semver hits STAT_PATTERN; block 50-200).
+          LND-18 (sprint 17, D5): border-y → border-t so the Changelog merges
+          into the S6 white band (one continuous surface, no double border). */}
+      <section className="border-t border-[#e2e8f0] bg-white py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="mb-10 text-center">
             <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
@@ -663,41 +698,45 @@ export default async function Home() {
       </section>
 
       {/* 6. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
-          descuenta FAQPage como deprecado, RSC-7) */}
-      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <div className="mb-10 text-center">
-          <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
-            {LANDING_COPY.faq.eyebrow}
-          </span>
-          <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
-            {LANDING_COPY.faq.title}
-          </h2>
-        </div>
-        <div className="divide-y divide-[#e2e8f0] overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
-          {LANDING_COPY.faq.items.map((item) => (
-            <details
-              key={item.question}
-              className="group px-6 py-5 open:bg-[#f8fafc]"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-medium text-[#0f172a]">
-                <span>{item.question}</span>
-                <span className="text-[#94a3b8] transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-sm leading-relaxed text-[#475569]">
-                {item.answer}
-              </p>
-            </details>
-          ))}
-        </div>
+          descuenta FAQPage como deprecado, RSC-7). LND-18 (sprint 17, D5):
+          the FAQ becomes a white border-b band (the top border comes from S5c)
+          so Changelog + FAQ read as ONE continuous white band. */}
+      <section className="border-b border-[#e2e8f0] bg-white py-16">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <div className="mb-10 text-center">
+            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">
+              {LANDING_COPY.faq.eyebrow}
+            </span>
+            <h2 className="mt-2 font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+              {LANDING_COPY.faq.title}
+            </h2>
+          </div>
+          <div className="divide-y divide-[#e2e8f0] overflow-hidden rounded-xl border border-[#e2e8f0] bg-white">
+            {LANDING_COPY.faq.items.map((item) => (
+              <details
+                key={item.question}
+                className="group px-6 py-5 open:bg-[#f8fafc]"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-medium text-[#0f172a]">
+                  <span>{item.question}</span>
+                  <span className="text-[#94a3b8] transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-[#475569]">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
 
-        {/* LND-13 (sprint 12): real content date, never a placeholder. The
+          {/* LND-13 (sprint 12): real content date, never a placeholder. The
             author byline moved to the global footer (SHL-11, sprint 16). */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-1 border-t border-[#e2e8f0] pt-8 text-center text-xs text-[#64748b]">
-          <time dateTime={LANDING_COPY.contentDates.datePublished}>
-            Publicado el {LANDING_COPY.contentDates.datePublished}
-          </time>
+          <div className="mt-8 flex flex-col items-center justify-center gap-1 border-t border-[#e2e8f0] pt-8 text-center text-xs text-[#64748b]">
+            <time dateTime={LANDING_COPY.contentDates.datePublished}>
+              Publicado el {LANDING_COPY.contentDates.datePublished}
+            </time>
+          </div>
         </div>
       </section>
 

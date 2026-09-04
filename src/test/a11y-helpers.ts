@@ -8,9 +8,14 @@
 const FOCUSABLE_SELECTOR =
   "a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]";
 
-/** Interactive elements in document (tab) order within `root`. */
+/** Interactive elements in document (tab) order within `root`.
+ * Subtrees that are `inert` or `aria-hidden` are excluded: in a real browser
+ * inert elements are removed from the tab order, and aria-hidden content is
+ * not exposed to ATs (SHL-10 closed mobile drawer is both). */
 export function focusableElements(root: ParentNode): HTMLElement[] {
-  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+  ).filter((el) => !el.closest("[inert], [aria-hidden='true']"));
 }
 
 /**

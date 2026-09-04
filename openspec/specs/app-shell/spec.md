@@ -19,7 +19,7 @@ The shared app shell (navbar + footer) restyled to Gemini: active-state nav link
 | SHL-7 | Security headers | New | MUST | Every response MUST send CSP + HSTS (CSP report-only first, then enforced) |
 | SHL-8 | Support email constant | New | MUST | Footer support `mailto:` MUST resolve to the single shared support email constant |
 | SHL-9 | Brand metadata + copyright | New | MUST | Title/OG `siteName`/`alt` and footer copyright MUST read "Relevy" |
-| SHL-10 | Mobile navigation menu | ADDED | MUST | Below `md` a hamburger toggle opens a panel with all nav links + session actions; `md+` unchanged; Navbar stays a sync server component |
+| SHL-10 | Mobile navigation menu | ADDED | MUST | Below `md` a hamburger toggle (right container, `md:hidden`) opens a right-side drawer portaled to `document.body` with all nav links + session actions; Escape/overlay-close/focus-return; closed drawer `aria-hidden`+`inert`; `md+` unchanged; Navbar stays a sync server component; `NavLinks` desktop-only |
 | SHL-11 | Footer author byline | ADDED | MUST | Footer MUST render an author byline block (`.byline` class) with the real founder name + role ("Fundador de Relevy") from centralized brand/copy constants; present on every page via the root layout; absent from the page-only `<Page/>` render |
 
 ### Requirement: Active Nav States (SHL-1)
@@ -139,14 +139,16 @@ The app MUST emit "Relevy" as the page `<title>`/metadata template and in the sh
 
 ### Requirement: Mobile Navigation Menu (SHL-10)
 
-When the navbar renders below the `md` breakpoint, then it MUST expose a hamburger toggle that opens a navigation panel containing ALL primary nav links (Producto, Multi-página) and the session-appropriate actions — sign-in/sign-up for anonymous users, plan pill + user chip + logout for authenticated users. Above `md`, the desktop navigation MUST render unchanged (no toggle). The Navbar shell MUST remain a synchronous server component; the toggle and panel MUST live in the existing `"use client"` NavLinks island.
+When the navbar renders below the `md` breakpoint, then it MUST expose a hamburger toggle that opens a navigation panel containing ALL primary nav links (Producto, Multi-página) and the session-appropriate actions — sign-in/sign-up for anonymous users, plan pill + user chip + logout for authenticated users. Above `md`, the desktop navigation MUST render unchanged (no toggle). The toggle MUST render in the navbar's RIGHT container, visible only below `md` (`md:hidden`); the drawer and its overlay MUST be portaled to `document.body` (the header's `backdrop-blur-md` creates a containing block for `fixed` descendants, so in-header positioning would anchor to the 64px header). The drawer MUST close on Escape, on overlay click, and on toggle activation; focus MUST move into the drawer when it opens and MUST return to the toggle when it closes. A closed drawer MUST be `aria-hidden` and `inert` (not focusable, excluded from role queries). The Navbar shell MUST remain a synchronous server component; the toggle, drawer, and open state MUST live in a client `MobileMenu` island rendered from the Navbar's right container, and `NavLinks` MUST render the desktop nav only.
+(Previously: the toggle lived inside the `NavLinks` island in the navbar's LEFT container and the panel dropped full-width from the top (`inset-x-0 top-16`) inside the header — clipped by the `backdrop-blur-md` containing block — with no Escape, overlay-close, or focus management.)
 
 #### Scenario: Hamburger opens the panel with links and actions
 
 - GIVEN a viewport below `md` and an anonymous session
 - WHEN the hamburger toggle is activated
-- THEN the panel opens showing the nav links (Producto, Multi-página)
-- AND the sign-in and sign-up actions are present in the panel
+- THEN the drawer opens from the right showing the nav links (Producto, Multi-página)
+- AND the sign-in and sign-up actions are present in the drawer
+- AND focus moves into the drawer
 
 #### Scenario: Authenticated actions in the panel
 
@@ -165,6 +167,40 @@ When the navbar renders below the `md` breakpoint, then it MUST expose a hamburg
 - GIVEN a viewport at or above `md`
 - WHEN the navbar renders
 - THEN the desktop nav links render as before and no hamburger toggle is shown
+
+#### Scenario: Toggle on the far right below md
+
+- GIVEN a viewport below `md`
+- WHEN the navbar renders
+- THEN the toggle renders in the navbar's right container (`md:hidden`)
+- AND `NavLinks` renders no toggle of its own
+
+#### Scenario: Drawer and overlay portal to document.body
+
+- GIVEN the drawer is open
+- WHEN the DOM is inspected
+- THEN the drawer and its overlay are children of `document.body`, not descendants of the header
+
+#### Scenario: Closed drawer is aria-hidden and inert
+
+- GIVEN the drawer is closed
+- WHEN its attributes are inspected
+- THEN it carries `aria-hidden` and `inert`
+- AND its links are not focusable and are excluded from role queries
+
+#### Scenario: Escape closes and returns focus
+
+- GIVEN the drawer is open
+- WHEN the user presses Escape
+- THEN the drawer closes
+- AND focus returns to the toggle
+
+#### Scenario: Overlay click closes and returns focus
+
+- GIVEN the drawer is open
+- WHEN the overlay is clicked
+- THEN the drawer closes
+- AND focus returns to the toggle
 
 ### Requirement: Footer Author Byline (SHL-11)
 
@@ -202,5 +238,5 @@ When the shared footer renders, then it MUST include an author byline block — 
 | SHL-7 | CSP + HSTS emitted, CSP report-only before enforce | Covered |
 | SHL-8 | Footer support mailto | Covered |
 | SHL-9 | Page title is Relevy, OG siteName is Relevy, Footer copyright | Covered |
-| SHL-10 | Hamburger opens the panel with links and actions, Authenticated actions in the panel, Toggle closes the panel, Desktop nav unchanged | Covered |
+| SHL-10 | Hamburger opens the panel with links and actions, Authenticated actions in the panel, Toggle closes the panel, Desktop nav unchanged, Toggle on the far right below md, Drawer and overlay portal to document.body, Closed drawer is aria-hidden and inert, Escape closes and returns focus, Overlay click closes and returns focus | Covered |
 | SHL-11 | Byline renders with the .byline class, Byline present on every page via the shell, Byline copy is neutral and centralized | Covered |

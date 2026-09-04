@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Navbar } from "@/ui/navbar";
 import { LogoutButton } from "@/ui/logout-button";
@@ -55,9 +55,12 @@ describe("Navbar (SHL-2/3/4)", () => {
   it("shows the static Free pill with usage for an authenticated user (SHL-2)", () => {
     render(<Navbar session={PRO_SESSION} plan={{ used: 2, limit: 10 }} />);
     // The pill is a static label, not a link - there is no /pricing href
-    // (route deleted) and no tier-dependent label.
-    expect(screen.getByText("Plan Free")).toBeInTheDocument();
-    expect(screen.getByText(/\(2\/10\)/)).toBeInTheDocument();
+    // (route deleted) and no tier-dependent label. Scoped to the header: the
+    // closed mobile drawer (portaled to body) carries the same copy for the
+    // mobile surface, so text queries must not see both (SHL-10).
+    const header = screen.getByRole("banner");
+    expect(within(header).getByText("Plan Free")).toBeInTheDocument();
+    expect(within(header).getByText(/\(2\/10\)/)).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: /Plan Free/ }),
     ).not.toBeInTheDocument();
@@ -73,8 +76,11 @@ describe("Navbar (SHL-2/3/4)", () => {
     render(<Navbar session={PRO_SESSION} plan={null} />);
     expect(screen.queryByRole("link", { name: "Inicie sesión" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Cree su cuenta" })).toBeNull();
-    expect(screen.getByText("MT")).toBeInTheDocument(); // avatar initials
-    expect(screen.getByLabelText("Cierra sesión")).toBeInTheDocument();
+    // Scoped to the header - the closed mobile drawer duplicates the chip
+    // copy for the mobile surface (SHL-10, portaled to body).
+    const header = screen.getByRole("banner");
+    expect(within(header).getByText("MT")).toBeInTheDocument(); // avatar initials
+    expect(within(header).getByLabelText("Cierra sesión")).toBeInTheDocument();
   });
 
   it("highlights the active route link (SHL-1)", () => {
