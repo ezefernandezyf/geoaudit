@@ -402,6 +402,19 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(org.email).toBe("ezefernandezyf@gmail.com");
     expect(org.foundingDate).toBe("2026-08-05");
     expect(org.logo).toMatch(/og\.png$/);
+
+    // LND-9 (sprint 17, D6): real org attributes, values locked in
+    // brand.test.ts (ORG_AREA_SERVED / ORG_INDUSTRY / ORG_EMPLOYEES) - AR
+    // matches BRAND_ADDRESS, solo founder without contractors, Software
+    // industry. Never hardcoded literals in the page (LND-7).
+    expect(org.areaServed).toBe("AR");
+    expect(org.industry).toBe("Software");
+    expect(org.numberOfEmployees).toBe(1);
+
+    // LND-9 (sprint 17, D6): NO award property - no real award exists and
+    // inventing one would violate LND-7. The schema engine keeps reporting
+    // missing_recommended for award (honesty over score, 4 → 1).
+    expect(org.award).toBeUndefined();
   });
 
   // LND-12 (sprint 9): E-E-A-T trust signals - external citations to authority

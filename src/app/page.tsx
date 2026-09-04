@@ -14,6 +14,9 @@ import {
   FOUNDER,
   FOUNDING_DATE,
   KNOWS_ABOUT,
+  ORG_AREA_SERVED,
+  ORG_EMPLOYEES,
+  ORG_INDUSTRY,
   ORG_SAME_AS,
   SUPPORT_EMAIL,
 } from "@/lib/brand";
@@ -78,6 +81,13 @@ function OrganizationJsonLd() {
           contactPoint: BRAND_CONTACT_POINT,
           email: SUPPORT_EMAIL,
           foundingDate: FOUNDING_DATE,
+          // LND-9 (sprint 17, D6): real org attributes from brand.ts - AR
+          // matches BRAND_ADDRESS, Software industry, solo founder. `award`
+          // stays OMITTED: no real award exists and inventing one would
+          // violate LND-7 (engine keeps reporting missing_recommended).
+          areaServed: ORG_AREA_SERVED,
+          industry: ORG_INDUSTRY,
+          numberOfEmployees: ORG_EMPLOYEES,
         }),
       }}
     />
