@@ -627,6 +627,126 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
   });
 });
 
+// LND-18 (sprint 17): the S5→S7 gray run is broken by an interleaved
+// gray/white rhythm (D5): S4 gray + white rounded-2xl recuadro, S5 white
+// border-y band, S5b gray + white rounded-2xl recuadro, S5c border-t absorbed
+// into S6, S6 white border-b band, S7 gray + existing white recuadro. The
+// platforms grid keeps EXACTLY 6 rounded-xl cards; new recuadros are always
+// rounded-2xl; the comparison table wrapper stays overflow-x-auto with any
+// recuadro OUTSIDE it.
+describe("landing page interleaved backgrounds (LND-18)", () => {
+  it("breaks the four-gray run with alternating gray/white surfaces (LND-18)", async () => {
+    await renderPage();
+    // S5 (Comparativa) renders as a white border-y band.
+    const s5 = screen.getByRole("table").closest("section");
+    expect(s5?.className).toContain("bg-white");
+    expect(s5?.className).toContain("border-y");
+    // S5b (Case Study) stays on the gray base - no white band on the section.
+    const s5b = screen
+      .getByRole("heading", { level: 2, name: /^Case Study:/ })
+      .closest("section");
+    expect(s5b?.className).not.toContain("bg-white");
+    // S5c (Changelog) merges into the S6 white band: border-t only (no border-b).
+    const s5c = screen
+      .getByRole("heading", { level: 2, name: "Changelog" })
+      .closest("section");
+    expect(s5c?.className).toContain("bg-white");
+    expect(s5c?.className).toContain("border-t");
+    expect(s5c?.className).not.toContain("border-b");
+    // S6 (FAQ) closes the band with border-b only (no border-t).
+    const s6 = screen
+      .getByRole("heading", {
+        level: 2,
+        name: "Respuestas rápidas sobre GEO y visibilidad en IA",
+      })
+      .closest("section");
+    expect(s6?.className).toContain("bg-white");
+    expect(s6?.className).toContain("border-b");
+    expect(s6?.className).not.toContain("border-t");
+    // S7 (CTA) stays on the gray base with its existing white recuadro.
+    const s7 = screen
+      .getByRole("heading", {
+        level: 2,
+        name: "Audite su sitio hoy y vea cómo lo citan los motores de IA",
+      })
+      .closest("section");
+    expect(s7?.className).not.toContain("bg-white");
+    // Adjacent surfaces differ across the run: white / gray / white / gray.
+    expect(s5?.className).toContain("bg-white");
+    expect(s5b?.className).not.toContain("bg-white");
+    expect(s7?.className).not.toContain("bg-white");
+  });
+
+  it("keeps EXACTLY 6 rounded-xl platform cards in a white rounded-2xl recuadro (LND-18)", async () => {
+    await renderPage();
+    const section = screen
+      .getByText("6 plataformas de búsqueda generativa auditadas")
+      .closest("section");
+    expect(section).not.toBeNull();
+    // The gray section no longer carries the white band classes.
+    expect(section?.className).not.toContain("bg-white");
+    // The grid is wrapped in a white rounded-2xl recuadro (never rounded-xl).
+    const recuadro = section?.querySelector("div.rounded-2xl");
+    expect(recuadro).not.toBeNull();
+    expect(recuadro?.className).toContain("bg-white");
+    expect(recuadro?.className).toContain("border");
+    expect(recuadro?.className).not.toContain("rounded-xl");
+    // The 6 platform cards keep their rounded-xl surface - the count stays 6.
+    const cards = section?.querySelectorAll("div.rounded-xl");
+    expect(cards?.length).toBe(6);
+  });
+
+  it("wraps the Case Study section in a white rounded-2xl recuadro (LND-18)", async () => {
+    await renderPage();
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: /^Case Study:/,
+    });
+    const section = heading.closest("section");
+    expect(section).not.toBeNull();
+    expect(section?.className).not.toContain("bg-white");
+    const recuadro = section?.querySelector("div.rounded-2xl");
+    expect(recuadro).not.toBeNull();
+    expect(recuadro?.className).toContain("bg-white");
+    expect(recuadro?.className).toContain("border");
+    // The heading lives INSIDE the recuadro.
+    expect(recuadro?.contains(heading)).toBe(true);
+  });
+
+  it("bumps gray-surface eyebrows to #475569 and keeps white-band ones at #64748b (LND-18)", async () => {
+    await renderPage();
+    // Gray surfaces (S3 Scorecard, S4 Plataformas): #475569, never #64748b.
+    const scorecardEyebrow = screen.getByText("Scorecard Unificado");
+    expect(scorecardEyebrow.className).toContain("text-[#475569]");
+    expect(scorecardEyebrow.className).not.toContain("text-[#64748b]");
+    const platformsEyebrow = screen.getByText("Ecosistema de Búsqueda de IA");
+    expect(platformsEyebrow.className).toContain("text-[#475569]");
+    expect(platformsEyebrow.className).not.toContain("text-[#64748b]");
+    // White bands keep #64748b (AA on white): S5, S6 and the S7 recuadro.
+    for (const label of [
+      "Comparativa",
+      "Preguntas frecuentes",
+      "Comience gratis",
+    ]) {
+      expect(screen.getByText(label).className).toContain("text-[#64748b]");
+    }
+  });
+
+  it("keeps the comparison table wrapper overflow-x-auto with the recuadro outside it (LND-18)", async () => {
+    await renderPage();
+    const table = screen.getByRole("table");
+    const wrapper = table.parentElement;
+    expect(wrapper?.className).toContain("overflow-x-auto");
+    expect(wrapper?.className).not.toContain("overflow-hidden");
+    expect(table.className).toContain("min-w-[640px]");
+    // The white recuadro wraps OUTSIDE the scroll wrapper, rounded-2xl.
+    const recuadro = wrapper?.parentElement;
+    expect(recuadro?.className).toContain("rounded-2xl");
+    expect(recuadro?.className).toContain("bg-white");
+    expect(recuadro?.className).not.toContain("overflow-x-auto");
+  });
+});
+
 describe("landing page metadata (LND-8)", () => {
   it("emits OpenGraph metadata with title, description, url and the shared og.png", () => {
     expect(landingMetadata.openGraph).toMatchObject({
