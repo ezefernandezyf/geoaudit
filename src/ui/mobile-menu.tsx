@@ -50,10 +50,20 @@ export function MobileMenu({
 }: MobileMenuProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // HYD-1 (sprint 17 hotfix): `createPortal(document.body, ...)` cannot run
+  // during SSR - `document` is undefined server-side, which crashed the whole
+  // shell with HTTP 500 (every page renders the Navbar). The portal only
+  // mounts after hydration, so SSR renders the toggle alone and the drawer
+  // appears on the client.
+  const [mounted, setMounted] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const links = buildLinks(showMultiPage);
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // A11y contract (SHL-10): focus moves into the drawer on open; Escape
   // closes from anywhere; focus returns to the toggle on any close path
@@ -99,115 +109,120 @@ export function MobileMenu({
         )}
       </button>
 
-      {/* SHL-10: drawer + overlay portaled to document.body - escapes the
-          header's backdrop-blur-md containing block. Always mounted; closed =
-          aria-hidden + inert + pointer-events-none + translated off-canvas. */}
-      {createPortal(
-        <>
-          <div
-            aria-hidden="true"
-            onClick={close}
-            className={`fixed inset-0 z-50 bg-[#0f172a]/40 transition-opacity duration-250 ease-out motion-reduce:transition-none ${
-              open ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-          />
-          <div
-            ref={panelRef}
-            id="mobile-nav-panel"
-            tabIndex={-1}
-            inert={!open}
-            aria-hidden={open ? undefined : true}
-            className={`fixed inset-y-0 right-0 top-0 z-50 h-dvh w-80 max-w-[85vw] overflow-y-auto border-l border-[#e2e8f0] bg-white px-4 pb-6 pt-3 shadow-sm transition-transform duration-250 ease-out motion-reduce:transition-none ${
-              open ? "translate-x-0" : "translate-x-full"
-            }`}
-          >
-            <nav aria-label="Navegación móvil" className="flex flex-col gap-1">
-              {links.map((link) => {
-                const active = link.match(pathname);
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={close}
-                    aria-current={active ? "page" : undefined}
-                    className={`flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors ${
-                      active
-                        ? "bg-[#f1f5f9] text-[#0f172a]"
-                        : "text-[#475569] hover:bg-[#f8fafc] hover:text-[#0f172a]"
-                    }`}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        active ? "bg-[#10b981]" : "border border-[#cbd5e1]"
-                      }`}
-                    />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </nav>
+      {/* HYD-1: the drawer+overlay portal mounts ONLY after hydration (mounted).
+          During SSR (mounted=false) the portal is skipped - no `document`
+          access, no 500. The toggle stays visible in both passes. */}
+      {mounted
+        ? createPortal(
+            <>
+              <div
+                aria-hidden="true"
+                onClick={close}
+                className={`fixed inset-0 z-50 bg-[#0f172a]/40 transition-opacity duration-250 ease-out motion-reduce:transition-none ${
+                  open ? "opacity-100" : "pointer-events-none opacity-0"
+                }`}
+              />
+              <div
+                ref={panelRef}
+                id="mobile-nav-panel"
+                tabIndex={-1}
+                inert={!open}
+                aria-hidden={open ? undefined : true}
+                className={`fixed inset-y-0 right-0 top-0 z-50 h-dvh w-80 max-w-[85vw] overflow-y-auto border-l border-[#e2e8f0] bg-white px-4 pb-6 pt-3 shadow-sm transition-transform duration-250 ease-out motion-reduce:transition-none ${
+                  open ? "translate-x-0" : "translate-x-full"
+                }`}
+              >
+                <nav
+                  aria-label="Navegación móvil"
+                  className="flex flex-col gap-1"
+                >
+                  {links.map((link) => {
+                    const active = link.match(pathname);
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={close}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors ${
+                          active
+                            ? "bg-[#f1f5f9] text-[#0f172a]"
+                            : "text-[#475569] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            active ? "bg-[#10b981]" : "border border-[#cbd5e1]"
+                          }`}
+                        />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
 
-            <div className="mt-3 flex flex-col gap-2 border-t border-[#e2e8f0] pt-3">
-              {isAuthenticated ? (
-                <>
-                  {plan ? (
-                    <span
-                      className="flex items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857]"
-                      title={`Plan Free: ${plan.used}/${plan.limit} auditorías usadas`}
-                    >
-                      <Sparkles
-                        className="h-3 w-3 text-[#10b981]"
-                        aria-hidden="true"
-                      />
-                      <span className="font-mono text-[10px] uppercase tracking-wider">
-                        Plan Free
-                      </span>
-                      <span className="font-mono text-[#0f172a]">
-                        ({plan.used}/{plan.limit})
-                      </span>
-                    </span>
-                  ) : null}
+                <div className="mt-3 flex flex-col gap-2 border-t border-[#e2e8f0] pt-3">
+                  {isAuthenticated ? (
+                    <>
+                      {plan ? (
+                        <span
+                          className="flex items-center gap-1.5 rounded-full border border-[#10b981]/20 bg-[#10b981]/10 px-3 py-1 text-xs font-semibold text-[#047857]"
+                          title={`Plan Free: ${plan.used}/${plan.limit} auditorías usadas`}
+                        >
+                          <Sparkles
+                            className="h-3 w-3 text-[#10b981]"
+                            aria-hidden="true"
+                          />
+                          <span className="font-mono text-[10px] uppercase tracking-wider">
+                            Plan Free
+                          </span>
+                          <span className="font-mono text-[#0f172a]">
+                            ({plan.used}/{plan.limit})
+                          </span>
+                        </span>
+                      ) : null}
 
-                  <Link
-                    href="/dashboard"
-                    onClick={close}
-                    title={`Sesión iniciada como ${displayName ?? ""}`}
-                    className="flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white p-1 pl-2 pr-3 transition-colors hover:bg-[#f8fafc]"
-                  >
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#cbd5e1] text-[10px] font-bold text-[#0f172a]">
-                      {initials}
-                    </span>
-                    <span className="text-[11px] font-bold leading-tight text-[#0f172a]">
-                      {displayName}
-                    </span>
-                  </Link>
+                      <Link
+                        href="/dashboard"
+                        onClick={close}
+                        title={`Sesión iniciada como ${displayName ?? ""}`}
+                        className="flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white p-1 pl-2 pr-3 transition-colors hover:bg-[#f8fafc]"
+                      >
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#cbd5e1] text-[10px] font-bold text-[#0f172a]">
+                          {initials}
+                        </span>
+                        <span className="text-[11px] font-bold leading-tight text-[#0f172a]">
+                          {displayName}
+                        </span>
+                      </Link>
 
-                  <LogoutButton />
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={close}
-                    className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
-                  >
-                    {SHELL_COPY.nav.login}
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={close}
-                    className="inline-flex items-center justify-center rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b]"
-                  >
-                    {SHELL_COPY.nav.signup}
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        </>,
-        document.body,
-      )}
+                      <LogoutButton />
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        onClick={close}
+                        className="inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-[#0f172a] transition-colors hover:bg-[#f1f5f9]"
+                      >
+                        {SHELL_COPY.nav.login}
+                      </Link>
+                      <Link
+                        href="/signup"
+                        onClick={close}
+                        className="inline-flex items-center justify-center rounded-md bg-[#0f172a] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1e293b]"
+                      >
+                        {SHELL_COPY.nav.signup}
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
