@@ -122,6 +122,11 @@ export const SHELL_COPY = {
     login: "Inicie sesión",
     signup: "Cree su cuenta",
   },
+  // SHL-11 (sprint 16): footer author byline - neutral Spanish role sourced
+  // from centralized shell copy; the founder name comes from FOUNDER (brand.ts).
+  byline: {
+    role: "Fundador de Relevy",
+  },
 } as const;
 
 /**
@@ -297,14 +302,12 @@ export const LANDING_COPY = {
       },
     ],
   },
-  // LND-13 (sprint 12): real content date and author byline - never a placeholder.
+  // LND-13 (sprint 12): real content date, never a placeholder. The author
+  // byline moved to the global footer (SHL-11, sprint 16) - contentByline was
+  // removed as dead copy.
   contentDates: {
     datePublished: "2026-08-20",
     dateModified: "2026-08-28",
-  },
-  contentByline: {
-    name: "Ezequiel Alejandro Fernandez",
-    role: "Fundador de Relevy",
   },
 } as const;
 

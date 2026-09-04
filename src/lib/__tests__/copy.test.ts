@@ -147,6 +147,10 @@ describe("COPY - neutral Spanish (ATH-9, LGL-4)", () => {
     expect(SHELL_COPY.nav.signup).toBe("Cree su cuenta");
   });
 
+  it("centralizes the footer byline role copy (SHL-11)", () => {
+    expect(SHELL_COPY.byline.role).toBe("Fundador de Relevy");
+  });
+
   it("keeps the auth signup developer eyebrow neutral (B10)", () => {
     expect(AUTH_COPY.signup.developerEyebrow).toBe(
       "Cree su cuenta de desarrollador / marketer",

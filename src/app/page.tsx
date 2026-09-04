@@ -652,19 +652,12 @@ export default async function Home() {
           ))}
         </div>
 
-        {/* LND-13 (sprint 12): real content date + author byline, never a
-            placeholder. */}
+        {/* LND-13 (sprint 12): real content date, never a placeholder. The
+            author byline moved to the global footer (SHL-11, sprint 16). */}
         <div className="mt-8 flex flex-col items-center justify-center gap-1 border-t border-[#e2e8f0] pt-8 text-center text-xs text-[#64748b]">
           <time dateTime={LANDING_COPY.contentDates.datePublished}>
             Publicado el {LANDING_COPY.contentDates.datePublished}
           </time>
-          <p>
-            Por{" "}
-            <span className="font-medium text-[#0f172a]">
-              {LANDING_COPY.contentByline.name}
-            </span>
-            {` · ${LANDING_COPY.contentByline.role}`}
-          </p>
         </div>
       </section>
 

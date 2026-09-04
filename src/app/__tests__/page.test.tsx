@@ -424,15 +424,22 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(types).not.toContain("FAQPage");
   });
 
-  // LND-13 (sprint 12): real content date + author byline on the content
-  // sections - never a placeholder.
-  it("renders a real datePublished and an author byline (LND-13)", async () => {
+  // LND-13 (sprint 16): the content section keeps its real datePublished -
+  // the byline moved to the global footer (SHL-11), so the name/role are
+  // asserted in footer.test.tsx / the shell render, not here.
+  it("renders a real datePublished on the content section (LND-13)", async () => {
     await renderPage();
     expect(screen.getByText(/Publicado el 2026-08-20/)).toBeInTheDocument();
+  });
+
+  // SHL-11 (sprint 16): the byline belongs to the shell - it MUST NOT appear
+  // inside the page-only <Page/> render (the footer owns it).
+  it("keeps the author byline out of the page-only render (SHL-11)", async () => {
+    await renderPage();
     expect(
-      screen.getByText("Ezequiel Alejandro Fernandez"),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Fundador de Relevy/)).toBeInTheDocument();
+      screen.queryByText("Ezequiel Alejandro Fernandez"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fundador de Relevy/)).not.toBeInTheDocument();
   });
 
   // LND-13 (sprint 12): every <img> on the landing has a descriptive alt.
