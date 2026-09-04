@@ -9,6 +9,9 @@ import {
   FOUNDER,
   FOUNDING_DATE,
   KNOWS_ABOUT,
+  ORG_AREA_SERVED,
+  ORG_EMPLOYEES,
+  ORG_INDUSTRY,
   ORG_SAME_AS,
   SUPPORT_EMAIL,
 } from "@/lib/brand";
@@ -88,5 +91,20 @@ describe("brand constants (sprint 12 LND-9 real data)", () => {
   it("exposes knowsAbout topics covering the GEO product", () => {
     expect(KNOWS_ABOUT).toContain("GEO");
     expect(KNOWS_ABOUT).toContain("AI search visibility");
+  });
+
+  // LND-9 (sprint 17, D6): real org attributes confirmed by the founder -
+  // country AR (matches BRAND_ADDRESS), Software industry, solo founder
+  // without contractors. Never invented placeholders (LND-7).
+  it("exposes the real area served (AR)", () => {
+    expect(ORG_AREA_SERVED).toBe("AR");
+  });
+
+  it("exposes the real industry (Software)", () => {
+    expect(ORG_INDUSTRY).toBe("Software");
+  });
+
+  it("exposes the real employee count (1, solo founder)", () => {
+    expect(ORG_EMPLOYEES).toBe(1);
   });
 });
