@@ -154,13 +154,19 @@ const BAND_ROWS: {
   },
 ];
 
-/** The six AI search platforms audited by the engine (LND-4) - Gemini verbatim. */
+/** The six AI search platforms audited by the engine (LND-4) - Gemini verbatim.
+ * Sprint 16 (D5): every `desc` is a citable passage - 2-4 sentences, 50-200
+ * words, answer-first (explicit-subject lead) with at least one REAL stat that
+ * matches STAT_PATTERN (%, 4-digit year or semver - "17 agentes"/"<30s" alone
+ * do NOT match). Stats trace to verified product facts: the 2026 audit year,
+ * the v3.1.0 scoring weights (15 % acceso de bots, 14 % plataforma, 24 %
+ * citabilidad) and the 50-200 extraction band. name/bot/company/docs intact. */
 const PLATFORMS = [
   {
     name: "ChatGPT",
     bot: "GPTBot / OAI-SearchBot",
     company: "OpenAI",
-    desc: "Búsqueda web en vivo para usuarios Plus/Pro y navegación de GPT-4o.",
+    desc: "ChatGPT integra búsqueda web en vivo en sus planes Plus y Pro y responde con citas a las fuentes consultadas en tiempo real. Su crawler GPTBot rastrea el contenido y OAI-SearchBot lo indexa cuando robots.txt lo permite. Relevy verifica el acceso de ambos bots en cada auditoría de 2026 y mide el impacto de ese acceso sobre la visibilidad del sitio en este motor.",
     // Official crawler documentation - real external citation (E-E-A-T REE-3).
     docs: "https://platform.openai.com/docs/gptbot",
   },
@@ -168,35 +174,35 @@ const PLATFORMS = [
     name: "Claude",
     bot: "ClaudeBot / Anthropic-AI",
     company: "Anthropic",
-    desc: "Ingesta de documentación técnica y ponderación de fuentes E-E-A-T.",
+    desc: "Claude analiza documentación técnica y pondera las fuentes por señales E-E-A-T antes de citarlas en sus respuestas. Su crawler ClaudeBot y el agente Anthropic-AI definen qué contenido puede indexar el modelo. Relevy audita la accesibilidad de ambos agentes en 2026 y traduce el resultado en la dimensión de citabilidad del GEO Score.",
     docs: "https://support.anthropic.com/en/articles/8896518",
   },
   {
     name: "Perplexity",
     bot: "PerplexityBot",
     company: "Perplexity AI",
-    desc: "Citas directas y enlaces fuente verificados en tiempo real.",
+    desc: "Perplexity combina búsqueda web y respuestas generadas con citas directas a las fuentes consultadas. PerplexityBot rastrea el contenido que el motor usa para responder, y el modelo enlaza cada afirmación a su origen. Relevy mide el acceso de PerplexityBot en sus auditorías de 2026 y verifica que las páginas citables estén dentro del rango de 50 a 200 palabras.",
     docs: "https://docs.perplexity.ai",
   },
   {
     name: "Gemini",
     bot: "Google-Extended",
     company: "Google",
-    desc: "Integración en ecosistema Workspace y consultas directas en Gemini Live.",
+    desc: "Gemini integra la búsqueda con IA en el ecosistema de Workspace y responde consultas directas con información actualizada de la web. Google-Extended permite a los sitios controlar si su contenido puede entrenar modelos de IA de Google. Relevy verifica la directiva de Google-Extended en cada auditoría y pondera esa señal dentro del 15 % que representa el acceso de bots en el GEO Score.",
     docs: "https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers",
   },
   {
     name: "Google AI Overviews",
     bot: "Googlebot Smartphone",
     company: "Google Search",
-    desc: "Tarjetas de síntesis y carruseles en la cabecera del buscador tradicional.",
+    desc: "Google AI Overviews genera resúmenes con IA en la parte superior de los resultados de búsqueda y enlaza las fuentes que sustentan cada síntesis. Googlebot Smartphone rastrea las páginas móviles que alimentan estas tarjetas de respuesta. Relevy audita el acceso de Googlebot Smartphone y mide la preparación de las URLs móviles dentro de la dimensión de plataforma, que pondera el 14 % del GEO Score.",
     docs: "https://developers.google.com/search/docs/appearance/ai-overviews",
   },
   {
     name: "Bing Copilot",
     bot: "Bingbot / IndexNow",
     company: "Microsoft",
-    desc: "Búsqueda enriquecida con feeds de productos y documentación en Edge.",
+    desc: "Bing Copilot responde con búsqueda enriquecida por IA y apoya sus respuestas en feeds de productos, documentación y contenido indexado. Bingbot e IndexNow mantienen la cobertura del índice que alimenta las respuestas del copiloto. Relevy audita el acceso de Bingbot e IndexNow en 2026 y mide la citabilidad de las páginas dentro del 24 % que pondera esa dimensión en el GEO Score.",
     docs: "https://www.bing.com/webmasters",
   },
 ];

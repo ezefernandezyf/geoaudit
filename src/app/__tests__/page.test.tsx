@@ -279,6 +279,47 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
+  // LND-4 (sprint 16): every platform description is a citable passage - 2-4
+  // sentences, 50-200 words (the extraction band), answer-first (explicit
+  // subject lead, never a pronoun/conjunction) and carries at least one
+  // concrete stat that matches STAT_PATTERN (%, 4-digit year or semver - D5
+  // gotcha: "17 agentes"/"<30s" alone do NOT match). The page descs are not
+  // part of the COPY voseo invariant, so neutrality is covered here.
+  it("gives each platform card a citable description with a real stat (LND-4)", async () => {
+    await renderPage();
+    const section = screen
+      .getByText("6 plataformas de búsqueda generativa auditadas")
+      .closest("section");
+    expect(section).not.toBeNull();
+    const cards = section?.querySelectorAll("div.rounded-xl");
+    expect(cards?.length).toBe(6);
+    const STAT_PATTERN =
+      /[\d,.]+?\s*%|\b(?:20\d{2}|19\d{2})\b|\bv?\d+\.\d+\.\d+\b/;
+    const VOSEO_PATTERN =
+      /Verificá|Probá|Esperá|Alcanzaste|Necesitás|Mejorá|Iniciá|Creá|Accedé|Auditá|tenés|Comenzá|obtené|Ingresá|Analizá|Copiá|Compartí|Descargá|Podés|Querés|Mirá|Fijate|Registrate|Logueáte|Pega|obtén|Comienza|Ingresa|te citan|Inicia sesión|Crea cuenta|Crea tu|prueba/;
+    const SUBJECT_LEAD =
+      /^(?:ChatGPT|Claude|Perplexity|Gemini|Google AI|Google|Bing)/;
+    for (const card of cards ?? []) {
+      const desc = card.querySelector("p");
+      expect(desc).not.toBeNull();
+      const text = desc?.textContent?.trim() ?? "";
+      // 2-4 sentences: period followed by a space and a capital letter.
+      const sentences = text.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿])/).length;
+      expect(sentences).toBeGreaterThanOrEqual(2);
+      expect(sentences).toBeLessThanOrEqual(4);
+      // 50-200 word extraction band (RCI-4).
+      const words = text.split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(50);
+      expect(words).toBeLessThanOrEqual(200);
+      // Answer-first: explicit subject lead (the platform name).
+      expect(text).toMatch(SUBJECT_LEAD);
+      // At least one real stat token (% / 2026 / semver).
+      expect(text).toMatch(STAT_PATTERN);
+      // Neutral Spanish - no voseo/tuteo forms.
+      expect(text).not.toMatch(VOSEO_PATTERN);
+    }
+  });
+
   it("renders no pricing teaser or /pricing link (LND-6)", async () => {
     await renderPage();
     // The /pricing route is deleted (WU-1) - the landing must not link it.
