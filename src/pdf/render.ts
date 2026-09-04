@@ -57,9 +57,23 @@ export type PdfRenderDeps = {
 /** Serverless-safe Chrome flags (threat matrix: Chromium subprocess). */
 export const CHROMIUM_ARGS = ["--no-sandbox"];
 
-/** Pinned chromium-min release pack - same Chromium major as the pin (149). */
-export const CHROMIUM_PACK_URL =
-  "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.tar";
+/**
+ * Resolves the pinned chromium-min release pack URL for the runtime
+ * architecture (PDF-4). Since v149.0.0 the release assets carry an arch
+ * suffix (`chromium-v149.0.0-pack.x64.tar` / `...-pack.arm64.tar`); the bare
+ * `...-pack.tar` URL returns HTTP 404 and surfaces as `render_failed`. An
+ * unsupported architecture throws the typed `PdfRenderError` so the route
+ * maps it to a 5xx - never a bare download 404. The default `process.arch`
+ * keeps the production call site one-argument; passing `arch` explicitly
+ * makes both branches and the error path unit-testable (D1).
+ */
+export function resolveChromiumPackUrl(arch: string = process.arch): string {
+  const base =
+    "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack";
+  if (arch === "x64") return `${base}.x64.tar`;
+  if (arch === "arm64") return `${base}.arm64.tar`;
+  throw new PdfRenderError(`Unsupported architecture: ${arch}`);
+}
 
 /** Launch config resolved per environment (dev: puppeteer; prod: chromium-min). */
 async function resolveLaunchConfig(): Promise<{
@@ -78,7 +92,7 @@ async function resolveLaunchConfig(): Promise<{
     };
   }
   return {
-    executablePath: await chromium.executablePath(CHROMIUM_PACK_URL),
+    executablePath: await chromium.executablePath(resolveChromiumPackUrl()),
     headless: true,
     defaultViewport: { width: 1920, height: 1080 },
   };
