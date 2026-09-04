@@ -4,6 +4,7 @@ import type { Session } from "next-auth";
 import Page, { metadata as landingMetadata } from "@/app/page";
 import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
 import { LANDING_COPY } from "@/lib/copy";
+import { ORG_SAME_AS } from "@/lib/brand";
 import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand } from "@/ui/severity-badge";
 
@@ -346,6 +347,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(org.founder).toEqual({
       "@type": "Person",
       name: "Ezequiel Alejandro Fernandez",
+      sameAs: ORG_SAME_AS,
     });
     expect(org.address).toEqual({
       "@type": "PostalAddress",
