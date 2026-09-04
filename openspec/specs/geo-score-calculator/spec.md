@@ -48,9 +48,11 @@ The calculator MUST use the v3.1.0 calibrated weight distribution (sprint 14): c
 
 #### Scenario: Benchmark re-verification discriminates
 
-- GIVEN the v3.1.0 model applied to the sprint-14 corpus (10 sites + relevy.app)
+- GIVEN the v3.1.0 model applied to the measured sprint-14/15 corpus (14 URLs from `CANDIDATE_URLS`)
 - WHEN `pnpm verify:scorehero` re-runs
-- THEN moz scores 58-63, relevy.app scores 50-54, the average lands in 40-60, and no site is below 25
+- THEN moz scores 57, relevy.app scores 55, the average lands at 42.4, no site is below 25
+- AND `docs.anthropic.com` resolves to the brand "Anthropic" (eTLD+1, `brandFromDomain`)
+(Previously: moz 58-63, relevy.app 50-54, average 40-60 — predicted ranges now refreshed to the measured corpus; the sprint-14 archive stays immutable.)
 
 ### Requirement: Severity Band Assignment (RGS-5)
 

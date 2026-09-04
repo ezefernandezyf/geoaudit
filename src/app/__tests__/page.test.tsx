@@ -4,6 +4,7 @@ import type { Session } from "next-auth";
 import Page, { metadata as landingMetadata } from "@/app/page";
 import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
 import { LANDING_COPY } from "@/lib/copy";
+import { ORG_SAME_AS } from "@/lib/brand";
 import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand } from "@/ui/severity-badge";
 
@@ -278,6 +279,47 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     }
   });
 
+  // LND-4 (sprint 16): every platform description is a citable passage - 2-4
+  // sentences, 50-200 words (the extraction band), answer-first (explicit
+  // subject lead, never a pronoun/conjunction) and carries at least one
+  // concrete stat that matches STAT_PATTERN (%, 4-digit year or semver - D5
+  // gotcha: "17 agentes"/"<30s" alone do NOT match). The page descs are not
+  // part of the COPY voseo invariant, so neutrality is covered here.
+  it("gives each platform card a citable description with a real stat (LND-4)", async () => {
+    await renderPage();
+    const section = screen
+      .getByText("6 plataformas de búsqueda generativa auditadas")
+      .closest("section");
+    expect(section).not.toBeNull();
+    const cards = section?.querySelectorAll("div.rounded-xl");
+    expect(cards?.length).toBe(6);
+    const STAT_PATTERN =
+      /[\d,.]+?\s*%|\b(?:20\d{2}|19\d{2})\b|\bv?\d+\.\d+\.\d+\b/;
+    const VOSEO_PATTERN =
+      /Verificá|Probá|Esperá|Alcanzaste|Necesitás|Mejorá|Iniciá|Creá|Accedé|Auditá|tenés|Comenzá|obtené|Ingresá|Analizá|Copiá|Compartí|Descargá|Podés|Querés|Mirá|Fijate|Registrate|Logueáte|Pega|obtén|Comienza|Ingresa|te citan|Inicia sesión|Crea cuenta|Crea tu|prueba/;
+    const SUBJECT_LEAD =
+      /^(?:ChatGPT|Claude|Perplexity|Gemini|Google AI|Google|Bing)/;
+    for (const card of cards ?? []) {
+      const desc = card.querySelector("p");
+      expect(desc).not.toBeNull();
+      const text = desc?.textContent?.trim() ?? "";
+      // 2-4 sentences: period followed by a space and a capital letter.
+      const sentences = text.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿])/).length;
+      expect(sentences).toBeGreaterThanOrEqual(2);
+      expect(sentences).toBeLessThanOrEqual(4);
+      // 50-200 word extraction band (RCI-4).
+      const words = text.split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(50);
+      expect(words).toBeLessThanOrEqual(200);
+      // Answer-first: explicit subject lead (the platform name).
+      expect(text).toMatch(SUBJECT_LEAD);
+      // At least one real stat token (% / 2026 / semver).
+      expect(text).toMatch(STAT_PATTERN);
+      // Neutral Spanish - no voseo/tuteo forms.
+      expect(text).not.toMatch(VOSEO_PATTERN);
+    }
+  });
+
   it("renders no pricing teaser or /pricing link (LND-6)", async () => {
     await renderPage();
     // The /pricing route is deleted (WU-1) - the landing must not link it.
@@ -346,6 +388,7 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(org.founder).toEqual({
       "@type": "Person",
       name: "Ezequiel Alejandro Fernandez",
+      sameAs: ORG_SAME_AS,
     });
     expect(org.address).toEqual({
       "@type": "PostalAddress",
@@ -422,15 +465,22 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(types).not.toContain("FAQPage");
   });
 
-  // LND-13 (sprint 12): real content date + author byline on the content
-  // sections - never a placeholder.
-  it("renders a real datePublished and an author byline (LND-13)", async () => {
+  // LND-13 (sprint 16): the content section keeps its real datePublished -
+  // the byline moved to the global footer (SHL-11), so the name/role are
+  // asserted in footer.test.tsx / the shell render, not here.
+  it("renders a real datePublished on the content section (LND-13)", async () => {
     await renderPage();
     expect(screen.getByText(/Publicado el 2026-08-20/)).toBeInTheDocument();
+  });
+
+  // SHL-11 (sprint 16): the byline belongs to the shell - it MUST NOT appear
+  // inside the page-only <Page/> render (the footer owns it).
+  it("keeps the author byline out of the page-only render (SHL-11)", async () => {
+    await renderPage();
     expect(
-      screen.getByText("Ezequiel Alejandro Fernandez"),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Fundador de Relevy/)).toBeInTheDocument();
+      screen.queryByText("Ezequiel Alejandro Fernandez"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/Fundador de Relevy/)).not.toBeInTheDocument();
   });
 
   // LND-13 (sprint 12): every <img> on the landing has a descriptive alt.
@@ -476,6 +526,21 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     ).toBeInTheDocument();
   });
 
+  // LND-14 (sprint 15): at 360px the comparison table must stay legible - the
+  // wrapper scrolls horizontally (overflow-x-auto) instead of clipping
+  // (overflow-hidden) and the <table> keeps a min-width so columns don't
+  // squeeze. The semantic <table> markup is preserved (RCI-5/RPL-10).
+  it("keeps the comparison table scrollable on mobile with a legible min-width (LND-14)", async () => {
+    await renderPage();
+    const table = screen.getByRole("table");
+    // Semantic table with real data survives the responsive change.
+    expect(within(table).getAllByRole("row").length).toBeGreaterThanOrEqual(4);
+    const wrapper = table.parentElement;
+    expect(wrapper?.className).toContain("overflow-x-auto");
+    expect(wrapper?.className).not.toContain("overflow-hidden");
+    expect(table.className).toContain("min-w-[640px]");
+  });
+
   // LND-13 (sprint 13): the key content headings are phrased as questions
   // (query-matchable, RCI-5/RPL-8) - not just the hero H1.
   it("phrases the key section headings as questions (LND-13)", async () => {
@@ -508,6 +573,57 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     );
     expect(brand?.name).toBe("Autoridad de marca");
     expect(brand?.weight).toBe("12%");
+  });
+
+  // LND-16 (sprint 16): Case Study section between the comparison table and
+  // the FAQ - H2 question form (EN heading), neutral ES body with verified
+  // numbers only.
+  it("renders the Case Study section between comparison and FAQ (LND-16)", async () => {
+    await renderPage();
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    });
+    expect(heading).toBeInTheDocument();
+    // Document order: comparison table → Case Study → FAQ.
+    const comparison = screen.getByRole("table");
+    const faq = screen.getByText(
+      "Respuestas rápidas sobre GEO y visibilidad en IA",
+    );
+    expect(
+      comparison.compareDocumentPosition(heading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    expect(
+      heading.compareDocumentPosition(faq) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    // The two neutral paragraphs render from the shared copy.
+    for (const paragraph of LANDING_COPY.caseStudy.paragraphs) {
+      expect(screen.getByText(paragraph)).toBeInTheDocument();
+    }
+  });
+
+  // LND-17 (sprint 16): Changelog section immediately after the Case Study -
+  // H2 "Changelog" (engine changelog-heading pattern → +10 experience proxy)
+  // plus the three real semver lines in a <ul>.
+  it("renders the Changelog section right after Case Study (LND-17)", async () => {
+    await renderPage();
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Changelog",
+    });
+    expect(heading).toBeInTheDocument();
+    const caseStudy = screen.getByRole("heading", {
+      level: 2,
+      name: "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    });
+    expect(
+      caseStudy.compareDocumentPosition(heading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    for (const line of LANDING_COPY.changelog) {
+      expect(screen.getByText(line)).toBeInTheDocument();
+    }
   });
 });
 

@@ -60,6 +60,10 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
 
   const session = await auth();
   const userId = session?.user?.id;
+  // PDF-10 (D1): best-effort persistence - the persisted id threads into the
+  // report as the direct /api/report/{id}/pdf href (the route owns auth +
+  // ownership). Null when the audit did not persist → no export entry.
+  let persistedId: string | null = null;
   if (userId) {
     const { allowed } = await checkTierLimit(prisma, userId, Date.now());
     if (!allowed) {
@@ -69,7 +73,7 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
     }
 
     try {
-      await prisma.audit.create({
+      const persisted = await prisma.audit.create({
         data: {
           userId,
           url,
@@ -83,6 +87,7 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
           result: result as unknown as Prisma.InputJsonValue,
         },
       });
+      if (persisted) persistedId = persisted.id;
     } catch (error) {
       // Best-effort persist: never hide the finished report behind a DB error.
       console.error("audit persist failed", error);
@@ -101,7 +106,17 @@ export async function AuditRunner({ url }: AuditRunnerProps) {
     }
   }
 
-  return <AuditReport result={result} />;
+  return (
+    <AuditReport
+      result={result}
+      ctx={{
+        // PDF-10 (D1): direct export link only when the audit persisted;
+        // anonymous reports get the PDF signup CTA (D2: no id → no entry).
+        exportPdfHref: persistedId ? `/api/report/${persistedId}/pdf` : null,
+        exportAnonCta: !userId,
+      }}
+    />
+  );
 }
 
 function TierLimitState() {

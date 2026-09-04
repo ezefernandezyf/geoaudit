@@ -15,6 +15,7 @@ Define the baseline scaffold for GeoAudit: a Next.js 15.5 project with TypeScrip
 | R5 | Dev server | MUST | `pnpm dev` must serve a smoke-test page on port 3000 |
 | R6 | Quality gates | MUST | `pnpm lint`, `pnpm typecheck`, and `pnpm build` must pass with zero errors from a clean scaffold |
 | R7 | Test runner | MUST | Vitest configured with at least one smoke test (`page.test.tsx`) that passes |
+| R8 | Lint ignores coverage | MUST | ESLint ignores the generated `coverage/` directory so `pnpm lint` passes with coverage artifacts present |
 
 ### Requirement: Next.js Scaffold (R1)
 
@@ -66,3 +67,13 @@ The system MUST have a passing smoke test.
 - WHEN `pnpm test` is invoked
 - THEN at least one test passes
 - AND it is a render check on the root page
+
+### Requirement: Lint Ignores Generated Coverage (R8)
+
+The ESLint configuration MUST ignore the generated `coverage/` directory, so `pnpm lint` passes with coverage artifacts present.
+
+#### Scenario: lint passes with coverage artifacts
+
+- GIVEN `coverage/` exists with generated artifacts
+- WHEN `pnpm lint` runs
+- THEN lint passes without linting coverage files

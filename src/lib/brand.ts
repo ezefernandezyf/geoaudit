@@ -35,6 +35,10 @@ export const ORG_SAME_AS = [
 export const FOUNDER = {
   "@type": "Person",
   name: "Ezequiel Alejandro Fernandez",
+  // LND-9 (sprint 16): the nested founder Person shares the SAME real profiles
+  // as the Organization - a distinct expertise signal (+2) while sameAsUrls
+  // dedupes them, so authoritativeness is unchanged (design D2).
+  sameAs: ORG_SAME_AS,
 } as const;
 
 /** Real founding date (ISO) - Relevy was incorporated on this date (LND-9). */

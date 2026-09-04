@@ -72,4 +72,17 @@ describe("Footer (SHL-5)", () => {
       screen.getByText(`© ${new Date().getFullYear()} ${BRAND_NAME}`),
     ).toBeInTheDocument();
   });
+
+  // SHL-11 (sprint 16): the global footer renders the author byline - a
+  // paragraph with the engine's AUTHOR_SELECTOR class (.byline) showing the
+  // real founder name and role from the shared constants. The class is a
+  // functional contract for the expertise engine over the full DOM
+  // (AUTHOR_SELECTOR = '.byline, [rel="author"], .author, author'), not a
+  // styling detail: without it the +5 byline bonus is never detected.
+  it("renders the author byline with the .byline class (SHL-11)", () => {
+    render(<Footer />);
+    const byline = screen.getByText(/Fundador de Relevy/).closest("p.byline");
+    expect(byline).not.toBeNull();
+    expect(byline?.textContent).toContain("Ezequiel Alejandro Fernandez");
+  });
 });
