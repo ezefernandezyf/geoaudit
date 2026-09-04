@@ -54,7 +54,15 @@ describe("brand constants (sprint 12 LND-9 real data)", () => {
     expect(FOUNDER).toEqual({
       "@type": "Person",
       name: "Ezequiel Alejandro Fernandez",
+      sameAs: ORG_SAME_AS,
     });
+  });
+
+  it("shares the ORG_SAME_AS const by reference (D2 dedupe)", () => {
+    // D2 (sprint 16): the founder reuses the SAME array - sameAsUrls dedupes
+    // the URLs, so authoritativeness is unchanged (+0) while the nested Person
+    // sameAs still earns the +2 expertise signal.
+    expect(FOUNDER.sameAs).toBe(ORG_SAME_AS);
   });
 
   it("exposes the real founding date", () => {

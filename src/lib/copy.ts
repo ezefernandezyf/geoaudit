@@ -122,6 +122,11 @@ export const SHELL_COPY = {
     login: "Inicie sesión",
     signup: "Cree su cuenta",
   },
+  // SHL-11 (sprint 16): footer author byline - neutral Spanish role sourced
+  // from centralized shell copy; the founder name comes from FOUNDER (brand.ts).
+  byline: {
+    role: "Fundador de Relevy",
+  },
 } as const;
 
 /**
@@ -297,15 +302,36 @@ export const LANDING_COPY = {
       },
     ],
   },
-  // LND-13 (sprint 12): real content date and author byline - never a placeholder.
+  // LND-13 (sprint 12): real content date, never a placeholder. The author
+  // byline moved to the global footer (SHL-11, sprint 16) - contentByline was
+  // removed as dead copy.
   contentDates: {
     datePublished: "2026-08-20",
     dateModified: "2026-08-28",
   },
-  contentByline: {
-    name: "Ezequiel Alejandro Fernandez",
-    role: "Fundador de Relevy",
+  // LND-16 (sprint 16): Case Study section between the comparison table and
+  // the FAQ - EN question-form heading (experience case-heading + citability
+  // question bonus) with a NEUTRAL ES body (scope LOCKED: ES bodies cap
+  // experience at 15/25). Only verified numbers: 14-URL corpus, 55 vs 57 vs
+  // 42,4, 47 → 62 during 2026, 6 engines, <30s per URL. No "92", no
+  // dimension/total conflation, no English phrases.
+  caseStudy: {
+    heading:
+      "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    paragraphs: [
+      "Relevy auditó su propio sitio con el motor que utiliza para auditar a sus clientes. Sobre un corpus de 14 URLs, Relevy obtuvo 55 puntos, frente a 57 de moz.com y un promedio general de 42,4. El resultado confirma que el motor mide con la misma vara a todos los dominios.",
+      "Durante 2026, el GEO Score de Relevy pasó de 47 a 62 puntos aplicando los mismos cambios que recomienda a sus usuarios. Cada auditoría completa el análisis en menos de 30 segundos sobre las 6 plataformas de búsqueda generativa.",
+    ],
   },
+  // LND-17 (sprint 16): Changelog section right after the Case Study - three
+  // REAL engine versions in semver, one honest line each (v3.1.0 sprint 14,
+  // v3.0.0 sprint 13, v2.0.0 sprint 9). Semver strings hit the citability
+  // STAT_PATTERN and the block stays in the 50-200 word extraction band.
+  changelog: [
+    "v3.1.0 — Calibración de los pesos de las seis dimensiones (24/23/15/12/14/12), bandas 80/65/50/30 y motor de citabilidad v3.1 con piso de unicidad.",
+    "v3.0.0 — Incorporación de la sexta dimensión de autoridad de marca, con verificación de Wikipedia y Wikidata en cada auditoría.",
+    "v2.0.0 — Primer modelo de puntuación calibrado, con ponderaciones iniciales por dimensión y bandas de severidad definidas.",
+  ],
 } as const;
 
 /**

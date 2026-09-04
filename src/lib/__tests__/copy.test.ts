@@ -147,6 +147,10 @@ describe("COPY - neutral Spanish (ATH-9, LGL-4)", () => {
     expect(SHELL_COPY.nav.signup).toBe("Cree su cuenta");
   });
 
+  it("centralizes the footer byline role copy (SHL-11)", () => {
+    expect(SHELL_COPY.byline.role).toBe("Fundador de Relevy");
+  });
+
   it("keeps the auth signup developer eyebrow neutral (B10)", () => {
     expect(AUTH_COPY.signup.developerEyebrow).toBe(
       "Cree su cuenta de desarrollador / marketer",
@@ -369,5 +373,73 @@ describe("LANDING_COPY six-dimension polish (LND-11/13/14/15, sprint 13/15)", ()
       expect(heading).toMatch(/^\u00bf/);
       expect(heading.endsWith("?")).toBe(true);
     }
+  });
+});
+
+describe("LANDING_COPY case study (LND-16, sprint 16)", () => {
+  it("locks the exact question-form heading (LND-16)", () => {
+    expect(LANDING_COPY.caseStudy.heading).toBe(
+      "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    );
+    // Question-form bonus (ends in "?") + experience case-heading ("Case Study").
+    expect(LANDING_COPY.caseStudy.heading.endsWith("?")).toBe(true);
+    expect(LANDING_COPY.caseStudy.heading).toContain("Case Study");
+  });
+
+  it("keeps the body in the 50-200 word extraction band (LND-16)", () => {
+    const body = LANDING_COPY.caseStudy.paragraphs.join(" ");
+    const words = body.trim().split(/\s+/).length;
+    expect(words).toBeGreaterThanOrEqual(50);
+    expect(words).toBeLessThanOrEqual(200);
+  });
+
+  it("uses only verified numbers and no '92' (LND-16)", () => {
+    const body = LANDING_COPY.caseStudy.paragraphs.join(" ");
+    // Verified set: 14-URL corpus, 55 vs 57 vs 42,4, 47 → 62 in 2026, 6
+    // engines, <30s per URL - never the E-E-A-T dimension total (46).
+    expect(body).toMatch(/14 URLs/);
+    expect(body).toMatch(/55/);
+    expect(body).toMatch(/57/);
+    expect(body).toMatch(/42,4/);
+    expect(body).toMatch(/47 a 62/);
+    expect(body).toMatch(/2026/);
+    expect(body).toMatch(/6 plataformas/);
+    expect(body).toMatch(/30 segundos/);
+    // "92" ban + no dimension/total conflation ("46→55" style).
+    expect(body).not.toContain("92");
+    expect(body).not.toMatch(/46\s*(?:a|→)\s*55/);
+  });
+
+  it("keeps every paragraph in neutral Spanish (LND-16)", () => {
+    for (const paragraph of LANDING_COPY.caseStudy.paragraphs) {
+      expect(paragraph).not.toMatch(VOSEO_PATTERN);
+    }
+  });
+});
+
+describe("LANDING_COPY changelog (LND-17, sprint 16)", () => {
+  it("lists the three real engine versions in semver (LND-17)", () => {
+    expect(LANDING_COPY.changelog).toHaveLength(3);
+    expect(LANDING_COPY.changelog[0]).toMatch(/^v3\.1\.0\b/);
+    expect(LANDING_COPY.changelog[1]).toMatch(/^v3\.0\.0\b/);
+    expect(LANDING_COPY.changelog[2]).toMatch(/^v2\.0\.0\b/);
+  });
+
+  it("keeps each version line in the 16-23 word band and the block in 50-200 (LND-17)", () => {
+    const block = LANDING_COPY.changelog.join(" ");
+    const blockWords = block.trim().split(/\s+/).length;
+    expect(blockWords).toBeGreaterThanOrEqual(50);
+    expect(blockWords).toBeLessThanOrEqual(200);
+    for (const line of LANDING_COPY.changelog) {
+      const words = line.trim().split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(16);
+      expect(words).toBeLessThanOrEqual(23);
+    }
+  });
+
+  it("avoids the '92' ban and voseo forms (LND-17)", () => {
+    const block = LANDING_COPY.changelog.join(" ");
+    expect(block).not.toContain("92");
+    expect(block).not.toMatch(VOSEO_PATTERN);
   });
 });

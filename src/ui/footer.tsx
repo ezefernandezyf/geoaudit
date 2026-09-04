@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Session } from "next-auth";
 import { Logo } from "@/ui/logo";
-import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
+import { BRAND_NAME, FOUNDER, SUPPORT_EMAIL } from "@/lib/brand";
+import { SHELL_COPY } from "@/lib/copy";
 
 type FooterProps = {
   /** Optional session - gates the Dashboard link (D6: anon shell has none). */
@@ -60,6 +61,15 @@ export function Footer({ session }: FooterProps = {}) {
           © {new Date().getFullYear()} {BRAND_NAME}
         </p>
       </div>
+      {/* SHL-11 (sprint 16): author byline - the expertise engine matches
+          AUTHOR_SELECTOR (.byline) over the FULL DOM, so a footer byline is
+          detected on the landing and every subpage (+5). Footer is stripped
+          from pageText/paragraphTexts (BOILERPLATE_SELECTOR) and citability
+          (EXCLUDE_SELECTOR) → zero scoring collateral. */}
+      <p className="byline pb-8 text-center text-xs text-[#64748b]">
+        Por <span className="font-medium text-[#0f172a]">{FOUNDER.name}</span>
+        {` · ${SHELL_COPY.byline.role}`}
+      </p>
     </footer>
   );
 }
