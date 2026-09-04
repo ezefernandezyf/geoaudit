@@ -533,6 +533,34 @@ describe("landing page (LND-1..5, ADF-1/ADF-8)", () => {
     expect(brand?.name).toBe("Autoridad de marca");
     expect(brand?.weight).toBe("12%");
   });
+
+  // LND-16 (sprint 16): Case Study section between the comparison table and
+  // the FAQ - H2 question form (EN heading), neutral ES body with verified
+  // numbers only.
+  it("renders the Case Study section between comparison and FAQ (LND-16)", async () => {
+    await renderPage();
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    });
+    expect(heading).toBeInTheDocument();
+    // Document order: comparison table → Case Study → FAQ.
+    const comparison = screen.getByRole("table");
+    const faq = screen.getByText(
+      "Respuestas rápidas sobre GEO y visibilidad en IA",
+    );
+    expect(
+      comparison.compareDocumentPosition(heading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    expect(
+      heading.compareDocumentPosition(faq) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
+    // The two neutral paragraphs render from the shared copy.
+    for (const paragraph of LANDING_COPY.caseStudy.paragraphs) {
+      expect(screen.getByText(paragraph)).toBeInTheDocument();
+    }
+  });
 });
 
 describe("landing page metadata (LND-8)", () => {

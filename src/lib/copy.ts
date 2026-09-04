@@ -309,6 +309,20 @@ export const LANDING_COPY = {
     datePublished: "2026-08-20",
     dateModified: "2026-08-28",
   },
+  // LND-16 (sprint 16): Case Study section between the comparison table and
+  // the FAQ - EN question-form heading (experience case-heading + citability
+  // question bonus) with a NEUTRAL ES body (scope LOCKED: ES bodies cap
+  // experience at 15/25). Only verified numbers: 14-URL corpus, 55 vs 57 vs
+  // 42,4, 47 → 62 during 2026, 6 engines, <30s per URL. No "92", no
+  // dimension/total conflation, no English phrases.
+  caseStudy: {
+    heading:
+      "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    paragraphs: [
+      "Relevy auditó su propio sitio con el motor que utiliza para auditar a sus clientes. Sobre un corpus de 14 URLs, Relevy obtuvo 55 puntos, frente a 57 de moz.com y un promedio general de 42,4. El resultado confirma que el motor mide con la misma vara a todos los dominios.",
+      "Durante 2026, el GEO Score de Relevy pasó de 47 a 62 puntos aplicando los mismos cambios que recomienda a sus usuarios. Cada auditoría completa el análisis en menos de 30 segundos sobre las 6 plataformas de búsqueda generativa.",
+    ],
+  },
 } as const;
 
 /**

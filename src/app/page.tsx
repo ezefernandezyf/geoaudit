@@ -622,6 +622,22 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* 5b. CASE STUDY (LND-16, sprint 16) - EN heading (case-heading +
+          question-form bonuses), NEUTRAL ES body with verified numbers only,
+          placed between the comparison table and the FAQ. */}
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <div className="mb-10 text-center">
+          <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
+            {LANDING_COPY.caseStudy.heading}
+          </h2>
+        </div>
+        <div className="space-y-4 text-sm leading-relaxed text-[#475569] sm:text-base">
+          {LANDING_COPY.caseStudy.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      </section>
+
       {/* 6. FAQ VISIBLE (LND-13) - real Q&A, sin FAQPage JSON-LD (el engine
           descuenta FAQPage como deprecado, RSC-7) */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">

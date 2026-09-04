@@ -375,3 +375,44 @@ describe("LANDING_COPY six-dimension polish (LND-11/13/14/15, sprint 13/15)", ()
     }
   });
 });
+
+describe("LANDING_COPY case study (LND-16, sprint 16)", () => {
+  it("locks the exact question-form heading (LND-16)", () => {
+    expect(LANDING_COPY.caseStudy.heading).toBe(
+      "Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?",
+    );
+    // Question-form bonus (ends in "?") + experience case-heading ("Case Study").
+    expect(LANDING_COPY.caseStudy.heading.endsWith("?")).toBe(true);
+    expect(LANDING_COPY.caseStudy.heading).toContain("Case Study");
+  });
+
+  it("keeps the body in the 50-200 word extraction band (LND-16)", () => {
+    const body = LANDING_COPY.caseStudy.paragraphs.join(" ");
+    const words = body.trim().split(/\s+/).length;
+    expect(words).toBeGreaterThanOrEqual(50);
+    expect(words).toBeLessThanOrEqual(200);
+  });
+
+  it("uses only verified numbers and no '92' (LND-16)", () => {
+    const body = LANDING_COPY.caseStudy.paragraphs.join(" ");
+    // Verified set: 14-URL corpus, 55 vs 57 vs 42,4, 47 → 62 in 2026, 6
+    // engines, <30s per URL - never the E-E-A-T dimension total (46).
+    expect(body).toMatch(/14 URLs/);
+    expect(body).toMatch(/55/);
+    expect(body).toMatch(/57/);
+    expect(body).toMatch(/42,4/);
+    expect(body).toMatch(/47 a 62/);
+    expect(body).toMatch(/2026/);
+    expect(body).toMatch(/6 plataformas/);
+    expect(body).toMatch(/30 segundos/);
+    // "92" ban + no dimension/total conflation ("46→55" style).
+    expect(body).not.toContain("92");
+    expect(body).not.toMatch(/46\s*(?:a|→)\s*55/);
+  });
+
+  it("keeps every paragraph in neutral Spanish (LND-16)", () => {
+    for (const paragraph of LANDING_COPY.caseStudy.paragraphs) {
+      expect(paragraph).not.toMatch(VOSEO_PATTERN);
+    }
+  });
+});
