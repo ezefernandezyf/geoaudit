@@ -20,6 +20,7 @@ The shared app shell (navbar + footer) restyled to Gemini: active-state nav link
 | SHL-8 | Support email constant | New | MUST | Footer support `mailto:` MUST resolve to the single shared support email constant |
 | SHL-9 | Brand metadata + copyright | New | MUST | Title/OG `siteName`/`alt` and footer copyright MUST read "Relevy" |
 | SHL-10 | Mobile navigation menu | ADDED | MUST | Below `md` a hamburger toggle opens a panel with all nav links + session actions; `md+` unchanged; Navbar stays a sync server component |
+| SHL-11 | Footer author byline | ADDED | MUST | Footer MUST render an author byline block (`.byline` class) with the real founder name + role ("Fundador de Relevy") from centralized brand/copy constants; present on every page via the root layout; absent from the page-only `<Page/>` render |
 
 ### Requirement: Active Nav States (SHL-1)
 
@@ -165,6 +166,29 @@ When the navbar renders below the `md` breakpoint, then it MUST expose a hamburg
 - WHEN the navbar renders
 - THEN the desktop nav links render as before and no hamburger toggle is shown
 
+### Requirement: Footer Author Byline (SHL-11)
+
+When the shared footer renders, then it MUST include an author byline block — a paragraph with class `byline` — showing the real founder name and role ("Fundador de Relevy"), sourced from the centralized brand/copy constants (neutral Spanish, SHL-6). Because the footer renders on every page through the root layout, every audited page exposes the byline; the expertise engine matches `.byline` over the full DOM (+5) while the footer remains excluded from citability content and E-E-A-T word counts, so the move has zero scoring collateral. The byline MUST NOT appear inside the page-only `<Page/>` render (it belongs to the shell).
+
+#### Scenario: Byline renders with the .byline class
+
+- GIVEN the shared footer
+- WHEN it renders
+- THEN a paragraph with class `byline` shows the founder's real name and the role "Fundador de Relevy"
+
+#### Scenario: Byline present on every page via the shell
+
+- GIVEN any route that renders the root layout (navbar + footer)
+- WHEN the shell is inspected
+- THEN the byline block is present (asserted in the shell/footer render, not in the page-only render)
+
+#### Scenario: Byline copy is neutral and centralized
+
+- GIVEN the byline strings
+- WHEN they are inspected
+- THEN they come from the shared brand/copy constants (founder name from `FOUNDER`, role from centralized copy)
+- AND they contain no voseo or tuteo forms (SHL-6 invariant)
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -179,3 +203,4 @@ When the navbar renders below the `md` breakpoint, then it MUST expose a hamburg
 | SHL-8 | Footer support mailto | Covered |
 | SHL-9 | Page title is Relevy, OG siteName is Relevy, Footer copyright | Covered |
 | SHL-10 | Hamburger opens the panel with links and actions, Authenticated actions in the panel, Toggle closes the panel, Desktop nav unchanged | Covered |
+| SHL-11 | Byline renders with the .byline class, Byline present on every page via the shell, Byline copy is neutral and centralized | Covered |
