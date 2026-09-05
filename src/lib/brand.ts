@@ -23,12 +23,17 @@ export const BRAND_REPO = "https://github.com/ezefernandezyf/relevy";
 
 /**
  * Real, verifiable org profiles for JSON-LD `sameAs` (LND-9, LND-7 honesty).
- * GitHub + LinkedIn + personal site - never invented handles.
+ * GitHub + LinkedIn + personal site - never invented handles. LND-19.1
+ * (sprint 19): +TikTok @ezefernandezdev and the relevy GitHub repo (both
+ * HTTP 200 verified) → 5 profiles → countValidSameAs 15 (5×3). FOUNDER
+ * inherits the same array by reference (D2 dedupe).
  */
 export const ORG_SAME_AS = [
   "https://github.com/ezefernandezyf",
   "https://www.linkedin.com/in/ezequiel-fernandez-59a21a387/",
   "https://ezefernandez.com",
+  "https://www.tiktok.com/@ezefernandezdev",
+  "https://github.com/ezefernandezyf/relevy",
 ] as const;
 
 /** Real founder (Person) - author of Relevy, never a placeholder (LND-9). */
