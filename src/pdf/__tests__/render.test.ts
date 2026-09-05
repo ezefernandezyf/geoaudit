@@ -36,10 +36,17 @@ function successDeps(): {
   const closeMock = vi.fn().mockResolvedValue(undefined);
   const deps: PdfRenderDeps = {
     launch: vi.fn().mockResolvedValue({
+      pages: vi.fn().mockResolvedValue([
+        {
+          goto: gotoMock,
+          setContent: setContentMock,
+          pdf: pdfMock,
+        },
+      ]),
       newPage: vi.fn().mockResolvedValue({
-        goto: gotoMock,
-        setContent: setContentMock,
-        pdf: pdfMock,
+        goto: vi.fn().mockResolvedValue(undefined),
+        setContent: vi.fn().mockResolvedValue(undefined),
+        pdf: vi.fn().mockResolvedValue(new Uint8Array([0])),
       }),
       close: closeMock,
     }),
@@ -93,6 +100,13 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
     const closeMock = vi.fn().mockResolvedValue(undefined);
     const deps: PdfRenderDeps = {
       launch: vi.fn().mockResolvedValue({
+        pages: vi.fn().mockResolvedValue([
+          {
+            goto: vi.fn().mockResolvedValue(undefined),
+            setContent: vi.fn().mockResolvedValue(undefined),
+            pdf: pdfMock,
+          },
+        ]),
         newPage: vi.fn().mockResolvedValue({
           goto: vi.fn().mockResolvedValue(undefined),
           setContent: vi.fn().mockResolvedValue(undefined),
@@ -112,6 +126,13 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
     const closeMock = vi.fn().mockResolvedValue(undefined);
     const deps: PdfRenderDeps = {
       launch: vi.fn().mockResolvedValue({
+        pages: vi.fn().mockResolvedValue([
+          {
+            goto: vi.fn().mockResolvedValue(undefined),
+            setContent: vi.fn().mockResolvedValue(undefined),
+            pdf: pdfMock,
+          },
+        ]),
         newPage: vi.fn().mockResolvedValue({
           goto: vi.fn().mockResolvedValue(undefined),
           setContent: vi.fn().mockResolvedValue(undefined),
@@ -125,6 +146,46 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
       PdfRenderError,
     );
     expect(closeMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("renderPdf main-frame reuse (HYD-2)", () => {
+  it("reuses the browser's initial page when one exists", async () => {
+    const pdfMock = vi.fn().mockResolvedValue(new Uint8Array([37, 80, 68, 70]));
+    const setContentMock = vi.fn().mockResolvedValue(undefined);
+    const gotoMock = vi.fn().mockResolvedValue(undefined);
+    const closeMock = vi.fn().mockResolvedValue(undefined);
+    const newPageMock = vi.fn().mockResolvedValue({
+      goto: vi.fn().mockResolvedValue(undefined),
+      setContent: vi.fn().mockResolvedValue(undefined),
+      pdf: vi.fn().mockResolvedValue(new Uint8Array([0])),
+    });
+    const deps: PdfRenderDeps = {
+      launch: vi.fn().mockResolvedValue({
+        pages: vi.fn().mockResolvedValue([
+          {
+            goto: gotoMock,
+            setContent: setContentMock,
+            pdf: pdfMock,
+          },
+        ]),
+        newPage: newPageMock,
+        close: closeMock,
+      }),
+    };
+
+    await renderPdf(SAMPLE_HTML, deps);
+
+    // The committed initial page is reused - newPage is never called.
+    expect(newPageMock).not.toHaveBeenCalled();
+    expect(gotoMock).toHaveBeenCalledWith("about:blank", {
+      waitUntil: "domcontentloaded",
+    });
+    expect(setContentMock).toHaveBeenCalled();
+    expect(pdfMock).toHaveBeenCalledWith({
+      printBackground: true,
+      format: "A4",
+    });
   });
 });
 

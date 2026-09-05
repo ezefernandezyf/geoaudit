@@ -50,6 +50,8 @@ export type PdfPageLike = {
 
 /** Minimal structural surface of a Chromium browser used by the pipeline. */
 export type PdfBrowserLike = {
+  /** Existing pages - the initial launch page has a committed main frame. */
+  pages(): Promise<PdfPageLike[]>;
   newPage(): Promise<PdfPageLike>;
   close(): Promise<void>;
 };
@@ -127,14 +129,15 @@ export async function renderPdf(
   let browser: PdfBrowserLike | null = null;
   try {
     browser = await deps.launch();
-    const page = await browser.newPage();
-    // HYD-2 (PDF-9): puppeteer-core 25.x `setContent` throws
-    // "Requesting main frame too early!" when called before the page's main
-    // frame is committed - a race that surfaces on serverless cold starts
-    // (the frame is created asynchronously after newPage()). Navigating to
-    // `about:blank` first forces the frame to commit, then setContent is
-    // safe. The `goto` call is part of the injected page surface so tests
-    // cover the sequence.
+    // HYD-2 (PDF-9): puppeteer-core 25.x races "Requesting main frame too
+    // early!" on `newPage()` - the fresh page's main frame is attached
+    // asynchronously, so a cold serverless launch can call goto/setContent
+    // before the frame exists. The browser's INITIAL page (created during
+    // launch, `about:blank`) has its frame committed already - reuse it and
+    // only create a new page when the browser exposes none. The extra
+    // `goto("about:blank")` then just re-confirms the committed frame.
+    const pages = await browser.pages();
+    const page = pages[0] ?? (await browser.newPage());
     await page.goto("about:blank", { waitUntil: "domcontentloaded" });
     // `/fonts/*` resolves against the traced `public/` bundle (PDF-5/8).
     const base = `file://${process.cwd()}/public/`;
