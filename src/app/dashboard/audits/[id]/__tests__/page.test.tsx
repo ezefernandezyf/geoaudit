@@ -335,3 +335,35 @@ describe("AuditDetailPage share (ADP-7)", () => {
     ).toHaveAttribute("href", "/share/tok-9");
   });
 });
+
+/**
+ * DASH-19.1 (sprint 19): the audit detail page serves a BreadcrumbList
+ * JSON-LD block with the honest trail Home > Dashboard > Auditoría and the
+ * terminal item resolved to its own route (no placeholder).
+ */
+describe("AuditDetailPage breadcrumbs (DASH-19.1)", () => {
+  it("serves a BreadcrumbList with Home > Dashboard > Auditoría (DASH-19.1)", async () => {
+    const { container } = render(await AuditDetailPage({ params }));
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const payloads = [...scripts].map((script) =>
+      JSON.parse(script.textContent ?? ""),
+    );
+    const crumbs = payloads.find(
+      (payload) => payload["@type"] === "BreadcrumbList",
+    );
+    expect(crumbs).toBeDefined();
+    expect(
+      crumbs.itemListElement.map((item: { name: string }) => item.name),
+    ).toEqual(["Home", "Dashboard", "Auditoría"]);
+    expect(
+      crumbs.itemListElement.map((item: { position: number }) => item.position),
+    ).toEqual([1, 2, 3]);
+    // The terminal item URL resolves to the real route - never a placeholder.
+    expect(crumbs.itemListElement[2].item).toMatch(
+      /^https?:\/\/.+\/dashboard\/audits\/audit-1$/,
+    );
+  });
+});

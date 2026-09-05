@@ -13,6 +13,7 @@ import type {
   MultiPageResult,
   SeverityBand,
 } from "@/lib/contracts/audit-result";
+import { BreadcrumbListJsonLd } from "@/ui/breadcrumb-list-json-ld";
 
 /**
  * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
@@ -75,6 +76,13 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-dvh bg-white">
+      {/* DASH-19.1 (sprint 19): honest Home > Dashboard breadcrumb trail. */}
+      <BreadcrumbListJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Dashboard", path: "/dashboard" },
+        ]}
+      />
       {/* C14 (A11Y-4/5): sr-only page heading - the dashboard is a landmark
           page without a visible h1; the hidden heading gives screen readers a
           stable page title without altering the Gemini visual design. */}
