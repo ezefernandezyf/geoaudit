@@ -1,6 +1,6 @@
 # Dashboard Specification
 
-> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` + `sprint-7-ui-fidelity` + `sprint-10-free-mode` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-3-auth-dashboard` + `sprint-4-stripe-integration` + `sprint-5-pro-features` + `sprint-7-ui-fidelity` + `sprint-10-free-mode` + `sprint-19-schema-up` · **Type**: New capability (ADDED) + Delta (MODIFIED + ADDED)
 
 ## Purpose
 
@@ -20,6 +20,7 @@ Authenticated dashboard listing the user's audit history with a score trend, a r
 | DSH-9 | 12-col grid | MUST | Aggregate (col-4) + Trend (col-8, 12 CSS bars) MUST share one row |
 | DSH-10 | Table + Multi-Page chip | MUST | History table MUST have a header bar and a "Multi-Page" chip on multi-page rows |
 | DSH-11 | Refresh + scanning row | MUST | A refresh action MUST exist and a "SCANNING..." row MUST show during an in-flight audit |
+| DASH-19.1 | Dashboard BreadcrumbList | MUST | Authenticated dashboard pages MUST emit a `BreadcrumbList` JSON-LD block (shared component, no `dashboard/layout.tsx`) — `/dashboard` → Home > Dashboard, `/dashboard/audits/[id]` → Home > Dashboard > Auditoría, `/dashboard/profile` → Home > Dashboard > Perfil — satisfying `breadcrumbs` 5/5 |
 
 ### Requirement: History Table (DSH-1)
 
@@ -137,6 +138,40 @@ When the dashboard is viewed, then a refresh action MUST be available, and while
 - WHEN the dashboard renders
 - THEN a "SCANNING..." row appears
 
+### Requirement: Dashboard BreadcrumbList (DASH-19.1)
+
+When an authenticated dashboard page renders, then it MUST emit a `BreadcrumbList` JSON-LD block (`<script type="application/ld+json">`) whose `itemListElement` items reflect the real navigation hierarchy, using a shared component injected per page (no `dashboard/layout.tsx` exists). The emitted block MUST satisfy the schema engine's `breadcrumbs` criterion (5/5). The three routes MUST emit exactly:
+- `/dashboard` → Home > Dashboard
+- `/dashboard/audits/[id]` → Home > Dashboard > Auditoría
+- `/dashboard/profile` → Home > Dashboard > Perfil
+
+Each item MUST carry an `@type: "ListItem"` with a sequential `position` (1-based) and a `name`, and the terminal item MAY carry an `item` URL (the audit detail item MAY use a placeholder-free resolved URL for its own route).
+
+#### Scenario: Dashboard root breadcrumb
+
+- GIVEN the authenticated user visits `/dashboard`
+- WHEN the page renders
+- THEN a JSON-LD `BreadcrumbList` block is served with `itemListElement` names `["Home", "Dashboard"]` at positions 1 and 2
+
+#### Scenario: Audit detail breadcrumb
+
+- GIVEN the authenticated user visits `/dashboard/audits/<id>`
+- WHEN the page renders
+- THEN a JSON-LD `BreadcrumbList` block is served with `itemListElement` names `["Home", "Dashboard", "Auditoría"]` at positions 1, 2 and 3
+
+#### Scenario: Profile breadcrumb
+
+- GIVEN the authenticated user visits `/dashboard/profile`
+- WHEN the page renders
+- THEN a JSON-LD `BreadcrumbList` block is served with `itemListElement` names `["Home", "Dashboard", "Perfil"]` at positions 1, 2 and 3
+
+#### Scenario: Breadcrumbs criterion satisfied
+
+- GIVEN a served `BreadcrumbList` block on any dashboard page
+- WHEN the schema engine scores the page's JSON-LD
+- THEN `breadcrumbs` scores 5/5
+- AND the block is honest — every `name` matches the real navigation trail (no invented or inflated path)
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -151,3 +186,4 @@ When the dashboard is viewed, then a refresh action MUST be available, and while
 | DSH-9 | Aggregate and trend same row | Covered |
 | DSH-10 | Multi-page chip shown | Covered |
 | DSH-11 | Scanning row during flight | Covered |
+| DASH-19.1 | Dashboard root breadcrumb, Audit detail breadcrumb, Profile breadcrumb, Breadcrumbs criterion satisfied | Covered |
