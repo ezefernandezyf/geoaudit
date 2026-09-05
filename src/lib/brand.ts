@@ -77,8 +77,9 @@ export const BRAND_CONTACT_POINT = {
  * `numberOfEmployees` (LND-9, sprint 17 D6). Confirmed by the founder:
  * country AR (matches BRAND_ADDRESS), Software industry, solo founder
  * without contractors. `award` is deliberately OMITTED - no real award
- * exists and inventing one would violate LND-7 (the schema engine keeps
- * reporting `missing_recommended` for award, honesty over score).
+ * exists and inventing one would violate LND-7 (LND-19.4): the schema
+ * engine keeps reporting `missing_recommended` for award, so
+ * organization_person stays 13/15 - honesty over score.
  */
 export const ORG_AREA_SERVED = "AR";
 export const ORG_INDUSTRY = "Software";
