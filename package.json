@@ -24,13 +24,11 @@
     "@auth/prisma-adapter": "2.11.3",
     "@prisma/adapter-pg": "7.9.1",
     "@prisma/client": "7.9.1",
-    "@sparticuz/chromium-min": "149.0.0",
     "cheerio": "^1.2.0",
     "lucide-react": "^1.33.0",
     "next": "15.5.22",
     "next-auth": "5.0.0-beta.32",
     "pg": "^8.22.0",
-    "puppeteer-core": "25.1.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zod": "^4.4.3"
@@ -60,7 +58,6 @@
     "playwright": "^1.62.1",
     "prettier": "^3.6.2",
     "prisma": "7.9.1",
-    "puppeteer": "25.1.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "4.1.10"
