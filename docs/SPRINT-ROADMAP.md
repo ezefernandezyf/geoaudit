@@ -13,14 +13,16 @@
 > **✅ Score Up completado (Sprint 16, archivado 2026-09-04):** byline de autor al footer global (`.byline`, +5 expertise), `FOUNDER.sameAs` = `ORG_SAME_AS` (+2), secciones Case Study y Changelog (+experience/citabilidad), 6 descs de plataforma a 50-200 palabras con stats reales. Verificado PASS (6/6 requisitos, 22/22 escenarios, 1066 tests). develop = bd954ce = PR #71. Shortfall honesto: los cuerpos ES-only capan experience en 15/25 — el composite puede quedar 67-70, no 70+ garantizado.
 >
 > **✅ UI Polish completado (Sprint 17, archivado 2026-09-04):** fix del PDF en producción (pack de chromium resuelto por arquitectura, mata el 500 `render_failed`), drawer mobile portaleado a `document.body` (Escape/overlay/focus-return, `NavLinks` desktop-only), landing con ritmo gris/blanco (S4/S5b recuadros blancos, S5/S6 bandas blancas, eyebrows AA en gris) y JSON-LD Organization con `areaServed`/`industry`/`numberOfEmployees` reales sin `award` inventado (honestidad LND-7). Verificado PASS (4/4 requisitos, 24/24 escenarios, 1084 tests). develop = ad116c1 = PRs #73/#77/#78 (la cadena original se rompió y se recuperó combinando drawer+landing en el PR #77).
+>
+> **✅ Remove PDF completado (Sprint 18, archivado 2026-09-05):** remoción completa del feature de export PDF — `src/pdf/`, route `/api/report/[id]/pdf`, threading del report layer, botón "Exportar PDF" del dashboard, copy de beneficio, deps `puppeteer-core`/`puppeteer`/`@sparticuz/chromium-min` y spec canonical `pdf-export`; crawler content-type `application/pdf` preservado. Verificado PASS WITH WARNINGS (0/0 requisitos — remoción, 1049 tests). main = develop = `eeeaf3f` = PR #83.
 
 ## Estado actual
 
 | Campo | Valor |
 |---|---|
 | Rama | `develop` (integración) / `main` (release) |
-| Main / Develop | `8c58dc7` / `ad116c1` |
-| Tests | **1084 passed / 4 skipped** |
+| Main / Develop | `eeeaf3f` / `eeeaf3f` |
+| Tests | **1049 passed / 4 skipped** |
 | Deploy | Vercel Free · `relevy.app` (dominio nuevo, env configurado) |
 | Nombre de marca | **Relevy** |
 | Preflight | interactive · both (openspec+engram) · ask-on-risk · 400 líneas · strict TDD |
@@ -50,21 +52,24 @@
 | 15 | **Polish Final** (barra benchmark critical→excellent, score 100 sin clip, hamburguesa mobile, copy v3.1.0 + hero names-only, tabla responsive, entrada "Exportar PDF" en reporte live, branch degradado 3.1.0, lint ignora coverage/, benchmark RGS-1 al corpus medido) | ✅ archivado · develop = `f5f14a6` = PR #70 · 1052 tests · verify PASS WITH WARNINGS 11/11 · 30/30 |
 | 16 | **Score Up** (byline footer `.byline`, founder sameAs = ORG_SAME_AS, Case Study + Changelog, platform descs 50-200w con stats reales) | ✅ archivado · develop = `bd954ce` = PR #71 · 1066 tests · verify PASS 6/6 · 22/22 · shortfall honesto: ES bodies capan experience 15/25 (composite 67-70) |
 | 17 | **UI Polish** (PDF arch resolver, drawer mobile portaleado a body, fondos landing intercalados gris/blanco, JSON-LD org attrs reales sin award) | ✅ archivado · develop = `ad116c1` = PRs #73/#77/#78 · 1084 tests · verify PASS 4/4 · 24/24 |
+| 18 | **Remove PDF** (remoción completa del feature de export PDF — src/pdf/, route `/api/report/[id]/pdf`, threading report layer, botón Exportar PDF, copy, deps puppeteer-core/puppeteer/@sparticuz/chromium-min, spec canonical pdf-export; crawler `application/pdf` preservado) | ✅ archivado · main = develop = `eeeaf3f` = PR #83 · 1049 tests · verify PASS WITH WARNINGS 0/0 |
 
-## Próximos sprints (plan revisado 2026-09-03)
+## Próximos sprints (plan revisado 2026-09-03, actualizado 2026-09-05)
 
-> El plan original del brief terminaba en "Sprint 7 — Launch". La realidad superó ese plan (Sprints 7-17 reales, con dogfood como Sprint 12, Brand Authority como Sprint 13, Geo Calibration v3.1 como Sprint 14, Polish Final como Sprint 15, Score Up como Sprint 16 y UI Polish como Sprint 17). La salida oficial ya NO incluye Stripe: la monetización se reintroduce solo al validar tracción (D4). Lo que sigue cierra el free (Sprint 18).
+> El plan original del brief terminaba en "Sprint 7 — Launch". La realidad superó ese plan (Sprints 7-18 reales, con dogfood como Sprint 12, Brand Authority como Sprint 13, Geo Calibration v3.1 como Sprint 14, Polish Final como Sprint 15, Score Up como Sprint 16, UI Polish como Sprint 17 y Remove PDF como Sprint 18). La salida oficial ya NO incluye Stripe: la monetización se reintroduce solo al validar tracción (D4). Lo que sigue cierra el free (Close Free).
 
 | Sprint | Contenido | Detalle |
 |---|---|---|
-| **18 — Close Free** | Cierre del free (salida oficial sin Stripe) | Sentry (monitoreo) · brand presence final · announce/marketing · dominio final · remote local → `relevy.git` (cosmético) |
+| **19 — Close Free** | Cierre del free (salida oficial sin Stripe) | Sentry (monitoreo) · brand presence final · announce/marketing · dominio final · remote local → `relevy.git` (cosmético) · limpieza follow-ups W-1..W-3 del Sprint 18 |
 
-## Deudas pendientes (para Sprints 17-18 — UI Polish cerrado y Close Free)
+## Deudas pendientes (para Sprints 17-18 — UI Polish y Remove PDF cerrados; Close Free próximo)
+
+- **De Sprint 18 (Remove PDF, archivado 2026-09-05) — follow-ups no bloqueantes (W-1..W-3 del verify)**: (1) `pnpm-lock.yaml` retiene `puppeteer-core@25.8.0` transitiva dev-only de `lighthouse@13.4.1` — limpiar solo si se remueve lighthouse; (2) `node_modules/.pnpm/@sparticuz+chromium-min@149.0.0` huérfano — un `pnpm install` fresco lo pruna; (3) menciones históricas de Puppeteer en `openspec/config.yaml:6` + `README.md:28` (cosmético, sprint futuro).
 
 - **De Sprint 14 (resueltas por Sprint 15)**: (1) refrescar los rangos predichos del escenario RGS-1 (moz 58-63, relevy 50-54, "nada <25") → REFRESCADOS al corpus medido (moz 57, relevy 55, promedio 42.4, 14 URLs, Anthropic eTLD+1 — T8 del Sprint 15, docs-only); (2) excluir `coverage/` del lint → RESUELTO (`eslint.config.mjs` ignora `coverage/**`, T7 del Sprint 15).
-- **De Sprint 12 → Sprint 16 (RESUELTO parcialmente)**: Sprint 16 entregó el contenido de landing (byline `.byline` en footer, founder sameAs, Case Study + Changelog, descs de plataforma 50-200w con stats) y el re-audit muestra un composite 67-70 — el objetivo 70+/80+ sigue abierto porque los cuerpos ES-only capan experience en 15/25 (shortfall honesto documentado en el archivo del Sprint 16). Siguiente palanca: brand presence final (Sprint 18) y/o contenido EN first-person.
+- **De Sprint 12 → Sprint 16 (RESUELTO parcialmente)**: Sprint 16 entregó el contenido de landing (byline `.byline` en footer, founder sameAs, Case Study + Changelog, descs de plataforma 50-200w con stats) y el re-audit muestra un composite 67-70 — el objetivo 70+/80+ sigue abierto porque los cuerpos ES-only capan experience en 15/25 (shortfall honesto documentado en el archivo del Sprint 16). Siguiente palanca: brand presence final (Close Free, Sprint 19) y/o contenido EN first-person.
 - **De Sprint 13 (resueltas por Sprint 14)**: (1) `brandFromDomain` con dominios compuestos → FIXED (eTLD+1 + `MULTI_PART_TLDS`, T12); (2) `searchWikipedia` por título exacto → FIXED (comparación case-insensitive en `probes.ts`, T12 — limitación MVP de título alternativo documentada); (3) rama degradada de URL inválida escribiendo "2.0.0" → DECISIÓN documentada en design D (resultado degradado no es audit real, se conserva "2.0.0").
-- **Resuelta**: rename manual del repo GitHub `geoaudit` → `relevy` (external pending de Sprint 11) — renombrado en GitHub, el alias redirige; queda pendiente (cosmético) actualizar el remote local a `git@github.com:ezefernandezyf/relevy.git` en Close Free (Sprint 18).
+- **Resuelta**: rename manual del repo GitHub `geoaudit` → `relevy` (external pending de Sprint 11) — renombrado en GitHub, el alias redirige; queda pendiente (cosmético) actualizar el remote local a `git@github.com:ezefernandezyf/relevy.git` en Close Free (Sprint 19).
 
 ## Decisiones estratégicas (para no re-preguntar)
 
@@ -75,7 +80,7 @@
 | D3 | **Nombre**: GeoAudit → **Relevy** (2026-08-30) · dominio `relevy.app` · semi-inventado defendible |
 | D4 | **Monetización**: Stripe + tiers pagos ELIMINADOS (Sprint 10) · se reintroduce con Cloudflare al validar |
 | D5 | **Límite FREE**: 10 auditorías / 30 días + rate limit 5 req/60s |
-| D6 | **PDF**: Puppeteer en Vercel (sin cambios) |
+| D6 | **PDF**: OBSOLETA — la feature de export PDF se removió completa en Sprint 18 (`src/pdf/`, route, deps puppeteer; el content-type `application/pdf` del crawler se preserva) |
 | D7 | **GEO Score**: v3.1.0 · pesos 24/23/15/12/14/12 (brand_authority 12%) · bandas 80/65/50/30 · crédito parcial · rescale AIO ×100/70 · recalibración con datos reales (sprint 14) |
 | D8 | **Merge**: NUNCA squash+delete en cadena feature-branch-chain · integrar por la punta (ff) · milestone vía release/sprint-N |
 
@@ -86,4 +91,4 @@
 - ✅ → al archivar cada sprint (openspec archive)
 - 🟡 → al completar implementación (verify PASS, pendiente deploy/archive)
 - 🔄 → work en progreso
-- **Próximo**: Sprint 18 (Close Free) — Sentry + brand presence + announce
+- **Próximo**: Close Free (Sprint 19) — Sentry + brand presence + announce
