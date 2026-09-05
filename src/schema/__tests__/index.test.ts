@@ -154,6 +154,37 @@ describe("scoreSchema rubric (12 criteria, RSC-9)", () => {
     );
     expect(website?.points).toBe(2);
   });
+
+  // LND-19 (sprint 19): the landing mirror fixture (Organization with 5 real
+  // sameAs + WebSite + Article with author/speakable + byline) pins the
+  // rubric at 93 and stabilizes business_type_schema to publisher - the
+  // dogfood landing target after WU-1/WU-2 (design: 13+15+10+10+5+0+5+10+
+  // 5+10+5+5). award stays omitted → organization_person 13, never 15.
+  it("pins the sprint-19 landing mirror at 93 with publisher business type (LND-19)", () => {
+    const result = scoreSchema(page("ld-landing-93.html"));
+    expect(result.businessType).toBe("publisher");
+    expect(result.score).toBe(93);
+    const byKey = Object.fromEntries(
+      result.rubric.criteria.map((c) => [c.key, c.points]),
+    );
+    expect(byKey).toMatchObject({
+      organization_person: 13,
+      same_as: 15,
+      article_author: 10,
+      business_type_schema: 10,
+      website_search_action: 5,
+      breadcrumbs: 0,
+      json_ld_format: 5,
+      server_rendered: 10,
+      speakable: 5,
+      valid_json_types: 10,
+      knows_about: 5,
+      no_deprecated: 5,
+    });
+    expect(result.rubric.criteria.reduce((sum, c) => sum + c.points, 0)).toBe(
+      93,
+    );
+  });
 });
 
 describe("toContractResult (SchemaResult contract)", () => {

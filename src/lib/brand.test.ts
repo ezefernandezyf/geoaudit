@@ -53,6 +53,19 @@ describe("brand constants (sprint 12 LND-9 real data)", () => {
     expect(ORG_SAME_AS).toContain("https://ezefernandez.com");
   });
 
+  // LND-19.1 (sprint 19): ORG_SAME_AS grows 3→5 with two more REAL, verified
+  // profiles (TikTok @ezefernandezdev + the relevy GitHub repo) so
+  // countValidSameAs returns 15 (5×3) - never invented handles (LND-7).
+  it("exposes exactly five real sameAs profiles (LND-19.1)", () => {
+    expect(ORG_SAME_AS).toEqual([
+      "https://github.com/ezefernandezyf",
+      "https://www.linkedin.com/in/ezequiel-fernandez-59a21a387/",
+      "https://ezefernandez.com",
+      "https://www.tiktok.com/@ezefernandezdev",
+      "https://github.com/ezefernandezyf/relevy",
+    ]);
+  });
+
   it("exposes the real founder as a Person", () => {
     expect(FOUNDER).toEqual({
       "@type": "Person",

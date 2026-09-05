@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { countAuditsInWindow, FREE_AUDIT_LIMIT } from "@/lib/audit/tier";
 import { PROFILE_COPY } from "@/lib/copy";
+import { BreadcrumbListJsonLd } from "@/ui/breadcrumb-list-json-ld";
 
 /**
  * Profile page (PRF-1..6, design U4).
@@ -52,6 +53,14 @@ export default async function ProfilePage() {
 
   return (
     <main className="min-h-dvh bg-white">
+      {/* DASH-19.1 (sprint 19): honest Home > Dashboard > Perfil trail. */}
+      <BreadcrumbListJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Perfil", path: "/dashboard/profile" },
+        ]}
+      />
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-12 sm:px-6">
         <header className="flex flex-col gap-3">
           <span className="font-mono text-xs font-semibold uppercase tracking-widest text-[#64748b]">

@@ -119,6 +119,45 @@ function WebSiteJsonLd() {
 }
 
 /**
+ * LND-19.2/19.3 (sprint 19): third inline JSON-LD block - `@type: "Article"`
+ * (NOT TechArticle: only article/newsarticle/blogposting fire the publisher
+ * signal in classify.ts). All fields trace to real data (LND-7): headline and
+ * dates from LANDING_COPY, author = FOUNDER, publisher = Organization Relevy.
+ * `speakable` points at the served `#case-study` element (LND-19.3) - the id
+ * lives on the Case Study recuadro in the markup below, never a dangling
+ * selector. This satisfies article_author (10) and stabilizes
+ * business_type_schema to publisher (10).
+ */
+function ArticleJsonLd() {
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: LANDING_COPY.caseStudy.heading,
+          datePublished: LANDING_COPY.contentDates.datePublished,
+          dateModified: LANDING_COPY.contentDates.dateModified,
+          author: FOUNDER,
+          publisher: {
+            "@type": "Organization",
+            name: BRAND_NAME,
+            url: APP_URL,
+          },
+          url: APP_URL,
+          image: `${APP_URL}/og.png`,
+          speakable: {
+            "@type": "SpeakableSpecification",
+            cssSelector: ["#case-study"],
+          },
+        }),
+      }}
+    />
+  );
+}
+
+/**
  * LND-8 (sprint 8, C16): landing OpenGraph/Twitter metadata via the shared
  * helper - reuses the page title/description and the shared 1200×630 og.png.
  */
@@ -223,9 +262,11 @@ export default async function Home() {
 
   return (
     <main className="w-full bg-[#f8fafc]">
-      {/* LND-9 (sprint 9): JSON-LD inline SSR - Organization + WebSite. */}
+      {/* LND-9/LND-19 (sprint 9/19): JSON-LD inline SSR - Organization +
+          WebSite + Article (real case-study data, speakable #case-study). */}
       <OrganizationJsonLd />
       <WebSiteJsonLd />
+      <ArticleJsonLd />
       {/* 1. HERO - badge GEO Engine (LND-5) + AuditForm real (LND-1) */}
       <section className="mx-auto max-w-5xl px-4 pb-16 pt-12 text-center sm:px-6 sm:pt-18">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white px-3 py-1 text-xs text-[#475569] shadow-xs">
@@ -662,8 +703,13 @@ export default async function Home() {
           placed between the comparison table and the FAQ. */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
         {/* LND-18 (sprint 17): the Case Study sits on the gray base wrapped
-            in a white rounded-2xl recuadro (breaks the S5→S7 gray run). */}
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 sm:p-8">
+            in a white rounded-2xl recuadro (breaks the S5→S7 gray run).
+            LND-19.3 (sprint 19): the recuadro carries id="case-study" - the
+            Article speakable cssSelector targets this REAL element. */}
+        <div
+          id="case-study"
+          className="rounded-2xl border border-[#e2e8f0] bg-white p-6 sm:p-8"
+        >
           <div className="mb-10 text-center">
             <h2 className="font-serif text-3xl tracking-tight text-[#0f172a] sm:text-4xl">
               {LANDING_COPY.caseStudy.heading}

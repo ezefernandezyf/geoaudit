@@ -15,6 +15,7 @@ import { ShareModal } from "@/dashboard/share-modal";
 import { createShareToken, revokeShareToken } from "@/lib/audit/share-actions";
 import { Card } from "@/ui/card";
 import { MULTIPAGE_COPY } from "@/lib/copy";
+import { BreadcrumbListJsonLd } from "@/ui/breadcrumb-list-json-ld";
 
 /**
  * Discriminates the two persisted result shapes (D3, U3.10): a multi-page
@@ -114,6 +115,15 @@ export default async function AuditDetailPage({
 
   return (
     <main className="min-h-dvh bg-[#f8fafc]">
+      {/* DASH-19.1 (sprint 19): honest Home > Dashboard > Auditoría trail -
+          the terminal item resolves to THIS audit route (no placeholder). */}
+      <BreadcrumbListJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Auditoría", path: `/dashboard/audits/${id}` },
+        ]}
+      />
       <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         {/* Top action header (Gemini AuditDetailPage verbatim) */}
         <div className="flex flex-col justify-between gap-4 pt-8 sm:flex-row sm:items-center sm:pt-10">

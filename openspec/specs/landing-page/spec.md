@@ -1,6 +1,6 @@
 # Landing Page Specification
 
-> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` + `sprint-12-dogfood-geo-score` + `sprint-13-brand-authority` · **Type**: New capability (ADDED) + Delta (MODIFIED)
+> **Change**: `sprint-7-ui-fidelity` + `sprint-8-polish-testing-backlog` + `sprint-9-audit-calibration` + `sprint-10-free-mode` + `sprint-11-rebrand-polish` + `sprint-12-dogfood-geo-score` + `sprint-13-brand-authority` + `sprint-19-schema-up` · **Type**: New capability (ADDED) + Delta (MODIFIED + ADDED)
 
 ## Purpose
 
@@ -18,7 +18,10 @@ The marketing landing page re-implemented 1:1 with Gemini's composition: a hero 
 | LND-6 | Authenticated CTA | New | MUST | Home MUST call `auth()`; session → "Ir al dashboard", else signup/audit CTA; no pricing teaser |
 | LND-7 | Veracious ScoreHero | New | MUST | ScoreHero MUST show verified score + `auditDate` + `categoryScores` (no placeholder) |
 | LND-8 | OG/SEO tags | New | MUST | Landing MUST emit OpenGraph + Twitter metadata |
-| LND-9 | JSON-LD organization | New | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` "AR", `industry` "Software", `numberOfEmployees` 1 (real data from brand constants); nested founder Person MUST carry `sameAs` = `ORG_SAME_AS` (+2 expertise, no authoritativeness double-count); `award` MUST NOT be emitted (honesty LND-7) |
+| LND-9 | JSON-LD organization | MODIFIED | MUST | Landing MUST emit Organization + WebSite JSON-LD naming "Relevy" with `url` `relevy.app` and `sameAs` the `relevy` repo; Organization MUST include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` "AR", `industry` "Software", `numberOfEmployees` 1 (real data from brand constants); `ORG_SAME_AS` MUST contain EXACTLY five real profiles (the three existing + `https://www.tiktok.com/@ezefernandezdev` + `https://github.com/ezefernandezyf/relevy` → `countValidSameAs` 15); nested founder Person MUST carry `sameAs` = `ORG_SAME_AS` (+2 expertise, no authoritativeness double-count); `award` MUST NOT be emitted (honesty LND-7, `missing_recommended` stays 1) |
+| LND-19.2 | Article JSON-LD with real data | ADDED | MUST | Landing MUST emit a third JSON-LD block `@type: "Article"` (NOT TechArticle) with real data: `headline` = Case Study heading, `datePublished` "2026-08-20", `dateModified` "2026-08-28", `author` = FOUNDER, `publisher` = Organization Relevy, `url` = `APP_URL`; satisfies `article_author` 10/10 and `detectBusinessType` → `publisher` 10/10 |
+| LND-19.3 | Article speakable + case-study element | ADDED | MUST | Article MUST include `speakable.cssSelector` `["#case-study"]` and the served HTML Case Study container MUST have `id="case-study"`; satisfies `speakable` 5/5 |
+| LND-19.4 | Award stays honest missing_recommended | ADDED | MUST | `award` MUST NOT be added to any JSON-LD node (honesty LND-7); engine keeps reporting `missing_recommended` for `award`; `organization_person` remains 13/15; no test MAY assert an invented award |
 | LND-10 | Crawl/AI assets | New | MUST | Landing MUST serve robots.txt, sitemap.xml, and llms.txt (Relevy brand, `relevy.app`, accurate 10/30d limit) |
 | LND-11 | Citable passages | New | MUST | Hero/feature copy MUST be answer-first with concrete stats, each passage in the 50-200 word band, hero subtitle names-only (no percentages) |
 | LND-12 | E-E-A-T signals | New | MUST | Landing MUST surface author/org trust signals (legal links, contact, HTTPS) |
@@ -154,8 +157,8 @@ When the landing page renders, then it MUST emit OpenGraph and Twitter card meta
 
 ### Requirement: JSON-LD Organization (LND-9)
 
-When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` "Relevy", `url` the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`. The `Organization` node MUST additionally include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` ("AR"), `industry` ("Software"), and `numberOfEmployees` (1), populated with real Relevy data (nothing invented, LND-7). The nested `founder` Person node MUST carry `sameAs` referencing the same three real profiles as `ORG_SAME_AS` — a distinct expertise signal (+2) even though the authoritativeness engine deduplicates the URLs (no authoritativeness gain, no invented profiles). The Organization node MUST NOT emit an `award` property — no real award exists and inventing one would violate LND-7; the schema engine keeps reporting `missing_recommended` for `award` (accepted honesty-over-score tradeoff).
-(Previously: the Organization node carried the recommended set without `areaServed`, `industry`, or `numberOfEmployees` — the engine flagged 4 `missing_recommended` properties.)
+When the landing page renders, then it MUST emit `Organization` and `WebSite` structured data via a `<script type="application/ld+json">` block with `name` "Relevy", `url` the production domain (`relevy.app`), and `sameAs` linking the GitHub repo `relevy`. The `Organization` node MUST additionally include `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed` ("AR"), `industry` ("Software"), and `numberOfEmployees` (1), populated with real Relevy data (nothing invented, LND-7). The nested `founder` Person node MUST carry `sameAs` referencing the same real profiles as `ORG_SAME_AS` — a distinct expertise signal (+2) even though the authoritativeness engine deduplicates the URLs (no authoritativeness gain, no invented profiles). `ORG_SAME_AS` MUST contain EXACTLY five real, verifiable profiles: the three existing (github.com/ezefernandezyf, linkedin.com/in/ezequiel-fernandez-59a21a387, ezefernandez.com) plus `https://www.tiktok.com/@ezefernandezdev` and `https://github.com/ezefernandezyf/relevy`, so `countValidSameAs` returns 15 (5×3). The Organization node MUST NOT emit an `award` property — no real award exists and inventing one would violate LND-7; the schema engine keeps reporting `missing_recommended` for `award` (accepted honesty-over-score tradeoff).
+(Previously: `ORG_SAME_AS` had exactly three profiles, so `countValidSameAs` returned 9 (3×3).)
 
 #### Scenario: Relevy Organization + WebSite
 
@@ -170,11 +173,11 @@ When the landing page renders, then it MUST emit `Organization` and `WebSite` st
 - THEN `knowsAbout`, `founder`, `address`, `contactPoint`, `email`, `foundingDate`, `areaServed`, `industry`, and `numberOfEmployees` are present
 - AND every value traces to real Relevy data (verified `sameAs` URLs, real founder/address/contact, country "AR", industry "Software", 1 employee — no placeholders)
 
-#### Scenario: Founder Person carries the real sameAs profiles
+#### Scenario: Founder Person carries the five real sameAs profiles
 
 - GIVEN the `Organization` node's nested `founder` Person
 - WHEN its properties are inspected
-- THEN `sameAs` equals `ORG_SAME_AS` (github.com/ezefernandezyf, linkedin.com/in/ezequiel-fernandez-59a21a387, ezefernandez.com)
+- THEN `sameAs` equals `ORG_SAME_AS` with exactly five entries: github.com/ezefernandezyf, linkedin.com/in/ezequiel-fernandez-59a21a387, ezefernandez.com, www.tiktok.com/@ezefernandezdev, github.com/ezefernandezyf/relevy
 - AND no invented handle appears (updated `toEqual`/`toMatchObject` in `brand.test.ts` and `page.test.tsx`)
 
 #### Scenario: No authoritativeness double-count
@@ -190,12 +193,19 @@ When the landing page renders, then it MUST emit `Organization` and `WebSite` st
 - THEN they equal "AR", "Software", and 1 respectively
 - AND each value comes from a `brand.ts` constant (`ORG_AREA_SERVED`, `ORG_INDUSTRY`, `ORG_EMPLOYEES`) — never a hardcoded literal in the page
 
+#### Scenario: sameAs scores 15/15 with five real profiles
+
+- GIVEN the `Organization` node's `sameAs` and the nested `founder` Person's `sameAs`
+- WHEN `countValidSameAs` runs across all flattened nodes
+- THEN it returns 15 (5 profiles × 3 nodes flattened, deduplicated)
+- AND no invented handle appears in either array
+
 #### Scenario: No invented award
 
 - GIVEN the `Organization` node
 - WHEN it is inspected
 - THEN no `award` property is present
-- AND the schema engine still reports `missing_recommended` for `award` (honesty over score, LND-7) — the `missing_recommended` count drops from 4 to 1
+- AND the schema engine still reports `missing_recommended` for `award` (honesty over score, LND-7) — the `missing_recommended` count stays 1
 
 ### Requirement: Crawl/AI Assets (LND-10)
 
@@ -415,6 +425,52 @@ When the landing renders, then the section backgrounds MUST follow an alternatin
 - THEN `table.parentElement` keeps `overflow-x-auto` (never `overflow-hidden`)
 - AND the table keeps `min-w-[640px]`
 
+### Requirement: Article JSON-LD with Real Data (LND-19.2)
+
+When the landing page renders, then it MUST emit a third JSON-LD block with `@type: "Article"` (NOT "TechArticle" — only `article`/`newsarticle`/`blogposting` fire the publisher signal in `classify.ts:109-115`). The Article node MUST be populated with real Relevy data from `copy.ts`/`brand.ts`: `headline` equal to the Case Study heading ("Case Study: ¿Cómo mejoramos el GEO Score de nuestro propio sitio?"), `datePublished` "2026-08-20", `dateModified` "2026-08-28", `author` = `FOUNDER` (name + sameAs), `publisher` = Organization Relevy (`BRAND_NAME` + `APP_URL`), and `url` = `APP_URL`. Emitting this node MUST satisfy the engine's `article_author` criterion (10/10) and MUST make `detectBusinessType` return `publisher` (10/10).
+
+#### Scenario: Article node served with real fields
+
+- GIVEN the landing page
+- WHEN its JSON-LD blocks are inspected
+- THEN one block has `@type: "Article"` with `headline` matching the Case Study heading, `datePublished` "2026-08-20", `dateModified` "2026-08-28", `author` carrying the FOUNDER name and sameAs, and `publisher` naming Relevy at `relevy.app`
+- AND no block uses `@type: "TechArticle"`
+
+#### Scenario: Article satisfies article_author and publisher
+
+- GIVEN the emitted Article node
+- WHEN the schema engine scores the served JSON-LD
+- THEN `article_author` scores 10/10 (author name + sameAs)
+- AND `business_type_schema` scores 10/10 with `detectBusinessType` returning `publisher` (stable, anonymous or authenticated crawl)
+
+### Requirement: Article speakable + case-study element (LND-19.3)
+
+When the landing renders the Article JSON-LD and the Case Study section, then the Article node MUST include a `speakable` property whose `cssSelector` array contains exactly `["#case-study"]`, and the Case Study section container in the served HTML MUST have `id="case-study"` so the selector points to a real element (honesty LND-7). Emitting this MUST satisfy the engine's `speakable` criterion (5/5).
+
+#### Scenario: speakable selector references a real element
+
+- GIVEN the Article JSON-LD block and the served Case Study markup
+- WHEN the JSON-LD and the rendered HTML are inspected
+- THEN `speakable.cssSelector` equals `["#case-study"]`
+- AND an element with `id="case-study"` is present in the served HTML (presence test — no dangling selector)
+
+#### Scenario: speakable criterion satisfied
+
+- GIVEN the Article node with `speakable`
+- WHEN the schema engine scores the served JSON-LD
+- THEN `speakable` scores 5/5
+
+### Requirement: Award stays honest missing_recommended (LND-19.4)
+
+The `award` property MUST NOT be added to any JSON-LD node — no real award exists and inventing one would violate LND-7. The schema engine MUST keep reporting `missing_recommended` for `award`, and `organization_person` MUST remain 13/15. No test MAY assert an invented award.
+
+#### Scenario: No award emitted, gap documented
+
+- GIVEN the landing JSON-LD
+- WHEN it is inspected
+- THEN no `award` property appears anywhere
+- AND `organization_person` scores 13/15 with `award` documented as `missing_recommended` (honest, never fabricated)
+
 ## Compliance Matrix
 
 | Requirement | Scenarios | Coverage |
@@ -427,7 +483,7 @@ When the landing renders, then the section backgrounds MUST follow an alternatin
 | LND-6 | Logged-in user sees dashboard CTA, Anonymous visitor sees audit CTA | Covered |
 | LND-7 | Verified evidence shown, No candidate reaches 90+ | Covered |
 | LND-8 | OG + Twitter tags present | Covered |
-| LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data, Founder Person carries real sameAs, No authoritativeness double-count, Real org attributes trace to brand constants, No invented award | Covered |
+| LND-9 | Relevy Organization + WebSite, Recommended properties populated with real data, Founder Person carries the five real sameAs profiles, No authoritativeness double-count, Real org attributes trace to brand constants, sameAs scores 15/15 with five real profiles, No invented award | Covered |
 | LND-10 | Assets served at root, llms.txt is Relevy-accurate | Covered |
 | LND-11 | Answer-first copy with stats, Passages in the 50-200 word band, Hero subtitle is names-only | Covered |
 | LND-12 | Trust signals present | Covered |
@@ -437,3 +493,6 @@ When the landing renders, then the section backgrounds MUST follow an alternatin
 | LND-16 | Section renders between comparison and FAQ, Heading matches locked question form, Spanish neutral body 50-200 words, Verified numbers only | Covered |
 | LND-17 | Changelog heading present, Three real versions in semver, Block in extraction band | Covered |
 | LND-18 | Four-gray run broken, Platforms grid keeps exactly 6 rounded-xl cards, Case Study wrapped in a white recuadro, Eyebrow contrast on gray bands, Comparison table wrapper stays overflow-x-auto | Covered |
+| LND-19.2 | Article node served with real fields, Article satisfies article_author and publisher | Covered |
+| LND-19.3 | speakable selector references a real element, speakable criterion satisfied | Covered |
+| LND-19.4 | No award emitted, gap documented | Covered |

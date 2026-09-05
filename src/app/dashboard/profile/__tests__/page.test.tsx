@@ -103,3 +103,36 @@ describe("ProfilePage (PRF-1)", () => {
     ).toHaveAttribute("href", "mailto:ezefernandezyf@gmail.com");
   });
 });
+
+/**
+ * DASH-19.1 (sprint 19): the profile page serves a BreadcrumbList JSON-LD
+ * block with the honest navigation trail Home > Dashboard > Perfil.
+ */
+describe("ProfilePage breadcrumbs (DASH-19.1)", () => {
+  it("serves a BreadcrumbList with Home > Dashboard > Perfil (DASH-19.1)", async () => {
+    authMock.mockResolvedValue({ user: { id: "user-1", name: "Ana" } });
+    userFindUniqueMock.mockResolvedValue({
+      name: "Ana",
+      email: "ana@example.com",
+    });
+
+    const { container } = render(await ProfilePage());
+
+    const scripts = container.querySelectorAll(
+      'script[type="application/ld+json"]',
+    );
+    const payloads = [...scripts].map((script) =>
+      JSON.parse(script.textContent ?? ""),
+    );
+    const crumbs = payloads.find(
+      (payload) => payload["@type"] === "BreadcrumbList",
+    );
+    expect(crumbs).toBeDefined();
+    expect(
+      crumbs.itemListElement.map((item: { name: string }) => item.name),
+    ).toEqual(["Home", "Dashboard", "Perfil"]);
+    expect(
+      crumbs.itemListElement.map((item: { position: number }) => item.position),
+    ).toEqual([1, 2, 3]);
+  });
+});
