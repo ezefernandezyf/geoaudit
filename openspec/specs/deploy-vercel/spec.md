@@ -13,7 +13,7 @@ Make the Vercel Free (Hobby) deploy work end-to-end on `geoaudit-tau.vercel.app`
 | DPV-1 | Env vars configured | MUST | DATABASE_URL + auth secrets + NEXT_PUBLIC_APP_URL set in the Vercel project |
 | DPV-2 | Migrations at build | MUST | `prisma migrate deploy` runs during the Vercel build |
 | DPV-3 | No-500 on preview | MUST | Landing, login, and audit flow serve without the DATABASE_URL-absent 500 |
-| DPV-4 | End-to-end smoke | MUST | Audit + login + PDF verified on the live preview |
+| DPV-4 | End-to-end smoke | MUST | Audit + login verified on the live preview |
 
 ### Requirement: Env Vars Configured (DPV-1)
 
@@ -53,10 +53,10 @@ When a visitor uses `geoaudit-tau.vercel.app`, then the landing, login, and audi
 
 ### Requirement: End-to-End Smoke (DPV-4)
 
-When the deploy is verified, then audit + GitHub login + PDF download MUST be exercised end-to-end on the live preview.
+When the deploy is verified, then audit + GitHub login MUST be exercised end-to-end on the live preview.
 
-#### Scenario: Audit + login + PDF verified
+#### Scenario: Audit + login verified
 
 - GIVEN the live preview
-- WHEN an audit is run, a user signs in via GitHub, and a PDF is requested
+- WHEN an audit is run and a user signs in via GitHub
 - THEN each step completes without error

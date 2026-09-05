@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Performance measurement with Lighthouse targeting 95+ where achievable, with documented deviations where heavy pages (report PDF, multi-page) cannot reach the target.
+Performance measurement with Lighthouse targeting 95+ where achievable, with documented deviations where heavy pages (multi-page) cannot reach the target.
 
 ## Requirements
 
@@ -36,7 +36,7 @@ When a page is measured, then it SHOULD reach a Lighthouse score of 95 or higher
 
 ### Requirement: Documented Deviations (PERF-3)
 
-When a page cannot reach the 95+ target (e.g. report PDF or heavy multi-page views), then the deviation and its reason MUST be documented rather than silently accepted.
+When a page cannot reach the 95+ target (e.g. heavy multi-page views), then the deviation and its reason MUST be documented rather than silently accepted.
 
 #### Scenario: Heavy page deviation documented
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, Download, FileQuestion } from "lucide-react";
+import { ArrowLeft, FileQuestion } from "lucide-react";
 import type {
   AuditResult,
   MultiPageResult,
@@ -54,8 +54,8 @@ function pageViewsFromRows(
  * renders the persisted audit's report in the Gemini AuditDetailPage
  * composition: back-to-history bar, the full Gemini report (hero with real
  * benchmark + 5-category scorecard + 6-platform matrix + findings with real
- * JSON-LD code), the ShareModal (real actions) and the Export PDF - available
- * to every authenticated owner (ADP-7/8, no tier gate).
+ * JSON-LD code) and the ShareModal (real actions) - available to every
+ * authenticated owner (ADP-7, no tier gate).
  *
  * force-dynamic: per-user row, never prerenderable. runtime nodejs: reads
  * Prisma through the pg driver adapter (Node-only).
@@ -125,7 +125,7 @@ export default async function AuditDetailPage({
             <span>Volver al historial</span>
           </Link>
 
-          {/* ADP-7/8: share + export are available to every authenticated owner. */}
+          {/* ADP-7: sharing is available to every authenticated owner. */}
           <div className="flex flex-wrap items-center gap-2.5">
             <ShareModal
               auditId={audit.id}
@@ -133,14 +133,6 @@ export default async function AuditDetailPage({
               createAction={createShareToken}
               revokeAction={revokeShareToken}
             />
-            {/* Real download: the PDF route re-checks ownership (PDF-2). */}
-            <a
-              href={`/api/report/${audit.id}/pdf`}
-              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[#0f172a] px-3 text-xs font-medium text-white shadow-xs transition-all duration-150 select-none whitespace-nowrap hover:bg-[#1e293b] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0f172a]/20"
-            >
-              <Download className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>Exportar PDF</span>
-            </a>
           </div>
         </div>
 

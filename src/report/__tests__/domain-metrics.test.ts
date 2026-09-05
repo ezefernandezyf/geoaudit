@@ -13,8 +13,8 @@ import {
 
 /**
  * U4 - domain-metrics (APT-6, APT-11): the ONE source of truth for "what is
- * the score of a domain row", shared by the web scorecard, the PDF template
- * and the Gemini view model. The brand row is the honesty case: a MEASURED 0
+ * the score of a domain row", shared by the web scorecard and the Gemini view
+ * model. The brand row is the honesty case: a MEASURED 0
  * is a real value (RGS-11 penalty), an absent or failed engine is `null`
  * ("No medido") - the `rowScore` default `return 0` must never fabricate a
  * measured value for the brand row (APT-11, RAO-16).

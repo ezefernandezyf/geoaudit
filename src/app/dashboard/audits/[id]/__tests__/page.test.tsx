@@ -56,11 +56,11 @@ beforeEach(() => {
 });
 
 /**
- * U5.9 - Audit detail page (ADP-6/7/8, design U5). `/dashboard/audits/[id]`
+ * U5.9 - Audit detail page (ADP-6/7, design U5). `/dashboard/audits/[id]`
  * renders the persisted report through the shared `<AuditReport>` (adapter at
  * the boundary, Gemini composition) plus the Gemini action bar: ShareModal
- * with the real share actions and the real Export PDF download - available to
- * every authenticated owner (ADP-7/8, no tier gate).
+ * with the real share actions - available to every authenticated owner
+ * (ADP-7, no tier gate).
  */
 describe("AuditDetailPage (ADP-1/ADP-2)", () => {
   it("queries the audit by id scoped to the session user", async () => {
@@ -285,15 +285,12 @@ describe("AuditDetailPage multi-page drill-down (A3, MPU-7/8)", () => {
   });
 });
 
-describe("AuditDetailPage share + export (ADP-7/8)", () => {
-  it("renders share + export for every authenticated owner - no tier lookup (ADP-7/8)", async () => {
+describe("AuditDetailPage share (ADP-7)", () => {
+  it("renders share for every authenticated owner - no tier lookup (ADP-7)", async () => {
     render(await AuditDetailPage({ params }));
 
     expect(
       screen.getByRole("button", { name: "Compartir reporte" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Exportar PDF" }),
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", { name: "Mejorar a PRO" }),
@@ -336,13 +333,5 @@ describe("AuditDetailPage share + export (ADP-7/8)", () => {
     expect(
       screen.getByRole("link", { name: /Ver vista pública/ }),
     ).toHaveAttribute("href", "/share/tok-9");
-  });
-
-  it("owner: Export PDF links to the ownership-gated PDF route (ADP-8)", async () => {
-    render(await AuditDetailPage({ params }));
-
-    const exportLink = screen.getByRole("link", { name: "Exportar PDF" });
-    // The PDF route itself re-checks ownership (PDF-2); there is no tier gate.
-    expect(exportLink).toHaveAttribute("href", "/api/report/audit-1/pdf");
   });
 });
