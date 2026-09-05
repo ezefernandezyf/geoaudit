@@ -129,7 +129,23 @@ export async function renderPdf(
     await page.setContent(documentHtml, { waitUntil: "networkidle0" });
     const pdf = await page.pdf({ printBackground: true, format: "A4" });
     return Buffer.from(pdf);
-  } catch {
+  } catch (error) {
+    // PDF-9 (observability): the typed error is user-facing but the REAL
+    // cause (download/extract/launch/render) is logged - Vercel shows it in
+    // the function logs, so a production `render_failed` is diagnosable
+    // instead of a swallowed black box.
+    console.error("PDF render failed", {
+      arch: process.arch,
+      packUrl: (() => {
+        try {
+          return resolveChromiumPackUrl();
+        } catch {
+          return "unsupported-arch";
+        }
+      })(),
+      cause: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     throw new PdfRenderError(
       "No se pudo generar el PDF del reporte. Intente nuevamente.",
     );
