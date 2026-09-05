@@ -33,6 +33,11 @@ export class PdfRenderError extends Error {
 
 /** Minimal structural surface of a Chromium page used by the pipeline. */
 export type PdfPageLike = {
+  /** Navigates the page - `about:blank` forces the main frame to commit. */
+  goto(
+    url: string,
+    options?: { waitUntil?: string | string[] },
+  ): Promise<unknown>;
   setContent(
     html: string,
     options?: { waitUntil?: string | string[] },
@@ -123,6 +128,14 @@ export async function renderPdf(
   try {
     browser = await deps.launch();
     const page = await browser.newPage();
+    // HYD-2 (PDF-9): puppeteer-core 25.x `setContent` throws
+    // "Requesting main frame too early!" when called before the page's main
+    // frame is committed - a race that surfaces on serverless cold starts
+    // (the frame is created asynchronously after newPage()). Navigating to
+    // `about:blank` first forces the frame to commit, then setContent is
+    // safe. The `goto` call is part of the injected page surface so tests
+    // cover the sequence.
+    await page.goto("about:blank", { waitUntil: "domcontentloaded" });
     // `/fonts/*` resolves against the traced `public/` bundle (PDF-5/8).
     const base = `file://${process.cwd()}/public/`;
     const documentHtml = html.replace(/<head>/i, `<head><base href="${base}">`);

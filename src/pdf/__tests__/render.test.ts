@@ -27,32 +27,41 @@ function successDeps(): {
   deps: PdfRenderDeps;
   pdfMock: ReturnType<typeof vi.fn>;
   setContentMock: ReturnType<typeof vi.fn>;
+  gotoMock: ReturnType<typeof vi.fn>;
   closeMock: ReturnType<typeof vi.fn>;
 } {
   const pdfMock = vi.fn().mockResolvedValue(new Uint8Array([37, 80, 68, 70]));
   const setContentMock = vi.fn().mockResolvedValue(undefined);
+  const gotoMock = vi.fn().mockResolvedValue(undefined);
   const closeMock = vi.fn().mockResolvedValue(undefined);
   const deps: PdfRenderDeps = {
     launch: vi.fn().mockResolvedValue({
       newPage: vi.fn().mockResolvedValue({
+        goto: gotoMock,
         setContent: setContentMock,
         pdf: pdfMock,
       }),
       close: closeMock,
     }),
   };
-  return { deps, pdfMock, setContentMock, closeMock };
+  return { deps, pdfMock, setContentMock, gotoMock, closeMock };
 }
 
 describe("renderPdf (PDF-6)", () => {
   it("renders the HTML with printBackground: true on A4", async () => {
-    const { deps, pdfMock, setContentMock, closeMock } = successDeps();
+    const { deps, pdfMock, setContentMock, gotoMock, closeMock } =
+      successDeps();
 
     const result = await renderPdf(SAMPLE_HTML, deps);
 
     expect(pdfMock).toHaveBeenCalledWith({
       printBackground: true,
       format: "A4",
+    });
+    // HYD-2: the main frame MUST commit (about:blank) before setContent -
+    // puppeteer 25 throws "Requesting main frame too early!" otherwise.
+    expect(gotoMock).toHaveBeenCalledWith("about:blank", {
+      waitUntil: "domcontentloaded",
     });
     expect(setContentMock).toHaveBeenCalledWith(
       expect.stringContaining('<base href="file://'),
@@ -85,6 +94,7 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
     const deps: PdfRenderDeps = {
       launch: vi.fn().mockResolvedValue({
         newPage: vi.fn().mockResolvedValue({
+          goto: vi.fn().mockResolvedValue(undefined),
           setContent: vi.fn().mockResolvedValue(undefined),
           pdf: pdfMock,
         }),
@@ -103,6 +113,7 @@ describe("renderPdf failure path (threat: Chromium subprocess)", () => {
     const deps: PdfRenderDeps = {
       launch: vi.fn().mockResolvedValue({
         newPage: vi.fn().mockResolvedValue({
+          goto: vi.fn().mockResolvedValue(undefined),
           setContent: vi.fn().mockResolvedValue(undefined),
           pdf: pdfMock,
         }),
