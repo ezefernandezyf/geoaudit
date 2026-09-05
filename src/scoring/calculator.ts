@@ -19,7 +19,7 @@ import {
  * composed from `crawler.compositeScore × 0.6 + platform.onPageScore × 0.4`
  * when no standalone technical score is provided (RGS-2, design `src/scoring/`).
  * The severity bands are single source (D8): 80-100 Excellent / 65-79 Good /
- * 50-64 Fair / 30-49 Poor / 0-29 Critical, shared by findings, PDF, multi-page
+ * 50-64 Fair / 30-49 Poor / 0-29 Critical, shared by findings, multi-page
  * and score-hero (RGS-5).
  *
  * Pure function: deterministic, no side effects, no I/O.

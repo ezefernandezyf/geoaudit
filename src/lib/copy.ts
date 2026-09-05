@@ -30,7 +30,7 @@ export const AUDIT_FORM_ERRORS = {
 /** Anonymous audit limit state (TLM-11, RTL-8) - neutral Spanish (LGL-4). */
 export const ANONYMOUS_AUDIT_LIMIT_COPY = {
   title: "Alcanzó el límite de auditorías anónimas",
-  body: "Sin una cuenta puede realizar 3 auditorías cada 30 días por IP. Inicie sesión para acceder a 10 auditorías gratuitas por ventana de 30 días, con historial y exportación a PDF.",
+  body: "Sin una cuenta puede realizar 3 auditorías cada 30 días por IP. Inicie sesión para acceder a 10 auditorías gratuitas por ventana de 30 días, con historial.",
 } as const;
 
 /** FetchErrorCode → user-facing Spanish copy (ARU-6) - neutral (LGL-4). */
@@ -217,7 +217,7 @@ export const LANDING_COPY = {
     ctaEyebrow: "Comience gratis",
     ctaTitle: "Audite su sitio hoy y vea cómo lo citan los motores de IA",
     ctaSubtitle:
-      "Cree su cuenta y acceda a 10 auditorías GEO gratuitas por ventana de 30 días, con historial, auditoría multi-página y exportación a PDF.",
+      "Cree su cuenta y acceda a 10 auditorías GEO gratuitas por ventana de 30 días, con historial y auditoría multi-página.",
     ctaPrimary: "Auditar gratis",
     ctaLoggedIn: "Ir al dashboard",
   },
@@ -283,7 +283,7 @@ export const LANDING_COPY = {
       {
         question: "¿Cuánto tarda una auditoría y cuántas puedo hacer?",
         answer:
-          "Cada auditoría entrega su resultado en menos de 30 segundos. Con una cuenta gratuita dispone de 10 auditorías por ventana de 30 días, con historial, auditoría multi-página y exportación a PDF.",
+          "Cada auditoría entrega su resultado en menos de 30 segundos. Con una cuenta gratuita dispone de 10 auditorías por ventana de 30 días, con historial y auditoría multi-página.",
       },
       {
         question: "¿Cómo mejoro mi citabilidad en los motores de IA?",
@@ -527,19 +527,6 @@ export const REPORT_COPY = {
       current: "Analizando…",
       pending: "En cola",
     },
-  },
-  // PDF-10 (sprint 15): live-report export entry - logged-in users with a
-  // persisted id link DIRECTLY to /api/report/{id}/pdf (the route owns auth +
-  // ownership, PDF-2/PDF-9); anonymous users see PDF account-benefit copy with
-  // a signup CTA (marketing gate, not a security one). Neutral Spanish.
-  export: {
-    title: "Exporte el reporte en PDF",
-    body: "Guarde esta auditoría como PDF para compartirla o archivarla.",
-    cta: "Exportar PDF",
-    anonTitle: "Exporte sus reportes como PDF",
-    anonBody:
-      "Cree su cuenta para guardar esta auditoría y exportarla a PDF en cualquier momento.",
-    anonCta: "Crear cuenta gratis",
   },
 } as const;
 

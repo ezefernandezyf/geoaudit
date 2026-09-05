@@ -2,7 +2,7 @@
  * Shared brand constants (sprint 11 rebrand, design §Brand).
  *
  * Single source of truth for every user-visible brand string (copy, og
- * metadata, layout JSON-LD, PDF templates, emails). Surfaces import these
+ * metadata, layout JSON-LD, emails). Surfaces import these
  * constants instead of hardcoding literals so the brand can never drift.
  */
 

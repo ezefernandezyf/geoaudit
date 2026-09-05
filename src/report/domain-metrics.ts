@@ -1,9 +1,9 @@
 import type { AuditResult } from "@/lib/contracts/audit-result";
 
 /**
- * Pure domain-score derivation shared by the React `<DomainScorecard>` and the
- * PDF report template (U4). ONE source of truth for "what is the score of a
- * domain row" - the PDF must print the same numbers the web report shows.
+ * Pure domain-score derivation shared by every report surface (U4). ONE
+ * source of truth for "what is the score of a domain row" - the scorecard and
+ * the web report always show the same numbers.
  *
  * No React, no presentation: functions only, fully unit-testable.
  */

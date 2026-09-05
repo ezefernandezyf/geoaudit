@@ -19,7 +19,7 @@ import {
 /**
  * Sprint 11 rebrand (design §Brand): the shared brand module is the single
  * source of truth for every user-visible brand string. Keeping the assertions
- * here locks the constants so no surface (copy, og, layout, PDF, emails) can
+ * here locks the constants so no surface (copy, og, layout, emails) can
  * drift back to "GeoAudit" or the old support address.
  */
 describe("brand constants (sprint 11 rebrand)", () => {
