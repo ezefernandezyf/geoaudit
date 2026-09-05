@@ -4,7 +4,7 @@ import type { Session } from "next-auth";
 import Page, { metadata as landingMetadata } from "@/app/page";
 import { SCOREHERO_EVIDENCE } from "@/app/score-hero-evidence";
 import { LANDING_COPY } from "@/lib/copy";
-import { ORG_SAME_AS } from "@/lib/brand";
+import { FOUNDER, ORG_SAME_AS } from "@/lib/brand";
 import { severityForScore } from "@/scoring/calculator";
 import type { GeminiBand } from "@/ui/severity-badge";
 
@@ -757,6 +757,81 @@ describe("landing page interleaved backgrounds (LND-18)", () => {
     expect(recuadro?.className).toContain("rounded-2xl");
     expect(recuadro?.className).toContain("bg-white");
     expect(recuadro?.className).not.toContain("overflow-x-auto");
+  });
+});
+
+/**
+ * LND-19 (sprint 19): the landing emits a THIRD inline JSON-LD block -
+ * `@type: "Article"` (NOT TechArticle) populated with real case-study data
+ * from copy.ts/brand.ts (LND-7), plus a speakable selector that targets a
+ * REAL element in the served HTML (`id="case-study"`), and ORG_SAME_AS grows
+ * to five real profiles. `award` stays omitted (LND-19.4).
+ */
+describe("landing page sprint-19 JSON-LD (LND-19)", () => {
+  // LND-19.1: the served Organization carries the five real sameAs profiles,
+  // including the two new ones (TikTok + the relevy GitHub repo).
+  it("serves org.sameAs with the five real profiles including TikTok and the repo (LND-19.1)", async () => {
+    const { container } = await renderPage();
+    const payloads = [
+      ...container.querySelectorAll('script[type="application/ld+json"]'),
+    ].map((script) => JSON.parse(script.textContent ?? ""));
+    const org = payloads.find((payload) => payload["@type"] === "Organization");
+    expect(org.sameAs).toContain("https://www.tiktok.com/@ezefernandezdev");
+    expect(org.sameAs).toContain("https://github.com/ezefernandezyf/relevy");
+  });
+
+  // LND-19.2: a third block emits Article with the REAL case-study data -
+  // headline, published/modified dates, FOUNDER author and Relevy publisher.
+  it("emits an Article JSON-LD block with real case-study data (LND-19.2)", async () => {
+    const { container } = await renderPage();
+    const payloads = [
+      ...container.querySelectorAll('script[type="application/ld+json"]'),
+    ].map((script) => JSON.parse(script.textContent ?? ""));
+    const types = payloads.map((payload) => payload["@type"]);
+    // Only article/newsarticle/blogposting fire the publisher signal - never
+    // TechArticle (classify.ts).
+    expect(types).not.toContain("TechArticle");
+    const article = payloads.find((payload) => payload["@type"] === "Article");
+    expect(article).toBeDefined();
+    expect(article.headline).toBe(LANDING_COPY.caseStudy.heading);
+    expect(article.datePublished).toBe("2026-08-20");
+    expect(article.dateModified).toBe("2026-08-28");
+    expect(article.author).toEqual(FOUNDER);
+    expect(article.publisher).toMatchObject({
+      "@type": "Organization",
+      name: "Relevy",
+    });
+    expect(article.publisher.url).toMatch(/^https?:\/\//);
+    expect(article.url).toMatch(/^https?:\/\//);
+  });
+
+  // LND-19.3: the Article speakable selector targets a REAL element in the
+  // served HTML (LND-7 honesty - no dangling selector).
+  it("points speakable at the served #case-study element (LND-19.3)", async () => {
+    const { container } = await renderPage();
+    const payloads = [
+      ...container.querySelectorAll('script[type="application/ld+json"]'),
+    ].map((script) => JSON.parse(script.textContent ?? ""));
+    const article = payloads.find((payload) => payload["@type"] === "Article");
+    expect(article.speakable).toEqual({
+      "@type": "SpeakableSpecification",
+      cssSelector: ["#case-study"],
+    });
+    // Presence test: the selector resolves in the served HTML, not only JSON.
+    expect(container.querySelector("#case-study")).not.toBeNull();
+  });
+
+  // LND-19.4: no award property anywhere (no real award exists, LND-7) and
+  // no FAQPage block (deprecated, RSC-7).
+  it("emits no award property and no FAQPage block (LND-19.4)", async () => {
+    const { container } = await renderPage();
+    const payloads = [
+      ...container.querySelectorAll('script[type="application/ld+json"]'),
+    ].map((script) => JSON.parse(script.textContent ?? ""));
+    expect(payloads.map((payload) => payload["@type"])).not.toContain(
+      "FAQPage",
+    );
+    expect(JSON.stringify(payloads)).not.toContain('"award"');
   });
 });
 
