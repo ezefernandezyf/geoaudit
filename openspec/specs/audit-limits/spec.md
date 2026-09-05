@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Usage limits for the audit flow. There is a single FREE limit: **10 audits per 30-day moving window** (was 3), enforced for authenticated users only. Paid monthly counters (`Subscription.auditsUsed`/`auditsResetAt`), counter selection by tier, the `Tier` enum, and the `isPaidTier` PRO feature gate are removed with the billing capability. Anonymous audits are allowed; since Sprint 11 they MUST NOT persist `Audit` rows nor count toward the authenticated 10/30d limit, and instead count toward a separate **3-audit / 30-day fixed window per client IP** limit (TLM-11), enforced at completion in the audit runner. Since Sprint 5, multi-page audit, PDF export, and share links are available to every authenticated user (no tier gate), and one multi-page audit counts as exactly one audit toward the limit.
+Usage limits for the audit flow. There is a single FREE limit: **10 audits per 30-day moving window** (was 3), enforced for authenticated users only. Paid monthly counters (`Subscription.auditsUsed`/`auditsResetAt`), counter selection by tier, the `Tier` enum, and the `isPaidTier` PRO feature gate are removed with the billing capability. Anonymous audits are allowed; since Sprint 11 they MUST NOT persist `Audit` rows nor count toward the authenticated 10/30d limit, and instead count toward a separate **3-audit / 30-day fixed window per client IP** limit (TLM-11), enforced at completion in the audit runner. Since Sprint 5, multi-page audit and share links are available to every authenticated user (no tier gate; the PDF export was removed with the feature in Sprint 18), and one multi-page audit counts as exactly one audit toward the limit.
 
 ## Requirements
 

@@ -97,11 +97,11 @@ When deriving category scores, then the adapter MUST produce exactly six entries
 - THEN `categoryScores` has length 6 and each score equals the corresponding engine value
 - AND the Autoridad de marca entry equals the `brandAuthority` score of the contract
 
-#### Scenario: Derivation is shared across web, PDF, and findings
+#### Scenario: Derivation is shared across web and findings
 
 - GIVEN a schema section whose engine rubric score is 61 with 9 warnings
 - WHEN `deriveSchemaScore(schema)` runs (single source in `domain-metrics`)
-- THEN the row, the PDF template, and the findings severity all use 61, never the `100 - 9*10 = 10` proxy
+- THEN the scorecard row and the findings severity both use 61, never the `100 - 9*10 = 10` proxy
 - AND findings tests no longer assert the derived proxy
 
 ### Requirement: Brand Row Honesty (APT-11)
@@ -171,7 +171,7 @@ When any metric has no real source (`citationRate`, `presenceInPrompts`, `impact
 | APT-3 | Title falls back to domain | Covered |
 | APT-4 | Summary uses real metrics | Covered |
 | APT-5 | Milliseconds to seconds | Covered |
-| APT-6 | Six real category scores, Derivation is shared across web/PDF/findings | Covered |
+| APT-6 | Six real category scores, Derivation is shared across web/findings | Covered |
 | APT-7 | Findings from real sources only | Covered |
 | APT-8 | Claude not measured | Covered |
 | APT-9 | Token passthrough | Covered |

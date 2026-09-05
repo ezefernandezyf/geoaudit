@@ -181,7 +181,7 @@ The contract MUST accept the `scoringModelVersion` literals "2.0.0", "3.0.0", an
 #### Scenario: New audit persists v3.1
 
 - GIVEN a completed v3.1 audit
-- WHEN its result is validated and persisted (dashboard, share, PDF)
+- WHEN its result is validated and persisted (dashboard, share)
 - THEN `scoringModelVersion` is "3.1.0"
 - AND `brandAuthority` is present
 - AND Zod validation accepts the result
@@ -196,7 +196,7 @@ The contract MUST accept the `scoringModelVersion` literals "2.0.0", "3.0.0", an
 #### Scenario: Legacy 2.0.0 row still reads
 
 - GIVEN a persisted 2.0.0 result without `brandAuthority`
-- WHEN it is loaded by the dashboard, share page, or PDF route
+- WHEN it is loaded by the dashboard or share page
 - THEN validation accepts the "2.0.0" version
 - AND no `brandAuthority` is fabricated
 - AND presenters render the brand row as "No medido" (APT-11)
